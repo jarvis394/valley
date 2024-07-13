@@ -1,0 +1,34 @@
+{
+  "extends": [
+    "plugin:@nx/react-typescript",
+    "next",
+    "next/core-web-vitals",
+    "../../.eslintrc.json",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "ignorePatterns": ["!**/*"],
+  "parserOptions": {
+    "project": "tsconfig.base.json"
+  },
+  "plugins": ["react", "@typescript-eslint"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-uses-vars": "error",
+        "react/jsx-uses-react": "error",
+        "react/prop-types": "off"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ]
+}

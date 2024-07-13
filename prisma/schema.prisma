@@ -6,32 +6,3 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-model User {
-  id           Int     @id @default(autoincrement())
-  email        String  @unique
-  password     String
-  refreshToken String?
-  notes        Note[]
-  Tag          Tag[]
-}
-
-model Note {
-  id          Int      @id @default(autoincrement())
-  title       String
-  markdown    String   @default("")
-  tags        Tag[]
-  dateCreated DateTime @default(now())
-  dateUpdated DateTime @default(now())
-  User        User     @relation(fields: [userId], references: [id])
-  userId      Int
-}
-
-model Tag {
-  id     Int     @id @default(autoincrement())
-  label  String
-  icon   String?
-  notes  Note[]
-  User   User?   @relation(fields: [userId], references: [id])
-  userId Int?
-}
