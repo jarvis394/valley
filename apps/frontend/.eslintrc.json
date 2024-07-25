@@ -7,9 +7,9 @@
     "plugin:react/recommended",
     "plugin:react/jsx-runtime"
   ],
-  "ignorePatterns": ["!**/*"],
+  "ignorePatterns": ["!**/*", "storybook-static"],
   "parserOptions": {
-    "project": "tsconfig.base.json"
+    "project": ["tsconfig.base.json", "apps/frontend/tsconfig.json"]
   },
   "plugins": ["react", "@typescript-eslint"],
   "overrides": [

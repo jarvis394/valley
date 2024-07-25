@@ -6,8 +6,9 @@ module.exports = composePlugins(
     target: 'node',
   }),
   (config) => {
-    // Update the webpack config as needed here.
-    // e.g. `config.plugins.push(new MyPlugin())`
-    return config
+    return {
+      ...config,
+      externals: [...config.externals, { sharp: 'commonjs sharp' }],
+    }
   }
 )

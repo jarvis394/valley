@@ -4,7 +4,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
-    "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -13,25 +12,34 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" },
+      { "name": "typescript-plugin-css-modules" }
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "noEmit": true
   },
   "extends": "../../tsconfig.base.json",
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.module.css",
     "../../dist/apps/frontend/.next/types/**/*.ts",
     "dist/apps/frontend/types/**/*.ts",
     "../../dist/apps/frontend/types/**/*.ts",
     "dist/types/**/*.ts",
-    "../../apps/frontend/dist/.next/types/**/*.ts",
-    ".next/types/**/*.ts"
+    "apps/frontend/src/**/*.module.css",
+    "apps/frontend/.storybook/*.tsx",
+    ".next/types/**/*.ts",
+    ".storybook/*.ts",
+    ".storybook/preview.tsx",
+    "components/**/*.stories.ts",
+    "components/**/*.stories.js",
+    "components/**/*.stories.jsx",
+    "components/**/*.stories.tsx",
+    "components/**/*.stories.mdx"
   ],
   "exclude": ["node_modules"]
 }
