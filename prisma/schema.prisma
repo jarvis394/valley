@@ -8,7 +8,60 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String
+  passwordHash String
+  refreshToken String?
+  projects     Project[]
+}
+
+model Project {
+  id                 Int                 @id @default(autoincrement())
+  title              String
+  url                String
+  totalFiles         Int                 @default(0)
+  dateCreated        DateTime            @default(now())
+  dateUpdated        DateTime            @updatedAt
+  dateShot           DateTime            @default(now())
+  // 0 means stored indefinitely, unix timestamps are supported
+  storedUntil        Int                 @default(0)
+  language           String              @default("en")
+  protected          Boolean             @default(false)
+  passwordHash       String?
+  folders            Folder[]
+  translationStrings TranslationStrings?
+
+  User                 User? @relation(fields: [userId], references: [id])
+  userId               Int?
+  translationStringsId Int
+}
+
+model Folder {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  files       File[]
+
+  Project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+}
+
+model File {
+  id     Int    @id @default(autoincrement())
+  bucket String
+  path   String
+
+  Folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
+}
+
+model TranslationStrings {
+  id         Int    @id @default(autoincrement())
+  name       String
+  occupation String
+  hint       String
+
+  Project   Project @relation(fields: [projectId], references: [id])
+  projectId Int     @unique
 }

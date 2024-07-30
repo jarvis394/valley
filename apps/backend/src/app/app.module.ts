@@ -4,6 +4,9 @@ import { ConfigModule } from '../config/config.module'
 import { PrismaModule } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
 import { UploadModule } from '../upload/upload.module'
+import { redisStore } from 'cache-manager-redis-yet'
+import { CacheModule } from '@nestjs/cache-manager'
+import type { RedisClientOptions } from 'redis'
 
 @Module({
   imports: [
@@ -12,6 +15,18 @@ import { UploadModule } from '../upload/upload.module'
     }),
     PrismaModule.forRoot({
       isGlobal: true,
+    }),
+    CacheModule.registerAsync<RedisClientOptions>({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      isGlobal: true,
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          ttl: configService.CACHE_TTL,
+          keyPrefix: configService.REDIS_KEY_PREFIX,
+          url: configService.REDIS_URL,
+        }),
+      }),
     }),
     UploadModule,
   ],

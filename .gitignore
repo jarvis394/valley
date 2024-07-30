@@ -62,3 +62,7 @@ build/
 next-env.d.ts
 
 storybook-static
+
+# Next.js
+.next
+out

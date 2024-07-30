@@ -1,0 +1,21 @@
+.App,
+#storybook-root,
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--background-default);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+svg {
+  fill: currentColor;
+}
+
+path {
+  fill: currentColor;
+}
+

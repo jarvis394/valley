@@ -4,6 +4,12 @@
   "sourceRoot": "apps/backend/src",
   "projectType": "application",
   "targets": {
+    "production": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node dist/apps/backend/main.js"
+      }
+    },
     "build": {
       "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],

@@ -16,7 +16,7 @@
       { "name": "typescript-plugin-css-modules" }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@valley/shared": ["./libs/shared/src/index.ts"]
     },
     "noEmit": true
   },
@@ -41,5 +41,5 @@
     "components/**/*.stories.tsx",
     "components/**/*.stories.mdx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next"]
 }

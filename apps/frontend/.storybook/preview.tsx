@@ -3,8 +3,8 @@ import type { Preview } from '@storybook/react'
 import { GeistSans } from 'geist/font/sans'
 import styles from '../src/app/styles.module.css'
 import cx from 'classnames'
-import '../src/app/theme.css'
-import '../src/app/globals.css'
+import '../app/theme.css'
+import '../app/globals.css'
 
 const preview: Preview = {
   decorators: [

@@ -1,0 +1,26 @@
+.tabsItem {
+  font-family: var(--font-geist-sans);
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+  vertical-align: middle;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.tabsItem--selected {
+  color: var(--text-primary);
+}
