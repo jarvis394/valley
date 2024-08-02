@@ -1,27 +1,18 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import exifr from 'exifr'
 import dec2frac from '../utils/dec2frac'
-import {
-  S3Client,
-  UploadPartCommand,
-  CreateMultipartUploadCommand,
-  CompleteMultipartUploadCommand,
-} from '@aws-sdk/client-s3'
 import { ConfigService } from '../config/config.service'
 import { PrismaService } from 'nestjs-prisma'
 import {
-  FileMultipartUploadChunkReq,
-  FileMultipartUploadChunkRes,
-  FileMultipartUploadCompleteReq,
-  FileMultipartUploadStartReq,
-  FileMultipartUploadStartRes,
-} from '@valley/shared'
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
-import deburr from 'lodash.deburr'
+import { TusHookData } from './upload.controller'
+import { Readable } from 'node:stream'
+import { buffer } from 'node:stream/consumers'
+import sharp from 'sharp'
 
 type UploadContext = {
   filename: string
@@ -74,7 +65,14 @@ const extractFields = new Set<ExifDataKey>([
 @Injectable()
 export class UploadService {
   static UPLOAD_BUCKET = 'files'
-  storage: S3Client
+  static THUMBNAIL_ALLOWED_CONTENT_TYPES = new Set([
+    'image/png',
+    'image/jpg',
+    'image/jpeg',
+  ])
+
+  private logger = new Logger('UploadService')
+  readonly storage: S3Client
 
   constructor(
     private readonly configService: ConfigService,
@@ -82,12 +80,12 @@ export class UploadService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {
     this.storage = new S3Client({
-      endpoint: configService.S3_ENDPOINT,
-      region: configService.S3_REGION,
+      endpoint: configService.AWS_ENDPOINT,
+      region: configService.AWS_REGION,
       forcePathStyle: true,
       credentials: {
-        accessKeyId: configService.S3_ACCESS_KEY,
-        secretAccessKey: configService.S3_SECRET_ACCESS_KEY,
+        accessKeyId: configService.AWS_ACCESS_KEY_ID,
+        secretAccessKey: configService.AWS_SECRET_ACCESS_KEY,
       },
     })
   }
@@ -146,78 +144,47 @@ export class UploadService {
     )
   }
 
-  async startMultipartUpload(
-    data: FileMultipartUploadStartReq
-  ): Promise<FileMultipartUploadStartRes> {
-    const normalizedName = deburr(data.filename)
-    const command = new CreateMultipartUploadCommand({
-      Bucket: UploadService.UPLOAD_BUCKET,
-      Key: normalizedName,
-      ChecksumAlgorithm: 'CRC32',
+  async generateThumbnail(upload: TusHookData['Event']['Upload']) {
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: upload.Storage.Bucket,
+      Key: upload.Storage.Key,
     })
-    const res = await this.storage.send(command)
+    const object = await this.storage.send(getObjectCommand)
 
-    if (!res.UploadId) {
-      throw new InternalServerErrorException('S3 did not return UploadId')
+    if (object.Body instanceof Readable) {
+      const fileBuffer = await buffer(object.Body)
+      const imageBuffer = await sharp(fileBuffer)
+        .resize({
+          fit: sharp.fit.contain,
+          width: 320,
+        })
+        .jpeg({
+          quality: 70,
+        })
+        .toBuffer()
+
+      const putObjectCommand = new PutObjectCommand({
+        Bucket: upload.Storage.Bucket,
+        Key: upload.Storage.Key + '_320w',
+        Body: imageBuffer,
+      })
+      await this.storage.send(putObjectCommand)
     }
 
-    this.cacheManager.set(
-      this.getUploadContextKey(res.UploadId),
-      { filename: normalizedName },
-      this.configService.UPLOAD_CONTEXT_TTL
-    )
-
-    return { uploadId: res.UploadId }
+    return upload.Storage.Key + '_320w'
   }
 
-  async completeMultipartUpload(data: FileMultipartUploadCompleteReq) {
-    const command = new CompleteMultipartUploadCommand({
-      Bucket: UploadService.UPLOAD_BUCKET,
-      Key: data.filename,
-      UploadId: data.uploadId,
-      MultipartUpload: {
-        Parts: data.parts,
-      },
-    })
-    const res = await this.storage.send(command)
-
-    return res
-  }
-
-  async uploadMultipartChunk(
-    data: FileMultipartUploadChunkReq,
-    chunk: Express.Multer.File
-  ): Promise<FileMultipartUploadChunkRes> {
-    const context = await this.getUploadContext(data.uploadId)
-
-    if (!context) {
-      throw new InternalServerErrorException(
-        'Upload context is not found in store'
-      )
+  async finalizeUpload(event: TusHookData['Event']) {
+    const contentType = event.Upload.MetaData.type
+    const shouldGenerateThumbnail =
+      UploadService.THUMBNAIL_ALLOWED_CONTENT_TYPES.has(contentType)
+    const res: { thumbnailKey?: string; originalKey: string } = {
+      originalKey: event.Upload.Storage.Key,
     }
 
-    const command = new UploadPartCommand({
-      Bucket: UploadService.UPLOAD_BUCKET,
-      Key: context.filename,
-      Body: chunk.buffer,
-      UploadId: data.uploadId,
-      ChecksumAlgorithm: 'CRC32',
-      PartNumber: Number(data.part),
-    })
-    const res = await this.storage.send(command)
-
-    if (!res.ETag) {
-      throw new InternalServerErrorException(
-        'No ETag returned from S3 when uploading chunk'
-      )
-    }
-
-    return {
-      filename: context.filename,
-      fileSize: data.fileSize,
-      partSize: data.partSize,
-      part: data.part,
-      etag: res.ETag,
+    if (shouldGenerateThumbnail) {
+      const thumbnailKey = await this.generateThumbnail(event.Upload)
+      res.thumbnailKey = thumbnailKey
     }
   }
 }

@@ -12,6 +12,7 @@ export type ButtonProps = React.PropsWithChildren<{
     | 'warning'
     | 'danger'
   disabled?: boolean
+  fullWidth?: boolean
   before?: React.ReactElement
 }> &
   React.DetailedHTMLProps<
@@ -26,6 +27,7 @@ const Button: React.FC<ButtonProps> = ({
   className,
   disabled,
   before,
+  fullWidth,
   ...props
 }) => {
   return (
@@ -42,6 +44,7 @@ const Button: React.FC<ButtonProps> = ({
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
+        [styles['button--fullWidth']]: fullWidth,
       })}
     >
       {before && <div className={styles.button__before}>{before}</div>}

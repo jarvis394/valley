@@ -3,11 +3,14 @@ import { ConfigService as BaseConfigService } from '@nestjs/config'
 
 type EnvSchema = {
   PORT: string
+  JWT_KEY: string
+  JWT_REFRESH_TOKEN_TTL: string
+  JWT_ACCESS_TOKEN_TTL: string
   DATABASE_URL: string
-  S3_ENDPOINT: string
-  S3_REGION: string
-  S3_ACCESS_KEY: string
-  S3_SECRET_ACCESS_KEY: string
+  AWS_ENDPOINT: string
+  AWS_REGION: string
+  AWS_ACCESS_KEY_ID: string
+  AWS_SECRET_ACCESS_KEY: string
   CACHE_TTL: string
   REDIS_URL: string
   REDIS_KEY_PREFIX: string
@@ -25,24 +28,36 @@ export class ConfigService {
     return this.configService.get('PORT') || 5000
   }
 
+  get JWT_KEY() {
+    return this.configService.getOrThrow('JWT_KEY')
+  }
+
+  get JWT_REFRESH_TOKEN_TTL() {
+    return this.configService.get('JWT_REFRESH_TOKEN_TTL') || '30d'
+  }
+
+  get JWT_ACCESS_TOKEN_TTL() {
+    return this.configService.get('JWT_ACCESS_TOKEN_TTL') || '1d'
+  }
+
   get DATABASE_URL() {
     return this.configService.getOrThrow('DATABASE_URL')
   }
 
-  get S3_ENDPOINT() {
-    return this.configService.getOrThrow('S3_ENDPOINT')
+  get AWS_ENDPOINT() {
+    return this.configService.getOrThrow('AWS_ENDPOINT')
   }
 
-  get S3_REGION() {
-    return this.configService.getOrThrow('S3_REGION')
+  get AWS_REGION() {
+    return this.configService.getOrThrow('AWS_REGION')
   }
 
-  get S3_ACCESS_KEY() {
-    return this.configService.getOrThrow('S3_ACCESS_KEY')
+  get AWS_ACCESS_KEY_ID() {
+    return this.configService.getOrThrow('AWS_ACCESS_KEY_ID')
   }
 
-  get S3_SECRET_ACCESS_KEY() {
-    return this.configService.getOrThrow('S3_SECRET_ACCESS_KEY')
+  get AWS_SECRET_ACCESS_KEY() {
+    return this.configService.getOrThrow('AWS_SECRET_ACCESS_KEY')
   }
 
   /** Cache data TTL in milliseconds */

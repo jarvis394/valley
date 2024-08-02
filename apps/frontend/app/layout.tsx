@@ -3,10 +3,11 @@ import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import cx from 'classnames'
 import styles from './App.module.css'
-import Header from './components/Header/Header'
-import Toolbar from './components/Toolbar/Toolbar'
+
 import './theme.css'
 import './global.css'
+import '@uppy/core/dist/style.min.css'
+import '@uppy/progress-bar/dist/style.min.css'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -17,6 +18,7 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0e0e0e' },
   ],
+  colorScheme: 'light dark',
 }
 
 export const metadata: Metadata = {
@@ -63,11 +65,7 @@ const RootLayout = ({
     <html lang="en" className={GeistSans.variable}>
       <body>
         <div className={cx('App', styles.app)} data-theme="dark">
-          <Header />
-          <main>
-            <Toolbar />
-            {children}
-          </main>
+          {children}
         </div>
       </body>
     </html>

@@ -60,6 +60,14 @@
   --text-secondary-inversed: rgba(10, 10, 10, 0.63);
   --text-hint-inversed: rgba(10, 10, 10, 0.4);
 
+  /** Input */
+  --input-border: #2b2b2b;
+  --input-border-focused: var(--text-secondary);
+  --input-border-focused-shadow: rgba(255, 255, 255, 0.24);
+
+  /** Spinner */
+  --spinner-color: var(--text-secondary);
+
   /** Alpha */
   --alpha-solid-07: #1c1c1c;
   --alpha-transparent-07: rgba(255, 255, 255, 0.07);
@@ -127,6 +135,14 @@
   --text-primary-inversed: rgba(237, 237, 237, 1);
   --text-secondary-inversed: rgba(237, 237, 237, 0.63);
   --text-hint-inversed: rgba(237, 237, 237, 0.4);
+
+  /** Input */
+  --input-border: rgba(23, 23, 23, 0.12);
+  --input-border-focused: var(--text-secondary);
+  --input-border-focused-shadow: rgba(0, 0, 0, 0.16);
+
+  /** Spinner */
+  --spinner-color: var(--text-secondary);
 
   /** Alpha */
   --alpha-solid-07: rgba(23, 23, 23, 0.07);

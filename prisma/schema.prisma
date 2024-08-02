@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -9,9 +10,8 @@ datasource db {
 
 model User {
   id           Int       @id @default(autoincrement())
-  email        String    @unique
-  name         String
-  passwordHash String
+  username     String    @unique
+  password     String
   refreshToken String?
   projects     Project[]
 }
@@ -28,7 +28,7 @@ model Project {
   storedUntil        Int                 @default(0)
   language           String              @default("en")
   protected          Boolean             @default(false)
-  passwordHash       String?
+  password           String?
   folders            Folder[]
   translationStrings TranslationStrings?
 

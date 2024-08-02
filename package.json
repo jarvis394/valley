@@ -15,7 +15,8 @@
     "lint": "yarn nx run-many -t lint --output-style stream",
     "format": "yarn nx run-many -t lint --fix --output-style stream",
     "storybook": "yarn nx run frontend:storybook",
-    "prepare": "husky && yarn prisma migrate dev"
+    "prisma:migrate": "yarn prisma migrate dev",
+    "prepare": "husky"
   },
   "dependencies": {
     "@aws-crypto/crc32": "^5.2.0",
@@ -32,11 +33,26 @@
     "@nestjs/platform-express": "^10.3.10",
     "@prisma/client": "^5.17.0",
     "@reduxjs/toolkit": "^2.2.7",
+    "@rpldy/tus-sender": "^1.8.1",
+    "@rpldy/tus-uploady": "^1.8.1",
+    "@rpldy/uploader": "^1.8.1",
+    "@rpldy/uploady": "^1.8.1",
     "@swc-node/register": "^1.10.9",
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.3",
     "@swc/helpers": "^0.5.12",
+    "@tus/s3-store": "^1.5.0",
+    "@tus/server": "^1.7.0",
+    "@uppy/core": "^4.1.0",
+    "@uppy/dashboard": "^4.0.2",
+    "@uppy/drag-drop": "^4.0.1",
+    "@uppy/file-input": "^4.0.0",
+    "@uppy/progress-bar": "^4.0.0",
+    "@uppy/react": "^4.0.1",
+    "@uppy/tus": "^4.0.0",
+    "@uppy/utils": "^6.0.1",
     "axios": "^1.7.2",
+    "axios-retry": "^4.4.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cache-manager": "^5.7.4",
@@ -60,6 +76,7 @@
     "prisma": "^5.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.52.1",
     "react-is": "^18.3.1",
     "react-redux": "^9.1.2",
     "redis": "^4.7.0",
@@ -144,5 +161,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

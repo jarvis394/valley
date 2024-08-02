@@ -14,8 +14,8 @@ export default function Home() {
     >
       <h1>Test</h1>
       <div style={{ display: 'flex' }}>
-        <Link style={{ textDecoration: 'none' }} href="/projects">
-          <Button>Go to projects</Button>
+        <Link style={{ textDecoration: 'none' }} href="/auth/login">
+          <Button>Login</Button>
         </Link>
       </div>
     </div>

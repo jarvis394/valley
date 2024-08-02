@@ -3,10 +3,14 @@ import { AppController } from './app.controller'
 import { ConfigModule } from '../config/config.module'
 import { PrismaModule } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
-import { UploadModule } from '../upload/upload.module'
 import { redisStore } from 'cache-manager-redis-yet'
 import { CacheModule } from '@nestjs/cache-manager'
 import type { RedisClientOptions } from 'redis'
+import { UploadModule } from '../upload/upload.module'
+import { FilesModule } from '../files/files.module'
+import { UsersModule } from '../users/users.module'
+import { AuthModule } from '../auth/auth.module'
+import { ProjectsModule } from '../projects/projects.module'
 
 @Module({
   imports: [
@@ -29,6 +33,10 @@ import type { RedisClientOptions } from 'redis'
       }),
     }),
     UploadModule,
+    FilesModule,
+    AuthModule,
+    UsersModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [ConfigService],

@@ -1,8 +1,8 @@
 import React from 'react'
-import Button from '../components/Button/Button'
+import Button from '../../components/Button/Button'
 import Link from 'next/link'
 import styles from './Projects.module.css'
-import ProjectCard from '../components/ProjectCard/ProjectCard'
+import ProjectCard from '../../components/ProjectCard/ProjectCard'
 import { Project } from '@prisma/client'
 import { Metadata } from 'next'
 
@@ -23,7 +23,7 @@ const REMOVEME_PROJECT_DATA: Project = {
   totalFiles: 21,
   url: '/test',
   userId: 1,
-  passwordHash: null,
+  password: null,
   translationStringsId: null,
 }
 

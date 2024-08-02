@@ -40,7 +40,6 @@ Thumbs.db
 
 .env
 uploads
-postgres
 .nx
 .yarn/install-state.gz
 

@@ -1,4 +1,4 @@
-import { Folder, Project } from '@prisma/client'
+import { Project } from '@prisma/client'
 
 export type ProjectGetAllReq = unknown
 export type ProjectGetAllRes = {
@@ -8,7 +8,6 @@ export type ProjectGetAllRes = {
 export type ProjectGetReq = unknown
 export type ProjectGetRes = {
   project: Project
-  folders: Folder[]
 }
 
 export type ProjectCreateReq = Omit<

@@ -1,17 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { useDispatch, useSelector, useStore } from 'react-redux'
-import { apiSlice } from '../api'
 
-const rootReducer = combineReducers({
-  [apiSlice.reducerPath]: apiSlice.reducer,
-})
+const rootReducer = combineReducers({})
 
 export const makeStore = () => {
   return configureStore({
     reducer: rootReducer,
     devTools: true,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(apiSlice.middleware),
   })
 }
 

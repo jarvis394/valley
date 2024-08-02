@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './ProjectCard.module.css'
 import Image from 'next/image'
-import cover from '../../assets/cover.jpg'
+import cover from '@app/assets/cover.jpg'
 import {
   Copy,
   Download,

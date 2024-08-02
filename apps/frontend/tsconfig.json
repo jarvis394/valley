@@ -16,7 +16,9 @@
       { "name": "typescript-plugin-css-modules" }
     ],
     "paths": {
-      "@valley/shared": ["./libs/shared/src/index.ts"]
+      "@valley/shared": ["./libs/shared/src/index.ts"],
+      "@app/*": ["./apps/frontend/app/*"],
+      "@lib/*": ["./apps/frontend/lib/*"]
     },
     "noEmit": true
   },
