@@ -34,7 +34,7 @@ model Project {
 
   User                 User? @relation(fields: [userId], references: [id])
   userId               Int?
-  translationStringsId Int
+  translationStringsId Int?
 }
 
 model Folder {

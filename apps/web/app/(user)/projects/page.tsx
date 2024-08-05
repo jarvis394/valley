@@ -24,8 +24,6 @@ const REMOVEME_PROJECT_DATA: Project = {
   url: '/test',
   userId: 1,
   password: null,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
   translationStringsId: null,
 }
 
