@@ -32,20 +32,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.button__content {
+.button.button__content {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   display: inline-block;
 }
 
-.button:disabled {
+.button.button:disabled {
   color: var(--button-disabled-fg);
   background: var(--button-disabled-bg);
   --themed-border: var(--button-disabled-border);
 }
 
-.button--size-sm {
+.button.button--size-sm {
   border-radius: 8px;
   gap: 8px;
   --x-padding: 12px;
@@ -54,7 +54,7 @@
   --line-height: 17px;
 }
 
-.button--size-md {
+.button.button--size-md {
   border-radius: 12px;
   gap: 12px;
   --x-padding: 16px;
@@ -63,7 +63,7 @@
   --line-height: 17px;
 }
 
-.button--size-lg {
+.button.button--size-lg {
   border-radius: 12px;
   gap: 12px;
   font-weight: 500;
@@ -73,34 +73,34 @@
   --line-height: 20px;
 }
 
-.button--primary {
+.button.button--primary {
   color: var(--button-primary-fg);
   background: var(--button-primary-bg);
 }
 
-.button--secondary {
+.button.button--secondary {
   color: var(--button-secondary-fg);
   background: var(--button-secondary-bg);
   --themed-border: var(--button-secondary-border);
 }
 
-.button--secondary-dimmed {
+.button.button--secondary-dimmed {
   color: var(--button-secondary-dimmed-fg);
   background: var(--button-secondary-dimmed-bg);
   --themed-border: var(--button-secondary-dimmed-border);
 }
 
-.button--tertiary {
+.button.button--tertiary {
   color: var(--button-tertiary-fg);
   background: var(--button-tertiary-bg);
 }
 
-.button--warning {
+.button.button--warning {
   color: var(--button-warning-fg);
   background: var(--button-warning-bg);
 }
 
-.button--danger {
+.button.button--danger {
   color: var(--button-danger-fg);
   background: var(--button-danger-bg);
 }
@@ -145,7 +145,7 @@
   color: var(--button-focused-fg-inversed);
 }
 
-.button__before {
+.button .button__before {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -154,13 +154,13 @@
   flex-shrink: 0;
 }
 
-.button--size-md .button__before,
-.button--size-lg .button__before {
+.button.button--size-md .button__before,
+.button.button--size-lg .button__before {
   margin-left: -2px;
   width: 16px;
   height: 16px;
 }
 
-.button--fullWidth {
+.button.button--fullWidth {
   width: 100%;
 }
