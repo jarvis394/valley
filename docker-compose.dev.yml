@@ -1,0 +1,127 @@
+name: valley
+services:
+  web:
+    container_name: valley-web
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    ports:
+      - '4200:4200'
+    networks:
+      - tusd
+    volumes:
+      - .:/app
+
+  api:
+    container_name: valley-api
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.dev
+    ports:
+      - '${PORT}:${PORT}'
+    networks:
+      - tusd
+    depends_on:
+      - tusd
+      - minio
+      - postgres
+      - redis
+    volumes:
+      - .:/app
+
+  minio:
+    container_name: valley-minio
+    command: minio server --console-address ":9001" /data
+    image: minio/minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    env_file:
+      - .env
+    volumes:
+      - 'minio:/data/'
+    networks:
+      - tusd
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:9000/minio/health/live']
+      interval: 10s
+      start_interval: 1s
+      start_period: 10s
+
+  tusd:
+    container_name: valley-tusd
+    image: tusproject/tusd
+    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://valley-api:${PORT}/upload -hooks-enabled-events pre-create,post-create,post-receive,pre-finish,post-finish
+    volumes:
+      - tusd:/data
+    ports:
+      - '8080:8080'
+    env_file:
+      - .env
+    depends_on:
+      - minio
+    networks:
+      - tusd
+
+  postgres:
+    container_name: valley-postgres
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
+    restart: always
+    networks:
+      - tusd
+    healthcheck:
+      test: ['CMD', 'pg_isready -d valley -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    container_name: valley-redis
+    image: redis:latest
+    env_file:
+      - .env
+    restart: always
+    expose:
+      - '6379'
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+    networks:
+      - tusd
+
+  createbuckets:
+    image: minio/mc
+    env_file:
+      - .env
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://valley-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb myminio/files;
+      /usr/bin/mc anonymous set private myminio/files;
+      exit 0;
+      "
+    networks:
+      - tusd
+
+volumes:
+  tusd:
+  minio:
+  pgdata:
+networks:
+  tusd:

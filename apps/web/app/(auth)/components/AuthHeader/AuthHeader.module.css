@@ -1,0 +1,27 @@
+.header {
+  position: relative;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.header__stack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.header a {
+  text-decoration: none;
+}
+
+.header__logo {
+  display: inline-flex;
+  text-decoration: none;
+  z-index: var(--header-zindex);
+}

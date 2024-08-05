@@ -1,21 +1,22 @@
 {
-  "name": "my-turborepo",
+  "name": "valley",
   "version": "0.0.0",
   "private": true,
   "description": "",
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "jarvis394",
+  "license": "MIT",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "test": "turbo test",
-    "test:e2e": "turbo test:e2e",
-    "lint": "turbo lint",
+    "dev": "turbo dev --filter !storybook",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up",
+    "build": "NODE_ENV=production turbo build",
+    "prisma:migrate": "yarn prisma migrate dev",
+    "prepare": "husky",
+    "lint": "turbo typecheck && turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@valley/eslint-config": "*",
+    "@valley/typescript-config": "*",
     "prettier": "^3.2.5",
     "turbo": "^2.0.11"
   },
@@ -26,5 +27,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "husky": "^9.1.4"
+  }
 }

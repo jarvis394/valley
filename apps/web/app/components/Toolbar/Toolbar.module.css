@@ -1,0 +1,7 @@
+.toolbar {
+  position: sticky;
+  background: var(--background-paper);
+  top: 0;
+  box-shadow: inset 0 -1px var(--alpha-transparent-12);
+  padding: 0 16px;
+}

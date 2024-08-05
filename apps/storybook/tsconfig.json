@@ -1,0 +1,30 @@
+{
+  "extends": "@valley/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      },
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "next.config.js",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.module.css",
+    "**/*.css",
+    ".next/types/**/*.ts",
+    ".storybook/*.ts",
+    ".storybook/preview.tsx",
+    "components/**/*.stories.ts",
+    "components/**/*.stories.js",
+    "components/**/*.stories.jsx",
+    "components/**/*.stories.tsx",
+    "components/**/*.stories.mdx"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,12 @@
+.app {
+  background-color: var(--background-default);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans);
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: auto;
+}

@@ -1,24 +1,36 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local", ".env"],
+  "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_TUS_URL"],
   "tasks": {
     "dev": {
+      "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^db:generate", "^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", "!**/*.stories.{tsx,jsx,mdx}"],
       "outputs": [
         ".next/**",
-        "!.next/cache/**"
+        "!.next/cache/**",
+        "storybook-static/**",
+        "dist/**"
       ]
     },
+    "build:storybook": {},
     "lint": {},
-    "test": {},
-    "test:e2e": {}
+    "typecheck": {
+      "dependsOn": ["^db:generate"]
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    }
   }
 }

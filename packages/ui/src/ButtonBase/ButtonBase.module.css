@@ -1,0 +1,106 @@
+.buttonBase {
+  --font-size: 14px;
+  --line-height: 17px;
+}
+
+.buttonBase {
+  font-family: var(--font-geist-sans);
+  border-radius: 8px;
+  max-width: 100%;
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  padding: 0;
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+  transform: translateZ(0);
+  outline: none;
+  border: 0;
+  box-shadow: 0 0 0 1px inset var(--themed-border, transparent);
+  vertical-align: middle;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.buttonBase:disabled {
+  color: var(--button-disabled-fg);
+  background: var(--button-disabled-bg);
+  --themed-border: var(--button-disabled-border);
+}
+
+.buttonBase--primary {
+  color: var(--button-primary-fg);
+  background: var(--button-primary-bg);
+}
+
+.buttonBase--secondary {
+  color: var(--button-secondary-fg);
+  background: var(--button-secondary-bg);
+  --themed-border: var(--button-secondary-border);
+}
+
+.buttonBase--secondary-dimmed {
+  color: var(--button-secondary-dimmed-fg);
+  background: var(--button-secondary-dimmed-bg);
+  --themed-border: var(--button-secondary-dimmed-border);
+}
+
+.buttonBase--tertiary {
+  color: var(--button-tertiary-fg);
+  background: var(--button-tertiary-bg);
+}
+
+.buttonBase--warning {
+  color: var(--button-warning-fg);
+  background: var(--button-warning-bg);
+}
+
+.buttonBase--danger {
+  color: var(--button-danger-fg);
+  background: var(--button-danger-bg);
+}
+
+.buttonBase:not(:disabled).buttonBase--primary:hover {
+  background-color: var(--button-primary-hovered-bg);
+  color: var(--button-primary-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--secondary:hover {
+  background-color: var(--button-secondary-hovered-bg);
+  color: var(--button-secondary-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--secondary-dimmed:hover {
+  background-color: var(--button-secondary-dimmed-hovered-bg);
+  color: var(--button-secondary-dimmed-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--tertiary:hover {
+  background-color: var(--button-tertiary-hovered-bg);
+  color: var(--button-tertiary-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--warning:hover {
+  background-color: var(--button-warning-hovered-bg);
+  color: var(--button-warning-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--danger:hover {
+  background-color: var(--button-danger-hovered-bg);
+  color: var(--button-danger-hovered-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--secondary:active,
+.buttonBase:not(:disabled).buttonBase--secondary-dimmed:active,
+.buttonBase:not(:disabled).buttonBase--tertiary:active {
+  color: var(--button-focused-fg);
+}
+
+.buttonBase:not(:disabled).buttonBase--primary:active {
+  color: var(--button-focused-fg-inversed);
+}

@@ -1,0 +1,52 @@
+.header {
+  --header-height: 64px;
+
+  background: var(--background-paper);
+  position: relative;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  align-items: center;
+}
+
+.header__nav {
+  /** Logo width + gap */
+  padding-left: calc(32px + 16px);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.header__stack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.header a {
+  text-decoration: none;
+}
+
+.header__logo {
+  display: inline-flex;
+  text-decoration: none;
+  position: fixed;
+  left: 24px;
+  top: 16px;
+  z-index: var(--header-zindex);
+}
+
+.header__avatarAndNameContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+}

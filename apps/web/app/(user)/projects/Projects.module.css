@@ -1,0 +1,18 @@
+.projects {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.projects__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media screen and (min-width: 900px) {
+  .projects__list {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}

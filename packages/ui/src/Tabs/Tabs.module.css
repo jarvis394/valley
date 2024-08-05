@@ -1,0 +1,26 @@
+.tabs {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.tabs__hover {
+  border-radius: 8px;
+  background: var(--alpha-transparent-07);
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  transition: all 150ms ease;
+  pointer-events: none;
+}
+
+.tabs__indicator {
+  position: absolute;
+  z-index: 10;
+  background: var(--text-primary);
+  height: 2px;
+  transition: all 150ms ease;
+  bottom: 0;
+  pointer-events: none;
+}

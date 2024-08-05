@@ -3,11 +3,19 @@
   "display": "Next.js",
   "extends": "./base.json",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      },
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowJs": true,
+    "allowJs": false,
     "jsx": "preserve",
     "noEmit": true
-  }
+  },
+  "exclude": ["node_modules", ".next"]
 }
