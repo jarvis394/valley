@@ -1,4 +1,4 @@
-import { Project } from '@prisma/client'
+import { Project } from '@valley/db'
 
 export type ProjectGetAllReq = unknown
 export type ProjectGetAllRes = {

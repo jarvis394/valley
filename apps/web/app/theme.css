@@ -72,6 +72,9 @@
   --alpha-solid-07: #1c1c1c;
   --alpha-transparent-07: rgba(255, 255, 255, 0.07);
   --alpha-transparent-12: rgba(255, 255, 255, 0.12);
+
+  /** Modal */
+  --modal-backdrop: rgba(10, 10, 10, 0.5);
 }
 
 .App[data-theme='light'] {

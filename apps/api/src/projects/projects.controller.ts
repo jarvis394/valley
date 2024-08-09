@@ -16,7 +16,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get('all')
+  @Get('')
   async getUserProjects(
     @Request() req: RequestWithUser
   ): Promise<ProjectGetAllRes> {

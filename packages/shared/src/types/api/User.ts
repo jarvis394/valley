@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { User } from '@valley/db'
 import { SerializedUser } from '../SerializedUser'
 
 export type UserGetSelfReq = unknown
@@ -10,3 +10,6 @@ export type UserLoginRes = { user: SerializedUser; tokens: Tokens }
 
 export type UserRegisterReq = Omit<User, 'id' | 'refreshToken'>
 export type UserRegisterRes = { user: SerializedUser; tokens: Tokens }
+
+export type UserLogoutReq = unknown
+export type UserLogoutRes = { ok: boolean }

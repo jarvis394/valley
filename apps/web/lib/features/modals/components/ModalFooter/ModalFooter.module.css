@@ -1,0 +1,17 @@
+.modalFooter {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--background-paper);
+  border-top: 1px solid var(--alpha-transparent-12);
+}
+
+.modalFooter__before,
+.modalFooter__after {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

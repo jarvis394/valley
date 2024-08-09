@@ -3,12 +3,13 @@ import {
   Controller,
   Get,
   Post,
-  Req,
+  Response,
   Request,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common'
 import { User } from '@prisma/client'
-import { UserLoginRes, UserRegisterRes } from '@valley/shared'
+import { Tokens, UserLoginRes, UserRegisterRes } from '@valley/shared'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from './strategies/jwt.strategy'
 import type { RequestWithJwtPayload } from './strategies/jwtRefreshToken.strategy'
 import { JwtRefreshTokenAuthGuard } from './strategies/jwtRefreshToken.strategy'
 import { LocalAuthGuard } from './strategies/local.strategy'
+import type { Response as Res } from 'express'
 
 export interface RequestWithUser extends Request {
   user: {
@@ -29,12 +31,22 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
   @Post('login')
   async login(
     @Request() req: RequestWithUser,
+    @Response() res: Res<UserLoginRes>,
     @Body() _data: LoginDto
-  ): Promise<UserLoginRes> {
-    return await this.authService.login(req.user.userId, req.user.username)
+  ): Promise<Res<UserLoginRes>> {
+    const data = await this.authService.login(
+      req.user.userId,
+      req.user.username
+    )
+
+    return res
+      .cookie('access-token', data.tokens.accessToken, { httpOnly: true })
+      .cookie('refresh-token', data.tokens.refreshToken, { httpOnly: true })
+      .json(data)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,19 +57,33 @@ export class AuthController {
 
   @Post('register')
   async register(
-    @Body() { username, password }: RegisterDto
-  ): Promise<UserRegisterRes> {
-    return await this.authService.register({
+    @Body() { username, password }: RegisterDto,
+    @Response() res: Res<UserRegisterRes>
+  ): Promise<Res<UserRegisterRes>> {
+    const data = await this.authService.register({
       username,
       password,
     })
+
+    return res
+      .cookie('access-token', data.tokens.accessToken, { httpOnly: true })
+      .cookie('refresh-token', data.tokens.refreshToken, { httpOnly: true })
+      .json(data)
   }
 
   @UseGuards(JwtRefreshTokenAuthGuard)
   @Get('refresh')
-  async refreshTokens(@Req() req: RequestWithJwtPayload) {
+  async refreshTokens(
+    @Request() req: RequestWithJwtPayload,
+    @Response() res: Res<Tokens>
+  ): Promise<Res<Tokens>> {
     const userId = Number(req.user.sub)
     const refreshToken = req.user.refreshToken
-    return await this.authService.refreshTokens(userId, refreshToken)
+    const data = await this.authService.refreshTokens(userId, refreshToken)
+
+    return res
+      .cookie('access-token', data.accessToken, { httpOnly: true })
+      .cookie('refresh-token', data.refreshToken, { httpOnly: true })
+      .json(data)
   }
 }

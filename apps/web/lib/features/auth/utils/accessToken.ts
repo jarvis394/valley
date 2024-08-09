@@ -3,6 +3,8 @@ import { Tokens } from '@valley/shared'
 const TOKENS_KEY = 'tokens'
 
 function getAuthTokensFromLocalStorage(): Tokens | null {
+  if (typeof window === 'undefined') return null
+
   const tokens = localStorage.getItem(TOKENS_KEY) || ''
 
   try {
@@ -14,6 +16,8 @@ function getAuthTokensFromLocalStorage(): Tokens | null {
 }
 
 function setAuthTokensToLocalStorage(tokens: Tokens) {
+  if (typeof window === 'undefined') return
+
   localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens))
 }
 

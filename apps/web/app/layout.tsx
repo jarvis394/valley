@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import cx from 'classnames'
 import styles from './App.module.css'
+import { Modals } from '../lib/features/modals'
 
 import './theme.css'
 import './global.css'
@@ -63,10 +64,9 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" className={GeistSans.variable}>
-      <body>
-        <div className={cx('App', styles.app)} data-theme="dark">
-          {children}
-        </div>
+      <body className={cx('App', styles.app)} data-theme="dark">
+        {children}
+        <Modals />
       </body>
     </html>
   )

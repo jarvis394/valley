@@ -1,40 +1,35 @@
+'use client'
 import React from 'react'
 import Button from '@valley/ui/Button'
 import Link from 'next/link'
 import styles from './Projects.module.css'
-import { Project } from '@prisma/client'
-import { Metadata } from 'next'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
-
-export const metadata: Metadata = {
-  title: 'Projects | Valley',
-  description: 'Platform for your photography sessions',
-}
-
-const REMOVEME_PROJECT_DATA: Project = {
-  id: 1,
-  dateCreated: new Date(),
-  dateUpdated: new Date(),
-  dateShot: new Date(),
-  storedUntil: 0,
-  language: 'ru',
-  protected: false,
-  title: 'Безымянный Исполнитель — Неизвестно',
-  totalFiles: 21,
-  url: '/test',
-  userId: 1,
-  password: null,
-  translationStringsId: null,
-}
+import useSWR from 'swr'
+import { api } from '../../../lib/features/api'
+import { ProjectGetAllReq, ProjectGetAllRes } from '@valley/shared'
 
 const ProjectsPage = () => {
+  const { data, isLoading } = useSWR<ProjectGetAllRes, ProjectGetAllReq>(
+    '/projects',
+    api({ isAccessTokenRequired: true })
+  )
+
   return (
     <div className={styles.projects}>
       <Link style={{ textDecoration: 'none' }} href="/">
         <Button>Go back</Button>
       </Link>
+      <Link
+        style={{ textDecoration: 'none' }}
+        href={{ pathname: '/projects', query: { modal: 'create-project' } }}
+      >
+        <Button variant="secondary-dimmed">projects/create-project</Button>
+      </Link>
       <div className={styles.projects__list}>
-        <ProjectCard data={REMOVEME_PROJECT_DATA} />
+        {isLoading && <h2>Loading...</h2>}
+        {data?.projects.map((project, i) => (
+          <ProjectCard data={project} key={i} />
+        ))}
       </div>
     </div>
   )

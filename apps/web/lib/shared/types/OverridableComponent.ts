@@ -34,7 +34,7 @@ export type DefaultComponentProps<M extends OverridableTypeMap> = BaseProps<M> &
  */
 export type OverrideProps<
   M extends OverridableTypeMap,
-  C extends React.ElementType,
+  C extends React.ElementType
 > = BaseProps<M> &
   DistributiveOmit<React.ComponentPropsWithRef<C>, keyof BaseProps<M>>
 

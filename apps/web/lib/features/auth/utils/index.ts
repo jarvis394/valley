@@ -1,2 +1,2 @@
-export * from './access-token'
+export * from './accessToken'
 export * from './user'

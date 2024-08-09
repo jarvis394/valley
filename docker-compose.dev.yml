@@ -33,6 +33,25 @@ services:
     volumes:
       - .:/app
 
+  prisma-studio:
+    container_name: valley-prisma-studio
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: packages/database/Dockerfile.dev
+    ports:
+      - '5555:5555'
+    networks:
+      - tusd
+    depends_on:
+      - tusd
+      - minio
+      - postgres
+      - redis
+    volumes:
+      - .:/app
+
   minio:
     container_name: valley-minio
     command: minio server --console-address ":9001" /data

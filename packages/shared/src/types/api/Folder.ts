@@ -1,4 +1,4 @@
-import { Folder } from '@prisma/client'
+import { Folder } from '@valley/db'
 
 export type FolderGetAllReq = unknown
 export type FolderGetAllRes = {

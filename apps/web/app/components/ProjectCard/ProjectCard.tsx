@@ -28,7 +28,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
   return (
     <div className={styles.projectCard}>
       <Link href={projectLink} className={styles.projectCard__cover}>
-        <Image height={424} src={cover} alt={'Cover'} />
+        <Image priority height={424} src={cover} alt={'Cover'} />
       </Link>
       <div className={styles.projectCard__content}>
         <Link href={projectLink} className={styles.projectCard__header}>

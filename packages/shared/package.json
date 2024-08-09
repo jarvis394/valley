@@ -42,6 +42,7 @@
   "devDependencies": {
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
+    "@valley/db": "*",
     "@types/node": "^20.3.1",
     "eslint": "^8.56.11",
     "@swc/cli": "^0.4.0",

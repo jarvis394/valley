@@ -1,4 +1,4 @@
-import { File, Folder } from '@prisma/client'
+import { File, Folder } from '@valley/db'
 
 export type FileMultipartUploadCompletedPart = {
   ETag: string
