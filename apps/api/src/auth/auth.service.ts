@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
@@ -63,15 +64,36 @@ export class AuthService {
     return tokens
   }
 
+  async validateToken(payload: JwtPayload): Promise<RequestWithUser['user']> {
+    try {
+      const user = await this.userService.user({ id: Number(payload.sub) })
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      return {
+        username: user.username,
+        userId: user.id,
+      }
+    } catch (error) {
+      throw new UnauthorizedException(
+        `Invalid credentials, id was not found: ${payload.sub}`
+      )
+    }
+  }
+
   async validateUser(
     username: string,
     password: string
   ): Promise<RequestWithUser['user']> {
-    const user = await this.userService.login(username, password)
-
-    return {
-      userId: user.id,
-      username: user.username,
+    try {
+      const user = await this.userService.login(username, password)
+      return {
+        userId: user.id,
+        username: user.username,
+      }
+    } catch (e) {
+      throw new UnauthorizedException('Invalid credentials')
     }
   }
 

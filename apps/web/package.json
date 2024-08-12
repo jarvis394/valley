@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo --port 4200",
+    "dev": "VIPS_CONCURRENCY=$(nproc) next dev --turbo --port 4200",
     "build": "next build",
-    "start": "next start",
+    "start": "VIPS_CONCURRENCY=$(nproc) next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0"
   },
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.1.1",
+    "@swc/helpers": "^0.5.12",
     "@types/lodash.deburr": "^4.1.9",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",

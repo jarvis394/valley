@@ -15,10 +15,10 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.17.0"
+    "@prisma/client": "^5.18.0"
   },
   "devDependencies": {
     "eslint": "^8.56.11",
-    "prisma": "^5.17.0"
+    "prisma": "^5.18.0"
   }
 }

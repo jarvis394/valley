@@ -16,6 +16,8 @@ import { AppController } from './app.controller'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // Imports root .env file and local apps/api .env file
+      envFilePath: ['../../.env', './.env'],
     }),
     PrismaModule.forRoot({
       isGlobal: true,

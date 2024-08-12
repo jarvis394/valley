@@ -57,7 +57,16 @@ const api = ({ isAccessTokenRequired }: ApiProps = {}) => {
     (response) => response.data,
     (error) => {
       if (isAccessTokenRequired && error?.response?.status === 401) {
-        window.location.href = '/auth/login'
+        axios
+          .get<Tokens>(API_URL + '/auth/logout', {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${tokens?.refreshToken}`,
+            },
+          })
+          .then(() => {
+            window.location.href = '/auth/login'
+          })
       } else {
         Promise.reject(error)
       }
@@ -71,6 +80,7 @@ const requestRepeaterConfig: IAxiosRetryConfig = {
   retries: 5,
   shouldResetTimeout: true,
   retryCondition: (error) => {
+    if (error.response?.status === 401) return false
     return !(error.response?.status === 404)
   },
   retryDelay: axiosRetry.exponentialDelay,

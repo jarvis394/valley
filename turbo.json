@@ -4,7 +4,7 @@
   "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_TUS_URL"],
   "tasks": {
     "dev": {
-      "dependsOn": ["^db:generate"],
+      "dependsOn": ["^db:migrate"],
       "cache": false,
       "persistent": true
     },

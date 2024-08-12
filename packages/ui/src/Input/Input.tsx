@@ -29,7 +29,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...paperProps}
         component="div"
         variant="secondary"
-        className={cx(styles.input, paperProps?.className, {
+        className={cx(styles.input, 'Input', paperProps?.className, {
           [styles['input--withBefore']]: !!before,
           [styles['input--withAfter']]: !!after,
           [styles['input--error']]: state === 'error',

@@ -9,7 +9,12 @@ import {
   HttpCode,
 } from '@nestjs/common'
 import { User } from '@prisma/client'
-import { Tokens, UserLoginRes, UserRegisterRes } from '@valley/shared'
+import {
+  Tokens,
+  UserLoginRes,
+  UserLogoutRes,
+  UserRegisterRes,
+} from '@valley/shared'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -51,8 +56,16 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('logout')
-  async logout(@Request() req: RequestWithUser) {
-    return await this.authService.logout(req.user.userId)
+  async logout(
+    @Request() req: RequestWithUser,
+    @Response() res: Res<UserLogoutRes>
+  ): Promise<Res<UserLogoutRes>> {
+    const data = await this.authService.logout(req.user.userId)
+
+    return res
+      .cookie('access-token', '', { httpOnly: true })
+      .cookie('refresh-token', '', { httpOnly: true })
+      .json(data)
   }
 
   @Post('register')

@@ -19,7 +19,7 @@
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "prettier": "^3.2.5",
-    "turbo": "^2.0.11"
+    "turbo": "^2.0.12"
   },
   "engines": {
     "node": ">=18"

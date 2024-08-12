@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./ModalHeader": "./src/ModalHeader/ModalHeader.tsx",
+    "./ModalFooter": "./src/ModalFooter/ModalFooter.tsx",
+    "./Modal": "./src/Modal/Modal.tsx",
+    "./InputLabel": "./src/InputLabel/InputLabel.tsx",
     "./Spinner": "./src/Spinner/Spinner.tsx",
     "./Tabs": "./src/Tabs/Tabs.tsx",
     "./TabsItem": "./src/TabsItem/TabsItem.tsx",

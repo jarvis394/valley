@@ -17,6 +17,7 @@ const nextConfig = {
     buildActivity: true,
     buildActivityPosition: 'bottom-right',
   },
+  output: 'standalone',
 }
 
 module.exports = nextConfig

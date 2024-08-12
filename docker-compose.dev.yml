@@ -1,39 +1,64 @@
+x-defaults: &defaults
+  init: true
+  tty: true
+  networks:
+    - valley_network
+
 name: valley
+
 services:
   web:
-    container_name: valley-web
+    <<: *defaults
     env_file:
       - .env
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile.dev
     ports:
       - '4200:4200'
-    networks:
+    command: turbo dev --filter web --filter @valley/shared
+    build:
+      args:
+        APP: web
+        START_COMMAND: dev
+      context: .
+      dockerfile: ./Dockerfile.dev
+    depends_on:
+      - api
       - tusd
+      - minio
+      - postgres
+      - redis
     volumes:
-      - .:/app
+      - ./apps/web:/app/apps/web
+      - ./.env:/app/.env
+      - ./packages:/app/packages
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
 
   api:
-    container_name: valley-api
+    <<: *defaults
     env_file:
       - .env
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile.dev
     ports:
       - '${PORT}:${PORT}'
-    networks:
-      - tusd
+    command: turbo dev --filter api --filter @valley/shared
+    build:
+      args:
+        APP: api
+        START_COMMAND: dev
+      context: .
+      dockerfile: ./Dockerfile.dev
     depends_on:
       - tusd
       - minio
       - postgres
       - redis
     volumes:
-      - .:/app
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+      - ./.env:/app/.env
+      - /app/apps/api/node_modules
 
   prisma-studio:
+    <<: *defaults
     container_name: valley-prisma-studio
     env_file:
       - .env
@@ -42,8 +67,6 @@ services:
       dockerfile: packages/database/Dockerfile.dev
     ports:
       - '5555:5555'
-    networks:
-      - tusd
     depends_on:
       - tusd
       - minio
@@ -53,6 +76,7 @@ services:
       - .:/app
 
   minio:
+    <<: *defaults
     container_name: valley-minio
     command: minio server --console-address ":9001" /data
     image: minio/minio
@@ -63,8 +87,6 @@ services:
       - .env
     volumes:
       - 'minio:/data/'
-    networks:
-      - tusd
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://127.0.0.1:9000/minio/health/live']
       interval: 10s
@@ -72,6 +94,7 @@ services:
       start_period: 10s
 
   tusd:
+    <<: *defaults
     container_name: valley-tusd
     image: tusproject/tusd
     command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://valley-api:${PORT}/upload -hooks-enabled-events pre-create,post-create,post-receive,pre-finish,post-finish
@@ -83,32 +106,30 @@ services:
       - .env
     depends_on:
       - minio
-    networks:
-      - tusd
 
   postgres:
+    <<: *defaults
     container_name: valley-postgres
     image: postgres:16-alpine
     env_file:
       - .env
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./postgres:/docker-entrypoint-initdb.d
     ports:
       - '5432:5432'
     restart: always
-    networks:
-      - tusd
     healthcheck:
-      test: ['CMD', 'pg_isready -d valley -U postgres']
+      test: ['CMD', 'pg_isready -d valley -U ${POSTGRES_USER}']
       interval: 5s
       timeout: 5s
       retries: 10
 
   redis:
+    <<: *defaults
     container_name: valley-redis
     image: redis:latest
     env_file:
@@ -119,10 +140,10 @@ services:
     environment:
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
-    networks:
-      - tusd
 
+  # Creates minio bucket on startup if it was not created before
   createbuckets:
+    <<: *defaults
     image: minio/mc
     env_file:
       - .env
@@ -135,12 +156,11 @@ services:
       /usr/bin/mc anonymous set private myminio/files;
       exit 0;
       "
-    networks:
-      - tusd
 
 volumes:
   tusd:
   minio:
   pgdata:
+
 networks:
-  tusd:
+  valley_network:

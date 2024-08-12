@@ -2,8 +2,8 @@
 import React from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { DialogContent, DialogOverlay, DialogProps } from '@reach/dialog'
-import styles from './Modal.module.css'
 import { animated, useTransition, easings } from '@react-spring/web'
+import styles from './Modal.module.css'
 
 type ModalProps = DialogProps
 
@@ -29,7 +29,11 @@ const Modal: React.FC<ModalProps> = ({
   })
 
   const handleClose = (event: React.MouseEvent | React.KeyboardEvent) => {
-    onDismiss?.(event)
+    // Use only user-provided function if it is present
+    // See `handleClose` definition in lib/features/modals/index.tsxs
+    if (onDismiss) {
+      return onDismiss(event)
+    }
 
     const newQuery = new URLSearchParams(query.toString())
     newQuery.delete('modal')
