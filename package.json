@@ -19,6 +19,7 @@
   "devDependencies": {
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
+    "lint-staged": "^15.2.9",
     "prettier": "^3.2.5",
     "turbo": "^2.0.14"
   },
