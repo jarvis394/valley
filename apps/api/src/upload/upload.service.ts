@@ -186,5 +186,7 @@ export class UploadService {
       const thumbnailKey = await this.generateThumbnail(event.Upload)
       res.thumbnailKey = thumbnailKey
     }
+
+    return res
   }
 }

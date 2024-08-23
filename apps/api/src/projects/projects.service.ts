@@ -3,6 +3,8 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma, Project, User } from '@prisma/client'
 import { PrismaService } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
+import { ProjectCreateReq } from '@valley/shared'
+import { slugify } from 'transliteration'
 
 @Injectable()
 export class ProjectsService {
@@ -82,5 +84,26 @@ export class ProjectsService {
     }
 
     return project
+  }
+
+  generateProjectURL(title: string) {
+    return (
+      '/' +
+      slugify(title, {
+        trim: true,
+      })
+    )
+  }
+
+  async createProjectForUser(data: ProjectCreateReq, userId: User['id']) {
+    return await this.createProject({
+      ...data,
+      url: this.generateProjectURL(data.title),
+      User: {
+        connect: {
+          id: userId,
+        },
+      },
+    })
   }
 }

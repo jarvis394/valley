@@ -2,9 +2,11 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
   "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_TUS_URL"],
+  "ui": "tui",
   "tasks": {
     "dev": {
-      "dependsOn": ["^db:migrate"],
+      "dependsOn": ["^db:generate"],
+      "interactive": true,
       "cache": false,
       "persistent": true
     },
@@ -24,6 +26,9 @@
       "dependsOn": ["^db:generate"]
     },
     "db:migrate": {
+      "cache": false
+    },
+    "db:migrate:reset": {
       "cache": false
     },
     "db:generate": {

@@ -15,7 +15,7 @@ import authCover7 from '../assets/cover-7.jpg'
 import authCover8 from '../assets/cover-8.jpg'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { TELEGRAM_PHOTOS_URL } from '../../lib/shared/config/constants'
+import { TELEGRAM_PHOTOS_URL } from '../config/constants'
 
 const covers = [
   authCover1,

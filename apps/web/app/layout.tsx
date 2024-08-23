@@ -3,10 +3,10 @@ import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import cx from 'classnames'
 import styles from './App.module.css'
-import { Modals } from '../lib/features/modals'
+import { Modals } from './components/Modals'
 
-import './theme.css'
-import './global.css'
+import './styles/theme.css'
+import './styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 

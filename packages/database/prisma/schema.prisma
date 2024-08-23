@@ -21,11 +21,13 @@ model Project {
   title              String
   url                String
   totalFiles         Int                 @default(0)
+  // Total size is in bytes
+  totalSize          Int                 @default(0)
   dateCreated        DateTime            @default(now())
   dateUpdated        DateTime            @updatedAt
   dateShot           DateTime            @default(now())
-  // 0 means stored indefinitely, unix timestamps are supported
-  storedUntil        Int                 @default(0)
+  // "0" means stored indefinitely, unix timestamps in string format are supported
+  storedUntil        String              @default("0")
   language           String              @default("en")
   protected          Boolean             @default(false)
   password           String?
@@ -38,10 +40,14 @@ model Project {
 }
 
 model Folder {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String?
-  files       File[]
+  id              Int     @id @default(autoincrement())
+  title           String
+  isDefaultFolder Boolean
+  description     String?
+  totalFiles      Int     @default(0)
+  // Total size is in bytes
+  totalSize       Int     @default(0)
+  files           File[]
 
   Project   Project @relation(fields: [projectId], references: [id])
   projectId Int

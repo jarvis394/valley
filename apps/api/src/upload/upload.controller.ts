@@ -4,7 +4,7 @@ import { UploadService } from './upload.service'
 export enum TusEventType {
   PRE_CREATE = 'pre-create',
   POST_CREATE = 'post-create',
-  POST_RECEIVE = 'post_receive',
+  POST_RECEIVE = 'post-receive',
   PRE_FINISH = 'pre-finish',
   POST_FINISH = 'post-finish',
   POST_TERMINATE = 'post-terminate',
@@ -48,11 +48,25 @@ export class UploadController {
 
   @Post('/')
   async handleTusHook(@Body() data: TusHookData) {
+    console.log(data.Event.Upload.MetaData)
+
+    let res: Record<string, string> = { ok: 'true' }
     switch (data.Type) {
-      case TusEventType.POST_CREATE:
-        return await this.uploadService.finalizeUpload(data.Event)
+      case TusEventType.PRE_FINISH:
+        res = await this.uploadService.finalizeUpload(data.Event)
+        break
       default:
-        return { ok: true }
+        break
+    }
+
+    return {
+      HTTPResponse: {
+        StatusCode: 201,
+        Body: JSON.stringify({ ...res, type: data.Type }),
+        Header: {
+          'Content-Type': 'application/json',
+        },
+      },
     }
   }
 }

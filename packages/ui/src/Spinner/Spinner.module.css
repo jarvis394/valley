@@ -5,6 +5,7 @@
 .spinner__inner {
   height: var(--spinner-size, 20px);
   width: var(--spinner-size, 20px);
+  opacity: 0.85;
 }
 
 .spinner__inner {
@@ -15,7 +16,7 @@
 
 .spinner__bar {
   animation: spinner_spin 1.2s linear infinite;
-  background: var(--spinner-color);
+  background: currentColor;
   border-radius: 5px;
   height: 8%;
   left: -10%;

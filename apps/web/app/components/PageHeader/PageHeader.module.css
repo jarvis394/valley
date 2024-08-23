@@ -1,0 +1,16 @@
+.pageHeader__title {
+  margin: 0;
+  padding: 40px 0;
+  font-family: var(--font-geist-sans);
+  font-size: 32px;
+  font-weight: 600;
+  flex-grow: 1;
+  display: flex;
+}
+
+.pageHeader__before {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}

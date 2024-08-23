@@ -12,6 +12,7 @@ type ButtonBaseProps = React.PropsWithChildren<{
     | 'secondary'
     | 'secondary-dimmed'
     | 'tertiary'
+    | 'tertiary-dimmed'
     | 'warning'
     | 'danger'
   disabled?: boolean
@@ -51,6 +52,8 @@ const ButtonBase = React.forwardRef(
           [styles['buttonBase--secondary-dimmed']]:
             variant === 'secondary-dimmed',
           [styles['buttonBase--tertiary']]: variant === 'tertiary',
+          [styles['buttonBase--tertiary-dimmed']]:
+            variant === 'tertiary-dimmed',
           [styles['buttonBase--warning']]: variant === 'warning',
           [styles['buttonBase--danger']]: variant === 'danger',
         }),

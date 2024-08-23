@@ -7,6 +7,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0"

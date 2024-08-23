@@ -7,10 +7,10 @@ import styles from '../../styles.module.css'
 import Button from '@valley/ui/Button'
 import Spinner from '@valley/ui/Spinner'
 import {
-  registerUser,
   removeAuthTokensFromLocalStorage,
   setAuthTokensToLocalStorage,
-} from '../../../../lib/features/auth/utils'
+} from '../../../utils/accessToken'
+import { registerUser } from '../../../api/auth'
 
 type FieldValues = {
   username: string

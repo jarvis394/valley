@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./Divider": "./src/Divider/Divider.tsx",
+    "./Wrapper": "./src/Wrapper/Wrapper.tsx",
     "./ModalHeader": "./src/ModalHeader/ModalHeader.tsx",
     "./ModalFooter": "./src/ModalFooter/ModalFooter.tsx",
     "./Modal": "./src/Modal/Modal.tsx",

@@ -7,10 +7,10 @@ import styles from '../../styles.module.css'
 import Button from '@valley/ui/Button'
 import Spinner from '@valley/ui/Spinner'
 import {
-  autorizeUser,
   removeAuthTokensFromLocalStorage,
   setAuthTokensToLocalStorage,
-} from '../../../../lib/features/auth/utils'
+} from '../../../utils/accessToken'
+import { authorizeUser } from '../../../api/auth'
 
 type FieldValues = {
   username: string
@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
     removeAuthTokensFromLocalStorage()
 
     try {
-      const res = await autorizeUser(username, password)
+      const res = await authorizeUser(username, password)
       setAuthTokensToLocalStorage(res.tokens)
       router.push('/projects')
     } catch (e) {

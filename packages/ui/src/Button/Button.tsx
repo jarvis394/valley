@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import styles from './Button.module.css'
 import ButtonBase from '../ButtonBase/ButtonBase'
+import Spinner from '../Spinner/Spinner'
 
 export type ButtonProps = React.PropsWithChildren<{
   size?: 'sm' | 'md' | 'lg'
@@ -10,10 +11,12 @@ export type ButtonProps = React.PropsWithChildren<{
     | 'secondary'
     | 'secondary-dimmed'
     | 'tertiary'
+    | 'tertiary-dimmed'
     | 'warning'
     | 'danger'
   disabled?: boolean
   fullWidth?: boolean
+  loading?: boolean
   before?: React.ReactElement
 }> &
   React.DetailedHTMLProps<
@@ -27,6 +30,7 @@ const Button = React.forwardRef<'button', ButtonProps>(
       children,
       size = 'sm',
       variant = 'primary',
+      loading,
       className,
       disabled,
       before,
@@ -49,7 +53,10 @@ const Button = React.forwardRef<'button', ButtonProps>(
           [styles['button--fullWidth']]: fullWidth,
         })}
       >
-        {before && <div className={styles.button__before}>{before}</div>}
+        {loading && <Spinner />}
+        {before && !loading && (
+          <div className={styles.button__before}>{before}</div>
+        )}
         {children && <span className={styles.button__content}>{children}</span>}
       </ButtonBase>
     )

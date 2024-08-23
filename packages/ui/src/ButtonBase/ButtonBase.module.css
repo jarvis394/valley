@@ -12,6 +12,7 @@
   align-items: center;
   transition-duration: 0.15s;
   transition-timing-function: ease;
+  transition-property: background-color, background, box-shadow, border, color;
   font-size: var(--font-size);
   line-height: var(--line-height);
   display: flex;
@@ -35,6 +36,7 @@
 .buttonBase--primary {
   color: var(--button-primary-fg);
   background: var(--button-primary-bg);
+  --themed-border: transparent;
 }
 
 .buttonBase--secondary {
@@ -52,21 +54,31 @@
 .buttonBase--tertiary {
   color: var(--button-tertiary-fg);
   background: var(--button-tertiary-bg);
+  --themed-border: transparent;
+}
+
+.buttonBase--tertiary-dimmed {
+  color: var(--button-tertiary-dimmed-fg);
+  background: var(--button-tertiary-dimmed-bg);
+  --themed-border: transparent;
 }
 
 .buttonBase--warning {
   color: var(--button-warning-fg);
   background: var(--button-warning-bg);
+  --themed-border: transparent;
 }
 
 .buttonBase--danger {
   color: var(--button-danger-fg);
   background: var(--button-danger-bg);
+  --themed-border: transparent;
 }
 
 .buttonBase:not(:disabled).buttonBase--primary:hover {
   background-color: var(--button-primary-hovered-bg);
   color: var(--button-primary-hovered-fg);
+  --themed-border: transparent;
 }
 
 .buttonBase:not(:disabled).buttonBase--secondary:hover {
@@ -82,16 +94,25 @@
 .buttonBase:not(:disabled).buttonBase--tertiary:hover {
   background-color: var(--button-tertiary-hovered-bg);
   color: var(--button-tertiary-hovered-fg);
+  --themed-border: transparent;
+}
+
+.buttonBase:not(:disabled).buttonBase--tertiary-dimmed:hover {
+  background-color: var(--button-tertiary-dimmed-hovered-bg);
+  color: var(--button-tertiary-dimmed-hovered-fg);
+  --themed-border: transparent;
 }
 
 .buttonBase:not(:disabled).buttonBase--warning:hover {
   background-color: var(--button-warning-hovered-bg);
   color: var(--button-warning-hovered-fg);
+  --themed-border: transparent;
 }
 
 .buttonBase:not(:disabled).buttonBase--danger:hover {
   background-color: var(--button-danger-hovered-bg);
   color: var(--button-danger-hovered-fg);
+  --themed-border: transparent;
 }
 
 .buttonBase:not(:disabled).buttonBase--secondary:active,
@@ -102,4 +123,8 @@
 
 .buttonBase:not(:disabled).buttonBase--primary:active {
   color: var(--button-focused-fg-inversed);
+}
+
+.buttonBase:not(:disabled).buttonBase--tertiary-dimmed:active {
+  color: var(--button-tertiary-dimmed-focused-fg);
 }

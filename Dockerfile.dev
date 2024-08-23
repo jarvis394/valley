@@ -5,7 +5,7 @@ FROM node:22-alpine3.19 as base
 
 # adding apk deps to avoid node-gyp related errors and some other stuff. adds turborepo globally
 RUN apk add -f --update --no-cache --virtual .gyp nano bash libc6-compat openssl python3 make g++ \
-  && yarn global add turbo \
+  && npm i -g turbo \
   && apk del .gyp
 
 #############################################

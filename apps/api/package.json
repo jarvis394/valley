@@ -35,7 +35,8 @@
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "sharp": "^0.33.4"
+    "sharp": "^0.33.5",
+    "transliteration": "^2.3.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

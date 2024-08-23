@@ -1,3 +1,7 @@
+.iconButton {
+  --x-padding: 8px;
+}
+
 .iconButton.iconButton--size-sm {
   padding: 8px;
   --x-padding: 8px;
@@ -11,6 +15,16 @@
 .iconButton.iconButton--size-lg {
   padding: 16px;
   --x-padding: 16px;
+}
+
+.iconButton.iconButton--loading {
+  padding: 14px;
+  --x-padding: 14px;
+  --spinner-size: 20px;
+}
+
+.iconButton.iconButton--loading span {
+  height: var(--spinner-size);
 }
 
 .iconButton span {

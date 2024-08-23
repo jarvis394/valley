@@ -1,19 +1,30 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Request,
   UseGuards,
 } from '@nestjs/common'
-import { ProjectGetAllRes, ProjectGetRes } from '@valley/shared'
+import type {
+  ProjectCreateReq,
+  ProjectCreateRes,
+  ProjectGetAllRes,
+  ProjectGetRes,
+} from '@valley/shared'
 import type { RequestWithUser } from '../auth/auth.controller'
 import { JwtAuthGuard } from '../auth/strategies/jwt.strategy'
 import { ProjectsService } from './projects.service'
+import { FoldersService } from 'src/folders/folders.service'
 
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly foldersService: FoldersService
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('')
@@ -30,10 +41,26 @@ export class ProjectsController {
     @Request() req: RequestWithUser,
     @Param('id', ParseIntPipe) projectId: number
   ): Promise<ProjectGetRes> {
-    const project = await this.projectsService.getUserProject(
-      req.user.userId,
-      projectId
+    const [project, folders] = await Promise.all([
+      this.projectsService.getUserProject(req.user.userId, projectId),
+      this.foldersService.getProjectFolders(projectId),
+    ])
+    return { project, folders }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('create')
+  async createProject(
+    @Request() req: RequestWithUser,
+    @Body() data: ProjectCreateReq
+  ): Promise<ProjectCreateRes> {
+    const project = await this.projectsService.createProjectForUser(
+      data,
+      req.user.userId
     )
-    return { project }
+    const folder = await this.foldersService.createDefaultFolderForProject(
+      project.id
+    )
+    return { project, folders: [folder] }
   }
 }

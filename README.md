@@ -2,14 +2,6 @@
 
 This is an official starter Turborepo.
 
-## Using this example
-
-Run the following command:
-
-```bash
-npx create-turbo@latest -e with-nestjs
-```
-
 ## What's inside?
 
 This Turborepo includes the following packages/apps:
@@ -40,13 +32,11 @@ This `Turborepo` has some additional tools already set for you:
 
 ### Commands
 
-This `Turborepo` already configured useful commands for all your apps and packages.
-
 #### Build
 
 ```bash
 # Will build all the app & packages with the supported `build` script.
-pnpm run build
+yarn build
 
 # ℹ️ If you plan to only build apps individually,
 # Please make sure you've built the packages first.
@@ -56,19 +46,7 @@ pnpm run build
 
 ```bash
 # Will run the development server for all the app & packages with the supported `dev` script.
-pnpm run dev
-```
-
-#### test
-
-```bash
-# Will launch a test suites for all the app & packages with the supported `test` script.
-pnpm run test
-
-# You can launch e2e testes with `test:e2e`
-pnpm run test:e2e
-
-# See `@valley/jest-config` to customize the behavior.
+yarn dev
 ```
 
 #### Lint
@@ -76,7 +54,7 @@ pnpm run test:e2e
 ```bash
 # Will lint all the app & packages with the supported `lint` script.
 # See `@valley/eslint-config` to customize the behavior.
-pnpm run lint
+yarn run lint
 ```
 
 #### Format
@@ -84,34 +62,9 @@ pnpm run lint
 ```bash
 # Will format all the supported `.ts,.js,json,.tsx,.jsx` files.
 # See `@valley/eslint-config/prettier-base.js` to customize the behavior.
-pnpm format
+yarn format
 ```
 
-### Remote Caching
+## Installation and running issues
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```bash
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```bash
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+Ensure your machine has this packages installed: `libvips`, `libvips-tools`, `libvips-dev`

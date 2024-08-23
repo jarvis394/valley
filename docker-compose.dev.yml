@@ -7,73 +7,77 @@ x-defaults: &defaults
 name: valley
 
 services:
-  web:
-    <<: *defaults
-    env_file:
-      - .env
-    ports:
-      - '4200:4200'
-    command: turbo dev --filter web --filter @valley/shared
-    build:
-      args:
-        APP: web
-        START_COMMAND: dev
-      context: .
-      dockerfile: ./Dockerfile.dev
-    depends_on:
-      - api
-      - tusd
-      - minio
-      - postgres
-      - redis
-    volumes:
-      - ./apps/web:/app/apps/web
-      - ./.env:/app/.env
-      - ./packages:/app/packages
-      - /app/apps/web/node_modules
-      - /app/apps/web/.next
+  # web:
+  #   <<: *defaults
+  #   container_name: valley-web
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '4200:4200'
+  #   command: turbo dev --filter web --filter @valley/shared
+  #   build:
+  #     args:
+  #       APP: web
+  #       START_COMMAND: dev
+  #     context: .
+  #     dockerfile: ./Dockerfile.dev
+  #   depends_on:
+  #     - api
+  #     - tusd
+  #     - minio
+  #     - postgres
+  #     - redis
+  #   volumes:
+  #     - ./apps/web:/app/apps/web
+  #     - ./.env:/app/.env
+  #     - ./packages:/app/packages
+  #     - /app/apps/web/node_modules
+  #     - /app/node_modules
+  #     - /app/apps/web/.next
 
-  api:
-    <<: *defaults
-    env_file:
-      - .env
-    ports:
-      - '${PORT}:${PORT}'
-    command: turbo dev --filter api --filter @valley/shared
-    build:
-      args:
-        APP: api
-        START_COMMAND: dev
-      context: .
-      dockerfile: ./Dockerfile.dev
-    depends_on:
-      - tusd
-      - minio
-      - postgres
-      - redis
-    volumes:
-      - ./apps/api:/app/apps/api
-      - ./packages:/app/packages
-      - ./.env:/app/.env
-      - /app/apps/api/node_modules
+  # api:
+  #   <<: *defaults
+  #   container_name: valley-api
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '${PORT}:${PORT}'
+  #   command: turbo dev --filter api --filter @valley/shared
+  #   build:
+  #     args:
+  #       APP: api
+  #       START_COMMAND: dev
+  #     context: .
+  #     dockerfile: ./Dockerfile.dev
+  #   depends_on:
+  #     - tusd
+  #     - minio
+  #     - postgres
+  #     - redis
+  #   volumes:
+  #     - ./apps/api:/app/apps/api
+  #     - ./packages:/app/packages
+  #     - ./.env:/app/.env
+  #     - /app/node_modules
+  #     - /app/apps/api/node_modules
 
-  prisma-studio:
-    <<: *defaults
-    container_name: valley-prisma-studio
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: packages/database/Dockerfile.dev
-    ports:
-      - '5555:5555'
-    depends_on:
-      - tusd
-      - minio
-      - postgres
-      - redis
-    volumes:
-      - .:/app
+  # prisma-studio:
+  #   <<: *defaults
+  #   container_name: valley-prisma-studio
+  #   env_file:
+  #     - .env
+  #   build:
+  #     context: .
+  #     dockerfile: packages/database/Dockerfile.dev
+  #   ports:
+  #     - '5555:5555'
+  #   depends_on:
+  #     - tusd
+  #     - minio
+  #     - postgres
+  #     - redis
+  #   volumes:
+  #     - .:/app
 
   minio:
     <<: *defaults
@@ -97,7 +101,7 @@ services:
     <<: *defaults
     container_name: valley-tusd
     image: tusproject/tusd
-    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://valley-api:${PORT}/upload -hooks-enabled-events pre-create,post-create,post-receive,pre-finish,post-finish
+    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://localhost:${PORT}/upload -hooks-enabled-events pre-create,post-create,post-receive,pre-finish,post-finish
     volumes:
       - tusd:/data
     ports:
@@ -135,8 +139,8 @@ services:
     env_file:
       - .env
     restart: always
-    expose:
-      - '6379'
+    ports:
+      - '6379:6379'
     environment:
       - REDIS_PORT=6379
       - REDIS_DATABASES=16

@@ -11,6 +11,7 @@ import { ProjectsModule } from '../projects/projects.module'
 import { UploadModule } from '../upload/upload.module'
 import { UsersModule } from '../users/users.module'
 import { AppController } from './app.controller'
+import { FoldersModule } from 'src/folders/folders.module'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AppController } from './app.controller'
     AuthModule,
     UsersModule,
     ProjectsModule,
+    FoldersModule,
   ],
   controllers: [AppController],
   providers: [ConfigService],

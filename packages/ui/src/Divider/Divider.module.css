@@ -1,0 +1,14 @@
+.divider {
+  display: flex;
+  background-color: var(--alpha-transparent-12);
+}
+
+.divider--horizontal {
+  width: 100%;
+  height: 1px;
+}
+
+.divider--vertical {
+  height: 100%;
+  width: 1px;
+}
