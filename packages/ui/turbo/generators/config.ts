@@ -8,6 +8,9 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         type: 'input',
         name: 'name',
         message: 'What is the name of the component?',
+        validate(input) {
+          return input.trim() !== ''
+        },
       },
     ],
     actions: [

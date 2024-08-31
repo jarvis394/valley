@@ -14,6 +14,7 @@ type EnvSchema = {
   CACHE_TTL: string
   REDIS_URL: string
   REDIS_KEY_PREFIX: string
+  UPLOAD_BUCKET: string
 }
 
 @Injectable()
@@ -71,5 +72,9 @@ export class ConfigService {
 
   get REDIS_KEY_PREFIX() {
     return this.configService.get<string>('REDIS_KEY_PREFIX') || 'valley'
+  }
+
+  get UPLOAD_BUCKET() {
+    return this.configService.get<string>('UPLOAD_BUCKET') || 'files'
   }
 }

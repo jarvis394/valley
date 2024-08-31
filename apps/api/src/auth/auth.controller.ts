@@ -25,6 +25,7 @@ import { LocalAuthGuard } from './strategies/local.strategy'
 import type { Response as Res } from 'express'
 
 export interface RequestWithUser extends Request {
+  params: Record<string, string>
   user: {
     userId: User['id']
     username: User['username']

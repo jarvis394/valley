@@ -3,6 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./MenuIconButton": "./src/MenuIconButton/MenuIconButton.tsx",
+    "./MenuButton": "./src/MenuButton/MenuButton.tsx",
+    "./Dropdown": "./src/Dropdown/Dropdown.tsx",
+    "./Grow": "./src/Grow/Grow.tsx",
+    "./Fade": "./src/Fade/Fade.tsx",
+    "./Paper": "./src/Paper/Paper.tsx",
+    "./TextArea": "./src/TextArea/TextArea.tsx",
+    "./MenuItem": "./src/MenuItem/MenuItem.tsx",
+    "./Menu": "./src/Menu/Menu.tsx",
     "./Divider": "./src/Divider/Divider.tsx",
     "./Wrapper": "./src/Wrapper/Wrapper.tsx",
     "./ModalHeader": "./src/ModalHeader/ModalHeader.tsx",
@@ -37,6 +46,7 @@
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {
+    "@mui/base": "^5.0.0-beta.40",
     "classnames": "^2.5.1"
   }
 }

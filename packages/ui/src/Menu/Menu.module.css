@@ -1,0 +1,36 @@
+.menu__listbox {
+  padding: 6px;
+  margin: 12px 0;
+  min-width: 200px;
+  border-radius: 12px;
+  overflow: auto;
+  outline: 0px;
+  background: var(--background-paper);
+  border: 1px solid var(--alpha-transparent-07);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-4);
+  z-index: 1;
+}
+
+.menu__listbox--closed {
+  opacity: 0;
+  transform: scale(0.95, 0.8);
+  transition:
+    opacity 200ms ease-in,
+    transform 200ms ease-in;
+}
+
+.menu__listbox--open {
+  opacity: 1;
+  transform: scale(1, 1);
+  transition:
+    opacity 100ms ease-out,
+    transform 100ms cubic-bezier(0.43, 0.29, 0.37, 1.48);
+}
+
+.menu__listbox--placement-top {
+  transform-origin: bottom;
+}
+.menu__listbox--placement-bottom {
+  transform-origin: top;
+}

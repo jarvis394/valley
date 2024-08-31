@@ -52,7 +52,7 @@ const RegisterPage: React.FC = () => {
             required: true,
           })}
           state={errors.username ? 'error' : 'default'}
-          inputSize="lg"
+          size="lg"
           placeholder="Username"
           type="text"
         />
@@ -61,7 +61,7 @@ const RegisterPage: React.FC = () => {
             required: true,
           })}
           state={errors.password ? 'error' : 'default'}
-          inputSize="lg"
+          size="lg"
           placeholder="Password"
           type="password"
         />

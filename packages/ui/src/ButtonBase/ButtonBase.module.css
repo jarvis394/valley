@@ -30,6 +30,7 @@
 .buttonBase:disabled {
   color: var(--button-disabled-fg);
   background: var(--button-disabled-bg);
+  cursor: not-allowed;
   --themed-border: var(--button-disabled-border);
 }
 

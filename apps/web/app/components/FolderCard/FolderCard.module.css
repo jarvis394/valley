@@ -19,6 +19,8 @@
   gap: 4px;
   align-items: flex-start;
   flex-grow: 1;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .folderCard__contentTitle {
@@ -26,6 +28,10 @@
   font-weight: 600;
   line-height: 20px;
   margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 .folderCard__contentSubtitle {

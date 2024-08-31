@@ -8,8 +8,16 @@ import IconButton from '@valley/ui/IconButton'
 import MenuIcon from '../MenuIcon/MenuIcon'
 import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
+import useSWR from 'swr'
+import { api } from '../../api'
+import { UserGetSelfRes } from '@valley/shared'
 
 const Header = () => {
+  const me = useSWR<UserGetSelfRes>(
+    '/users/me',
+    api({ isAccessTokenRequired: true })
+  )
+
   return (
     <header className={styles.header}>
       <Link href="/">
@@ -20,7 +28,7 @@ const Header = () => {
           <Slash />
           <div className={styles.header__avatarAndNameContainer}>
             <Avatar />
-            jarvis394
+            {me.data?.user?.username}
           </div>
           <IconButton size="sm" variant="secondary-dimmed">
             <MenuIcon />

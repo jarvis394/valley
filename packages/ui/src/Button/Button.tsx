@@ -24,43 +24,40 @@ export type ButtonProps = React.PropsWithChildren<{
     HTMLButtonElement
   >
 
-const Button = React.forwardRef<'button', ButtonProps>(
-  (
-    {
-      children,
-      size = 'sm',
-      variant = 'primary',
-      loading,
-      className,
-      disabled,
-      before,
-      fullWidth,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <ButtonBase
-        {...props}
-        ref={ref}
-        component={'button'}
-        variant={variant}
-        disabled={disabled}
-        className={cx(styles.button, className, {
-          [styles['button--size-sm']]: size === 'sm',
-          [styles['button--size-md']]: size === 'md',
-          [styles['button--size-lg']]: size === 'lg',
-          [styles['button--fullWidth']]: fullWidth,
-        })}
-      >
-        {loading && <Spinner />}
-        {before && !loading && (
-          <div className={styles.button__before}>{before}</div>
-        )}
-        {children && <span className={styles.button__content}>{children}</span>}
-      </ButtonBase>
-    )
-  }
-)
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    children,
+    size = 'sm',
+    variant = 'primary',
+    loading,
+    className,
+    disabled,
+    before,
+    fullWidth,
+    ...props
+  },
+  ref
+) {
+  return (
+    <ButtonBase
+      {...props}
+      ref={ref}
+      variant={variant}
+      disabled={disabled}
+      className={cx(styles.button, className, {
+        [styles['button--size-sm']]: size === 'sm',
+        [styles['button--size-md']]: size === 'md',
+        [styles['button--size-lg']]: size === 'lg',
+        [styles['button--fullWidth']]: fullWidth,
+      })}
+    >
+      {loading && <Spinner />}
+      {before && !loading && (
+        <div className={styles.button__before}>{before}</div>
+      )}
+      {children && <span className={styles.button__content}>{children}</span>}
+    </ButtonBase>
+  )
+})
 
-export default Button
+export default React.memo(Button)

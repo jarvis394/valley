@@ -1,15 +1,15 @@
 import cx from 'classnames'
 import React from 'react'
-import Paper, { PaperComponentProps } from '../Paper/Paper'
+import Paper, { PaperProps } from '../Paper/Paper'
 import styles from './Input.module.css'
 
 type InputProps = {
   before?: React.ReactNode
   after?: React.ReactNode
   state?: 'default' | 'error' | 'valid'
-  inputSize?: 'md' | 'lg'
-  paperProps?: PaperComponentProps
-} & React.ComponentPropsWithRef<'input'>
+  size?: 'md' | 'lg'
+  paperProps?: PaperProps
+} & Omit<React.ComponentPropsWithRef<'input'>, 'size'>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   function InputWithRef(
@@ -19,7 +19,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       after,
       paperProps,
       state = 'default',
-      inputSize = 'md',
+      size = 'md',
       ...props
     },
     ref
@@ -34,8 +34,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           [styles['input--withAfter']]: !!after,
           [styles['input--error']]: state === 'error',
           [styles['input--valid']]: state === 'valid',
-          [styles['input--size-md']]: inputSize === 'md',
-          [styles['input--size-lg']]: inputSize === 'lg',
+          [styles['input--size-md']]: size === 'md',
+          [styles['input--size-lg']]: size === 'lg',
         })}
       >
         {before && <div className={styles.input__before}>{before}</div>}
@@ -44,7 +44,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cx(styles.input__input, className)}
           ref={ref}
         />
-        {after && <div className="Input__after">{after}</div>}
+        {after && <div className={styles.input__after}>{after}</div>}
       </Paper>
     )
   }

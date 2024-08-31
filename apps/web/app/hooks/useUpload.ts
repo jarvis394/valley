@@ -1,17 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+'use client'
+import { useEffect, useId, useRef, useState } from 'react'
 import deburr from 'lodash.deburr'
-import { MULTIPART_UPLOAD_CHUNK_SIZE } from '@valley/shared'
+import { MULTIPART_UPLOAD_CHUNK_SIZE, TusUploadMetadata } from '@valley/shared'
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { TUS_URL } from '../config/constants'
+import { getAuthTokens } from '../utils/accessToken'
 
-type InputProps = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
+type UseUploadProps = {
+  projectId: number
+  folderId: number
+}
 
-export const useUpload = () => {
-  const $input = useRef<HTMLInputElement>(null)
+export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
+  const tokens = getAuthTokens()
+  const inputId = useId()
+  const $root = useRef<HTMLElement>(null)
+  const $input = useRef<HTMLInputElement>(document.createElement('input'))
   const uploads = useRef<Map<string, string | null>>(new Map())
   const [uppy] = useState(() =>
     new Uppy({
@@ -23,19 +28,28 @@ export const useUpload = () => {
       onSuccess() {
         console.log('uploaded file')
       },
+      headers() {
+        if (!tokens) return {} as Record<string, string>
+        return { Authorization: `Bearer ${tokens.accessToken}` }
+      },
       async onAfterResponse(req, res) {
-        const body = res.getBody()
-        const parsedBody = JSON.parse(body || '')
+        try {
+          const body = res.getBody()
+          // const parsedBody = JSON.parse(body || '')
 
-        if (body) {
-          const files = uppy.getFiles()
+          if (body) {
+            // const files = uppy.getFiles()
 
-          switch (parsedBody.type) {
-            case '':
+            // switch (parsedBody.type) {
+            //   case '':
+            //     break
+            // }
+
+            // console.log(req, req.getURL(), res.getUnderlyingObject(), files)
+            console.log(JSON.parse(body))
           }
-
-          console.log(req, req.getURL(), res.getUnderlyingObject(), files)
-          console.log(JSON.parse(body))
+        } catch (e) {
+          // console.error(e)
         }
       },
     })
@@ -46,15 +60,23 @@ export const useUpload = () => {
     const fileIds: string[] = []
     let totalSize = 0
     files.forEach((file) => (totalSize += file.size))
-    console.log('uploading files:', files)
+    console.log(
+      `uploading files to folder ${folderId} in project ${projectId}:`,
+      files
+    )
     console.log('total size:', totalSize)
 
     files.forEach(async (file) => {
       const fileId = uppy.addFile(file)
-      uppy.setFileMeta(fileId, {
-        normalizedName: deburr(file.name),
-        uploadId: fileId,
-      })
+      const metadata: TusUploadMetadata = {
+        'normalized-name': deburr(file.name),
+        'upload-id': fileId,
+        'folder-id': folderId.toString(),
+        'project-id': projectId.toString(),
+        name: file.name,
+        type: file.type,
+      }
+      uppy.setFileMeta(fileId, metadata)
       fileIds.push(fileId)
       uploads.current.set(fileId, null)
     })
@@ -64,23 +86,15 @@ export const useUpload = () => {
     console.log('uploaded files:', res)
   }
 
-  const handleUploadInputChange: React.ChangeEventHandler<HTMLInputElement> = (
-    e
-  ) => {
+  const handleUploadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
     uploadFiles(e.target.files)
   }
 
-  const register = (props: InputProps = {}): InputProps => {
+  const register = () => {
     return {
-      // Overridable props
-      multiple: true,
-      hidden: true,
-      ...props,
-      // Non-overridable props
-      type: 'file',
-      ref: $input,
-      onChange: handleUploadInputChange,
+      ref: $root,
+      onClick: openFilePicker,
     }
   }
 
@@ -106,5 +120,30 @@ export const useUpload = () => {
     }
   }, [uppy])
 
-  return { uppy, uploadFiles, register, openFilePicker }
+  useEffect(() => {
+    const handleChange = (e: Event) =>
+      handleUploadInputChange(
+        e as unknown as React.ChangeEvent<HTMLInputElement>
+      )
+
+    document.body.appendChild($input.current)
+    $input.current.multiple = true
+    $input.current.hidden = true
+    $input.current.type = 'file'
+    $input.current.id = inputId
+    $input.current.addEventListener('change', handleChange)
+
+    return () => {
+      $input.current.removeEventListener('change', handleChange)
+      $input.current.remove()
+    }
+    // Should change `handleUploadInputChange` ref as hook props change
+  }, [folderId, projectId])
+
+  return {
+    uppy,
+    uploadFiles,
+    register,
+    openFilePicker,
+  }
 }

@@ -1,6 +1,5 @@
 .paper {
   --height: 40px;
-  --x-padding: 10px;
   --font-size: 14px;
   --line-height: 17px;
 }
@@ -11,7 +10,6 @@
   max-width: 100%;
   width: 100%;
   font-size: 16px;
-  padding: 16px;
   display: flex;
   position: relative;
   transform: translateZ(0);

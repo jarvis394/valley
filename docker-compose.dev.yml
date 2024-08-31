@@ -101,7 +101,7 @@ services:
     <<: *defaults
     container_name: valley-tusd
     image: tusproject/tusd
-    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://localhost:${PORT}/upload -hooks-enabled-events pre-create,post-create,post-receive,pre-finish,post-finish
+    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://host.docker.internal:${PORT}/upload -hooks-enabled-events pre-create,pre-finish
     volumes:
       - tusd:/data
     ports:
@@ -165,6 +165,5 @@ volumes:
   tusd:
   minio:
   pgdata:
-
 networks:
   valley_network:

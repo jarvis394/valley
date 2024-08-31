@@ -1,38 +1,36 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { DialogContent, DialogOverlay, DialogProps } from '@reach/dialog'
-import { animated, useTransition, easings } from '@react-spring/web'
+import { Modal as BaseModal, ModalOwnProps } from '@mui/base'
 import styles from './Modal.module.css'
+import Fade from '../Fade/Fade'
+import Grow from '../Grow/Grow'
 
-type ModalProps = DialogProps
+type ModalProps = React.PropsWithChildren<{
+  id: string
+  isOpen?: boolean
+  onDismiss?: ModalOwnProps['onClose']
+}>
 
 const Modal: React.FC<ModalProps> = ({
   onDismiss,
-  isOpen,
+  isOpen: propsIsOpen = false,
   children,
-  ...props
+  id,
 }) => {
-  const AnimatedDialogOverlay = animated(DialogOverlay)
-  const AnimatedDialogContent = animated(DialogContent)
+  const [open, setOpen] = useState(propsIsOpen)
   const router = useRouter()
   const pathname = usePathname()
   const query = useSearchParams()
-  const transitions = useTransition(isOpen, {
-    from: { opacity: 0, scale: 0.95 },
-    enter: { opacity: 1, scale: 1 },
-    leave: { opacity: 0, scale: 0.95 },
-    config: {
-      duration: 680,
-      easing: easings.easeOutExpo,
-    },
-  })
+  const currentModal = useMemo(() => query.get('modal'), [query])
 
-  const handleClose = (event: React.MouseEvent | React.KeyboardEvent) => {
+  const handleClose: ModalOwnProps['onClose'] = (
+    event: React.MouseEvent | React.KeyboardEvent,
+    reason
+  ) => {
     // Use only user-provided function if it is present
-    // See `handleClose` definition in lib/features/modals/index.tsxs
     if (onDismiss) {
-      return onDismiss(event)
+      return onDismiss(event, reason)
     }
 
     const newQuery = new URLSearchParams(query.toString())
@@ -41,27 +39,46 @@ const Modal: React.FC<ModalProps> = ({
     router.push(pathname + '?' + newQuery.toString())
   }
 
-  return transitions(
-    (animationStyles, item) =>
-      item && (
-        <AnimatedDialogOverlay
-          isOpen={isOpen}
-          className={styles.modal__dialogBackdrop}
-          onDismiss={handleClose}
-          style={{ opacity: animationStyles.opacity }}
-        >
-          <AnimatedDialogContent
-            {...props}
-            style={{
-              transform: animationStyles.scale.to((value) => `scale(${value})`),
-            }}
-            className={styles.modal__dialogContent}
-          >
-            {children}
-          </AnimatedDialogContent>
-        </AnimatedDialogOverlay>
-      )
+  useEffect(() => {
+    setOpen(currentModal === id)
+  }, [currentModal, id])
+
+  return (
+    <BaseModal
+      open={open}
+      onClose={handleClose}
+      className={styles.modal}
+      closeAfterTransition
+      slots={{
+        backdrop: Backdrop,
+      }}
+    >
+      <Grow
+        in={open}
+        transformTemplate={(e) => `translate(-50%, -50%) scale(${e.scale})`}
+        transition={{ duration: 0.32, ease: 'circInOut' }}
+        className={styles.modal__dialog}
+      >
+        {children}
+      </Grow>
+    </BaseModal>
   )
 }
+
+const Backdrop = React.forwardRef<
+  HTMLDivElement,
+  { children: React.ReactElement; open: boolean; ownerState: never }
+>((props, ref) => {
+  const { open, ownerState: _, ...other } = props
+  return (
+    <Fade
+      {...other}
+      ref={ref}
+      in={open}
+      transition={{ duration: 0.32, ease: 'easeInOut' }}
+      className={styles.modal__dialogBackdrop}
+    />
+  )
+})
 
 export default Modal

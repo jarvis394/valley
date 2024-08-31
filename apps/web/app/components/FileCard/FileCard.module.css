@@ -1,0 +1,48 @@
+.fileCard {
+  background-color: var(--background-paper);
+  aspect-ratio: 1 / 1;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  flex-direction: column;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px inset var(--alpha-solid-07);
+  overflow: hidden;
+}
+
+.fileCard__name {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  display: block;
+  flex-shrink: 0;
+}
+
+.fileCard__imageContainer {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fileCard__image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}

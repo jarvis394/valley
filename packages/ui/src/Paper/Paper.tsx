@@ -1,44 +1,51 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './Paper.module.css'
-import {
-  OverridableComponent,
-  OverrideProps,
-} from '../types/OverridableComponent'
+import { OverridableComponent, OverrideProps } from '@mui/types'
 
-type PaperProps = Partial<{
-  variant:
-    | 'primary'
-    | 'secondary'
-    | 'secondary-dimmed'
-    | 'tertiary'
-    | 'warning'
-    | 'danger'
-  button: boolean
-}>
+export type PaperOwnProps = Partial<
+  React.PropsWithChildren<{
+    variant:
+      | 'primary'
+      | 'secondary'
+      | 'secondary-dimmed'
+      | 'tertiary'
+      | 'warning'
+      | 'danger'
+    button: boolean
+    ref: React.Ref<unknown>
+  }>
+>
 
-type PaperTypeMap<D extends React.ElementType = 'div'> = {
-  props: PaperProps
-  defaultComponent: D
+export type PaperTypeMap<
+  AdditionalProps = unknown,
+  RootComponent extends React.ElementType = 'div'
+> = {
+  props: AdditionalProps & PaperOwnProps
+  defaultComponent: RootComponent
 }
 
-export type PaperComponentProps = OverrideProps<PaperTypeMap, 'div'> & {
+export type PaperProps<
+  RootComponent extends React.ElementType = PaperTypeMap['defaultComponent'],
+  AdditionalProps = unknown
+> = OverrideProps<
+  PaperTypeMap<AdditionalProps, RootComponent>,
+  RootComponent
+> & {
   component?: React.ElementType
 }
 
-const Paper = (({
-  button,
-  variant,
-  children,
-  className,
-  component = 'div',
-  ...props
-}: PaperComponentProps) => {
-  return React.createElement(
-    component,
-    {
-      ...props,
-      className: cx(className, styles.paper, {
+const Paper = React.forwardRef(function Paper(
+  { button, variant, children, className, component, ...props }: PaperProps,
+  ref
+) {
+  const Root = component || 'div'
+
+  return (
+    <Root
+      {...props}
+      ref={ref}
+      className={cx(className, styles.paper, {
         [styles['paper--primary']]: variant === 'primary',
         [styles['paper--secondary']]: variant === 'secondary',
         [styles['paper--secondary-dimmed']]: variant === 'secondary-dimmed',
@@ -46,10 +53,11 @@ const Paper = (({
         [styles['paper--warning']]: variant === 'warning',
         [styles['paper--danger']]: variant === 'danger',
         [styles['paper--button']]: button,
-      }),
-    },
-    children
+      })}
+    >
+      {children}
+    </Root>
   )
-}) as OverridableComponent<PaperTypeMap>
+})
 
-export default Paper
+export default React.memo(Paper) as OverridableComponent<PaperTypeMap>

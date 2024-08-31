@@ -1,10 +1,10 @@
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
-import { Prisma, Project, User } from '@prisma/client'
 import { PrismaService } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
-import { ProjectCreateReq } from '@valley/shared'
+import { ProjectCreateReq, SerializedProject } from '@valley/shared'
 import { slugify } from 'transliteration'
+import { File, Project, User, Prisma } from '@valley/db'
 
 @Injectable()
 export class ProjectsService {
@@ -13,6 +13,13 @@ export class ProjectsService {
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
+
+  serializeProject(project: Project): SerializedProject {
+    return {
+      ...project,
+      totalSize: Number(project.totalSize),
+    }
+  }
 
   async project(
     projectWhereUniqueInput: Prisma.ProjectWhereUniqueInput
@@ -27,10 +34,10 @@ export class ProjectsService {
     take?: number
     cursor?: Prisma.ProjectWhereUniqueInput
     where?: Prisma.ProjectWhereInput
-    orderBy?: Prisma.UserOrderByWithRelationInput
+    orderBy?: Prisma.ProjectOrderByWithRelationInput
   }): Promise<Project[]> {
     const { skip, take, cursor, where, orderBy } = params
-    return this.prismaService.project.findMany({
+    return await this.prismaService.project.findMany({
       skip,
       take,
       cursor,
@@ -40,7 +47,7 @@ export class ProjectsService {
   }
 
   async createProject(data: Prisma.ProjectCreateInput): Promise<Project> {
-    return this.prismaService.project.create({
+    return await this.prismaService.project.create({
       data,
     })
   }
@@ -50,30 +57,35 @@ export class ProjectsService {
     data: Prisma.ProjectUpdateInput
   }): Promise<Project> {
     const { where, data } = params
-    return this.prismaService.project.update({
+    return await this.prismaService.project.update({
       data,
       where,
     })
   }
 
   async deleteProject(where: Prisma.ProjectWhereUniqueInput): Promise<Project> {
-    return this.prismaService.project.delete({
+    return await this.prismaService.project.delete({
       where,
     })
   }
 
-  async getUserProjects(userId: User['id']): Promise<Project[]> {
-    return this.projects({
+  async getUserProjects(userId: User['id']): Promise<SerializedProject[]> {
+    const projects = await this.projects({
       where: {
         userId,
       },
+      orderBy: {
+        id: 'asc',
+      },
     })
+
+    return projects.map((e) => this.serializeProject(e))
   }
 
   async getUserProject(
     userId: User['id'],
     projectId: Project['id']
-  ): Promise<Project> {
+  ): Promise<SerializedProject> {
     const project = await this.project({
       id: projectId,
       userId,
@@ -83,7 +95,7 @@ export class ProjectsService {
       throw new NotFoundException('Project not found')
     }
 
-    return project
+    return this.serializeProject(project)
   }
 
   generateProjectURL(title: string) {
@@ -95,8 +107,11 @@ export class ProjectsService {
     )
   }
 
-  async createProjectForUser(data: ProjectCreateReq, userId: User['id']) {
-    return await this.createProject({
+  async createProjectForUser(
+    data: ProjectCreateReq,
+    userId: User['id']
+  ): Promise<SerializedProject> {
+    const project = await this.createProject({
       ...data,
       url: this.generateProjectURL(data.title),
       User: {
@@ -105,5 +120,26 @@ export class ProjectsService {
         },
       },
     })
+
+    return this.serializeProject(project)
+  }
+
+  async addFileToProject(
+    projectId: Project['id'],
+    file: File
+  ): Promise<SerializedProject> {
+    const project = await this.updateProject({
+      where: { id: projectId },
+      data: {
+        totalFiles: {
+          increment: 1,
+        },
+        totalSize: {
+          increment: file.size,
+        },
+      },
+    })
+
+    return this.serializeProject(project)
   }
 }

@@ -1,14 +1,14 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '@valley/ui/Button'
 import Input from '@valley/ui/Input'
 import InputLabel from '@valley/ui/InputLabel'
-import Modal from '@valley/ui/Modal'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import styles from './CreateProject.module.css'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { createProject } from '../../../api/projects'
+import { useRouter } from 'next/navigation'
 
 type CreateProjectModalProps = {
   onClose: () => void
@@ -20,12 +20,14 @@ type FieldValues = {
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   const { register, handleSubmit } = useForm<FieldValues>()
 
   const onSubmit: SubmitHandler<FieldValues> = async (values, e) => {
     e?.preventDefault()
-    console.log(values)
 
+    setIsLoading(true)
     const res = await createProject({
       dateShot: values.dateShot,
       protected: false,
@@ -35,11 +37,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
       translationStringsId: null,
     })
 
-    console.log(res)
+    onClose()
+    router.replace('/projects/' + res.project.id)
   }
 
   return (
-    <Modal isOpen onDismiss={onClose}>
+    <>
       <ModalHeader>Create Project</ModalHeader>
       <form
         id="create-project-form"
@@ -81,12 +84,18 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
           </Button>
         }
         after={
-          <Button form="create-project-form" variant="primary" size="md">
+          <Button
+            form="create-project-form"
+            variant="primary"
+            size="md"
+            disabled={isLoading}
+            loading={isLoading}
+          >
             Create
           </Button>
         }
       />
-    </Modal>
+    </>
   )
 }
 

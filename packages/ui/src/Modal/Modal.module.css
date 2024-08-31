@@ -1,17 +1,21 @@
-.modal__dialogBackdrop {
-  background: var(--modal-backdrop);
+.modal {
+  position: fixed;
+  z-index: 1300;
+  inset: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  overflow: auto;
 }
 
-.modal__dialogContent {
+.modal__dialogBackdrop {
+  background: var(--modal-backdrop);
+  z-index: -1;
+  position: fixed;
+  inset: 0px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal__dialog {
   max-width: 480px;
   width: 100%;
   margin: 16px;
@@ -24,4 +28,8 @@
   overflow: hidden;
   border-radius: 24px;
   border: 1px solid var(--alpha-transparent-12);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

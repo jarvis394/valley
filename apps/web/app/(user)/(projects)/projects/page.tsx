@@ -7,6 +7,7 @@ import ProjectCard from '../../../components/ProjectCard/ProjectCard'
 import useSWR from 'swr'
 import { api } from '../../../api'
 import { ProjectGetAllReq, ProjectGetAllRes } from '@valley/shared'
+import Wrapper from '@valley/ui/Wrapper'
 
 const ProjectsPage = () => {
   const { data, isLoading } = useSWR<ProjectGetAllRes, ProjectGetAllReq>(
@@ -25,12 +26,14 @@ const ProjectsPage = () => {
       >
         <Button variant="secondary-dimmed">projects/create-project</Button>
       </Link>
-      <div className={styles.projects__list}>
-        {isLoading && <h2>Loading...</h2>}
-        {data?.projects.map((project, i) => (
-          <ProjectCard data={project} key={i} />
-        ))}
-      </div>
+      <Wrapper>
+        <div className={styles.projects__list}>
+          {isLoading && <h2>Loading...</h2>}
+          {data?.projects.map((project, i) => (
+            <ProjectCard data={project} key={i} />
+          ))}
+        </div>
+      </Wrapper>
     </div>
   )
 }

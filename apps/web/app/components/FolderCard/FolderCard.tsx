@@ -1,26 +1,29 @@
 import React from 'react'
 import ButtonBase from '@valley/ui/ButtonBase'
 import styles from './FolderCard.module.css'
-import { Folder } from '@valley/db'
 import IconButton from '@valley/ui/IconButton'
 import { MoreVertical } from 'geist-ui-icons'
+import { formatBytes } from '../../utils/formatBytes'
 import cx from 'classnames'
+import { SerializedFolder } from '@valley/shared'
 
 type FolderCardProps = {
-  folder: Folder
+  folder: SerializedFolder
   active?: boolean
-  onClick?: (folder: Folder) => void
+  onClick?: (folder: SerializedFolder) => void
 }
 
 const FolderCard: React.FC<FolderCardProps> = ({ folder, active, onClick }) => {
+  const totalSize = formatBytes(folder.totalSize)
+
   const handleClick = () => {
     onClick?.(folder)
   }
 
   return (
     <ButtonBase
-      variant="secondary"
       component={'a'}
+      variant="secondary"
       onClick={handleClick}
       className={cx(styles.folderCard, {
         [styles['folderCard--active']]: active,
@@ -31,7 +34,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, active, onClick }) => {
         <div className={styles.folderCard__contentSubtitle}>
           <p>{folder.totalFiles} files</p>
           <span>•</span>
-          <p>{folder.totalSize} MB</p>
+          <p>{totalSize}</p>
         </div>
       </div>
       <IconButton size="sm" variant="tertiary">

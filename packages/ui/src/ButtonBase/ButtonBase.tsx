@@ -1,12 +1,9 @@
 import React from 'react'
 import styles from './ButtonBase.module.css'
 import cx from 'classnames'
-import {
-  OverridableComponent,
-  OverrideProps,
-} from '../types/OverridableComponent'
+import { OverridableComponent, OverrideProps } from '@mui/types'
 
-type ButtonBaseProps = React.PropsWithChildren<{
+export type ButtonBaseOwnProps = React.PropsWithChildren<{
   variant?:
     | 'primary'
     | 'secondary'
@@ -16,51 +13,51 @@ type ButtonBaseProps = React.PropsWithChildren<{
     | 'warning'
     | 'danger'
   disabled?: boolean
+  ref?: React.Ref<unknown>
 }>
 
-type ButtonBaseTypeMap<D extends React.ElementType = 'button'> = {
-  props: ButtonBaseProps
-  defaultComponent: D
+export type ButtonBaseTypeMap<
+  AdditionalProps = unknown,
+  RootComponent extends React.ElementType = 'button'
+> = {
+  props: AdditionalProps & ButtonBaseOwnProps
+  defaultComponent: RootComponent
 }
 
-export type ButtonBaseComponentProps = OverrideProps<
-  ButtonBaseTypeMap,
-  'button'
+export type ButtonBaseProps<
+  RootComponent extends React.ElementType = ButtonBaseTypeMap['defaultComponent'],
+  AdditionalProps = unknown
+> = OverrideProps<
+  ButtonBaseTypeMap<AdditionalProps, RootComponent>,
+  RootComponent
 > & {
   component?: React.ElementType
 }
 
-const ButtonBase = React.forwardRef(
-  (
-    {
-      variant,
-      children,
-      className,
-      component = 'button',
-      ...props
-    }: ButtonBaseComponentProps,
-    ref
-  ) => {
-    return React.createElement(
-      component,
-      {
-        ...props,
-        ref,
-        className: cx(className, styles.buttonBase, {
-          [styles['buttonBase--primary']]: variant === 'primary',
-          [styles['buttonBase--secondary']]: variant === 'secondary',
-          [styles['buttonBase--secondary-dimmed']]:
-            variant === 'secondary-dimmed',
-          [styles['buttonBase--tertiary']]: variant === 'tertiary',
-          [styles['buttonBase--tertiary-dimmed']]:
-            variant === 'tertiary-dimmed',
-          [styles['buttonBase--warning']]: variant === 'warning',
-          [styles['buttonBase--danger']]: variant === 'danger',
-        }),
-      },
-      children
-    )
-  }
-) as OverridableComponent<ButtonBaseTypeMap>
+const ButtonBase = React.forwardRef<HTMLButtonElement>(function ButtonBase(
+  { variant, children, className, component, ...props }: ButtonBaseProps,
+  ref
+) {
+  const Root = component || 'button'
 
-export default ButtonBase
+  return (
+    <Root
+      {...props}
+      className={cx(className, styles.buttonBase, {
+        [styles['buttonBase--primary']]: variant === 'primary',
+        [styles['buttonBase--secondary']]: variant === 'secondary',
+        [styles['buttonBase--secondary-dimmed']]:
+          variant === 'secondary-dimmed',
+        [styles['buttonBase--tertiary']]: variant === 'tertiary',
+        [styles['buttonBase--tertiary-dimmed']]: variant === 'tertiary-dimmed',
+        [styles['buttonBase--warning']]: variant === 'warning',
+        [styles['buttonBase--danger']]: variant === 'danger',
+      })}
+      ref={ref}
+    >
+      {children}
+    </Root>
+  )
+})
+
+export default React.memo(ButtonBase) as OverridableComponent<ButtonBaseTypeMap>

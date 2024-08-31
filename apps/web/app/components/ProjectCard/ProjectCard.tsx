@@ -13,12 +13,12 @@ import {
 } from 'geist-ui-icons'
 import Button from '@valley/ui/Button'
 import IconButton from '@valley/ui/IconButton'
-import { Project } from '@prisma/client'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { SerializedProject } from '@valley/shared'
 
 type ProjectCardProps = {
-  data: Project
+  data: SerializedProject
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {

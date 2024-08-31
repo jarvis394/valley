@@ -4,17 +4,15 @@ import styles from './IconButton.module.css'
 import Button, { ButtonProps } from '../Button/Button'
 import Spinner from '../Spinner/Spinner'
 
-const IconButton: React.FC<Omit<ButtonProps, 'before' | 'ref'>> = ({
-  children,
-  className,
-  size = 'sm',
-  loading,
-  ...props
-}) => {
+const IconButton = React.forwardRef<
+  HTMLButtonElement,
+  Omit<ButtonProps, 'before' | 'after'>
+>(({ children, className, size = 'sm', loading, ...props }, ref) => {
   return (
     <Button
       {...props}
       size={size}
+      ref={ref}
       className={cx(className, styles.iconButton, {
         [styles['iconButton--size-sm']]: size === 'sm',
         [styles['iconButton--size-md']]: size === 'md',
@@ -26,6 +24,6 @@ const IconButton: React.FC<Omit<ButtonProps, 'before' | 'ref'>> = ({
       {!loading && children}
     </Button>
   )
-}
+})
 
-export default IconButton
+export default React.memo(IconButton)

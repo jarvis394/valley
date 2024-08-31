@@ -22,7 +22,7 @@ model Project {
   url                String
   totalFiles         Int                 @default(0)
   // Total size is in bytes
-  totalSize          Int                 @default(0)
+  totalSize          BigInt              @default(0)
   dateCreated        DateTime            @default(now())
   dateUpdated        DateTime            @updatedAt
   dateShot           DateTime            @default(now())
@@ -46,7 +46,7 @@ model Folder {
   description     String?
   totalFiles      Int     @default(0)
   // Total size is in bytes
-  totalSize       Int     @default(0)
+  totalSize       BigInt  @default(0)
   files           File[]
 
   Project   Project @relation(fields: [projectId], references: [id])
@@ -54,9 +54,14 @@ model Folder {
 }
 
 model File {
-  id     Int    @id @default(autoincrement())
-  bucket String
-  path   String
+  id           Int     @id @default(autoincrement())
+  bucket       String
+  key          String
+  thumbnailKey String?
+  exifMetadata Json
+  name         String
+  type         String
+  size         Int
 
   Folder   Folder @relation(fields: [folderId], references: [id])
   folderId Int

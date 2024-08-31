@@ -13,7 +13,8 @@
     "db:migrate": "yarn workspace @valley/db  db:migrate",
     "db:migrate:reset": "yarn workspace @valley/db db:migrate:reset",
     "prepare": "husky",
-    "lint": "turbo typecheck && turbo lint",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {

@@ -1,3 +1,4 @@
+'use client'
 import Header from '../components/Header/Header'
 import React from 'react'
 import styles from './styles.module.css'

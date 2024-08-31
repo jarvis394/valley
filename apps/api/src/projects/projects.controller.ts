@@ -36,10 +36,10 @@ export class ProjectsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
+  @Get(':projectId')
   async getProject(
     @Request() req: RequestWithUser,
-    @Param('id', ParseIntPipe) projectId: number
+    @Param('projectId', ParseIntPipe) projectId: number
   ): Promise<ProjectGetRes> {
     const [project, folders] = await Promise.all([
       this.projectsService.getUserProject(req.user.userId, projectId),
@@ -58,9 +58,10 @@ export class ProjectsController {
       data,
       req.user.userId
     )
-    const folder = await this.foldersService.createDefaultFolderForProject(
-      project.id
-    )
+    const folder = await this.foldersService.createDefaultProjectFolder({
+      projectId: project.id,
+      userId: req.user.userId,
+    })
     return { project, folders: [folder] }
   }
 }

@@ -1,17 +1,32 @@
-import { Injectable } from '@nestjs/common'
-import { Folder, Prisma, Project } from '@valley/db'
-import { FolderCreateReq } from '@valley/shared'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { File, Folder, Prisma, Project, User } from '@valley/db'
+import {
+  FolderCreateReq,
+  FolderEditReq,
+  SerializedFolder,
+} from '@valley/shared'
 import { PrismaService } from 'nestjs-prisma'
+import { ProjectsService } from 'src/projects/projects.service'
 
 @Injectable()
 export class FoldersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly projectsService: ProjectsService
+  ) {}
+
+  serializeFolder(folder: Folder): SerializedFolder {
+    return {
+      ...folder,
+      totalSize: Number(folder.totalSize),
+    }
+  }
 
   async folder(
-    projectWhereUniqueInput: Prisma.FolderWhereUniqueInput
+    folderWhereUniqueInput: Prisma.FolderWhereUniqueInput
   ): Promise<Folder | null> {
     return await this.prismaService.folder.findUnique({
-      where: projectWhereUniqueInput,
+      where: folderWhereUniqueInput,
     })
   }
 
@@ -20,10 +35,10 @@ export class FoldersService {
     take?: number
     cursor?: Prisma.FolderWhereUniqueInput
     where?: Prisma.FolderWhereInput
-    orderBy?: Prisma.UserOrderByWithRelationInput
+    orderBy?: Prisma.FolderOrderByWithRelationInput
   }): Promise<Folder[]> {
     const { skip, take, cursor, where, orderBy } = params
-    return this.prismaService.folder.findMany({
+    return await this.prismaService.folder.findMany({
       skip,
       take,
       cursor,
@@ -33,7 +48,7 @@ export class FoldersService {
   }
 
   async createFolder(data: Prisma.FolderCreateInput): Promise<Folder> {
-    return this.prismaService.folder.create({
+    return await this.prismaService.folder.create({
       data,
     })
   }
@@ -43,50 +58,77 @@ export class FoldersService {
     data: Prisma.FolderUpdateInput
   }): Promise<Folder> {
     const { where, data } = params
-    return this.prismaService.folder.update({
+    return await this.prismaService.folder.update({
       data,
       where,
     })
   }
 
-  async deleteProject(where: Prisma.FolderWhereUniqueInput): Promise<Folder> {
-    return this.prismaService.folder.delete({
+  async deleteFolder(where: Prisma.FolderWhereUniqueInput): Promise<Folder> {
+    return await this.prismaService.folder.delete({
       where,
     })
   }
 
-  async getProjectFolders(projectId: Project['id']): Promise<Folder[]> {
-    return this.folders({
+  async getProjectFolders(
+    projectId: Project['id']
+  ): Promise<SerializedFolder[]> {
+    const res = await this.folders({
       where: {
         projectId,
       },
+      orderBy: {
+        id: 'asc',
+      },
     })
+
+    return res.map((e) => this.serializeFolder(e))
   }
 
-  async createFolderForProject(
-    projectId: Project['id'],
+  async createProjectFolder(props: {
+    userId: User['id']
+    projectId: Project['id']
     data: FolderCreateReq
-  ): Promise<Folder> {
-    return this.createFolder({
+  }): Promise<SerializedFolder> {
+    const project = await this.projectsService.project({
+      id: props.projectId,
+      userId: props.userId,
+    })
+    if (!project) {
+      throw new NotFoundException('Project not found')
+    }
+
+    const folder = await this.createFolder({
       Project: {
         connect: {
-          id: projectId,
+          id: props.projectId,
         },
       },
       isDefaultFolder: false,
-      title: data.title,
-      description: data.description,
+      title: props.data.title,
+      description: props.data.description,
       files: {},
     })
+
+    return this.serializeFolder(folder)
   }
 
-  async createDefaultFolderForProject(
+  async createDefaultProjectFolder(props: {
+    userId: User['id']
     projectId: Project['id']
-  ): Promise<Folder> {
-    return this.createFolder({
+  }): Promise<SerializedFolder> {
+    const project = await this.projectsService.project({
+      id: props.projectId,
+      userId: props.userId,
+    })
+    if (!project) {
+      throw new NotFoundException('Project not found')
+    }
+
+    const folder = await this.createFolder({
       Project: {
         connect: {
-          id: projectId,
+          id: props.projectId,
         },
       },
       isDefaultFolder: true,
@@ -94,5 +136,51 @@ export class FoldersService {
       description: null,
       files: {},
     })
+
+    return this.serializeFolder(folder)
+  }
+
+  async editProjectFolder(props: {
+    userId: User['id']
+    projectId: Project['id']
+    data: FolderEditReq
+  }): Promise<SerializedFolder> {
+    const { id, ...data } = props.data
+    const project = await this.projectsService.project({
+      id: props.projectId,
+      userId: props.userId,
+    })
+    if (!project) {
+      throw new NotFoundException('Project not found')
+    }
+
+    const folder = await this.updateFolder({
+      where: {
+        id,
+        projectId: props.projectId,
+      },
+      data,
+    })
+
+    return this.serializeFolder(folder)
+  }
+
+  async addFileToFolder(
+    folderId: Folder['id'],
+    file: File
+  ): Promise<SerializedFolder> {
+    const folder = await this.updateFolder({
+      where: { id: folderId },
+      data: {
+        totalFiles: {
+          increment: 1,
+        },
+        totalSize: {
+          increment: file.size,
+        },
+      },
+    })
+
+    return this.serializeFolder(folder)
   }
 }

@@ -1,3 +1,9 @@
+.pageHeader {
+  min-height: 120px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .pageHeader__title {
   margin: 0;
   padding: 40px 0;
@@ -6,6 +12,7 @@
   font-weight: 600;
   flex-grow: 1;
   display: flex;
+  line-height: 40px;
 }
 
 .pageHeader__before {

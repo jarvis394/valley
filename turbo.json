@@ -2,11 +2,9 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
   "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_TUS_URL"],
-  "ui": "tui",
   "tasks": {
     "dev": {
       "dependsOn": ["^db:generate"],
-      "interactive": true,
       "cache": false,
       "persistent": true
     },

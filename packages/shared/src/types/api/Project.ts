@@ -1,18 +1,19 @@
-import { Folder, Project } from '@valley/db'
+import { SerializedFolder } from '../SerializedFolder'
+import { SerializedProject } from '../SerializedProject'
 
 export type ProjectGetAllReq = unknown
 export type ProjectGetAllRes = {
-  projects: Project[]
+  projects: SerializedProject[]
 }
 
 export type ProjectGetReq = unknown
 export type ProjectGetRes = {
-  project: Project
-  folders: Folder[]
+  project: SerializedProject
+  folders: SerializedFolder[]
 }
 
 export type ProjectCreateReq = Omit<
-  Project,
+  SerializedProject,
   | 'id'
   | 'userId'
   | 'totalFiles'
@@ -27,6 +28,6 @@ export type ProjectCreateReq = Omit<
   url?: string
 }
 export type ProjectCreateRes = {
-  project: Project
-  folders: Folder[]
+  project: SerializedProject
+  folders: SerializedFolder[]
 }

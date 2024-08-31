@@ -1,13 +1,25 @@
 import React from 'react'
 import styles from './Wrapper.module.css'
 import cx from 'classnames'
+import Paper, { PaperProps } from '../Paper/Paper'
 
-type WrapperProps = React.PropsWithChildren<
-  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
->
+export type WrapperProps = PaperProps
 
-const Wrapper: React.FC<WrapperProps> = ({ children, className }) => {
-  return <div className={cx(styles.wrapper, className)}>{children}</div>
+const Wrapper: React.FC<WrapperProps> = ({
+  children,
+  className,
+  variant = 'tertiary',
+  ...props
+}) => {
+  return (
+    <Paper
+      {...props}
+      variant={variant}
+      className={cx(styles.wrapper, className)}
+    >
+      {children}
+    </Paper>
+  )
 }
 
 export default Wrapper
