@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common'
 import { UploadService } from './upload.service'
-import { JwtAuthGuard } from 'src/auth/strategies/jwt.strategy'
+import { JwtAuthGuard } from '../auth/strategies/jwt.strategy'
 import { UploadAccessGuard } from './guards/uploadAccess.guard'
 import { TusHookResponse, TusHookType } from '@valley/shared'
 import type { TusHookData } from '@valley/shared'
@@ -12,7 +12,6 @@ export class UploadController {
   @UseGuards(JwtAuthGuard, UploadAccessGuard)
   @Post('/')
   async handleTusHook(@Body() data: TusHookData): Promise<TusHookResponse> {
-    console.log('Trigger hook:', data.Type)
     switch (data.Type) {
       case TusHookType.PRE_CREATE:
         return await this.uploadService.handlePreCreateHook(data)

@@ -29,7 +29,7 @@
     "geist-ui-icons": "^1.1.1",
     "jwt-decode": "^4.0.0",
     "lodash.deburr": "^4.1.0",
-    "next": "^14.2.6",
+    "next": "^14.2.7",
     "next-auth": "^4.24.7",
     "pretty-bytes": "^6.1.1",
     "react": "^18.2.0",
@@ -41,7 +41,7 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^14.2.6",
+    "@next/eslint-plugin-next": "^14.2.7",
     "@swc/helpers": "^0.5.12",
     "@types/lodash.deburr": "^4.1.9",
     "@types/node": "^20.11.24",

@@ -17,9 +17,9 @@ import type {
   FolderGetRes,
 } from '@valley/shared'
 import { FoldersService } from './folders.service'
-import { FilesService } from 'src/files/files.service'
-import { JwtAuthGuard } from 'src/auth/strategies/jwt.strategy'
-import type { RequestWithUser } from 'src/auth/auth.controller'
+import { FilesService } from '../files/files.service'
+import { JwtAuthGuard } from '../auth/strategies/jwt.strategy'
+import type { RequestWithUser } from '../auth/auth.controller'
 
 @Controller('/projects/:projectId/folders')
 export class FoldersController {

@@ -17,7 +17,7 @@ import type {
 import type { RequestWithUser } from '../auth/auth.controller'
 import { JwtAuthGuard } from '../auth/strategies/jwt.strategy'
 import { ProjectsService } from './projects.service'
-import { FoldersService } from 'src/folders/folders.service'
+import { FoldersService } from '../folders/folders.service'
 
 @Controller('projects')
 export class ProjectsController {

@@ -31,13 +31,14 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
     api({ isAccessTokenRequired: true })
   )
   const searchParams = useSearchParams()
+  const folderId = Number(searchParams.get('folder'))
+  const parsedProjectId = Number(projectId)
+  const defaultDescription =
+    data?.folders.find((e) => e.id === folderId)?.description || ''
   const { register, handleSubmit } = useForm<FieldValues>()
 
   const onSubmit: SubmitHandler<FieldValues> = async (values, e) => {
     e?.preventDefault()
-    const folderId = Number(searchParams.get('folder'))
-    const parsedProjectId = Number(projectId)
-
     if (isNaN(parsedProjectId) || isNaN(folderId) || !data) return
 
     setIsLoading(true)
@@ -72,6 +73,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
           </InputLabel>
           <TextArea
             {...register('folderDescription')}
+            defaultValue={defaultDescription}
             id="folder-description-input"
             placeholder="Write here anything..."
           />

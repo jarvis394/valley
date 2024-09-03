@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { BaseTusHookResponseErrorBody, TusHookData } from '@valley/shared'
-import { RequestWithUser } from 'src/auth/auth.controller'
-import { ProjectsService } from 'src/projects/projects.service'
-import { TusHookResponseBuilder } from '../upload.service'
+import { RequestWithUser } from '../../auth/auth.controller'
+import { TusHookResponseBuilder } from '../../lib/TusHookResponseBuilder'
+import { ProjectsService } from '../../projects/projects.service'
 
 @Injectable()
 export class UploadAccessGuard implements CanActivate {

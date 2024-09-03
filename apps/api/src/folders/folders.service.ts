@@ -6,7 +6,7 @@ import {
   SerializedFolder,
 } from '@valley/shared'
 import { PrismaService } from 'nestjs-prisma'
-import { ProjectsService } from 'src/projects/projects.service'
+import { ProjectsService } from '../projects/projects.service'
 
 @Injectable()
 export class FoldersService {

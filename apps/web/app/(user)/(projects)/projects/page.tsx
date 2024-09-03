@@ -9,7 +9,7 @@ import { api } from '../../../api'
 import { ProjectGetAllReq, ProjectGetAllRes } from '@valley/shared'
 import Wrapper from '@valley/ui/Wrapper'
 
-const ProjectsPage = () => {
+const ProjectsPage: React.FC = () => {
   const { data, isLoading } = useSWR<ProjectGetAllRes, ProjectGetAllReq>(
     '/projects',
     api({ isAccessTokenRequired: true })

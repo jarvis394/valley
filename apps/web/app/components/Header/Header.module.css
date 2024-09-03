@@ -1,9 +1,8 @@
 .header {
-  --header-height: 64px;
-
   background: var(--background-paper);
   position: relative;
   padding: 16px 24px;
+  padding-bottom: 8px;
   display: flex;
   flex-direction: row;
   gap: 0;
@@ -34,12 +33,13 @@
 }
 
 .header__logo {
+  --logo-zindex: 100;
   display: inline-flex;
   text-decoration: none;
   position: fixed;
   left: 24px;
   top: 16px;
-  z-index: var(--header-zindex);
+  z-index: var(--logo-zindex);
 }
 
 .header__avatarAndNameContainer {

@@ -10,6 +10,9 @@ import React, {
 import { isFragment } from 'react-is'
 import styles from './Tabs.module.css'
 import { TabsItemProps } from '../TabsItem/TabsItem'
+import { useScrollProgress } from '../useScrollProgress/useScrollProgress'
+
+const HOVER_CONTAINER_PADDING = 8
 
 type BaseTabsProps<T extends string | number> = {
   onItemClick?: (
@@ -20,6 +23,8 @@ type BaseTabsProps<T extends string | number> = {
   children:
     | React.ReactElement<TabsItemProps>
     | Array<React.ReactElement<TabsItemProps>>
+  scrollProgressOffset?: number
+  scrollProgressTransitionStyles?: (progress: number) => CSSProperties
 }
 
 type ValueProps<T extends string | number> =
@@ -32,8 +37,8 @@ type ValueProps<T extends string | number> =
       value?: never
     }
 
-export type TabsProps<T extends string | number> = BaseTabsProps<T> &
-  ValueProps<T>
+export type TabsProps<T extends string | number = string | number> =
+  BaseTabsProps<T> & ValueProps<T>
 
 const Tabs = <T extends string | number = string | number>({
   onItemClick,
@@ -41,8 +46,14 @@ const Tabs = <T extends string | number = string | number>({
   value: propsValue,
   defaultValue,
   indicator,
+  ...props
 }: TabsProps<T>): JSX.Element => {
   const [innerValue, setInnerValue] = useState(defaultValue)
+  const scrollProgress = useScrollProgress(props.scrollProgressOffset || 0, {
+    enabled: props.scrollProgressOffset !== undefined,
+  })
+  const scrollProgressTransitionStyles =
+    props.scrollProgressTransitionStyles?.(scrollProgress)
   const value = useMemo(
     () => (propsValue !== undefined ? propsValue : innerValue),
     [innerValue, propsValue]
@@ -50,15 +61,14 @@ const Tabs = <T extends string | number = string | number>({
   const [mounted, setMounted] = useState(false)
   const buttonRefs = useRef(new Map<T, HTMLButtonElement>())
   const [hoveredTab, setHoveredTab] = useState<T | null>(null)
-  const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null)
   const initialHoveredElementTimeoutRef = useRef<NodeJS.Timeout>()
   const $root = useRef<HTMLDivElement>(null)
   const rootBoundingRect = $root.current?.getBoundingClientRect()
   const [isInitialHoveredElement, setIsInitialHoveredElement] = useState(true)
   const isInitialRender = useRef(true)
-  const selectedRect = useRef(
-    value !== undefined &&
-      buttonRefs.current.get(value)?.getBoundingClientRect()
+  const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null)
+  const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(
+    null
   )
 
   const onLeaveTabs = () => {
@@ -85,7 +95,7 @@ const Tabs = <T extends string | number = string | number>({
         return value
       })
 
-      setHoveredRect(e.target.getBoundingClientRect())
+      setHoveredElement(e.target)
     },
     []
   )
@@ -94,7 +104,7 @@ const Tabs = <T extends string | number = string | number>({
     (itemValue: T, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       onItemClick?.(itemValue, e)
       setInnerValue(itemValue)
-      selectedRect.current = e.currentTarget?.getBoundingClientRect()
+      setSelectedElement(e.currentTarget)
     },
     [onItemClick]
   )
@@ -138,7 +148,7 @@ const Tabs = <T extends string | number = string | number>({
         ref: (e: HTMLButtonElement) => {
           buttonRefs.current.set(childValue, e)
           if (selected) {
-            selectedRect.current = e?.getBoundingClientRect()
+            setSelectedElement(e)
           }
         },
         onPointerEnter: (
@@ -156,23 +166,25 @@ const Tabs = <T extends string | number = string | number>({
   }, [childrenProp, handleItemClick, indicator, mounted, onEnterTab, value])
 
   const hoverStyles: CSSProperties = { opacity: 0 }
+  const hoveredRect = hoveredElement?.getBoundingClientRect()
   if (rootBoundingRect && hoveredRect) {
     hoverStyles.transform = `translate3d(${
       hoveredRect.left - rootBoundingRect.left
-    }px,${hoveredRect.top - rootBoundingRect.top + 8}px,0px)`
+    }px,${hoveredRect.top - rootBoundingRect.top + HOVER_CONTAINER_PADDING}px,0px)`
     hoverStyles.width = hoveredRect.width
-    hoverStyles.height = hoveredRect.height - 16
-    hoverStyles.opacity = hoveredTab != null ? 1 : 0
+    hoverStyles.height = hoveredRect.height - HOVER_CONTAINER_PADDING * 2
+    hoverStyles.opacity = hoveredTab !== null ? 1 : 0
     hoverStyles.transition = isInitialHoveredElement
       ? 'opacity 150ms'
       : 'transform 150ms, opacity 150ms, width 150ms'
   }
 
   const selectStyles: CSSProperties = { opacity: 0 }
-  if (rootBoundingRect && selectedRect.current) {
-    selectStyles.width = selectedRect.current.width
+  const selectedRect = selectedElement?.getBoundingClientRect()
+  if (rootBoundingRect && selectedRect) {
+    selectStyles.width = selectedRect.width
     selectStyles.transform = `translateX(${
-      (selectedRect.current.left || 0) - rootBoundingRect.left
+      (selectedRect.left || 0) - rootBoundingRect.left
     }px)`
     selectStyles.opacity = 1
     selectStyles.transition = isInitialRender.current
@@ -195,7 +207,12 @@ const Tabs = <T extends string | number = string | number>({
   }, [children.length])
 
   return (
-    <div onPointerLeave={onLeaveTabs} ref={$root} className={styles.tabs}>
+    <div
+      onPointerLeave={onLeaveTabs}
+      ref={$root}
+      className={styles.tabs}
+      style={scrollProgressTransitionStyles}
+    >
       {children}
       <div className={styles.tabs__hover} style={hoverStyles} />
       <div className={styles.tabs__indicator} style={selectStyles} />

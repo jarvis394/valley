@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./useScrollProgress": "./src/useScrollProgress/useScrollProgress.ts",
     "./MenuIconButton": "./src/MenuIconButton/MenuIconButton.tsx",
     "./MenuButton": "./src/MenuButton/MenuButton.tsx",
     "./Dropdown": "./src/Dropdown/Dropdown.tsx",

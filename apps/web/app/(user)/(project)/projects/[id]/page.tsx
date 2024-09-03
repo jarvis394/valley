@@ -64,7 +64,9 @@ const ProjectPage: React.FC = () => {
   }
 
   const handleFolderClick = (folder: SerializedFolder) => {
-    router.push(`/projects/${id}?folder=${folder.id}`)
+    if (currentFolder?.id !== folder.id) {
+      router.push(`/projects/${id}?folder=${folder.id}`)
+    }
   }
 
   const handleEditFolderTitle = () => {

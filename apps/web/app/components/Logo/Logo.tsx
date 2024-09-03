@@ -1,8 +1,12 @@
 import React from 'react'
 import styles from './Logo.module.css'
 import cx from 'classnames'
+import { HEADER_HEIGHT } from '../../config/constants'
+import { map } from '../../utils/map'
+import { useScrollProgress } from '@valley/ui/useScrollProgress'
 
 type LogoProps = {
+  className?: string
   withBrandName?: boolean
 } & React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
@@ -10,8 +14,18 @@ type LogoProps = {
 >
 
 const Logo: React.FC<LogoProps> = ({ withBrandName, className, ...props }) => {
+  const scrollProgress = useScrollProgress(HEADER_HEIGHT)
+  const topOffset = map(scrollProgress, 0, 1, 0, -32 * 0.2)
+  const transformStyle = `scale(${map(scrollProgress, 0, 1, 1, 0.8)}) translateY(${topOffset}px) translateZ(0)`
+
   return (
-    <div {...props} className={cx(styles.logo, className)}>
+    <div
+      {...props}
+      className={cx(styles.logo, className)}
+      style={{
+        transform: transformStyle,
+      }}
+    >
       <svg
         width="32"
         height="32"

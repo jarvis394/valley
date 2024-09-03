@@ -11,6 +11,7 @@ import { LogoGithub } from 'geist-ui-icons'
 import useSWR from 'swr'
 import { api } from '../../api'
 import { UserGetSelfRes } from '@valley/shared'
+import { HEADER_HEIGHT } from '../../config/constants'
 
 const Header = () => {
   const me = useSWR<UserGetSelfRes>(
@@ -19,7 +20,12 @@ const Header = () => {
   )
 
   return (
-    <header className={styles.header}>
+    <header
+      className={styles.header}
+      style={{
+        ['--header-height' as string]: HEADER_HEIGHT,
+      }}
+    >
       <Link href="/">
         <Logo className={styles.header__logo} />
       </Link>

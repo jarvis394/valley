@@ -11,7 +11,7 @@ import { ProjectsModule } from '../projects/projects.module'
 import { UploadModule } from '../upload/upload.module'
 import { UsersModule } from '../users/users.module'
 import { AppController } from './app.controller'
-import { FoldersModule } from 'src/folders/folders.module'
+import { FoldersModule } from '../folders/folders.module'
 
 @Module({
   imports: [
