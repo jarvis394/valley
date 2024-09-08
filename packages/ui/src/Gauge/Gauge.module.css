@@ -1,0 +1,50 @@
+.gauge {
+  --transition-length: 1s;
+  --transition-step: 200ms;
+  --delay: 0s;
+  --percent-to-deg: 3.6deg;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transform: translateZ(0);
+}
+
+.gauge > svg {
+  overflow: visible;
+  fill: transparent;
+}
+
+.gauge__arcPrimary {
+  stroke-dasharray: calc(var(--stroke-percent) * var(--percent-to-px))
+    var(--circumference);
+  transition:
+    var(--transition-length) ease var(--delay),
+    stroke var(--transition-length) ease var(--delay);
+  transition-property: stroke-dasharray, transform;
+  transform: rotate(
+    calc(
+      -90deg + var(--gap-percent) * var(--offset-factor) * var(--percent-to-deg)
+    )
+  );
+  transform-origin: calc(var(--circle-size) / 2) calc(var(--circle-size) / 2);
+}
+
+.gauge__arcSecondary {
+  --offset-factor-secondary: calc(1 - var(--offset-factor));
+  stroke-dasharray: calc(var(--stroke-percent) * var(--percent-to-px))
+    var(--circumference);
+  transform: rotate(
+      calc(
+        1turn - 90deg -
+          (
+            var(--gap-percent) * var(--percent-to-deg) *
+              var(--offset-factor-secondary)
+          )
+      )
+    )
+    scaleY(-1);
+  transition: all var(--transition-length) ease var(--delay);
+  transform-origin: calc(var(--circle-size) / 2) calc(var(--circle-size) / 2);
+}

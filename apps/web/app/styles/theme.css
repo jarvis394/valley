@@ -1,3 +1,9 @@
+.App {
+  /** Colors */
+  --blue-600: #0091ff;
+  --blue-900: #52a8ff;
+}
+
 .App[data-theme='dark'] {
   /** Background */
   --background-default: #0a0a0a;
@@ -92,6 +98,10 @@
     0px 5px 8px 0px rgba(0, 0, 0, 0.14), 0px 1px 14px 0px rgba(0, 0, 0, 0.12);
   --shadow-6: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
     0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+
+  /** Overlay */
+  --overlay-shadow: 0 0 4px 0 rgba(255, 255, 255, 0.03),
+    0 4px 16px 0 rgba(255, 255, 255, 0.03);
 
   /** Modal */
   --modal-backdrop: rgba(10, 10, 10, 0.5);
@@ -191,6 +201,10 @@
     0px 5px 8px 0px rgba(0, 0, 0, 0.14), 0px 1px 14px 0px rgba(0, 0, 0, 0.12);
   --shadow-6: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
     0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+
+  /** Overlay */
+  --overlay-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.03),
+    0 4px 16px 0 rgba(0, 0, 0, 0.03);
 
   /** Modal */
   --modal-backdrop: rgba(255, 255, 255, 0.5);

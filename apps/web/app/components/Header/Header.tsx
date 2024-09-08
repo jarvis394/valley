@@ -23,7 +23,7 @@ const Header = () => {
     <header
       className={styles.header}
       style={{
-        ['--header-height' as string]: HEADER_HEIGHT,
+        ['--header-height' as string]: HEADER_HEIGHT + 'px',
       }}
     >
       <Link href="/">

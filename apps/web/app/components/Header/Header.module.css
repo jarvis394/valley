@@ -33,13 +33,12 @@
 }
 
 .header__logo {
-  --logo-zindex: 100;
   display: inline-flex;
   text-decoration: none;
   position: fixed;
   left: 24px;
   top: 16px;
-  z-index: var(--logo-zindex);
+  z-index: var(--logo-zIndex);
 }
 
 .header__avatarAndNameContainer {

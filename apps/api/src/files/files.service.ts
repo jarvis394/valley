@@ -244,19 +244,19 @@ export class FilesService {
       Key: data.key,
     })
     const object = await this.storage.send(getObjectCommand)
-    const image = await object.Body.transformToByteArray()
-    const exifMetadata = await this.extractExifData(image)
-    const thumbnailResult = await this.createFileThumbnail(image, {
+    const file = await object.Body.transformToByteArray()
+    const exifMetadata = await this.extractExifData(file)
+    const thumbnailResult = await this.createFileThumbnail(file, {
       key: data.key,
       bucket: this.configService.UPLOAD_BUCKET,
       metadata: object.Metadata,
     })
-    const processedExifMetadata = exifMetadata.ok ? exifMetadata.data : null
+    const processedExifMetadata = exifMetadata.ok ? exifMetadata.data : {}
     const processedThumbnailKey = thumbnailResult.ok
       ? thumbnailResult.key
       : null
 
-    const file = await this.createFile({
+    const databaseFile = await this.createFile({
       Folder: {
         connect: {
           id: data.folderId,
@@ -272,10 +272,10 @@ export class FilesService {
       bucket: this.configService.UPLOAD_BUCKET,
     })
 
-    await this.foldersService.addFileToFolder(data.folderId, file)
-    await this.projectsService.addFileToProject(data.projectId, file)
+    await this.foldersService.addFileToFolder(data.folderId, databaseFile)
+    await this.projectsService.addFileToProject(data.projectId, databaseFile)
 
-    return file
+    return databaseFile
   }
 
   async streamFile(key: string): Promise<StreamableFile> {

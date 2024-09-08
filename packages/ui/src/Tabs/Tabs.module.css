@@ -11,7 +11,7 @@
   z-index: 10;
   top: 0;
   left: 0;
-  transition: all 150ms ease;
+  transition: all 120ms ease;
   pointer-events: none;
 }
 
@@ -20,7 +20,7 @@
   z-index: 10;
   background: var(--text-primary);
   height: 2px;
-  transition: all 150ms ease;
+  transition: all 120ms ease;
   bottom: 0;
   pointer-events: none;
 }

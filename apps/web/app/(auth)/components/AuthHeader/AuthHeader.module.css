@@ -23,5 +23,5 @@
 .header__logo {
   display: inline-flex;
   text-decoration: none;
-  z-index: var(--header-zindex);
+  z-index: var(--header-zIndex);
 }

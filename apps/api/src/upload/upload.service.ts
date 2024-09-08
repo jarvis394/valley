@@ -35,7 +35,7 @@ export class UploadService {
           ok: false,
           type: TusHookType.PRE_CREATE,
           statusCode: 400,
-          message: `File size is too big (max: ${MAX_UPLOAD_FILE_SIZE})`,
+          message: `File size is too big (max: ${MAX_UPLOAD_FILE_SIZE}, got: ${fileSize})`,
         })
         .build()
     }
