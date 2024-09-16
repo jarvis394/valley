@@ -1,5 +1,5 @@
 .uploadsOverlay {
-  --uploads-overlay-width: 400px;
+  --uploads-overlay-width: 380px;
   --uploads-overlay-collapsed-height: 64px;
   --uploads-overlay-expanded-height: 323px;
   --uploads-overlay-offset: 16px;
@@ -39,6 +39,8 @@
   gap: 8px;
   align-items: center;
   flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .uploadsOverlay__spinner {
@@ -53,11 +55,15 @@
   flex-direction: column;
   gap: 4px;
   justify-content: center;
+  min-width: 0;
 }
 
 .uploadsOverlay__headerContentTextContainer > h5,
 .uploadsOverlay__headerContentTextContainer > p {
   margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .uploadsOverlay__headerContentTextContainer > h5 {
@@ -152,4 +158,24 @@
 
 .uploadsOverlay__fileProgress {
   padding: 4px;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadsOverlay__fileProgress > div {
+  transition: opacity 120ms ease;
+  opacity: 1;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadsOverlay__fileProgress > div[data-hidden='true'] {
+  opacity: 0;
 }

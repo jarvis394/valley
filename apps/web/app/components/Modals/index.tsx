@@ -1,9 +1,10 @@
 'use client'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import Modal from '@valley/ui/Modal'
 import CreateProjectModal from './CreateProject'
 import EditFolderTitleModal from './EditFolderTitle'
 import EditFolderDescriptionModal from './EditFolderDescription'
-import Modal from '@valley/ui/Modal'
+import ConfirmFolderDeletionModal from './ConfirmFolderDeletion'
 
 export const Modals = () => {
   const query = useSearchParams()
@@ -27,6 +28,9 @@ export const Modals = () => {
       </Modal>
       <Modal onDismiss={handleClose} id="edit-folder-description">
         <EditFolderDescriptionModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="confirm-folder-deletion">
+        <ConfirmFolderDeletionModal onClose={handleClose} />
       </Modal>
     </>
   )

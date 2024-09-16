@@ -1,7 +1,10 @@
 import React from 'react'
 import styles from './ButtonBase.module.css'
 import cx from 'classnames'
-import { OverridableComponent, OverrideProps } from '@mui/types'
+import {
+  PolymorphicComponentPropWithRef,
+  PolymorphicRef,
+} from '../types/PolymorphicComponent'
 
 export type ButtonBaseOwnProps = React.PropsWithChildren<{
   variant?:
@@ -13,32 +16,22 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
     | 'warning'
     | 'danger'
   disabled?: boolean
-  ref?: React.Ref<unknown>
 }>
 
-export type ButtonBaseTypeMap<
-  AdditionalProps = unknown,
-  RootComponent extends React.ElementType = 'button'
-> = {
-  props: AdditionalProps & ButtonBaseOwnProps
-  defaultComponent: RootComponent
-}
+export type ButtonBaseProps<C extends React.ElementType = 'button'> =
+  PolymorphicComponentPropWithRef<C, ButtonBaseOwnProps>
 
-export type ButtonBaseProps<
-  RootComponent extends React.ElementType = ButtonBaseTypeMap['defaultComponent'],
-  AdditionalProps = unknown
-> = OverrideProps<
-  ButtonBaseTypeMap<AdditionalProps, RootComponent>,
-  RootComponent
-> & {
-  component?: React.ElementType
-}
+type ButtonBaseComponent = <C extends React.ElementType = 'button'>(
+  props: ButtonBaseProps<C>
+) => React.ReactElement | null
 
-const ButtonBase = React.forwardRef<HTMLButtonElement>(function ButtonBase(
-  { variant, children, className, component, ...props }: ButtonBaseProps,
-  ref
+const ButtonBase = React.forwardRef<HTMLButtonElement>(function ButtonBase<
+  C extends React.ElementType = 'button',
+>(
+  { variant, children, className, as, ...props }: ButtonBaseProps<C>,
+  ref: PolymorphicRef<C>
 ) {
-  const Root = component || 'button'
+  const Root = as || 'button'
 
   return (
     <Root
@@ -60,4 +53,4 @@ const ButtonBase = React.forwardRef<HTMLButtonElement>(function ButtonBase(
   )
 })
 
-export default React.memo(ButtonBase) as OverridableComponent<ButtonBaseTypeMap>
+export default React.memo(ButtonBase) as ButtonBaseComponent

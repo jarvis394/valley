@@ -12,6 +12,7 @@ import useSWR from 'swr'
 import { api } from '../../api'
 import { UserGetSelfRes } from '@valley/shared'
 import { HEADER_HEIGHT } from '../../config/constants'
+import Stack from '@valley/ui/Stack'
 
 const Header = () => {
   const me = useSWR<UserGetSelfRes>(
@@ -27,24 +28,30 @@ const Header = () => {
       }}
     >
       <Link href="/">
-        <Logo className={styles.header__logo} />
+        <Logo withScrollAnimation className={styles.header__logo} />
       </Link>
       <nav className={styles.header__nav}>
-        <div className={styles.header__stack}>
+        <Stack gap={2} align={'center'}>
           <Slash />
-          <div className={styles.header__avatarAndNameContainer}>
-            <Avatar />
-            {me.data?.user?.username}
-          </div>
-          <IconButton size="sm" variant="secondary-dimmed">
-            <MenuIcon />
-          </IconButton>
-        </div>
-        <div className={styles.header__stack}>
+          <Stack gap={4} align={'center'}>
+            <Stack
+              gap={3}
+              align={'center'}
+              className={styles.header__avatarAndNameContainer}
+            >
+              <Avatar />
+              {me.data?.user?.username}
+            </Stack>
+            <IconButton size="sm" variant="secondary-dimmed">
+              <MenuIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
+        <Stack gap={2} align={'center'}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>
             Leave a star
           </Button>
-        </div>
+        </Stack>
       </nav>
     </header>
   )

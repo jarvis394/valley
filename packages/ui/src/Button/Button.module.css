@@ -10,18 +10,28 @@
   padding-left: var(--x-padding);
   padding-right: var(--x-padding);
   height: var(--height);
+  justify-content: center;
+  align-items: center;
 }
 
-.button.button__content {
+.button .button__content {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   display: inline-block;
 }
 
+.button.button--align-start {
+  justify-content: flex-start;
+}
+
+.button.button--align-end {
+  justify-content: flex-end;
+}
+
 .button.button--size-sm {
   border-radius: 8px;
-  gap: 8px;
+  gap: 10px;
   --x-padding: 12px;
   --height: 32px;
   --font-size: 14px;
@@ -47,7 +57,8 @@
   --line-height: 20px;
 }
 
-.button .button__before {
+.button .button__before,
+.button .button__after {
   display: flex;
   justify-content: center;
   align-items: center;

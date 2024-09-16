@@ -1,7 +1,6 @@
 .inputLabel {
   display: flex;
-  font-size: 12px;
-  line-height: 15px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }

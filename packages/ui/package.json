@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./Stack": "./src/Stack/Stack.tsx",
+    "./Note": "./src/Note/Note.tsx",
+    "./MenuSeparator": "./src/MenuSeparator/MenuSeparator.tsx",
     "./Gauge": "./src/Gauge/Gauge.tsx",
     "./useScrollProgress": "./src/useScrollProgress/useScrollProgress.ts",
     "./MenuIconButton": "./src/MenuIconButton/MenuIconButton.tsx",
@@ -40,6 +43,7 @@
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@valley/shared": "*",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
@@ -49,6 +53,7 @@
   },
   "dependencies": {
     "@mui/base": "^5.0.0-beta.40",
-    "classnames": "^2.5.1"
+    "classnames": "^2.5.1",
+    "geist-ui-icons": "^1.1.1"
   }
 }

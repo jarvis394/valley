@@ -1,10 +1,7 @@
 import { BaseTusHookResponseBody, TusHookResponse } from '@valley/shared'
 
 export class TusHookResponseBuilder<
-  ResBody extends Record<
-    string,
-    string | number | boolean
-  > = BaseTusHookResponseBody,
+  ResBody extends Record<string, any> = BaseTusHookResponseBody,
 > {
   private readonly data: TusHookResponse
   #body: ResBody = { ok: true } as unknown as ResBody

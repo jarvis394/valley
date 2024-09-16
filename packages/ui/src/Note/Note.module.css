@@ -1,0 +1,128 @@
+.note {
+  --note-border-color: var(--gray-400);
+  --note-fg: var(--gray-900);
+  --note-bg: transparent;
+
+  padding: 8px 12px;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+  border: 1px solid var(--note-border-color);
+  background: var(--note-bg);
+  color: var(--note-fg);
+}
+
+.note--withAction {
+  padding-right: 8px;
+  border-radius: 12px;
+}
+
+.note__content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note__content::selection {
+  background: var(--note-selection, var(--note-fg)) !important;
+  color: var(--text-primary);
+}
+
+.note__content--iconLabel {
+  gap: 12px;
+}
+
+.note__label {
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+}
+
+.note--secondary,
+.note--default,
+.note--tertiary {
+  --note-border-color: var(--alpha-transparent-12);
+  --note-fg: var(--text-secondary);
+  --note-bg: transparent;
+  --note-link: var(--text-primary);
+}
+
+.note--secondary.note--filled,
+.note--default.note--filled {
+  --note-bg: var(--alpha-transparent-07);
+  --note-border-color: transparent;
+}
+
+.note--error,
+.note--alert {
+  --note-border-color: var(--red-400);
+  --note-fg: var(--red-900);
+  --note-bg: transparent;
+  --note-selection: var(--red-800);
+  --note-link: var(--red-1000);
+}
+
+.note--error.note--filled,
+.note--alert.note--filled {
+  --note-bg: var(--red-200);
+  --note-border-color: var(--red-100);
+}
+
+.note--success {
+  --note-border-color: var(--blue-400);
+  --note-fg: var(--blue-900);
+  --note-bg: transparent;
+  --note-selection: var(--blue-700);
+  --note-link: var(--blue-1000);
+}
+
+.note--success.note--filled {
+  --note-bg: var(--blue-200);
+  --note-border-color: var(--blue-100);
+}
+
+.note--warning {
+  --note-border-color: var(--amber-400);
+  --note-fg: var(--amber-900);
+  --note-bg: transparent;
+  --note-link: var(--amber-1000);
+  --note-selection: var(--amber-500);
+}
+
+.note--warning.note--filled {
+  --note-bg: var(--amber-200);
+  --note-border-color: var(--amber-100);
+}
+
+.note--violet {
+  --note-border-color: var(--purple-400);
+  --note-fg: var(--purple-900);
+  --note-bg: transparent;
+  --note-link: var(--purple-1000);
+  --note-selection: var(--purple-600);
+}
+
+.note--violet.note--filled {
+  --note-bg: var(--purple-200);
+  --note-border-color: var(--purple-100);
+}
+
+.note--cyan {
+  --note-border-color: var(--teal-400);
+  --note-fg: var(--teal-900);
+  --note-bg: transparent;
+  --note-link: var(--teal-1000);
+  --note-selection: var(--teal-600);
+}
+
+.note--cyan.note--filled {
+  --note-bg: var(--teal-200);
+  --note-border-color: var(--teal-100);
+}

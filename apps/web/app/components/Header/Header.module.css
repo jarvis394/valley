@@ -12,20 +12,13 @@
 }
 
 .header__nav {
-  /** Logo width + gap */
-  padding-left: calc(32px + 16px);
+  /** Logo width + gap + visual padding */
+  padding-left: calc(32px + 8px + 4px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   width: 100%;
-}
-
-.header__stack {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
 }
 
 .header a {
@@ -35,17 +28,12 @@
 .header__logo {
   display: inline-flex;
   text-decoration: none;
-  position: fixed;
   left: 24px;
   top: 16px;
   z-index: var(--logo-zIndex);
 }
 
 .header__avatarAndNameContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: center;
   font-weight: 600;
   font-size: 16px;
 }

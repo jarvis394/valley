@@ -6,13 +6,24 @@ import Button, { ButtonProps } from '../Button/Button'
 import { ListContext } from '@mui/base/useList'
 import { useMenuItem, useMenuItemContextStabilizer } from '@mui/base'
 
-type MenuItemProps = ButtonProps & {
+type MenuItemProps = Omit<
+  ButtonProps,
+  'size' | 'variant' | 'align' | 'fullWidth'
+> & {
   label?: string
 }
 
 const InnerMenuItem = React.memo(
   React.forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
-    { children, className, id, disabled: disabledProp, label, ...props },
+    {
+      children,
+      className,
+      id,
+      disabled: disabledProp,
+      label,
+      onClick: propsOnClick,
+      ...props
+    },
     ref
   ) {
     const { getRootProps, disabled, highlighted } = useMenuItem({
@@ -21,10 +32,20 @@ const InnerMenuItem = React.memo(
       rootRef: ref,
       label,
     })
+    const { onClick, ...rootProps } = getRootProps(props)
+    const handleClick = (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+      e.stopPropagation()
+      propsOnClick?.(e)
+      onClick?.(e)
+    }
 
     return (
       <Button
-        {...getRootProps(props)}
+        {...rootProps}
+        onClick={handleClick}
+        align="start"
         size="sm"
         variant="tertiary"
         fullWidth

@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, { CSSProperties, useMemo } from 'react'
 import styles from './Logo.module.css'
 import cx from 'classnames'
 import { HEADER_HEIGHT } from '../../config/constants'
@@ -8,24 +9,31 @@ import { useScrollProgress } from '@valley/ui/useScrollProgress'
 type LogoProps = {
   className?: string
   withBrandName?: boolean
+  withScrollAnimation?: boolean
 } & React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
 >
 
-const Logo: React.FC<LogoProps> = ({ withBrandName, className, ...props }) => {
+const Logo: React.FC<LogoProps> = ({
+  withBrandName,
+  withScrollAnimation,
+  className,
+  ...props
+}) => {
   const scrollProgress = useScrollProgress(HEADER_HEIGHT)
   const topOffset = map(scrollProgress, 0, 1, 0, -32 * 0.2)
   const transformStyle = `scale(${map(scrollProgress, 0, 1, 1, 0.8)}) translateY(${topOffset}px) translateZ(0)`
+  const style = useMemo<CSSProperties>(() => {
+    if (!withScrollAnimation) return {}
+    return {
+      position: scrollProgress === 0 ? 'absolute' : 'fixed',
+      transform: transformStyle,
+    }
+  }, [scrollProgress, transformStyle])
 
   return (
-    <div
-      {...props}
-      className={cx(styles.logo, className)}
-      style={{
-        transform: transformStyle,
-      }}
-    >
+    <div {...props} className={cx(styles.logo, className)} style={style}>
       <svg
         width="32"
         height="32"

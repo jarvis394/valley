@@ -3,7 +3,12 @@ import { SerializedFolder } from '../SerializedFolder'
 
 export type FolderCreateReq = Omit<
   SerializedFolder,
-  'id' | 'isDefaultFolder' | 'totalFiles' | 'totalSize'
+  | 'id'
+  | 'isDefaultFolder'
+  | 'totalFiles'
+  | 'totalSize'
+  | 'dateCreated'
+  | 'dateUpdated'
 >
 export type FolderCreateRes = {
   folder: SerializedFolder

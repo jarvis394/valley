@@ -1,0 +1,89 @@
+.stack {
+  display: flex;
+  flex-direction: var(--stack-direction, column);
+  align-items: var(--stack-align, stretch);
+  justify-content: var(--stack-justify, flex-start);
+  flex: var(--stack-flex, initial);
+  gap: var(--stack-gap, 0);
+  padding: var(--stack-padding, 0);
+}
+
+@media screen and (width < 600px) {
+  .stack {
+    --stack-direction: var(--sm-stack-direction);
+    --stack-align: var(--sm-stack-align);
+    --stack-justify: var(--sm-stack-justify);
+    --stack-padding: var(--sm-stack-padding);
+    --stack-gap: var(--sm-stack-gap);
+    --stack-flex: var(--sm-stack-flex);
+  }
+}
+
+@media screen and (width >= 600px) and (width < 960px) {
+  .stack {
+    --stack-direction: var(--md-stack-direction, var(--sm-stack-direction));
+    --stack-align: var(--md-stack-align, var(--sm-stack-align));
+    --stack-justify: var(--md-stack-justify, var(--sm-stack-justify));
+    --stack-padding: var(--md-stack-padding, var(--sm-stack-padding));
+    --stack-gap: var(--md-stack-gap, var(--sm-stack-gap));
+    --stack-flex: var(--md-stack-flex, var(--sm-stack-flex));
+  }
+}
+
+@media screen and (width >= 960px) and (width < 1200px) {
+  .stack {
+    --stack-direction: var(
+      --lg-stack-direction,
+      var(--md-stack-direction, var(--sm-stack-direction))
+    );
+    --stack-align: var(
+      --lg-stack-align,
+      var(--md-stack-align, var(--sm-stack-align))
+    );
+    --stack-justify: var(
+      --lg-stack-justify,
+      var(--md-stack-justify, var(--sm-stack-justify))
+    );
+    --stack-padding: var(
+      --lg-stack-padding,
+      var(--md-stack-padding, var(--sm-stack-padding))
+    );
+    --stack-gap: var(--lg-stack-gap, var(--md-stack-gap, var(--sm-stack-gap)));
+    --stack-flex: var(
+      --lg-stack-flex,
+      var(--md-stack-flex, var(--sm-stack-flex))
+    );
+  }
+}
+
+@media screen and (width >= 1200px) {
+  .stack {
+    --stack-direction: var(
+      --xl-stack-direction,
+      var(
+        --lg-stack-direction,
+        var(--md-stack-direction, var(--sm-stack-direction))
+      )
+    );
+    --stack-align: var(
+      --xl-stack-align,
+      var(--lg-stack-align, var(--md-stack-align, var(--sm-stack-align)))
+    );
+    --stack-justify: var(
+      --xl-stack-justify,
+      var(--lg-stack-justify, var(--md-stack-justify, var(--sm-stack-justify)))
+    );
+    --stack-padding: var(
+      --xl-stack-padding,
+      var(--lg-stack-padding, var(--md-stack-padding, var(--sm-stack-padding)))
+    );
+    --stack-gap: var(
+      --xl-stack-gap,
+      var(--lg-stack-gap, var(--md-stack-gap, var(--sm-stack-gap)))
+    );
+    --stack-flex: var(
+      --xl-stack-flex,
+      var(--lg-stack-flex, var(--md-stack-flex, var(--sm-stack-flex)))
+    );
+  }
+}

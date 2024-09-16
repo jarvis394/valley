@@ -1,11 +1,16 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './Button.module.css'
-import ButtonBase from '../ButtonBase/ButtonBase'
+import ButtonBase, { ButtonBaseOwnProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
+import {
+  PolymorphicComponentPropWithRef,
+  PolymorphicRef,
+} from '../types/PolymorphicComponent'
+import { ViewportSize } from '../types/ViewportSize'
 
-export type ButtonProps = React.PropsWithChildren<{
-  size?: 'sm' | 'md' | 'lg'
+type ButtonOwnProps = React.PropsWithChildren<{
+  size?: Exclude<ViewportSize, 'xs' | 'xl'>
   variant?:
     | 'primary'
     | 'secondary'
@@ -17,14 +22,21 @@ export type ButtonProps = React.PropsWithChildren<{
   disabled?: boolean
   fullWidth?: boolean
   loading?: boolean
-  before?: React.ReactElement
-}> &
-  React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  >
+  before?: React.ReactNode
+  after?: React.ReactNode
+  align?: 'start' | 'center' | 'end'
+}>
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+export type ButtonProps<C extends React.ElementType = 'button'> =
+  PolymorphicComponentPropWithRef<C, ButtonOwnProps>
+
+type ButtonComponent = <C extends React.ElementType = 'button'>(
+  props: ButtonProps<C>
+) => React.ReactElement | null
+
+const Button = React.forwardRef(function Button<
+  C extends React.ElementType = 'button',
+>(
   {
     children,
     size = 'sm',
@@ -34,13 +46,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     disabled,
     before,
     fullWidth,
+    align,
+    as,
+    after,
     ...props
-  },
-  ref
+  }: ButtonProps<C>,
+  ref: PolymorphicRef<C>
 ) {
   return (
     <ButtonBase
       {...props}
+      as={as}
       ref={ref}
       variant={variant}
       disabled={disabled}
@@ -49,6 +65,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
         [styles['button--fullWidth']]: fullWidth,
+        [styles['button--align-start']]: align === 'start',
+        [styles['button--align-end']]: align === 'end',
       })}
     >
       {loading && <Spinner />}
@@ -56,8 +74,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         <div className={styles.button__before}>{before}</div>
       )}
       {children && <span className={styles.button__content}>{children}</span>}
+      {after && <div className={styles.button__after}>{after}</div>}
     </ButtonBase>
   )
 })
 
-export default React.memo(Button)
+export default React.memo(Button) as ButtonComponent

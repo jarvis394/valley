@@ -1,13 +1,18 @@
 'use client'
 import React, { useMemo } from 'react'
 import styles from './Gauge.module.css'
+import { ViewportSize } from '../types/ViewportSize'
+import cx from 'classnames'
 
-type GaugeSize = 'xs' | 'sm' | 'md' | 'lg'
+type GaugeSize = Exclude<ViewportSize, 'xl'>
 type GaugeProps = {
   value: number
   size?: GaugeSize
   arcPriority?: 'equal' | 'primary'
-}
+} & React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>
 
 type Variables = {
   circleProps: React.SVGProps<SVGCircleElement>
@@ -32,7 +37,14 @@ const SIZE_TO_CIRCLE_WIDTH: Record<GaugeSize, number> = {
   lg: 128,
 }
 
-const Gauge: React.FC<GaugeProps> = ({ value, size = 'sm', arcPriority }) => {
+const Gauge: React.FC<GaugeProps> = ({
+  value,
+  size = 'sm',
+  arcPriority,
+  className,
+  style,
+  ...props
+}) => {
   const circleSize = SIZE_TO_CIRCLE_WIDTH[size]
   const vars = useMemo<Variables>(() => {
     const strokeWidth = circleSize <= SIZE_TO_CIRCLE_WIDTH['xs'] ? 15 : 10
@@ -69,8 +81,10 @@ const Gauge: React.FC<GaugeProps> = ({ value, size = 'sm', arcPriority }) => {
 
   return (
     <div
-      className={styles.gauge}
+      {...props}
+      className={cx(styles.gauge, className)}
       style={{
+        ...style,
         ['--circle-size' as string]: '100px',
         ['--circumference' as string]: vars.circumference,
         ['--percent-to-px' as string]:
@@ -88,20 +102,20 @@ const Gauge: React.FC<GaugeProps> = ({ value, size = 'sm', arcPriority }) => {
       >
         <circle
           {...vars.circleProps}
-          className={styles.gauge__arcPrimary}
-          stroke="var(--blue-600)"
-          style={{
-            opacity: 1,
-            ['--stroke-percent' as string]: vars.primaryStrokePercent,
-          }}
-        />
-        <circle
-          {...vars.circleProps}
           className={styles.gauge__arcSecondary}
           stroke="var(--alpha-transparent-12)"
           style={{
             opacity: 1,
             ['--stroke-percent' as string]: vars.secondaryStrokePercent,
+          }}
+        />
+        <circle
+          {...vars.circleProps}
+          className={styles.gauge__arcPrimary}
+          stroke="var(--blue-600)"
+          style={{
+            opacity: 1,
+            ['--stroke-percent' as string]: vars.primaryStrokePercent,
           }}
         />
       </svg>

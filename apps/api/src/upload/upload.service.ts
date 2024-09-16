@@ -65,29 +65,36 @@ export class UploadService {
       Size: size,
       Storage: storage,
     } = data.Event.Upload
+    const dateCreated = new Date()
     const resBuilder = new TusHookResponseBuilder<TusHookPreFinishResponse>()
       .setStatusCode(201)
       .setBody({
         ok: true,
         type: TusHookType.PRE_FINISH,
-        projectId: Number(metadata['project-id']),
         folderId: Number(metadata['folder-id']),
+        size: size.toString(),
+        key: storage.Key,
+        bucket: storage.Bucket,
+        name: deburr(metadata['normalized-name']),
+        dateCreated: dateCreated.toISOString(),
+        exifMetadata: {},
+        id: -1,
         uploadId: metadata['upload-id'],
-        size: size,
-        originalKey: storage.Key,
-        name: deburr(metadata.name),
         contentType: metadata.type,
       })
 
     const file = await this.filesService.createFileForProjectFolder({
       folderId: resBuilder.body.folderId,
-      key: resBuilder.body.originalKey,
+      key: resBuilder.body.key,
       size: resBuilder.body.size,
       name: resBuilder.body.name,
-      type: resBuilder.body.contentType,
-      projectId: resBuilder.body.projectId,
+      type: metadata.type,
+      projectId: Number(metadata['project-id']),
+      dateCreated,
     })
 
+    resBuilder.setBodyRecord('id', file.id)
+    resBuilder.setBodyRecord('exifMetadata', file.exifMetadata)
     resBuilder.setBodyRecord('thumbnailKey', file.thumbnailKey)
     return resBuilder.build()
   }

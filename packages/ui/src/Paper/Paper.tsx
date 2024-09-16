@@ -19,7 +19,7 @@ export type PaperOwnProps = Partial<
 
 export type PaperTypeMap<
   AdditionalProps = unknown,
-  RootComponent extends React.ElementType = 'div'
+  RootComponent extends React.ElementType = 'div',
 > = {
   props: AdditionalProps & PaperOwnProps
   defaultComponent: RootComponent
@@ -27,7 +27,7 @@ export type PaperTypeMap<
 
 export type PaperProps<
   RootComponent extends React.ElementType = PaperTypeMap['defaultComponent'],
-  AdditionalProps = unknown
+  AdditionalProps = unknown,
 > = OverrideProps<
   PaperTypeMap<AdditionalProps, RootComponent>,
   RootComponent

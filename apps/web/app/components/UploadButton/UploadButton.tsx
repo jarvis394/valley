@@ -14,8 +14,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ projectId, folderId }) => {
 
   return (
     <ButtonBase
-      {...register()}
-      component={'button'}
+      {...register<HTMLButtonElement>()}
       variant="secondary"
       className={styles.uploadButton}
     >

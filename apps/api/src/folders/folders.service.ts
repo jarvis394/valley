@@ -169,18 +169,24 @@ export class FoldersService {
     folderId: Folder['id'],
     file: File
   ): Promise<SerializedFolder> {
-    const folder = await this.updateFolder({
-      where: { id: folderId },
-      data: {
-        totalFiles: {
-          increment: 1,
+    return await this.prismaService.$transaction(async (tx) => {
+      const folder = await tx.folder.findFirst({
+        where: { id: folderId },
+      })
+      const newFolderTotalSize = Number(folder.totalSize) + Number(file.size)
+      const newFolderData = await tx.folder.update({
+        where: { id: folderId },
+        data: {
+          totalFiles: {
+            increment: 1,
+          },
+          totalSize: {
+            set: newFolderTotalSize.toString(),
+          },
         },
-        totalSize: {
-          increment: file.size,
-        },
-      },
-    })
+      })
 
-    return this.serializeFolder(folder)
+      return this.serializeFolder(newFolderData)
+    })
   }
 }

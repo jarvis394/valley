@@ -4,6 +4,7 @@ import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion'
 type FadeProps = {
   children: React.ReactNode
   in?: boolean
+  appear?: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onClick?: any
   onEnter?: (node: HTMLElement, isAppearing: boolean) => void
@@ -11,7 +12,17 @@ type FadeProps = {
 } & HTMLMotionProps<'div'>
 
 const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(
-  { children, in: open, onEnter, onExited, initial, animate, exit, ...props },
+  {
+    children,
+    appear = true,
+    in: open,
+    onEnter,
+    onExited,
+    initial,
+    animate,
+    exit,
+    ...props
+  },
   ref
 ) {
   return (
@@ -27,7 +38,10 @@ const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(
         <motion.div
           {...props}
           ref={ref}
-          initial={{ ...(typeof initial === 'object' && initial), opacity: 0 }}
+          initial={{
+            ...(typeof initial === 'object' && initial),
+            opacity: appear ? 0 : 1,
+          }}
           animate={{ ...(typeof animate === 'object' && animate), opacity: 1 }}
           exit={{ ...(typeof exit === 'object' && exit), opacity: 0 }}
           onAnimationStart={() => {

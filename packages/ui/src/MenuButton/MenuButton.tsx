@@ -17,8 +17,19 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
       focusableWhenDisabled,
       rootRef: ref,
     })
+    const { onClick, ...rootProps } = getRootProps(props)
+    const handleClick = (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+      e.stopPropagation()
+      onClick(e)
+    }
 
-    return <Button {...getRootProps(props)}>{children}</Button>
+    return (
+      <Button {...rootProps} tabIndex={0} onClick={handleClick}>
+        {children}
+      </Button>
+    )
   }
 )
 

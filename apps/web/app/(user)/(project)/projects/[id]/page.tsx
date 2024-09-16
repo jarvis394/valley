@@ -30,13 +30,20 @@ const ProjectPage: React.FC = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isCreatingFolder, setIsCreatingFolder] = useState(false)
-  const { data, mutate } = useSWR<ProjectGetRes, ProjectGetReq>(
+  const {
+    data,
+    mutate,
+    isLoading: isLoadingProject,
+  } = useSWR<ProjectGetRes, ProjectGetReq>(
     '/projects/' + id,
     api({ isAccessTokenRequired: true })
   )
   const folderId = searchParams.get('folder')
   const parsedFolderId = folderId ? Number(folderId) : data?.folders[0]?.id
-  const { data: folderResponse } = useSWR<FolderGetRes, FolderGetReq>(
+  const { data: folderResponse, isLoading: isLoadingFolders } = useSWR<
+    FolderGetRes,
+    FolderGetReq
+  >(
     // Do not fetch data when `folderId` is undefined
     parsedFolderId ? '/projects/' + id + '/folders/' + parsedFolderId : null,
     api({ isAccessTokenRequired: true })
@@ -71,18 +78,20 @@ const ProjectPage: React.FC = () => {
 
   const handleEditFolderTitle = () => {
     if (!currentFolder) return
-
-    router.push(
-      `/projects/${id}?folder=${currentFolder.id}&modal=edit-folder-title`
-    )
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('folder', currentFolder.id.toString())
+    params.set('modal', 'edit-folder-title')
+    params.set('modal-folderId', currentFolder.id.toString())
+    router.push(`/projects/${id}?${params.toString()}`)
   }
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-
-    router.push(
-      `/projects/${id}?folder=${currentFolder.id}&modal=edit-folder-description`
-    )
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('folder', currentFolder.id.toString())
+    params.set('modal', 'edit-folder-description')
+    params.set('modal-folderId', currentFolder.id.toString())
+    router.push(`/projects/${id}?${params.toString()}`)
   }
 
   return (
@@ -107,12 +116,12 @@ const ProjectPage: React.FC = () => {
           </>
         }
       >
-        {data?.project.title}
+        <Fade in={!isLoadingProject}>{data?.project.title}</Fade>
       </PageHeader>
       <Divider />
       <div className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
-          <Fade in={!!data?.folders} className={styles.project__foldersList}>
+          <Fade in={!isLoadingFolders} className={styles.project__foldersList}>
             {data?.folders.map((folder, i) => (
               <FolderCard
                 onClick={handleFolderClick}

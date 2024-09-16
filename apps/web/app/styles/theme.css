@@ -1,9 +1,3 @@
-.App {
-  /** Colors */
-  --blue-600: #0091ff;
-  --blue-900: #52a8ff;
-}
-
 .App[data-theme='dark'] {
   /** Background */
   --background-default: #0a0a0a;
@@ -208,4 +202,114 @@
 
   /** Modal */
   --modal-backdrop: rgba(255, 255, 255, 0.5);
+}
+
+.App {
+  /** Colors / Gray */
+  --gray-100: #1a1a1a;
+  --gray-200: #1f1f1f;
+  --gray-300: #292929;
+  --gray-400: #2e2e2e;
+  --gray-500: #454545;
+  --gray-600: #878787;
+  --gray-700: #8f8f8f;
+  --gray-800: #7d7d7d;
+  --gray-900: #a1a1a1;
+  --gray-1000: #ededed;
+
+  /** Colors / Blue */
+  --blue-100: #0f1c2e;
+  --blue-200: #10233d;
+  --blue-300: #0f2f57;
+  --blue-400: #0d3868;
+  --blue-500: #0a4380;
+  --blue-600: #0091ff;
+  --blue-700: #0072f5;
+  --blue-800: #0062d1;
+  --blue-900: #52a8ff;
+  --blue-1000: #ebf6ff;
+
+  /** Colors / Green */
+  --green-100: #0b2212;
+  --green-200: #0f2e18;
+  --green-300: #12361b;
+  --green-400: #0c451b;
+  --green-500: #126426;
+  --green-600: #1a9338;
+  --green-700: #45a557;
+  --green-800: #398e4a;
+  --green-900: #62c073;
+  --green-1000: #e5fbea;
+
+  /** Colors / Red */
+  --red-100: #2a1314;
+  --red-200: #3c1618;
+  --red-300: #561a1e;
+  --red-400: #671e21;
+  --red-500: #832126;
+  --red-600: #e5484d;
+  --red-700: #e5484d;
+  --red-800: #d93036;
+  --red-900: #ff6166;
+  --red-1000: #feecee;
+
+  /** Colors / Amber */
+  --amber-100: #291800;
+  --amber-200: #331b00;
+  --amber-300: #4d2a00;
+  --amber-400: #573300;
+  --amber-500: #6b4105;
+  --amber-600: #e79d13;
+  --amber-700: #ffb224;
+  --amber-800: #ff990a;
+  --amber-900: #f2a20d;
+  --amber-1000: #fef3dc;
+
+  /** Colors / Green */
+  --green-100: #0b2212;
+  --green-200: #0f2e18;
+  --green-300: #12361b;
+  --green-400: #0c451b;
+  --green-500: #126426;
+  --green-600: #1a9338;
+  --green-700: #45a557;
+  --green-800: #398e4a;
+  --green-900: #62c073;
+  --green-1000: #e5fbea;
+
+  /** Colors / Teal */
+  --teal-100: #04201b;
+  --teal-200: #062822;
+  --teal-300: #083a33;
+  --teal-400: #053d35;
+  --teal-500: #085e53;
+  --teal-600: #0c9784;
+  --teal-700: #12a594;
+  --teal-800: #0d8c7d;
+  --teal-900: #0ac7b4;
+  --teal-1000: #e0faf4;
+
+  /** Colors / Purple */
+  --purple-100: #231528;
+  --purple-200: #2e1938;
+  --purple-300: #422154;
+  --purple-400: #4f2768;
+  --purple-500: #5f2e85;
+  --purple-600: #8e4ec6;
+  --purple-700: #8e4ec6;
+  --purple-800: #763da9;
+  --purple-900: #bf7af0;
+  --purple-1000: #f8edfc;
+
+  /** Colors / Pink */
+  --pink-100: #28151d;
+  --pink-200: #3a1726;
+  --pink-300: #4f1c31;
+  --pink-400: #551b33;
+  --pink-500: #6c1e3e;
+  --pink-600: #b31957;
+  --pink-700: #ea3e83;
+  --pink-800: #df2670;
+  --pink-900: #f75f8f;
+  --pink-1000: #feecf4;
 }

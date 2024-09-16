@@ -31,7 +31,9 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
     api({ isAccessTokenRequired: true })
   )
   const searchParams = useSearchParams()
-  const folderId = Number(searchParams.get('folder'))
+  const modalPropsFolderId = searchParams.get('modal-folderId')
+  const searchParamsFolderId = searchParams.get('folder')
+  const folderId = Number(modalPropsFolderId || searchParamsFolderId)
   const parsedProjectId = Number(projectId)
   const defaultTitle = data?.folders.find((e) => e.id === folderId)?.title
   const { register, handleSubmit } = useForm<FieldValues>()
@@ -78,7 +80,12 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
       </form>
       <ModalFooter
         before={
-          <Button onClick={onClose} variant="secondary-dimmed" size="md">
+          <Button
+            onClick={onClose}
+            disabled={isLoading}
+            variant="secondary-dimmed"
+            size="md"
+          >
             Cancel
           </Button>
         }

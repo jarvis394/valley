@@ -18,6 +18,7 @@ export type ProjectCreateReq = Omit<
   | 'userId'
   | 'totalFiles'
   | 'passwordHash'
+  | 'password'
   | 'url'
   | 'dateCreated'
   | 'dateUpdated'

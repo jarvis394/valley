@@ -10,7 +10,13 @@ type MenuIconButtonProps = ButtonProps & {
 
 const MenuIconButton = React.forwardRef<HTMLButtonElement, MenuIconButtonProps>(
   function MenuIconButton(
-    { children, disabled = false, focusableWhenDisabled = false, ...props },
+    {
+      children,
+      disabled = false,
+      onClick: propsOnClick,
+      focusableWhenDisabled = false,
+      ...props
+    },
     ref
   ) {
     const { getRootProps } = useMenuButton({
@@ -18,8 +24,20 @@ const MenuIconButton = React.forwardRef<HTMLButtonElement, MenuIconButtonProps>(
       focusableWhenDisabled,
       rootRef: ref,
     })
+    const { onClick, ...rootProps } = getRootProps(props)
+    const handleClick = (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+      e.stopPropagation()
+      propsOnClick?.(e)
+      onClick(e)
+    }
 
-    return <IconButton {...getRootProps(props)}>{children}</IconButton>
+    return (
+      <IconButton {...rootProps} onClick={handleClick}>
+        {children}
+      </IconButton>
+    )
   }
 )
 

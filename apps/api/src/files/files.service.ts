@@ -2,22 +2,24 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  StreamableFile,
 } from '@nestjs/common'
 import { PrismaService } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
 import { File, Folder, Prisma, Project } from '@valley/db'
 import {
   GetObjectCommand,
-  PutObjectCommand,
   S3Client,
+  GetObjectCommandOutput,
 } from '@aws-sdk/client-s3'
-import { TusUploadMetadata } from '@valley/shared'
+import { MULTIPART_UPLOAD_CHUNK_SIZE, TusUploadMetadata } from '@valley/shared'
 import { FoldersService } from '../folders/folders.service'
 import { ProjectsService } from '../projects/projects.service'
 import dec2frac from '../utils/dec2frac'
 import sharp from 'sharp'
 import exifr from 'exifr'
+import { Upload } from '@aws-sdk/lib-storage'
+import { IncomingMessage } from 'http'
+import { Response } from 'express'
 
 type ExifDataKey =
   | 'Artist'
@@ -47,7 +49,7 @@ type ThumbnailCreationResult =
   | { ok: true; key: string }
   | { ok: false; reason: string }
 
-const extractFields = new Set<ExifDataKey>([
+const extractFields: ExifDataKey[] = [
   'Artist',
   'Copyright',
   'DateTimeOriginal',
@@ -65,18 +67,22 @@ const extractFields = new Set<ExifDataKey>([
   'Flash',
   'FNumber',
   'Orientation',
-])
+]
 
 @Injectable()
 export class FilesService {
-  static THUMBNAIL_WIDTH = 320
-  static THUMBNAIL_QUALITY = 100
-  static THUMBNAIL_ALLOWED_CONTENT_TYPES = new Set([
+  static readonly MAX_PROCESSING_SIZE = 1024 * 1024 * 100 // 100 MB
+  static readonly THUMBNAIL_WIDTH = 320
+  static readonly THUMBNAIL_QUALITY = 100
+  static readonly THUMBNAIL_ALLOWED_CONTENT_TYPES = new Set([
     'image/png',
     'image/jpg',
     'image/jpeg',
   ])
-
+  static readonly EXIF_PARSING_OPTIONS = {
+    pick: extractFields,
+  }
+  static readonly THUMBNAIL_KEY = 'thumb_'
   readonly storage: S3Client
 
   constructor(
@@ -157,10 +163,10 @@ export class FilesService {
    * @param buffer Image binary data
    * @returns Parsed EXIF data
    */
-  async extractExifData(buffer: Uint8Array): Promise<ExifParsedData> {
-    let parsedExif: ExifData
+  async extractExifData(image: Uint8Array): Promise<ExifParsedData> {
+    let parsedExif: ExifData | null
     try {
-      parsedExif = await exifr.parse(buffer)
+      parsedExif = await exifr.parse(image, FilesService.EXIF_PARSING_OPTIONS)
     } catch (e) {
       if (e instanceof Error) {
         return { ok: false, reason: e.message }
@@ -169,39 +175,51 @@ export class FilesService {
       }
     }
 
+    if (!parsedExif) {
+      return { ok: false, reason: 'Parsed EXIF is empty' }
+    }
+
     const res: ExifParsedData = { ok: true, data: {} }
 
     for (const key of Object.keys(parsedExif)) {
       const typedKey = key as ExifDataKey
+      let value = parsedExif[typedKey]
 
-      if (extractFields.has(typedKey)) {
-        let value = parsedExif[typedKey]
+      // Transform shutter speed to a fraction
+      if (key === 'ExposureTime' && typeof value === 'number') {
+        value = dec2frac(value)
+      }
 
-        // Transform shutter speed to a fraction
-        if (key === 'ExposureTime' && typeof value === 'number') {
-          value = dec2frac(value)
-        }
+      // Shorten numbers to 3 digits
+      if (typeof value == 'number') {
+        value = Math.round(value * 100) / 100
+      }
 
-        // Shorten numbers to 3 digits
-        if (typeof value == 'number') {
-          value = Math.round(value * 100) / 100
-        }
-
-        if (value) {
-          res[typedKey] = value
-        }
+      if (value) {
+        res.data[typedKey] = value
       }
     }
 
     return res
   }
 
+  shouldProcessFileAsImage(object: GetObjectCommandOutput) {
+    const thumbnailAllowed = this.shouldGenerateThumbnail(object.Metadata.type)
+    const sizeAllowed = object.ContentLength <= FilesService.MAX_PROCESSING_SIZE
+    return thumbnailAllowed && sizeAllowed
+  }
+
+  shouldGenerateThumbnail(type: string) {
+    return FilesService.THUMBNAIL_ALLOWED_CONTENT_TYPES.has(type)
+  }
+
   async createFileThumbnail(
     image: Uint8Array,
     data: { key: string; bucket: string; metadata: Record<string, string> }
   ): Promise<ThumbnailCreationResult> {
-    const shouldGenerateThumbnail =
-      FilesService.THUMBNAIL_ALLOWED_CONTENT_TYPES.has(data.metadata.type)
+    const shouldGenerateThumbnail = this.shouldGenerateThumbnail(
+      data.metadata.type
+    )
 
     if (!shouldGenerateThumbnail) {
       return {
@@ -212,7 +230,9 @@ export class FilesService {
       }
     }
 
-    const imageBuffer = await sharp(image)
+    const thumbnailKey = FilesService.getThumbnailKey(data.key)
+    const thumbnailBuffer = await sharp(image)
+      .withMetadata()
       .resize({
         fit: sharp.fit.contain,
         width: FilesService.THUMBNAIL_WIDTH,
@@ -222,14 +242,19 @@ export class FilesService {
       })
       .toBuffer()
 
-    const thumbnailKey = FilesService.getThumbnailKey(data.key)
-    const putObjectCommand = new PutObjectCommand({
-      Bucket: data.bucket,
-      Key: thumbnailKey,
-      Body: imageBuffer,
-      Metadata: data.metadata,
+    const parallelUploads3 = new Upload({
+      client: this.storage,
+      params: {
+        Bucket: data.bucket,
+        Key: thumbnailKey,
+        Body: thumbnailBuffer,
+        Metadata: data.metadata,
+      },
+      queueSize: 4,
+      partSize: MULTIPART_UPLOAD_CHUNK_SIZE,
     })
-    await this.storage.send(putObjectCommand)
+
+    await parallelUploads3.done()
 
     return { ok: true, key: thumbnailKey }
   }
@@ -244,19 +269,7 @@ export class FilesService {
       Key: data.key,
     })
     const object = await this.storage.send(getObjectCommand)
-    const file = await object.Body.transformToByteArray()
-    const exifMetadata = await this.extractExifData(file)
-    const thumbnailResult = await this.createFileThumbnail(file, {
-      key: data.key,
-      bucket: this.configService.UPLOAD_BUCKET,
-      metadata: object.Metadata,
-    })
-    const processedExifMetadata = exifMetadata.ok ? exifMetadata.data : {}
-    const processedThumbnailKey = thumbnailResult.ok
-      ? thumbnailResult.key
-      : null
-
-    const databaseFile = await this.createFile({
+    const fileData: Prisma.FileCreateInput = {
       Folder: {
         connect: {
           id: data.folderId,
@@ -266,11 +279,24 @@ export class FilesService {
       name: data.name,
       size: data.size,
       type: data.type,
-      exifMetadata: processedExifMetadata,
-      thumbnailKey: processedThumbnailKey,
+      exifMetadata: {},
       // Files should always be saved in a default upload bucket
       bucket: this.configService.UPLOAD_BUCKET,
-    })
+    }
+
+    if (this.shouldProcessFileAsImage(object)) {
+      const image = await object.Body.transformToByteArray()
+      const exifMetadata = await this.extractExifData(image)
+      const thumbnailResult = await this.createFileThumbnail(image, {
+        key: data.key,
+        bucket: this.configService.UPLOAD_BUCKET,
+        metadata: object.Metadata,
+      })
+      fileData.exifMetadata = exifMetadata.ok ? exifMetadata.data : {}
+      fileData.thumbnailKey = thumbnailResult.ok ? thumbnailResult.key : null
+    }
+
+    const databaseFile = await this.createFile(fileData)
 
     await this.foldersService.addFileToFolder(data.folderId, databaseFile)
     await this.projectsService.addFileToProject(data.projectId, databaseFile)
@@ -278,7 +304,7 @@ export class FilesService {
     return databaseFile
   }
 
-  async streamFile(key: string): Promise<StreamableFile> {
+  async streamFile(key: string, res: Response) {
     const command = new GetObjectCommand({
       Bucket: this.configService.UPLOAD_BUCKET,
       Key: key,
@@ -298,17 +324,24 @@ export class FilesService {
         )
       }
 
-      return new StreamableFile(await item.Body.transformToByteArray(), {
-        type: item.Metadata.type,
-        length: item.ContentLength,
-        disposition: `inline; filename="${metadata['normalized-name']}"`,
-      })
+      const fileStream = item.Body as IncomingMessage
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${metadata['normalized-name']}"`
+      )
+      res.setHeader('Content-Length', item.ContentLength.toString())
+      res.setHeader('Content-Type', item.Metadata.type)
+      fileStream.pipe(res)
     } catch (e) {
       throw new NotFoundException('File not found')
     }
   }
 
   static getThumbnailKey(key: string) {
-    return key + '_320w'
+    return FilesService.THUMBNAIL_KEY + key
+  }
+
+  static isThumbnail(key: string) {
+    return key.startsWith(FilesService.THUMBNAIL_KEY)
   }
 }

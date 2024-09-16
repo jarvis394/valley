@@ -21,13 +21,13 @@ model Project {
   title              String
   url                String
   totalFiles         Int                 @default(0)
-  // Total size is in bytes
-  totalSize          BigInt              @default(0)
+  // Total size is in bytes, string formatted
+  totalSize          String              @default("0")
   dateCreated        DateTime            @default(now())
-  dateUpdated        DateTime            @updatedAt
+  dateUpdated        DateTime            @default(now()) @updatedAt
   dateShot           DateTime            @default(now())
   // "0" means stored indefinitely, unix timestamps in string format are supported
-  storedUntil        String              @default("0")
+  storedUntil        DateTime?
   language           String              @default("en")
   protected          Boolean             @default(false)
   password           String?
@@ -40,13 +40,15 @@ model Project {
 }
 
 model Folder {
-  id              Int     @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   title           String
   isDefaultFolder Boolean
   description     String?
-  totalFiles      Int     @default(0)
-  // Total size is in bytes
-  totalSize       BigInt  @default(0)
+  totalFiles      Int      @default(0)
+  dateCreated     DateTime @default(now())
+  dateUpdated     DateTime @default(now()) @updatedAt
+  // Total size is in bytes, string formatted
+  totalSize       String   @default("0")
   files           File[]
 
   Project   Project @relation(fields: [projectId], references: [id])
@@ -54,14 +56,16 @@ model Folder {
 }
 
 model File {
-  id           Int     @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   bucket       String
   key          String
   thumbnailKey String?
   exifMetadata Json
   name         String
   type         String
-  size         Int
+  // File size in bytes, string formatted
+  size         String
+  dateCreated  DateTime @default(now())
 
   Folder   Folder @relation(fields: [folderId], references: [id])
   folderId Int

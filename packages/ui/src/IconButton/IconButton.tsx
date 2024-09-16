@@ -6,7 +6,7 @@ import Spinner from '../Spinner/Spinner'
 
 const IconButton = React.forwardRef<
   HTMLButtonElement,
-  Omit<ButtonProps, 'before' | 'after'>
+  Omit<ButtonProps, 'before' | 'after' | 'align'>
 >(({ children, className, size = 'sm', loading, ...props }, ref) => {
   return (
     <Button

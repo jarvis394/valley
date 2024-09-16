@@ -32,8 +32,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
       dateShot: values.dateShot,
       protected: false,
       title: values.projectName,
-      storedUntil: Date.now().toString(),
-      password: '',
+      storedUntil: new Date(),
       translationStringsId: null,
     })
 
@@ -79,7 +78,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
       </form>
       <ModalFooter
         before={
-          <Button onClick={onClose} variant="secondary-dimmed" size="md">
+          <Button
+            onClick={onClose}
+            disabled={isLoading}
+            variant="secondary-dimmed"
+            size="md"
+          >
             Cancel
           </Button>
         }

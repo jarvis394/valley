@@ -1,7 +1,8 @@
 .menuItem {
+  --x-padding: 12px !important;
+  --height: 36px !important;
+  --font-size: 15px !important;
+  --line-height: 18px !important;
+  gap: 14px !important;
   list-style: none;
-}
-
-.menuItem--highlighted:focus-visible {
-  outline: 2px solid var(--text-primary);
 }

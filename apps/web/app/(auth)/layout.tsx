@@ -90,7 +90,7 @@ const AuthGroupLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
                   i === activeCoverIndex,
               })}
               quality={75}
-              priority={false}
+              priority
               src={cover}
               alt="Cover"
             />

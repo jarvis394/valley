@@ -1,7 +1,17 @@
 'use client'
-import { useEffect, useId, useRef, useState } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 import deburr from 'lodash.deburr'
-import { MULTIPART_UPLOAD_CHUNK_SIZE, TusUploadMetadata } from '@valley/shared'
+import {
+  exhaustivnessCheck,
+  FolderGetReq,
+  FolderGetRes,
+  MAX_UPLOAD_FILE_SIZE,
+  MULTIPART_UPLOAD_CHUNK_SIZE,
+  TusHookPreFinishResponse,
+  TusHookResponseBody,
+  TusHookType,
+  TusUploadMetadata,
+} from '@valley/shared'
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { TUS_URL } from '../config/constants'
@@ -10,6 +20,8 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import { Folder, Project } from '@valley/db'
+import useSWR from 'swr'
+import { api } from '../api'
 
 type Upload = {
   id: string
@@ -28,6 +40,14 @@ type UploadsState = {
   uploadsCount: number
   totalBytes: number
   bytesUploaded: number
+  /** Bytes in second */
+  uploadSpeed: number
+  /** Unix timestamp of last execution of setUploadProgress */
+  lastUploadProgressTimestamp: number
+  lastBytesUploaded: number
+  /** Upload remaining time based on upload speed in seconds */
+  remainingTime: number
+  uploadSpeedIntervalID: NodeJS.Timeout | null
   isUploading: boolean
   folderId: Folder['id'] | null
   projectId: Project['id'] | null
@@ -35,17 +55,20 @@ type UploadsState = {
 
 type UploadsAction = {
   setIsUploading: (state: UploadsState['isUploading']) => void
-  setUploadError: (id: Upload['id'], err: Upload['uploadError']) => void
+  setFileUploadError: (id: Upload['id'], err: Upload['uploadError']) => void
   addUpload: (
     upload: Pick<Upload, 'id' | 'totalBytes' | 'filetype' | 'normalizedName'>
   ) => void
-  setUploadProgress: (
+  setFileUploadProgress: (
     id: Upload['id'],
     bytesUploaded: Upload['bytesUploaded']
   ) => void
+  setFileUploaded: (id: Upload['id']) => void
   clearSuccessfulUploads: () => void
   setFolderId: (id: UploadsState['folderId']) => void
   setProjectId: (id: UploadsState['projectId']) => void
+  setUploadSpeed: (uploadSpeed: UploadsState['uploadSpeed']) => void
+  updateUploadSpeed: () => void
 }
 
 export const useUploadsStore = create<UploadsState & UploadsAction>()(
@@ -54,9 +77,21 @@ export const useUploadsStore = create<UploadsState & UploadsAction>()(
     uploadsCount: 0,
     totalBytes: 0,
     bytesUploaded: 0,
+    uploadSpeed: 0,
+    lastBytesUploaded: 0,
+    lastUploadProgressTimestamp: 0,
+    remainingTime: 0,
     isUploading: false,
     folderId: null,
     projectId: null,
+    uploadSpeedIntervalID: null,
+    updateUploadSpeed: () =>
+      set((state) => {
+        state.uploadSpeed = state.bytesUploaded - state.lastBytesUploaded
+        state.lastBytesUploaded = state.bytesUploaded
+        state.remainingTime =
+          (state.totalBytes - state.bytesUploaded) / state.uploadSpeed
+      }),
     setIsUploading: (newIsUploading) =>
       set((state) => {
         state.isUploading = newIsUploading
@@ -65,11 +100,15 @@ export const useUploadsStore = create<UploadsState & UploadsAction>()(
       set((state) => {
         state.folderId = id
       }),
+    setUploadSpeed: (uploadSpeed) =>
+      set((state) => {
+        state.uploadSpeed = uploadSpeed
+      }),
     setProjectId: (id) =>
       set((state) => {
         state.projectId = id
       }),
-    setUploadError: (id, err) =>
+    setFileUploadError: (id, err) =>
       set((state) => {
         if (!state.uploads[id]) {
           throw new Error(
@@ -94,7 +133,7 @@ export const useUploadsStore = create<UploadsState & UploadsAction>()(
         state.uploadsCount += 1
         state.totalBytes += upload.totalBytes
       }),
-    setUploadProgress: (id, bytesUploaded) =>
+    setFileUploadProgress: (id, bytesUploaded) =>
       set((state) => {
         const upload = state.uploads[id]
         if (!upload) {
@@ -109,8 +148,20 @@ export const useUploadsStore = create<UploadsState & UploadsAction>()(
         state.uploads[id].isUploading = true
         state.uploads[id].bytesUploaded = bytesUploaded
         state.uploads[id].progress = progress
-        state.uploads[id].isUploaded = progress >= 1
+        state.uploads[id].isUploaded = false
         state.bytesUploaded += bytesUploaded - prevBytesUploaded
+      }),
+    setFileUploaded: (id) =>
+      set((state) => {
+        if (!state.uploads[id]) {
+          throw new Error(
+            `Cannot set upload progress of an unknown upload, got: ${id}`
+          )
+        }
+
+        state.uploads[id].uploadError = null
+        state.uploads[id].isUploaded = true
+        state.uploads[id].isUploading = false
       }),
     clearSuccessfulUploads: () =>
       set((state) => {
@@ -143,47 +194,93 @@ type UseUploadProps = {
 }
 
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
+  const { mutate } = useSWR<FolderGetRes, FolderGetReq>(
+    '/projects/' + projectId + '/folders/' + folderId,
+    api({ isAccessTokenRequired: true })
+  )
   const tokens = getAuthTokens()
   const inputId = useId()
-  const $root = useRef<HTMLElement>(null)
+  const $root = useRef(null)
   const $input = useRef<HTMLInputElement>(document.createElement('input'))
   const setIsUploading = useUploadsStore((state) => state.setIsUploading)
   const setFolderId = useUploadsStore((state) => state.setFolderId)
   const setProjectId = useUploadsStore((state) => state.setProjectId)
   const addUpload = useUploadsStore((state) => state.addUpload)
-  const setUploadProgress = useUploadsStore((state) => state.setUploadProgress)
+  const updateUploadSpeed = useUploadsStore((state) => state.updateUploadSpeed)
+  const setFileUploadProgress = useUploadsStore(
+    (state) => state.setFileUploadProgress
+  )
+  const setFileUploadError = useUploadsStore(
+    (state) => state.setFileUploadError
+  )
+  const setFileUploaded = useUploadsStore((state) => state.setFileUploaded)
   const clearSuccessfulUploads = useUploadsStore(
     (state) => state.clearSuccessfulUploads
   )
+  const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
 
-  const getUppyHeaders = () => {
-    if (!tokens) return {} as Record<string, string>
+  const getUppyHeaders = (): Record<string, string> => {
+    if (!tokens) return {}
     return { Authorization: `Bearer ${tokens.accessToken}` }
+  }
+
+  const addUploadedFileToSWRCache = (file: TusHookPreFinishResponse) => {
+    const newFile = {
+      bucket: file.bucket,
+      dateCreated: new Date(file.dateCreated),
+      exifMetadata: file.exifMetadata,
+      folderId: file.folderId,
+      id: file.id,
+      key: file.key,
+      name: file.name,
+      size: file.size,
+      thumbnailKey: file.thumbnailKey || null,
+      type: file.contentType,
+    }
+
+    mutate((data) => {
+      if (!data) return undefined
+      return {
+        ...data,
+        files: [...data.files, newFile],
+      }
+    })
   }
 
   const handleUploadResponse = async (_req: HttpRequest, res: HttpResponse) => {
     try {
       const body = res.getBody()
-      // const parsedBody = JSON.parse(body || '')
+      if (!body) return
+
+      const parsedBody = JSON.parse(body) as TusHookResponseBody
 
       if (body) {
-        // const files = uppy.getFiles()
-
-        // switch (parsedBody.type) {
-        //   case '':
-        //     break
-        // }
-        console.log(JSON.parse(body))
+        switch (parsedBody.type) {
+          case TusHookType.PRE_CREATE:
+            break
+          case TusHookType.PRE_FINISH:
+            addUploadedFileToSWRCache(parsedBody)
+            break
+          default:
+            exhaustivnessCheck(parsedBody)
+        }
       }
-    } catch (e) {
-      // console.error(e)
+    } catch (error) {
+      console.warn('Could not parse tus hook response:', {
+        error,
+        body: res.getBody(),
+      })
     }
   }
 
   const [uppy] = useState(() =>
     new Uppy({
       autoProceed: false,
-      restrictions: {},
+      restrictions: {
+        maxFileSize: MAX_UPLOAD_FILE_SIZE,
+      },
+      // Allows duplicate files
+      onBeforeFileAdded: () => true,
     }).use(Tus, {
       endpoint: TUS_URL,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
@@ -197,20 +294,14 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     const fileIDs: string[] = []
     let totalSize = 0
     files.forEach((file) => (totalSize += file.size))
-    console.log(
-      `uploading files to folder ${folderId} in project ${projectId}:`,
-      files
-    )
-    console.log('total size:', totalSize)
 
-    files.forEach((file) => {
+    files.forEach(async (file) => {
       const fileId = uppy.addFile(file)
       const metadata: TusUploadMetadata = {
         'normalized-name': deburr(file.name),
         'upload-id': fileId,
         'folder-id': folderId.toString(),
         'project-id': projectId.toString(),
-        name: file.name,
         type: file.type,
       }
       uppy.setFileMeta(fileId, metadata)
@@ -224,12 +315,15 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     })
 
     setIsUploading(true)
+    uploadSpeedIntervalID.current = setInterval(() => {
+      updateUploadSpeed()
+    }, 1000)
+
     const res = await uppy.upload()
+
     setIsUploading(false)
-
-    uppy.removeFiles(fileIDs)
-
-    console.log('uploaded files:', res)
+    clearInterval(uploadSpeedIntervalID.current)
+    uppy.removeFiles(res?.successful?.map((e) => e.id) || [])
   }
 
   const handleUploadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,7 +332,10 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     uploadFiles(e.target.files)
   }
 
-  const register = () => {
+  const register = <T extends HTMLElement = HTMLElement>(): {
+    ref: React.RefObject<T>
+    onClick: () => void
+  } => {
     return {
       ref: $root,
       onClick: openFilePicker,
@@ -258,13 +355,34 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       progress: { bytesUploaded: number; bytesTotal: number | null }
     ) => {
       if (!file) return
-      setUploadProgress(file.id, progress.bytesUploaded)
+      setFileUploadProgress(file.id, progress.bytesUploaded)
+    }
+
+    const handleUploadError = (
+      file: UppyFile<Meta, Record<string, never>> | undefined,
+      error: { name: string; message: string; details?: string }
+    ) => {
+      if (!file) return
+      setFileUploadError(file.id, error.message)
+    }
+
+    const handleUploadSuccess = (
+      file: UppyFile<Meta, Record<string, never>> | undefined,
+      response: unknown
+    ) => {
+      if (!file) return
+      console.log(file, response)
+      setFileUploaded(file.id)
     }
 
     uppy.on('upload-progress', handleUploadProgress)
+    uppy.on('upload-error', handleUploadError)
+    uppy.on('upload-success', handleUploadSuccess)
 
     return () => {
       uppy.off('upload-progress', handleUploadProgress)
+      uppy.off('upload-error', handleUploadError)
+      uppy.off('upload-success', handleUploadSuccess)
     }
   }, [uppy])
 
@@ -290,6 +408,12 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     }
     // Should change `handleUploadInputChange` ref as hook props change
   }, [folderId, projectId])
+
+  useEffect(() => {
+    return () => {
+      clearInterval(uploadSpeedIntervalID.current)
+    }
+  }, [])
 
   return {
     uppy,
