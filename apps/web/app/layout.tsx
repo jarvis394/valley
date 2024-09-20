@@ -8,6 +8,7 @@ import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
 import './styles/theme.css'
 import './styles/global.css'
+import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'

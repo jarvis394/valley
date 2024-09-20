@@ -77,3 +77,36 @@
 .button.button--fullWidth {
   width: 100%;
 }
+
+@media screen and (width < 600px) {
+  .stack {
+    --button-size: var(--sm-button-size);
+  }
+}
+
+@media screen and (width >= 600px) and (width < 960px) {
+  .stack {
+    --button-size: var(--md-button-size, var(--sm-button-size));
+  }
+}
+
+@media screen and (width >= 960px) and (width < 1200px) {
+  .stack {
+    --button-size: var(
+      --lg-button-size,
+      var(--md-button-size, var(--sm-button-size))
+    );
+  }
+}
+
+@media screen and (width >= 1200px) {
+  .stack {
+    --button-size: var(
+      --xl-button-size,
+      var(
+        --lg-button-size,
+        var(--md-button-size, var(--sm-button-size))
+      )
+    );
+  }
+}

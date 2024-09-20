@@ -1,0 +1,44 @@
+.fade {
+  --fade-duration: 120ms;
+  --fade-timing-function: ease-in-out;
+  --fade-transition-property: visibility, opacity;
+  transition-property: var(--fade-transition-property);
+  transition-duration: var(--fade-duration);
+  transition-timing-function: var(--fade-timing-function);
+  opacity: 0;
+}
+
+.fade[data-fade-in='true'] {
+  opacity: 1;
+}
+
+.fade[data-fade-in='false'] {
+  opacity: 0;
+}
+
+.grow {
+  --grow-duration: 120ms;
+  --grow-timing-function: ease-in-out;
+  --grow-origin: center center;
+  --grow-transition-property: opacity, scale, translate;
+  transition-property: var(--grow-transition-property);
+  transition-duration: var(--grow-duration);
+  transition-timing-function: var(--grow-timing-function);
+  transform-origin: var(--grow-origin);
+
+  opacity: 0;
+  scale: 0.95;
+  translate: 0 8px;
+}
+
+.grow[data-grow-in='true'] {
+  opacity: 1;
+  scale: 1;
+  translate: 0 0px;
+}
+
+.grow[data-grow-in='false'] {
+  opacity: 0;
+  scale: 0.95;
+  translate: 0 8px;
+}

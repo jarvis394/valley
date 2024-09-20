@@ -1,12 +1,12 @@
 import React from 'react'
 import PageHeader from '../../../../../components/PageHeader/PageHeader'
 
-const ProjectSettingsPage: React.FC = () => {
+const ProjectDesignPage: React.FC = () => {
   return (
     <div>
-      <PageHeader>Settings</PageHeader>
+      <PageHeader>Design</PageHeader>
     </div>
   )
 }
 
-export default ProjectSettingsPage
+export default ProjectDesignPage

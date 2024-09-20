@@ -13,11 +13,20 @@ import { TabsItemProps } from '../TabsItem/TabsItem'
 import { useScrollProgress } from '../useScrollProgress/useScrollProgress'
 
 const HOVER_CONTAINER_PADDING = 8
+const ANIMATION_DURATION = 150
+const TRANSITION_OPACITY = `opacity ${ANIMATION_DURATION}ms`
+const TRANSITION_FULL = [
+  `opacity ${ANIMATION_DURATION}ms`,
+  `transform ${ANIMATION_DURATION}ms`,
+  `width ${ANIMATION_DURATION}ms`,
+].join(', ')
 
-type BaseTabsProps<T extends string | number> = {
+type TabValue = string | number | undefined
+
+type BaseTabsProps<T extends TabValue> = {
   onItemClick?: (
     value: T,
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => void
   indicator?: boolean
   children:
@@ -27,7 +36,7 @@ type BaseTabsProps<T extends string | number> = {
   scrollProgressTransitionStyles?: (progress: number) => CSSProperties
 }
 
-type ValueProps<T extends string | number> =
+type ValueProps<T extends TabValue> =
   | {
       value: T
       defaultValue?: never
@@ -37,10 +46,10 @@ type ValueProps<T extends string | number> =
       value?: never
     }
 
-export type TabsProps<T extends string | number = string | number> =
-  BaseTabsProps<T> & ValueProps<T>
+export type TabsProps<T extends TabValue = TabValue> = BaseTabsProps<T> &
+  ValueProps<T>
 
-const Tabs = <T extends string | number = string | number>({
+const Tabs = <T extends TabValue = TabValue>({
   onItemClick,
   children: childrenProp,
   value: propsValue,
@@ -59,13 +68,14 @@ const Tabs = <T extends string | number = string | number>({
     [innerValue, propsValue]
   )
   const [mounted, setMounted] = useState(false)
-  const buttonRefs = useRef(new Map<T, HTMLButtonElement>())
+  const tabsRefs = useRef(new Map<T, HTMLElement>())
   const [hoveredTab, setHoveredTab] = useState<T | null>(null)
   const initialHoveredElementTimeoutRef = useRef<NodeJS.Timeout>()
+  /** Removes transform animation from selected item indicator on first render */
+  const [isInitialSelectedAppear, setIsInitialSelectedAppear] = useState(true)
   const $root = useRef<HTMLDivElement>(null)
   const rootBoundingRect = $root.current?.getBoundingClientRect()
   const [isInitialHoveredElement, setIsInitialHoveredElement] = useState(true)
-  const isInitialRender = useRef(true)
   const [hoveredElement, setHoveredElement] = useState<HTMLElement | null>(null)
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(
     null
@@ -75,36 +85,31 @@ const Tabs = <T extends string | number = string | number>({
     setHoveredTab(null)
     initialHoveredElementTimeoutRef.current = setTimeout(() => {
       setIsInitialHoveredElement(true)
-    }, 150)
+    }, ANIMATION_DURATION)
   }
 
-  const onEnterTab = useCallback(
-    (
-      e:
-        | React.PointerEvent<HTMLButtonElement>
-        | React.FocusEvent<HTMLButtonElement>,
-      value: T
-    ) => {
-      if (!e.target || !(e.target instanceof HTMLButtonElement)) return
+  const onEnterTab = useCallback((e: React.PointerEvent, value: T) => {
+    // Do not show hover indicator when on mobile (client is using touch)
+    if (e.pointerType === 'touch') return
+    if (!e.target || !(e.target instanceof HTMLElement)) return
 
-      setHoveredTab((prev) => {
-        if (prev !== null && prev !== value) {
-          setIsInitialHoveredElement(false)
-        }
+    setHoveredTab((prev) => {
+      if (prev !== null && prev !== value) {
+        setIsInitialHoveredElement(false)
+      }
 
-        return value
-      })
+      return value
+    })
 
-      setHoveredElement(e.target)
-    },
-    []
-  )
+    setHoveredElement(e.target)
+  }, [])
 
   const handleItemClick = useCallback(
-    (itemValue: T, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (itemValue: T, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
       onItemClick?.(itemValue, e)
       setInnerValue(itemValue)
       setSelectedElement(e.currentTarget)
+      setIsInitialSelectedAppear(false)
     },
     [onItemClick]
   )
@@ -135,32 +140,23 @@ const Tabs = <T extends string | number = string | number>({
 
       childIndex += 1
 
-      return React.cloneElement(child, {
+      return React.cloneElement<
+        TabsItemProps & Omit<React.ComponentProps<'button'>, 'onClick'>
+      >(child, {
         indicator: selected && !mounted && indicator,
         selected,
-        onClick: (
-          value: string | number,
-          event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-        ) => {
+        onClick: (value, event) => {
           handleItemClick(value as T, event)
         },
         value: childValue,
-        ref: (e: HTMLButtonElement) => {
-          buttonRefs.current.set(childValue, e)
+        ref: (e) => {
+          if (!e) return
+          tabsRefs.current.set(childValue, e)
           if (selected) {
             setSelectedElement(e)
           }
         },
-        onPointerEnter: (
-          e:
-            | React.PointerEvent<HTMLButtonElement>
-            | React.FocusEvent<HTMLButtonElement, Element>
-        ) => onEnterTab(e, childValue),
-        onFocus: (
-          e:
-            | React.PointerEvent<HTMLButtonElement>
-            | React.FocusEvent<HTMLButtonElement, Element>
-        ) => onEnterTab(e, childValue),
+        onPointerEnter: (e) => onEnterTab(e, childValue),
       })
     })
   }, [childrenProp, handleItemClick, indicator, mounted, onEnterTab, value])
@@ -175,8 +171,8 @@ const Tabs = <T extends string | number = string | number>({
     hoverStyles.height = hoveredRect.height - HOVER_CONTAINER_PADDING * 2
     hoverStyles.opacity = hoveredTab !== null ? 1 : 0
     hoverStyles.transition = isInitialHoveredElement
-      ? 'opacity 150ms'
-      : 'transform 150ms, opacity 150ms, width 150ms'
+      ? TRANSITION_OPACITY
+      : TRANSITION_FULL
   }
 
   const selectStyles: CSSProperties = { opacity: 0 }
@@ -187,11 +183,9 @@ const Tabs = <T extends string | number = string | number>({
       (selectedRect.left || 0) - rootBoundingRect.left
     }px)`
     selectStyles.opacity = 1
-    selectStyles.transition = isInitialRender.current
-      ? 'opacity 150ms'
-      : 'transform 150ms 0ms, opacity 150ms, width 150ms'
-
-    isInitialRender.current = false
+    selectStyles.transition = isInitialSelectedAppear
+      ? TRANSITION_OPACITY
+      : TRANSITION_FULL
   }
 
   useEffect(() => {
@@ -203,7 +197,7 @@ const Tabs = <T extends string | number = string | number>({
   }, [])
 
   useEffect(() => {
-    buttonRefs.current = new Map()
+    tabsRefs.current = new Map()
   }, [children.length])
 
   return (

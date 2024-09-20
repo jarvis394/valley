@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Modal as BaseModal, ModalOwnProps } from '@mui/base'
 import styles from './Modal.module.css'
-import Fade from '../Fade/Fade'
 import Grow from '../Grow/Grow'
+import cx from 'classnames'
 
 type ModalProps = React.PropsWithChildren<{
   id: string
@@ -69,14 +69,21 @@ const Backdrop = React.forwardRef<
   HTMLDivElement,
   { children: React.ReactElement; open: boolean; ownerState: never }
 >((props, ref) => {
-  const { open, ownerState: _, ...other } = props
+  const { open: propsIsOpen, ownerState: _, ...other } = props
+  const [open, setOpen] = useState(false)
+
+  // To make fade animation work, first value in DOM for `data-fade-in` should be `false`
+  // After initial render, we can catch up to the latest props `open` value
+  useEffect(() => {
+    setOpen(propsIsOpen)
+  }, [propsIsOpen])
+
   return (
-    <Fade
+    <div
       {...other}
       ref={ref}
-      in={open}
-      transition={{ duration: 0.32, ease: 'easeInOut' }}
-      className={styles.modal__dialogBackdrop}
+      data-fade-in={open}
+      className={cx(styles.modal__dialogBackdrop, 'fade')}
     />
   )
 })

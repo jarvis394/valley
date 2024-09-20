@@ -24,6 +24,7 @@
   flex-direction: row;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .project__foldersTotalSizeContainer {
@@ -34,6 +35,7 @@
   font-size: 16px;
   color: var(--text-primary);
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .project__foldersTotalSizeCaption {

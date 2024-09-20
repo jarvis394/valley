@@ -12,7 +12,13 @@ import Wrapper from '@valley/ui/Wrapper'
 const ProjectsPage: React.FC = () => {
   const { data, isLoading } = useSWR<ProjectGetAllRes, ProjectGetAllReq>(
     '/projects',
-    api({ isAccessTokenRequired: true })
+    api({ isAccessTokenRequired: true }),
+    {
+      suspense: true,
+      fallbackData: {
+        projects: [],
+      },
+    }
   )
 
   return (

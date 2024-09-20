@@ -4,7 +4,10 @@
   /** Fix for small gap at the top in Chrome */
   top: -0.01px;
   box-shadow: inset 0 -1px var(--alpha-transparent-12);
-  padding: 0 16px;
   z-index: var(--toolbar-zIndex);
   display: flex;
+}
+
+.toolbar > div {
+  padding: 0 16px;
 }

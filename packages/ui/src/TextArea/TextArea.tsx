@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import Paper, { PaperProps } from '../Paper/Paper'
+import Paper, { PaperOwnProps } from '../Paper/Paper'
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize'
@@ -11,7 +11,7 @@ type TextAreaProps = {
   after?: React.ReactNode
   state?: 'default' | 'error' | 'valid'
   size?: 'md' | 'lg'
-  paperProps?: PaperProps
+  paperProps?: PaperOwnProps & React.ComponentPropsWithoutRef<'div'>
 } & Omit<TextareaAutosizeProps, 'size'>
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(

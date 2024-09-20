@@ -23,7 +23,7 @@ import { createFolder } from '../../../../api/folders'
 import { formatBytes } from '../../../../utils/formatBytes'
 import UploadButton from '../../../../components/UploadButton/UploadButton'
 import FileCard from '../../../../components/FileCard/FileCard'
-import Fade from '@valley/ui/Fade'
+import cx from 'classnames'
 
 const ProjectPage: React.FC = () => {
   const { id } = useParams()
@@ -97,6 +97,10 @@ const ProjectPage: React.FC = () => {
   return (
     <div className={styles.project}>
       <PageHeader
+        headerProps={{
+          className: 'fade',
+          ['data-fade-in' as string]: !isLoadingProject,
+        }}
         before={
           <>
             <Button size="lg" variant="secondary" before={<Share />}>
@@ -116,12 +120,15 @@ const ProjectPage: React.FC = () => {
           </>
         }
       >
-        <Fade in={!isLoadingProject}>{data?.project.title}</Fade>
+        {data?.project.title}
       </PageHeader>
       <Divider />
       <div className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
-          <Fade in={!isLoadingFolders} className={styles.project__foldersList}>
+          <div
+            data-fade-in={!isLoadingFolders}
+            className={cx(styles.project__foldersList, 'fade')}
+          >
             {data?.folders.map((folder, i) => (
               <FolderCard
                 onClick={handleFolderClick}
@@ -139,16 +146,16 @@ const ProjectPage: React.FC = () => {
             >
               <Plus />
             </IconButton>
-          </Fade>
-          <Fade
-            in={!!projectTotalSize}
-            className={styles.project__foldersTotalSizeContainer}
+          </div>
+          <div
+            data-fade-in={!!projectTotalSize}
+            className={cx(styles.project__foldersTotalSizeContainer, 'fade')}
           >
             <span className={styles.project__foldersTotalSizeCaption}>
               Total size
             </span>
             {projectTotalSize}
-          </Fade>
+          </div>
         </Wrapper>
       </div>
       <Divider />

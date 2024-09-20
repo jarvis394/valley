@@ -3,21 +3,45 @@ import React from 'react'
 import styles from './Toolbar.module.css'
 import TabsItem from '@valley/ui/TabsItem'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { ToolbarItem } from './ToolbarItem'
+
+const PROJECT_TOOLBAR_ITEMS: ToolbarItem[] = [
+  {
+    label: 'Overview',
+    value: '/',
+  },
+  {
+    label: 'Settings',
+    value: '/settings',
+  },
+  {
+    label: 'Design',
+    value: '/design',
+  },
+]
 
 const ProjectToolbar = () => {
-  const router = useRouter()
   const { id: projectId } = useParams()
-  const handleItemClick = (item: string | number) => {
-    router.push(`/projects/${projectId}${item}`)
-  }
+  const pathname = usePathname()
+  const baseURL = `/projects/${projectId}`
+  const defaultValue = pathname.slice(baseURL.length) || '/'
 
   return (
     <div className={styles.toolbar}>
-      <AnimatedTabs onItemClick={handleItemClick} defaultValue={'/'}>
-        <TabsItem value={'/'}>Overview</TabsItem>
-        <TabsItem value={'/settings'}>Settings</TabsItem>
-        <TabsItem value={'/design'}>Design</TabsItem>
+      <AnimatedTabs defaultValue={defaultValue}>
+        {PROJECT_TOOLBAR_ITEMS.map((tab) => (
+          <TabsItem
+            key={tab.value}
+            component={Link}
+            prefetch
+            href={baseURL + tab.value}
+            value={tab.value}
+          >
+            {tab.label}
+          </TabsItem>
+        ))}
       </AnimatedTabs>
     </div>
   )

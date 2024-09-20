@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import Paper, { PaperProps } from '../Paper/Paper'
+import Paper, { PaperOwnProps } from '../Paper/Paper'
 import styles from './Input.module.css'
 
 type InputProps = {
@@ -8,7 +8,7 @@ type InputProps = {
   after?: React.ReactNode
   state?: 'default' | 'error' | 'valid'
   size?: 'md' | 'lg'
-  paperProps?: PaperProps
+  paperProps?: PaperOwnProps & React.ComponentPropsWithoutRef<'div'>
 } & Omit<React.ComponentPropsWithRef<'input'>, 'size'>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(

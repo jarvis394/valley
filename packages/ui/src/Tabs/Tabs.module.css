@@ -2,6 +2,12 @@
   display: flex;
   flex-direction: row;
   position: relative;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tabs__hover {
@@ -22,5 +28,6 @@
   height: 2px;
   transition: all 120ms ease;
   bottom: 0;
+  left: 0;
   pointer-events: none;
 }

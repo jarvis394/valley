@@ -1,42 +1,32 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import cx from 'classnames'
 import styles from './Button.module.css'
 import ButtonBase, { ButtonBaseOwnProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
-import {
-  PolymorphicComponentPropWithRef,
-  PolymorphicRef,
-} from '../types/PolymorphicComponent'
 import { ViewportSize } from '../types/ViewportSize'
+import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 
-type ButtonOwnProps = React.PropsWithChildren<{
+export type ButtonOwnProps = React.PropsWithChildren<{
   size?: Exclude<ViewportSize, 'xs' | 'xl'>
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'secondary-dimmed'
-    | 'tertiary'
-    | 'tertiary-dimmed'
-    | 'warning'
-    | 'danger'
-  disabled?: boolean
   fullWidth?: boolean
   loading?: boolean
   before?: React.ReactNode
   after?: React.ReactNode
   align?: 'start' | 'center' | 'end'
-}>
+}> &
+  ButtonBaseOwnProps
 
-export type ButtonProps<C extends React.ElementType = 'button'> =
-  PolymorphicComponentPropWithRef<C, ButtonOwnProps>
-
-type ButtonComponent = <C extends React.ElementType = 'button'>(
-  props: ButtonProps<C>
-) => React.ReactElement | null
-
-const Button = React.forwardRef(function Button<
-  C extends React.ElementType = 'button',
->(
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  ButtonOwnProps & {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: any
+    className?: string
+    style?: CSSProperties
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    renderRoot: any
+  }
+>(function Button(
   {
     children,
     size = 'sm',
@@ -47,16 +37,14 @@ const Button = React.forwardRef(function Button<
     before,
     fullWidth,
     align,
-    as,
     after,
     ...props
-  }: ButtonProps<C>,
-  ref: PolymorphicRef<C>
+  },
+  ref
 ) {
   return (
     <ButtonBase
       {...props}
-      as={as}
       ref={ref}
       variant={variant}
       disabled={disabled}
@@ -79,4 +67,4 @@ const Button = React.forwardRef(function Button<
   )
 })
 
-export default React.memo(Button) as ButtonComponent
+export default createPolymorphicComponent<'button', ButtonOwnProps>(Button)

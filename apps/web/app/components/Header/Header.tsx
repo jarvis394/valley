@@ -10,16 +10,67 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import useSWR from 'swr'
 import { api } from '../../api'
-import { UserGetSelfRes } from '@valley/shared'
+import { ProjectGetRes, UserGetSelfRes } from '@valley/shared'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
+import { useParams } from 'next/navigation'
 
-const Header = () => {
+const CurrentUser = () => {
   const me = useSWR<UserGetSelfRes>(
     '/users/me',
     api({ isAccessTokenRequired: true })
   )
 
+  return (
+    <>
+      <Slash className="fade" data-fade-in={!!me.data} />
+      <Stack gap={4} align={'center'} className="fade" data-fade-in={!!me.data}>
+        <Stack
+          component={Link}
+          href={'/projects'}
+          gap={3}
+          align={'center'}
+          className={styles.header__avatarAndNameContainer}
+        >
+          <Avatar />
+          {me.data?.user?.username}
+        </Stack>
+        <IconButton size="sm" variant="secondary-dimmed">
+          <MenuIcon />
+        </IconButton>
+      </Stack>
+    </>
+  )
+}
+
+const CurrentProject = () => {
+  const { id: projectId } = useParams()
+  const project = useSWR<ProjectGetRes>(
+    projectId ? '/projects/' + projectId : null,
+    api({ isAccessTokenRequired: true }),
+    {
+      keepPreviousData: true,
+    }
+  )
+  const isShown = !!projectId && !!project.data
+
+  return (
+    <>
+      <Slash className="fade" data-fade-in={isShown} />
+      <Stack className="fade" data-fade-in={isShown} gap={4} align={'center'}>
+        <Stack
+          gap={3}
+          align={'center'}
+          className={styles.header__avatarAndNameContainer}
+        >
+          {project.data?.project?.title}
+        </Stack>
+      </Stack>
+    </>
+  )
+}
+
+const Header = () => {
   return (
     <header
       className={styles.header}
@@ -32,20 +83,8 @@ const Header = () => {
       </Link>
       <nav className={styles.header__nav}>
         <Stack gap={2} align={'center'}>
-          <Slash />
-          <Stack gap={4} align={'center'}>
-            <Stack
-              gap={3}
-              align={'center'}
-              className={styles.header__avatarAndNameContainer}
-            >
-              <Avatar />
-              {me.data?.user?.username}
-            </Stack>
-            <IconButton size="sm" variant="secondary-dimmed">
-              <MenuIcon />
-            </IconButton>
-          </Stack>
+          <CurrentUser />
+          <CurrentProject />
         </Stack>
         <Stack gap={2} align={'center'}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>

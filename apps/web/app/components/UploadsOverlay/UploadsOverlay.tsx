@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useUploadsStore } from '../../hooks/useUpload'
 import { Portal } from '@mui/base/Portal'
 import styles from './UploadsOverlay.module.css'
-import Fade from '@valley/ui/Fade'
 import Spinner from '@valley/ui/Spinner'
 import { formatBytes } from '../../utils/formatBytes'
 import IconButton from '@valley/ui/IconButton'
@@ -102,7 +101,7 @@ const UploadsOverlay: React.FC = () => {
 
   return (
     <Portal container={() => document.body}>
-      <Fade in={shouldShowUploadsOverlay}>
+      <div className="fade" data-fade-in={shouldShowUploadsOverlay}>
         <div
           className={cx(styles.uploadsOverlay, {
             [styles['uploadsOverlay--expanded']]: isExpanded,
@@ -150,7 +149,7 @@ const UploadsOverlay: React.FC = () => {
             ))}
           </OverlayScrollbarsComponent>
         </div>
-      </Fade>
+      </div>
     </Portal>
   )
 }

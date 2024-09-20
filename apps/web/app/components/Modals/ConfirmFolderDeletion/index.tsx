@@ -55,7 +55,7 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionModalProps> = ({
         </Note>
       </Stack>
       <Stack
-        as="form"
+        component="form"
         id="confirm-folder-deletion-form"
         direction={'column'}
         gap={6}

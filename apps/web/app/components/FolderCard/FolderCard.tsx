@@ -99,7 +99,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, active, onClick }) => {
   return (
     <Dropdown open={isMenuOpen} onOpenChange={handleDropdownIsOpenChange}>
       <ButtonBase
-        as={'a'}
+        component={'a'}
         variant="secondary"
         onClick={handleClick}
         onContextMenu={handleContextMenu}

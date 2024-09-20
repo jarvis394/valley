@@ -22,6 +22,9 @@ const nextConfig = {
     buildActivity: true,
     buildActivityPosition: 'bottom-right',
   },
+  experimental: {
+    optimizePackageImports: ['geist-ui-icons'],
+  },
   output: 'standalone',
 }
 

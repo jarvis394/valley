@@ -1,16 +1,16 @@
 import React from 'react'
 import styles from './Wrapper.module.css'
 import cx from 'classnames'
-import Paper, { PaperProps } from '../Paper/Paper'
+import Paper, { PaperOwnProps } from '../Paper/Paper'
+import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 
-export type WrapperProps = PaperProps
+export type WrapperOwnProps = PaperOwnProps
 
-const Wrapper: React.FC<WrapperProps> = ({
-  children,
-  className,
-  variant = 'tertiary',
-  ...props
-}) => {
+const Wrapper: React.FC<
+  WrapperOwnProps & {
+    className?: string
+  }
+> = ({ children, className, variant = 'tertiary', ...props }) => {
   return (
     <Paper
       {...props}
@@ -22,4 +22,4 @@ const Wrapper: React.FC<WrapperProps> = ({
   )
 }
 
-export default Wrapper
+export default createPolymorphicComponent<'div', PaperOwnProps>(Wrapper)

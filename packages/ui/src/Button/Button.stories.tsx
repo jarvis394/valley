@@ -25,10 +25,14 @@ export const Default: Story = {
         'warning',
         'tertiary',
         'secondary-dimmed',
+        'tertiary-dimmed',
       ],
       control: { type: 'select' },
     },
     disabled: {
+      control: { type: 'boolean' },
+    },
+    loading: {
       control: { type: 'boolean' },
     },
     size: {

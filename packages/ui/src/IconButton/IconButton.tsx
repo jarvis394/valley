@@ -1,12 +1,15 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './IconButton.module.css'
-import Button, { ButtonProps } from '../Button/Button'
+import Button, { ButtonOwnProps } from '../Button/Button'
 import Spinner from '../Spinner/Spinner'
+import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
+
+export type IconOwnProps = Omit<ButtonOwnProps, 'before' | 'after' | 'align'>
 
 const IconButton = React.forwardRef<
   HTMLButtonElement,
-  Omit<ButtonProps, 'before' | 'after' | 'align'>
+  IconOwnProps & { className?: string }
 >(({ children, className, size = 'sm', loading, ...props }, ref) => {
   return (
     <Button
@@ -26,4 +29,4 @@ const IconButton = React.forwardRef<
   )
 })
 
-export default React.memo(IconButton)
+export default createPolymorphicComponent<'button', IconOwnProps>(IconButton)

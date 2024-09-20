@@ -30,7 +30,12 @@
     "./IconButton": "./src/IconButton/IconButton.tsx",
     "./Avatar": "./src/Avatar/Avatar.tsx",
     "./ButtonBase": "./src/ButtonBase/ButtonBase.tsx",
-    "./Button": "./src/Button/Button.tsx"
+    "./Button": "./src/Button/Button.tsx",
+    "./createPolymorphicComponent": "./src/utils/createPolymorphicComponent.ts",
+    "./useViewportVariable": "./src/hooks/useViewportVariable.ts",
+    "./useMediaQuery": "./src/hooks/useMediaQuery.ts",
+    "./config/theme": "./src/config/theme.ts",
+    "./styles/global.css": "./src/styles/global.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -43,8 +48,8 @@
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
-    "@valley/shared": "*",
     "@valley/eslint-config": "*",
+    "@valley/shared": "*",
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
     "react": "^18.2.0",

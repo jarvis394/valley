@@ -1,9 +1,10 @@
 'use client'
 import React from 'react'
 import { useMenuButton } from '@mui/base'
-import Button, { ButtonProps } from '../Button/Button'
+import Button, { ButtonOwnProps } from '../Button/Button'
+import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 
-type MenuButtonProps = ButtonProps & {
+type MenuButtonProps = ButtonOwnProps & {
   focusableWhenDisabled?: boolean
 }
 
@@ -33,4 +34,4 @@ const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
   }
 )
 
-export default React.memo(MenuButton)
+export default createPolymorphicComponent<'button', ButtonOwnProps>(MenuButton)

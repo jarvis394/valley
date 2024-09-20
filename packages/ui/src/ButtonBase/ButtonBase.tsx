@@ -1,10 +1,7 @@
 import React from 'react'
 import styles from './ButtonBase.module.css'
 import cx from 'classnames'
-import {
-  PolymorphicComponentPropWithRef,
-  PolymorphicRef,
-} from '../types/PolymorphicComponent'
+import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 
 export type ButtonBaseOwnProps = React.PropsWithChildren<{
   variant?:
@@ -18,39 +15,36 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
   disabled?: boolean
 }>
 
-export type ButtonBaseProps<C extends React.ElementType = 'button'> =
-  PolymorphicComponentPropWithRef<C, ButtonBaseOwnProps>
-
-type ButtonBaseComponent = <C extends React.ElementType = 'button'>(
-  props: ButtonBaseProps<C>
-) => React.ReactElement | null
-
-const ButtonBase = React.forwardRef<HTMLButtonElement>(function ButtonBase<
-  C extends React.ElementType = 'button',
->(
-  { variant, children, className, as, ...props }: ButtonBaseProps<C>,
-  ref: PolymorphicRef<C>
+const ButtonBase = React.forwardRef<
+  HTMLButtonElement,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ButtonBaseOwnProps & { component: any; className: string; renderRoot: any }
+>(function ButtonBaseWithRef(
+  { variant, renderRoot, className, component, ...other },
+  ref
 ) {
-  const Root = as || 'button'
+  const Root = component || 'button'
+  const props: React.ComponentProps<'button'> = {
+    ...other,
+    ref,
+    className: cx(className, styles.buttonBase, {
+      [styles['buttonBase--primary']]: variant === 'primary',
+      [styles['buttonBase--secondary']]: variant === 'secondary',
+      [styles['buttonBase--secondary-dimmed']]: variant === 'secondary-dimmed',
+      [styles['buttonBase--tertiary']]: variant === 'tertiary',
+      [styles['buttonBase--tertiary-dimmed']]: variant === 'tertiary-dimmed',
+      [styles['buttonBase--warning']]: variant === 'warning',
+      [styles['buttonBase--danger']]: variant === 'danger',
+    }),
+  }
 
-  return (
-    <Root
-      {...props}
-      className={cx(className, styles.buttonBase, {
-        [styles['buttonBase--primary']]: variant === 'primary',
-        [styles['buttonBase--secondary']]: variant === 'secondary',
-        [styles['buttonBase--secondary-dimmed']]:
-          variant === 'secondary-dimmed',
-        [styles['buttonBase--tertiary']]: variant === 'tertiary',
-        [styles['buttonBase--tertiary-dimmed']]: variant === 'tertiary-dimmed',
-        [styles['buttonBase--warning']]: variant === 'warning',
-        [styles['buttonBase--danger']]: variant === 'danger',
-      })}
-      ref={ref}
-    >
-      {children}
-    </Root>
+  return typeof renderRoot === 'function' ? (
+    renderRoot(props)
+  ) : (
+    <Root {...props} />
   )
 })
 
-export default React.memo(ButtonBase) as ButtonBaseComponent
+export default createPolymorphicComponent<'button', ButtonBaseOwnProps>(
+  ButtonBase
+)
