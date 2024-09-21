@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "VIPS_CONCURRENCY=$(nproc) next dev --turbo --port 4200",
+    "dev": "yarn fix-vips-concurrency-env && next dev --turbo --port 4200",
     "build": "next build",
-    "start": "VIPS_CONCURRENCY=$(nproc) next start",
+    "start": "yarn fix-vips-concurrency-env && next start",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "fix-vips-concurrency-env": "VIPS_CONCURRENCY=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
   },
   "dependencies": {
     "@storybook/react": "^8.2.7",

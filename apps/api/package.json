@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "VIPS_CONCURRENCY=$(nproc) nest start --watch",
+    "dev": "yarn fix-vips-concurrency-env && nest start --watch",
     "build": "nest build",
-    "start": "VIPS_CONCURRENCY=$(nproc) nest start",
-    "start:debug": "VIPS_CONCURRENCY=$(nproc) nest start --debug --watch",
-    "start:prod": "VIPS_CONCURRENCY=$(nproc) node dist/main",
+    "start": "yarn fix-vips-concurrency-env && nest start",
+    "start:debug": "yarn fix-vips-concurrency-env && nest start --debug --watch",
+    "start:prod": "yarn fix-vips-concurrency-env && node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "fix-vips-concurrency-env": "VIPS_CONCURRENCY=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
