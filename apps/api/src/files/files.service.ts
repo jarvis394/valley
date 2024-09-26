@@ -10,8 +10,14 @@ import {
   GetObjectCommand,
   S3Client,
   GetObjectCommandOutput,
+  DeleteObjectsCommand,
+  ObjectIdentifier,
 } from '@aws-sdk/client-s3'
-import { MULTIPART_UPLOAD_CHUNK_SIZE, TusUploadMetadata } from '@valley/shared'
+import {
+  FolderDeleteRes,
+  MULTIPART_UPLOAD_CHUNK_SIZE,
+  TusUploadMetadata,
+} from '@valley/shared'
 import { FoldersService } from '../folders/folders.service'
 import { ProjectsService } from '../projects/projects.service'
 import dec2frac from '../utils/dec2frac'
@@ -20,6 +26,7 @@ import exifr from 'exifr'
 import { Upload } from '@aws-sdk/lib-storage'
 import { IncomingMessage } from 'http'
 import { Response } from 'express'
+import { v4 as uuid } from 'uuid'
 
 type ExifDataKey =
   | 'Artist'
@@ -82,7 +89,9 @@ export class FilesService {
   static readonly EXIF_PARSING_OPTIONS = {
     pick: extractFields,
   }
-  static readonly THUMBNAIL_KEY = 'thumb_'
+  static readonly THUMBNAIL_PREFIX = 'thumb_'
+  static readonly PROJECT_PATH_PREFIX = 'project-'
+  static readonly FOLDER_PATH_PREFIX = 'folder-'
   readonly storage: S3Client
 
   constructor(
@@ -118,7 +127,7 @@ export class FilesService {
     orderBy?: Prisma.FileOrderByWithRelationInput
   }): Promise<File[]> {
     const { skip, take, cursor, where, orderBy } = params
-    return this.prismaService.file.findMany({
+    return await this.prismaService.file.findMany({
       skip,
       take,
       cursor,
@@ -128,24 +137,32 @@ export class FilesService {
   }
 
   protected async createFile(data: Prisma.FileCreateInput): Promise<File> {
-    return this.prismaService.file.create({
+    return await this.prismaService.file.create({
       data,
     })
   }
 
-  async updateFile(params: {
+  async update(params: {
     where: Prisma.FileWhereUniqueInput
     data: Prisma.FileUpdateInput
   }): Promise<File> {
     const { where, data } = params
-    return this.prismaService.file.update({
+    return await this.prismaService.file.update({
       data,
       where,
     })
   }
 
-  async deleteFile(where: Prisma.FileWhereUniqueInput): Promise<File> {
-    return this.prismaService.file.delete({
+  private async delete(where: Prisma.FileWhereUniqueInput): Promise<File> {
+    return await this.prismaService.file.delete({
+      where,
+    })
+  }
+
+  private async deleteMany(
+    where: Prisma.FileWhereInput
+  ): Promise<Prisma.BatchPayload> {
+    return await this.prismaService.file.deleteMany({
       where,
     })
   }
@@ -230,7 +247,7 @@ export class FilesService {
       }
     }
 
-    const thumbnailKey = FilesService.getThumbnailKey(data.key)
+    const thumbnailKey = FilesService.makeThumbnailUploadPath(data.key)
     const thumbnailBuffer = await sharp(image)
       .withMetadata()
       .resize({
@@ -242,7 +259,7 @@ export class FilesService {
       })
       .toBuffer()
 
-    const parallelUploads3 = new Upload({
+    const upload = new Upload({
       client: this.storage,
       params: {
         Bucket: data.bucket,
@@ -254,7 +271,7 @@ export class FilesService {
       partSize: MULTIPART_UPLOAD_CHUNK_SIZE,
     })
 
-    await parallelUploads3.done()
+    await upload.done()
 
     return { ok: true, key: thumbnailKey }
   }
@@ -298,8 +315,8 @@ export class FilesService {
 
     const databaseFile = await this.createFile(fileData)
 
-    await this.foldersService.addFileToFolder(data.folderId, databaseFile)
-    await this.projectsService.addFileToProject(data.projectId, databaseFile)
+    await this.foldersService.addFilesToFolder(data.folderId, [databaseFile])
+    await this.projectsService.addFilesToProject(data.projectId, [databaseFile])
 
     return databaseFile
   }
@@ -337,11 +354,194 @@ export class FilesService {
     }
   }
 
-  static getThumbnailKey(key: string) {
-    return FilesService.THUMBNAIL_KEY + key
+  private async deleteFilesInS3(
+    files: File[]
+  ): Promise<Omit<FolderDeleteRes, 'ok'>> {
+    const objects: ObjectIdentifier[] = []
+
+    if (files.length === 0) return { deleted: [], errors: [] }
+
+    files.forEach((file) => {
+      objects.push({
+        Key: file.key,
+      })
+
+      // Delete <key>.info object which is created by Tus
+      objects.push({
+        Key: file.key + '.info',
+      })
+
+      // Delete thumbnail for object
+      if (file.thumbnailKey) {
+        objects.push({
+          Key: file.thumbnailKey,
+        })
+      }
+    })
+
+    const deleteFilesCommand = new DeleteObjectsCommand({
+      Bucket: this.configService.UPLOAD_BUCKET,
+      Delete: {
+        Objects: objects,
+      },
+    })
+    const res = await this.storage.send(deleteFilesCommand)
+
+    return {
+      deleted: res?.Deleted?.map((e) => e.Key) || [],
+      errors:
+        res?.Errors?.map((e) => ({
+          code: e.Code || 500,
+          message: e.Message || 'Error deleting a file',
+          key: e.Key,
+        })) || [],
+    }
   }
 
-  static isThumbnail(key: string) {
-    return key.startsWith(FilesService.THUMBNAIL_KEY)
+  // private async deleteFileInS3(
+  //   file: File
+  // ): Promise<Omit<FolderDeleteRes, 'ok'>> {
+  //   const objects: ObjectIdentifier[] = [
+  //     {
+  //       Key: file.key,
+  //     },
+  //     // Delete <key>.info object which is created by Tus
+  //     {
+  //       Key: file.key + '.info',
+  //     },
+  //   ]
+
+  //   // Delete thumbnail for object
+  //   if (file.thumbnailKey) {
+  //     objects.push({
+  //       Key: file.thumbnailKey,
+  //     })
+  //   }
+
+  //   const deleteFilesCommand = new DeleteObjectCommand({
+  //     Bucket: this.configService.UPLOAD_BUCKET,
+  //     Key: file.key,
+  //   })
+
+  //   try {
+  //     await this.storage.send(deleteFilesCommand)
+  //     return {
+  //       deleted: [file.key],
+  //       errors: [],
+  //     }
+  //   } catch (e) {
+  //     console.log(e)
+  //     throw new InternalServerErrorException()
+  //   }
+  // }
+
+  // async deleteFile(fileOrFileId: File | File['id']): Promise<{
+  //   deleted?: string
+  //   error?: {
+  //     code: string | number
+  //     message: string
+  //     key: string
+  //   }
+  // }> {
+  //   let file: File
+  //   if (typeof fileOrFileId === 'number') {
+  //     file = await this.file({ id: fileOrFileId })
+  //   } else {
+  //     file = fileOrFileId
+  //   }
+
+  //   await this.delete({ id: file.id })
+  //   await this.foldersService.deleteFilesFromFolder(file.folderId, [file])
+  //   const s3Result = await this.deleteFileInS3(file)
+
+  //   return {
+  //     deleted: s3Result.deleted[0],
+  //     error: s3Result.errors[0],
+  //   }
+  // }
+
+  /**
+   * Deletes files from a folder by deleting them in storage and in DB,
+   * and updating folder size as well.
+   *
+   * WARNING: Supports only deleting files from one folder
+   */
+  async deleteFiles(
+    folderId: Folder['id'],
+    files: File[]
+  ): Promise<Omit<FolderDeleteRes, 'ok'>> {
+    if (files.length === 0) return { deleted: [], errors: [] }
+
+    const [_filesDeleteResult, _folderUpdateResult, s3Result] =
+      await Promise.all([
+        this.deleteMany({
+          id: {
+            in: files.map((file) => file.id),
+          },
+        }),
+        this.foldersService.deleteFilesFromFolder(folderId, files),
+        this.deleteFilesInS3(files),
+      ])
+
+    return s3Result
+  }
+
+  static getFilePathnameParts(filePath: string): {
+    path: string
+    filename: string
+    projectId: Project['id'] | null
+    folderId: Folder['id'] | null
+  } {
+    let lastPathSeparator = filePath.lastIndexOf('/')
+    lastPathSeparator =
+      lastPathSeparator < 0 ? filePath.length : lastPathSeparator
+    const path = filePath.slice(0, lastPathSeparator)
+    const filename = filePath.slice(lastPathSeparator + 1)
+    const pathParts = path.split('/')
+    let projectId: Project['id'] = null,
+      folderId: Folder['id'] = null
+    if (pathParts.length === 2) {
+      projectId = Number(
+        pathParts[0].slice(FilesService.PROJECT_PATH_PREFIX.length)
+      )
+      folderId = Number(
+        pathParts[1].slice(FilesService.FOLDER_PATH_PREFIX.length)
+      )
+    }
+
+    return { path, filename, projectId, folderId }
+  }
+
+  static makeThumbnailUploadPath(filePath: string) {
+    const { filename, path } = FilesService.getFilePathnameParts(filePath)
+    return path + '/' + FilesService.THUMBNAIL_PREFIX + filename
+  }
+
+  static getUploadProjectName(projectId: Project['id']) {
+    return `${FilesService.PROJECT_PATH_PREFIX}${projectId}`
+  }
+
+  static getUploadFolderName(folderId: Folder['id']) {
+    return `${FilesService.FOLDER_PATH_PREFIX}${folderId}`
+  }
+
+  static generateUploadId(): string {
+    return uuid()
+  }
+
+  static makeUploadPath(props: {
+    projectId: string | number
+    folderId: string | number
+    uploadId: string
+  }): string {
+    const projectName = FilesService.getUploadProjectName(
+      Number(props.projectId)
+    )
+    const folderName = FilesService.getUploadFolderName(Number(props.folderId))
+    return `${projectName}/${folderName}/${props.uploadId}`
+  }
+
+  static isThumbnail(fileKey: string) {
+    return fileKey.startsWith(FilesService.THUMBNAIL_PREFIX)
   }
 }

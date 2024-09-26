@@ -124,20 +124,25 @@ export class ProjectsService {
     return this.serializeProject(project)
   }
 
-  async addFileToProject(
+  async addFilesToProject(
     projectId: Project['id'],
-    file: File
+    files: File[]
   ): Promise<SerializedProject> {
     return await this.prismaService.$transaction(async (tx) => {
       const project = await tx.project.findFirst({
         where: { id: projectId },
       })
-      const newProjectTotalSize = Number(project.totalSize) + Number(file.size)
+      let allFilesSize = 0
+      files.forEach((file) => {
+        allFilesSize += Number(file.size)
+      })
+
+      const newProjectTotalSize = Number(project.totalSize) + allFilesSize
       const newProjectData = await tx.project.update({
         where: { id: projectId },
         data: {
           totalFiles: {
-            increment: 1,
+            increment: files.length,
           },
           totalSize: {
             set: newProjectTotalSize.toString(),

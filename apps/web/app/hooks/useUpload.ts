@@ -371,7 +371,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       response: unknown
     ) => {
       if (!file) return
-      console.log(file, response)
+      console.log({ file, response })
       setFileUploaded(file.id)
     }
 

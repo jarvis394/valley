@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@valley/ui/Button'
 import Input from '@valley/ui/Input'
 import InputLabel from '@valley/ui/InputLabel'
@@ -10,7 +10,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { editFolder } from '../../../api/folders'
 import { useParams, useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
-import { ProjectGetReq, ProjectGetRes } from '@valley/shared'
+import {
+  PROJECT_FOLDER_TITLE_MAX_LENGTH,
+  ProjectGetReq,
+  ProjectGetRes,
+} from '@valley/shared'
 import { api } from '../../../api'
 
 type EditFolderTitleModalProps = {
@@ -36,7 +40,7 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
   const folderId = Number(modalPropsFolderId || searchParamsFolderId)
   const parsedProjectId = Number(projectId)
   const defaultTitle = data?.folders.find((e) => e.id === folderId)?.title
-  const { register, handleSubmit } = useForm<FieldValues>()
+  const { register, handleSubmit, setFocus } = useForm<FieldValues>()
 
   const onSubmit: SubmitHandler<FieldValues> = async (values, e) => {
     e?.preventDefault()
@@ -60,6 +64,12 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
     })
   }
 
+  useEffect(() => {
+    setFocus('folderTitle', {
+      shouldSelect: true,
+    })
+  }, [])
+
   return (
     <>
       <ModalHeader>Edit Folder Title</ModalHeader>
@@ -71,7 +81,12 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
         <div>
           <InputLabel htmlFor="folder-title-input">Title</InputLabel>
           <Input
-            {...register('folderTitle')}
+            {...register('folderTitle', {
+              required: true,
+              minLength: 0,
+              maxLength: PROJECT_FOLDER_TITLE_MAX_LENGTH,
+            })}
+            autoFocus
             defaultValue={defaultTitle}
             id="folder-title-input"
             placeholder="Folder"
@@ -94,6 +109,7 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
             form="edit-folder-title-form"
             variant="primary"
             size="md"
+            type="submit"
             disabled={isLoading}
             loading={isLoading}
           >

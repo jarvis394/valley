@@ -2,7 +2,6 @@
 import React, { useMemo, useState } from 'react'
 import Button from '@valley/ui/Button'
 import Divider from '@valley/ui/Divider'
-import Link from 'next/link'
 import styles from './Project.module.css'
 import { PencilEdit, Plus, Share } from 'geist-ui-icons'
 import useSWR from 'swr'
@@ -196,10 +195,6 @@ const ProjectPage: React.FC = () => {
           ))}
         </Wrapper>
       )}
-
-      <Link style={{ textDecoration: 'none' }} href={'/projects'}>
-        <Button>Go back</Button>
-      </Link>
     </div>
   )
 }

@@ -83,7 +83,7 @@ services:
     <<: *defaults
     container_name: valley-minio
     command: minio server --console-address ":9001" /data
-    image: minio/minio
+    image: minio/minio:latest
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -92,7 +92,7 @@ services:
     volumes:
       - 'minio:/data/'
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:9000/minio/health/live']
+      test: ['CMD', 'curl', '-fsS', 'http://localhosr:9000/minio/health/ready']
       interval: 10s
       start_interval: 1s
       start_period: 10s
@@ -100,8 +100,8 @@ services:
   tusd:
     <<: *defaults
     container_name: valley-tusd
-    image: tusproject/tusd
-    command: -verbose -s3-bucket files -s3-endpoint http://valley-minio:9000 -hooks-http http://host.docker.internal:${PORT}/upload -hooks-enabled-events pre-create,pre-finish
+    image: tusproject/tusd:latest
+    command: -verbose -s3-bucket ${UPLOAD_BUCKET} -s3-endpoint http://valley-minio:9000 -hooks-http http://host.docker.internal:${PORT}/upload -hooks-enabled-events pre-create,pre-finish
     volumes:
       - tusd:/data
     ports:
@@ -148,7 +148,7 @@ services:
   # Creates minio bucket on startup if it was not created before
   createbuckets:
     <<: *defaults
-    image: minio/mc
+    image: minio/mc:latest
     env_file:
       - .env
     depends_on:
@@ -156,8 +156,8 @@ services:
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://valley-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-      /usr/bin/mc mb myminio/files;
-      /usr/bin/mc anonymous set private myminio/files;
+      /usr/bin/mc mb myminio/${UPLOAD_BUCKET};
+      /usr/bin/mc anonymous set private myminio/${UPLOAD_BUCKET};
       exit 0;
       "
 

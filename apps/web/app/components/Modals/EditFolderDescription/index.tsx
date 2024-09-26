@@ -10,7 +10,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { editFolder } from '../../../api/folders'
 import { useParams, useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
-import { ProjectGetReq, ProjectGetRes } from '@valley/shared'
+import {
+  PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
+  ProjectGetReq,
+  ProjectGetRes,
+} from '@valley/shared'
 import { api } from '../../../api'
 
 type EditFolderDescriptionModalProps = {
@@ -74,7 +78,10 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
             Description
           </InputLabel>
           <TextArea
-            {...register('folderDescription')}
+            {...register('folderDescription', {
+              maxLength: PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
+            })}
+            autoFocus
             defaultValue={defaultDescription}
             id="folder-description-input"
             placeholder="Write here anything..."
@@ -97,6 +104,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
             form="edit-folder-description-form"
             variant="primary"
             size="md"
+            type="submit"
             disabled={isLoading}
             loading={isLoading}
           >

@@ -49,6 +49,13 @@ export class TusHookResponseBuilder<
     return this
   }
 
+  setUploadPath(path: string) {
+    this.data.ChangeFileInfo = {
+      ID: path,
+    }
+    return this
+  }
+
   build(): TusHookResponse {
     return this.data
   }

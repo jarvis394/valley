@@ -57,7 +57,7 @@ const Button = React.forwardRef<
         [styles['button--align-end']]: align === 'end',
       })}
     >
-      {loading && <Spinner />}
+      {loading && <Spinner className={styles.button__loading} />}
       {before && !loading && (
         <div className={styles.button__before}>{before}</div>
       )}

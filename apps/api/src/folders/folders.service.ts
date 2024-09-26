@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common'
 import { File, Folder, Prisma, Project, User } from '@valley/db'
 import {
   FolderCreateReq,
@@ -10,10 +15,14 @@ import { ProjectsService } from '../projects/projects.service'
 
 @Injectable()
 export class FoldersService {
+  private logger: Logger
+
   constructor(
     private readonly prismaService: PrismaService,
     private readonly projectsService: ProjectsService
-  ) {}
+  ) {
+    this.logger = new Logger('FoldersService')
+  }
 
   serializeFolder(folder: Folder): SerializedFolder {
     return {
@@ -70,6 +79,23 @@ export class FoldersService {
     })
   }
 
+  async assertFolderExists(props: {
+    projectId: Project['id']
+    folderId: Folder['id']
+    userId: User['id']
+  }) {
+    const project = await this.projectsService.getUserProject(
+      props.userId,
+      props.projectId
+    )
+    const folder = await this.getProjectFolder({
+      projectId: props.projectId,
+      folderId: props.folderId,
+    })
+
+    return { project, folder }
+  }
+
   async getProjectFolders(
     projectId: Project['id']
   ): Promise<SerializedFolder[]> {
@@ -83,6 +109,22 @@ export class FoldersService {
     })
 
     return res.map((e) => this.serializeFolder(e))
+  }
+
+  async getProjectFolder(props: {
+    projectId: Project['id']
+    folderId: Folder['id']
+  }): Promise<SerializedFolder> {
+    const folder = await this.folder({
+      projectId: props.projectId,
+      id: props.folderId,
+    })
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found')
+    }
+
+    return this.serializeFolder(folder)
   }
 
   async createProjectFolder(props: {
@@ -146,39 +188,98 @@ export class FoldersService {
     data: FolderEditReq
   }): Promise<SerializedFolder> {
     const { id, ...data } = props.data
-    const project = await this.projectsService.project({
-      id: props.projectId,
-      userId: props.userId,
-    })
-    if (!project) {
-      throw new NotFoundException('Project not found')
-    }
 
-    const folder = await this.updateFolder({
-      where: {
-        id,
-        projectId: props.projectId,
-      },
-      data,
-    })
+    return await this.prismaService.$transaction(async (tx) => {
+      const project = await tx.project.findFirst({
+        where: {
+          id: props.projectId,
+          userId: props.userId,
+        },
+      })
+      if (!project) {
+        throw new NotFoundException('Project not found')
+      }
 
-    return this.serializeFolder(folder)
+      const folder = await tx.folder.findFirst({
+        where: {
+          id,
+          projectId: props.projectId,
+        },
+      })
+      if (!folder) {
+        throw new NotFoundException('Folder not found')
+      }
+
+      try {
+        const updatedFolder = await this.updateFolder({
+          where: {
+            id,
+            projectId: props.projectId,
+          },
+          data,
+        })
+        return this.serializeFolder(updatedFolder)
+      } catch (e) {
+        this.logger.error(
+          `Caught exception on updating project folder: ${(e as Error).message}`
+        )
+        this.logger.debug(`Got props: ${JSON.stringify(props)}`)
+        throw new InternalServerErrorException(
+          'Cannot update folder, try again later'
+        )
+      }
+    })
   }
 
-  async addFileToFolder(
+  async addFilesToFolder(
     folderId: Folder['id'],
-    file: File
+    files: File[]
   ): Promise<SerializedFolder> {
     return await this.prismaService.$transaction(async (tx) => {
       const folder = await tx.folder.findFirst({
         where: { id: folderId },
       })
-      const newFolderTotalSize = Number(folder.totalSize) + Number(file.size)
+      let allFilesSize = 0
+      files.forEach((file) => {
+        allFilesSize += Number(file.size)
+      })
+
+      const newFolderTotalSize = Number(folder.totalSize) + allFilesSize
       const newFolderData = await tx.folder.update({
         where: { id: folderId },
         data: {
           totalFiles: {
-            increment: 1,
+            increment: files.length,
+          },
+          totalSize: {
+            set: newFolderTotalSize.toString(),
+          },
+        },
+      })
+
+      return this.serializeFolder(newFolderData)
+    })
+  }
+
+  async deleteFilesFromFolder(
+    folderId: Folder['id'],
+    files: File[]
+  ): Promise<SerializedFolder> {
+    return await this.prismaService.$transaction(async (tx) => {
+      const folder = await tx.folder.findFirst({
+        where: { id: folderId },
+      })
+      let allFilesSize = 0
+      files.forEach((file) => {
+        allFilesSize += Number(file.size)
+      })
+
+      const newFolderTotalSize = Number(folder.totalSize) - allFilesSize
+      const newFolderData = await tx.folder.update({
+        where: { id: folderId },
+        data: {
+          totalFiles: {
+            decrement: files.length,
           },
           totalSize: {
             set: newFolderTotalSize.toString(),

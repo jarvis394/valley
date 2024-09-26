@@ -92,6 +92,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
             form="create-project-form"
             variant="primary"
             size="md"
+            type="submit"
             disabled={isLoading}
             loading={isLoading}
           >

@@ -1,15 +1,18 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Modal as BaseModal, ModalOwnProps } from '@mui/base'
+import { Modal as BaseModal } from '@mui/base'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'
+import useMediaQuery from '../hooks/useMediaQuery'
+import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
+import { Drawer } from 'vaul'
 
 type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
-  onDismiss?: ModalOwnProps['onClose']
+  onDismiss?: () => void
 }>
 
 const Modal: React.FC<ModalProps> = ({
@@ -18,19 +21,19 @@ const Modal: React.FC<ModalProps> = ({
   children,
   id,
 }) => {
+  const shouldShowDrawer = useMediaQuery(
+    `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
+  )
   const [open, setOpen] = useState(propsIsOpen)
   const router = useRouter()
   const pathname = usePathname()
   const query = useSearchParams()
   const currentModal = useMemo(() => query.get('modal'), [query])
 
-  const handleClose: ModalOwnProps['onClose'] = (
-    event: React.MouseEvent | React.KeyboardEvent,
-    reason
-  ) => {
+  const handleClose = () => {
     // Use only user-provided function if it is present
     if (onDismiss) {
-      return onDismiss(event, reason)
+      return onDismiss()
     }
 
     const newQuery = new URLSearchParams(query.toString())
@@ -42,6 +45,35 @@ const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     setOpen(currentModal === id)
   }, [currentModal, id])
+
+  const handleDrawerOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      return handleClose()
+    }
+  }
+
+  if (shouldShowDrawer) {
+    return (
+      <Drawer.Root
+        direction="bottom"
+        open={open}
+        onOpenChange={handleDrawerOpenChange}
+      >
+        <Drawer.Portal>
+          <Drawer.Content className={styles.modal__drawer}>
+            <Drawer.Title style={{ display: 'none' }}>
+              {currentModal}
+            </Drawer.Title>
+            <Drawer.Description style={{ display: 'none' }}>
+              {currentModal}
+            </Drawer.Description>
+            {children}
+          </Drawer.Content>
+          <Drawer.Overlay className={styles.modal__drawerOverlay} />
+        </Drawer.Portal>
+      </Drawer.Root>
+    )
+  }
 
   return (
     <BaseModal

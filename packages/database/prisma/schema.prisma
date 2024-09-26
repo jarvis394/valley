@@ -34,7 +34,7 @@ model Project {
   folders            Folder[]
   translationStrings TranslationStrings?
 
-  User                 User? @relation(fields: [userId], references: [id])
+  User                 User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId               Int?
   translationStringsId Int?
 }
@@ -51,7 +51,7 @@ model Folder {
   totalSize       String   @default("0")
   files           File[]
 
-  Project   Project @relation(fields: [projectId], references: [id])
+  Project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int
 }
 
@@ -67,7 +67,7 @@ model File {
   size         String
   dateCreated  DateTime @default(now())
 
-  Folder   Folder @relation(fields: [folderId], references: [id])
+  Folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId Int
 }
 
@@ -77,6 +77,6 @@ model TranslationStrings {
   occupation String
   hint       String
 
-  Project   Project @relation(fields: [projectId], references: [id])
+  Project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int     @unique
 }

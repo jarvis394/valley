@@ -8,25 +8,30 @@ import {
   MAX_UPLOAD_FILE_SIZE,
 } from '@valley/shared'
 import { FilesService } from '../files/files.service'
-import { FoldersService } from '../folders/folders.service'
 import { TusHookResponseBuilder } from '../lib/TusHookResponseBuilder'
 import deburr from 'lodash.deburr'
 
 @Injectable()
 export class UploadService {
-  constructor(
-    private readonly filesService: FilesService,
-    private readonly foldersService: FoldersService
-  ) {}
+  constructor(private readonly filesService: FilesService) {}
 
   async handlePreCreateHook(data: TusHookData): Promise<TusHookResponse> {
     const fileSize = data.Event.Upload.Size
+    const folderId = data.Event.Upload.MetaData['folder-id']
+    const projectId = data.Event.Upload.MetaData['project-id']
+    const uploadId = FilesService.generateUploadId()
+    const uploadPath = FilesService.makeUploadPath({
+      projectId,
+      folderId,
+      uploadId,
+    })
     const resBuilder = new TusHookResponseBuilder<TusHookPreCreateResponse>()
       .setStatusCode(200)
       .setBody({
         ok: true,
         type: TusHookType.PRE_CREATE,
       })
+      .setUploadPath(uploadPath)
 
     if (fileSize > MAX_UPLOAD_FILE_SIZE) {
       return resBuilder
@@ -36,22 +41,6 @@ export class UploadService {
           type: TusHookType.PRE_CREATE,
           statusCode: 400,
           message: `File size is too big (max: ${MAX_UPLOAD_FILE_SIZE}, got: ${fileSize})`,
-        })
-        .build()
-    }
-
-    const doesFolderExist = await this.foldersService.folder({
-      id: Number(data.Event.Upload.MetaData?.['folder-id']) || -1,
-    })
-
-    if (!doesFolderExist) {
-      return resBuilder
-        .setStatusCode(404)
-        .setBody({
-          ok: false,
-          type: TusHookType.PRE_CREATE,
-          statusCode: 404,
-          message: 'Folder not found',
         })
         .build()
     }
@@ -75,12 +64,12 @@ export class UploadService {
         size: size.toString(),
         key: storage.Key,
         bucket: storage.Bucket,
-        name: deburr(metadata['normalized-name']),
+        name: deburr(metadata['normalized-name'].trim()),
         dateCreated: dateCreated.toISOString(),
         exifMetadata: {},
         id: -1,
         uploadId: metadata['upload-id'],
-        contentType: metadata.type,
+        contentType: metadata.type || 'application/octet-stream',
       })
 
     const file = await this.filesService.createFileForProjectFolder({

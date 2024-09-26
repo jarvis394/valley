@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@valley/ui/Button'
 import Input from '@valley/ui/Input'
 import ModalHeader from '@valley/ui/ModalHeader'
@@ -7,10 +7,17 @@ import ModalFooter from '@valley/ui/ModalFooter'
 import Note from '@valley/ui/Note'
 import Stack from '@valley/ui/Stack'
 import styles from './ConfirmFolderDeletion.module.css'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import useSWR from 'swr'
 import { ProjectGetReq, ProjectGetRes } from '@valley/shared'
 import { api } from '../../../api'
+import { deleteFolder } from '../../../api/folders'
+import { Folder } from '@valley/db'
+
+const findFolderFromData = (
+  data: ProjectGetRes | undefined,
+  folderId: Folder['id']
+) => data?.folders.find((e) => e.id === folderId)
 
 type ConfirmFolderDeletionModalProps = {
   onClose: () => void
@@ -21,7 +28,8 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { id: projectId } = useParams()
-  const { data } = useSWR<ProjectGetRes, ProjectGetReq>(
+  const router = useRouter()
+  const { data, mutate } = useSWR<ProjectGetRes, ProjectGetReq>(
     '/projects/' + projectId,
     api({ isAccessTokenRequired: true })
   )
@@ -29,16 +37,38 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionModalProps> = ({
   const modalPropsFolderId = searchParams.get('modal-folderId')
   const searchParamsFolderId = searchParams.get('folder')
   const folderId = Number(modalPropsFolderId || searchParamsFolderId)
-  const folder = data?.folders.find((e) => e.id === folderId)
+  const [folder, setFolder] = useState(findFolderFromData(data, folderId))
   const folderTitlePattern = `\\s*${folder?.title}\\s*`
   const deleteConfirmPattern = '\\s*delete my folder\\s*'
+  const isFolderWithFiles = folder && folder.totalFiles > 0
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.BaseSyntheticEvent) => {
+    e.preventDefault()
     setIsLoading(true)
+
+    const res = await deleteFolder(Number(projectId), folderId)
+
+    if (res.ok) {
+      mutate((prev) => {
+        if (!prev) return undefined
+        return {
+          ...prev,
+          folders: prev.folders.filter((e) => e.id !== folderId),
+        }
+      })
+
+      router.push(`/projects/${projectId}`)
+    }
   }
 
+  useEffect(() => {
+    if (!data) return
+    const foundFolder = findFolderFromData(data, folderId)
+    foundFolder && setFolder(foundFolder)
+  }, [data])
+
   return (
-    <>
+    <form id="confirm-folder-deletion-form" onSubmit={handleSubmit}>
       <ModalHeader>Delete Folder</ModalHeader>
       <Stack
         gap={4}
@@ -47,57 +77,61 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionModalProps> = ({
         className={styles.confirmFolderDeletion__content}
       >
         <p>
-          This folder, alongside with <b>{folder?.totalFiles} files</b>, will be
-          deleted.
+          Folder <b>"{folder?.title}"</b>
+          {isFolderWithFiles && (
+            <>
+              , alongside with <b>{folder?.totalFiles} files</b>,
+            </>
+          )}
+          &nbsp;will be deleted.
         </p>
         <Note variant="alert" fill>
           This action is not reversible. Please be certain.
         </Note>
       </Stack>
-      <Stack
-        component="form"
-        id="confirm-folder-deletion-form"
-        direction={'column'}
-        gap={6}
-        padding={6}
-        onSubmit={handleSubmit}
-        className={styles.confirmFolderDeletion__form}
-      >
-        <label>
-          <Stack gap={2} direction="column">
-            <p className={styles.confirmFolderDeletion__formLabel}>
-              Enter the folder title <b>{folder?.title}</b> to continue:
-            </p>
-            <Input
-              required
-              pattern={folderTitlePattern}
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              type="text"
-              name="resourceName"
-            />
-          </Stack>
-        </label>
-        <label>
-          <Stack gap={2} direction="column">
-            <p className={styles.confirmFolderDeletion__formLabel}>
-              To verify, type <b>delete my folder</b> below:
-            </p>
-            <Input
-              required
-              pattern={deleteConfirmPattern}
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              type="text"
-              name="resourceName"
-            />
-          </Stack>
-        </label>
-      </Stack>
+      {isFolderWithFiles && (
+        <Stack
+          direction={'column'}
+          gap={6}
+          padding={6}
+          className={styles.confirmFolderDeletion__form}
+        >
+          <label>
+            <Stack gap={2} direction="column">
+              <p className={styles.confirmFolderDeletion__formLabel}>
+                Enter the folder title <b>{folder?.title}</b> to continue:
+              </p>
+              <Input
+                required
+                pattern={folderTitlePattern}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                type="text"
+                name="resourceName"
+              />
+            </Stack>
+          </label>
+          <label>
+            <Stack gap={2} direction="column">
+              <p className={styles.confirmFolderDeletion__formLabel}>
+                To verify, type <b>delete my folder</b> below:
+              </p>
+              <Input
+                required
+                pattern={deleteConfirmPattern}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                type="text"
+                name="resourceName"
+              />
+            </Stack>
+          </label>
+        </Stack>
+      )}
       <ModalFooter
         className={styles.confirmFolderDeletion__footer}
         before={
@@ -117,14 +151,15 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionModalProps> = ({
             form="confirm-folder-deletion-form"
             variant="primary"
             size="md"
+            type="submit"
             disabled={isLoading}
             loading={isLoading}
           >
-            Continue
+            {isFolderWithFiles ? 'Continue' : 'Delete'}
           </Button>
         }
       />
-    </>
+    </form>
   )
 }
 

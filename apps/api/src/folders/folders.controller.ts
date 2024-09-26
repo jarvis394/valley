@@ -1,8 +1,8 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -12,6 +12,7 @@ import {
 import type {
   FolderCreateReq,
   FolderCreateRes,
+  FolderDeleteRes,
   FolderEditReq,
   FolderEditRes,
   FolderGetRes,
@@ -65,14 +66,40 @@ export class FoldersController {
   @UseGuards(JwtAuthGuard)
   @Get(':folderId')
   async getFolderWithFiles(
-    @Param('folderId', ParseIntPipe) folderId: number
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('folderId', ParseIntPipe) folderId: number,
+    @Req() req: RequestWithUser
   ): Promise<FolderGetRes> {
-    const folder = await this.foldersService.folder({ id: folderId })
-    if (!folder) {
-      throw new NotFoundException('Folder not found')
-    }
+    const { folder } = await this.foldersService.assertFolderExists({
+      projectId,
+      folderId,
+      userId: req.user.userId,
+    })
+    const files = await this.filesService.getFolderFiles(folderId)
+
+    return { folder, files }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':folderId/delete')
+  async deleteProjectFolder(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('folderId', ParseIntPipe) folderId: number,
+    @Req() req: RequestWithUser
+  ): Promise<FolderDeleteRes> {
+    await this.foldersService.assertFolderExists({
+      projectId,
+      folderId,
+      userId: req.user.userId,
+    })
 
     const files = await this.filesService.getFolderFiles(folderId)
-    return { folder: this.foldersService.serializeFolder(folder), files }
+    const deleteFilesResult = await this.filesService.deleteFiles(
+      folderId,
+      files
+    )
+    await this.foldersService.deleteFolder({ id: folderId })
+
+    return { ...deleteFilesResult, ok: deleteFilesResult.errors.length === 0 }
   }
 }

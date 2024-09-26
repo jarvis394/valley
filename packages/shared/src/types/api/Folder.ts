@@ -30,3 +30,14 @@ export type FolderGetRes = {
   folder: SerializedFolder
   files: File[]
 }
+
+export type FolderDeleteReq = unknown
+export type FolderDeleteRes = {
+  ok: boolean
+  deleted: string[]
+  errors: Array<{
+    code: string | number
+    message: string
+    key: string
+  }>
+}

@@ -52,6 +52,9 @@ export type TusHookResponse = {
     Body?: string
     Header?: Record<string, string>
   }
+  ChangeFileInfo?: {
+    ID?: string
+  }
 }
 
 export type BaseTusHookResponseBody = {

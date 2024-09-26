@@ -33,3 +33,43 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.modal__drawerOverlay {
+  --fade-duration: 320ms !important;
+  background: var(--modal-backdrop);
+  z-index: 1200;
+  position: fixed;
+  inset: 0px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal__drawer {
+  background: var(--background-default);
+  width: 100%;
+  max-width: 100%;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  outline: none;
+  border-radius: 16px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1300;
+  overflow: hidden;
+  overscroll-behavior: none;
+  top: auto;
+  max-height: 80dvh;
+  min-height: 5dvh;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  border: none;
+  box-shadow:
+    0 0 0 1px hsla(0, 0%, 100%, 0.145),
+    0px 1px 1px rgba(0, 0, 0, 0.02),
+    0px 4px 8px -4px rgba(0, 0, 0, 0.04),
+    0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+}

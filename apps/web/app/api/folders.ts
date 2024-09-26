@@ -1,10 +1,12 @@
 import type {
   FolderCreateReq,
   FolderCreateRes,
+  FolderDeleteReq,
+  FolderDeleteRes,
   FolderEditReq,
   FolderEditRes,
 } from '@valley/shared'
-import { Project } from '@valley/db'
+import { Folder, Project } from '@valley/db'
 import { api } from '.'
 
 export const createFolder = async (data: FolderCreateReq) => {
@@ -26,6 +28,19 @@ export const editFolder = async (
     FolderEditRes,
     FolderEditReq
   >('/projects/' + projectId + '/folders/' + data.id + '/edit', data)
+
+  return res
+}
+
+export const deleteFolder = async (
+  projectId: Project['id'],
+  folderId: Folder['id']
+) => {
+  const res = await api({ isAccessTokenRequired: true }).delete<
+    void,
+    FolderDeleteRes,
+    FolderDeleteReq
+  >('/projects/' + projectId + '/folders/' + folderId + '/delete')
 
   return res
 }

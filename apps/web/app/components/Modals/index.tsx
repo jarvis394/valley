@@ -13,7 +13,11 @@ export const Modals = () => {
 
   const handleClose = () => {
     const newQuery = new URLSearchParams(query.toString())
-    newQuery.delete('modal')
+    for (const key of query.keys()) {
+      if (key.startsWith('modal')) {
+        newQuery.delete(key)
+      }
+    }
 
     router.push(pathname + '?' + newQuery.toString())
   }
