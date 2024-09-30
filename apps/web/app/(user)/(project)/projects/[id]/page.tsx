@@ -58,7 +58,6 @@ const ProjectPage: React.FC = () => {
 
     setIsCreatingFolder(true)
     const res = await createFolder({
-      description: null,
       title: 'Folder',
       projectId: data.project.id,
     })

@@ -1,15 +1,9 @@
 import { File, Folder } from '@valley/db'
 import { SerializedFolder } from '../SerializedFolder'
 
-export type FolderCreateReq = Omit<
-  SerializedFolder,
-  | 'id'
-  | 'isDefaultFolder'
-  | 'totalFiles'
-  | 'totalSize'
-  | 'dateCreated'
-  | 'dateUpdated'
->
+export type FolderCreateReq = Pick<SerializedFolder, 'title' | 'projectId'> & {
+  description?: string
+}
 export type FolderCreateRes = {
   folder: SerializedFolder
   files: File[]
