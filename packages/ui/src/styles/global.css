@@ -6,14 +6,17 @@
   transition-duration: var(--fade-duration);
   transition-timing-function: var(--fade-timing-function);
   opacity: 0;
+  visibility: hidden;
 }
 
 .fade[data-fade-in='true'] {
   opacity: 1;
+  visibility: visible;
 }
 
 .fade[data-fade-in='false'] {
   opacity: 0;
+  visibility: hidden;
 }
 
 .grow {
@@ -29,16 +32,19 @@
   opacity: 0;
   scale: 0.95;
   translate: 0 8px;
+  visibility: hidden;
 }
 
 .grow[data-grow-in='true'] {
   opacity: 1;
   scale: 1;
   translate: 0 0px;
+  visibility: visible;
 }
 
 .grow[data-grow-in='false'] {
   opacity: 0;
   scale: 0.95;
   translate: 0 8px;
+  visibility: hidden;
 }

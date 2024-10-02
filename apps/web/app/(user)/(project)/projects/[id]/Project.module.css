@@ -82,6 +82,34 @@
 
 .project__files {
   display: grid !important;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: var(--grid-columns);
+  gap: var(--grid-gap);
+}
+
+@media screen and (width < 600px) {
+  .project__files {
+    --grid-columns: 1fr 1fr;
+    --grid-gap: 8px;
+  }
+}
+
+@media screen and (width >= 600px) and (width < 960px) {
+  .project__files {
+    --grid-columns: 1fr 1fr 1fr;
+    --grid-gap: 12px;
+  }
+}
+
+@media screen and (width >= 960px) and (width < 1200px) {
+  .project__files {
+    --grid-columns: 1fr 1fr 1fr 1fr;
+    --grid-gap: 16px;
+  }
+}
+
+@media screen and (width >= 1200px) {
+  .project__files {
+    --grid-columns: 1fr 1fr 1fr 1fr 1fr;
+    --grid-gap: 16px;
+  }
 }

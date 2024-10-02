@@ -3,8 +3,8 @@ import cx from 'classnames'
 import styles from './Paper.module.css'
 import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 
-export type PaperOwnProps = Partial<
-  React.PropsWithChildren<{
+export type PaperOwnProps = React.PropsWithChildren<
+  Partial<{
     variant:
       | 'primary'
       | 'secondary'

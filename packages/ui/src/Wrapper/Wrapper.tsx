@@ -22,4 +22,4 @@ const Wrapper: React.FC<
   )
 }
 
-export default createPolymorphicComponent<'div', PaperOwnProps>(Wrapper)
+export default createPolymorphicComponent<'div', WrapperOwnProps>(Wrapper)

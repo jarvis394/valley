@@ -10,3 +10,9 @@
   padding-left: var(--page-margin);
   padding-right: var(--page-margin);
 }
+
+@media screen and (width < 960px) {
+  .wrapper {
+    --page-margin: 16px;
+  }
+}
