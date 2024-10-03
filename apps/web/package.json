@@ -46,6 +46,7 @@
     "tus-js-client": "^4.2.3",
     "uuid": "^10.0.0",
     "vaul": "^0.9.6",
+    "@dotenvx/dotenvx": "^1.14.2",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

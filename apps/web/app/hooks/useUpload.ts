@@ -14,7 +14,7 @@ import {
 } from '@valley/shared'
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
-import { TUS_URL } from '../config/constants'
+import { TUSD_URL } from '../config/constants'
 import { getAuthTokens } from '../utils/accessToken'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -282,7 +282,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       // Allows duplicate files
       onBeforeFileAdded: () => true,
     }).use(Tus, {
-      endpoint: TUS_URL,
+      endpoint: TUSD_URL,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
       headers: getUppyHeaders,
       onAfterResponse: handleUploadResponse,
