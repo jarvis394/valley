@@ -2,9 +2,10 @@
 import React from 'react'
 import styles from './TabsItem.module.css'
 import cx from 'classnames'
-import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
+import { AsChildProps } from '../types/AsChildProps'
+import { Slot } from '@radix-ui/react-slot'
 
-export type TabsItemProps = React.PropsWithChildren<{
+export type TabsItemOwnProps = React.PropsWithChildren<{
   onClick?: (
     value: string | number,
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -12,43 +13,42 @@ export type TabsItemProps = React.PropsWithChildren<{
   value?: string | number
   indicator?: boolean
   selected?: boolean
+  className?: string
 }>
+export type TabsItemProps = AsChildProps<
+  React.ComponentPropsWithRef<'button'>
+> &
+  TabsItemOwnProps
 
-const TabsItem = React.forwardRef<
-  HTMLButtonElement,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TabsItemProps & { component: any; className?: string; renderRoot: any }
->(function TabsItemWithRef(
-  {
-    value,
-    onClick,
-    selected,
-    component,
-    renderRoot,
-    className,
-    indicator: _indicator,
-    ...other
-  },
-  ref
-) {
-  const Root = component || 'button'
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    value !== undefined && onClick?.(value, e)
+const TabsItem = React.forwardRef<HTMLButtonElement, TabsItemProps>(
+  function TabsItemWithRef(
+    {
+      value,
+      onClick,
+      asChild,
+      selected,
+      className,
+      indicator: _indicator,
+      ...other
+    },
+    ref
+  ) {
+    const Root = asChild ? Slot : 'button'
+    const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+      value !== undefined && onClick?.(value, e)
+    }
+
+    return (
+      <Root
+        {...other}
+        onClick={handleClick}
+        ref={ref}
+        className={cx(styles.tabsItem, className, {
+          [styles['tabsItem--selected']]: selected,
+        })}
+      />
+    )
   }
-  const props: React.ComponentProps<'button'> = {
-    onClick: handleClick,
-    className: cx(styles.tabsItem, className, {
-      [styles['tabsItem--selected']]: selected,
-    }),
-    ref,
-    ...other,
-  }
+)
 
-  return typeof renderRoot === 'function' ? (
-    renderRoot(props)
-  ) : (
-    <Root {...props} />
-  )
-})
-
-export default createPolymorphicComponent<'button', TabsItemProps>(TabsItem)
+export default TabsItem

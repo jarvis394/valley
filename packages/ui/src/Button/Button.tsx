@@ -1,32 +1,24 @@
-import React, { CSSProperties } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import styles from './Button.module.css'
-import ButtonBase, { ButtonBaseOwnProps } from '../ButtonBase/ButtonBase'
+import ButtonBase, { ButtonBaseProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
-import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
+import { Slot, Slottable } from '@radix-ui/react-slot'
 
-export type ButtonOwnProps = React.PropsWithChildren<{
-  size?: Exclude<ViewportSize, 'xs' | 'xl'>
-  fullWidth?: boolean
-  loading?: boolean
-  before?: React.ReactNode
-  after?: React.ReactNode
-  align?: 'start' | 'center' | 'end'
-}> &
-  ButtonBaseOwnProps
+export type ButtonProps = Partial<
+  React.PropsWithChildren<{
+    size: Exclude<ViewportSize, 'xs' | 'xl'>
+    fullWidth: boolean
+    loading: boolean
+    before: React.ReactNode
+    after: React.ReactNode
+    align: 'start' | 'center' | 'end'
+  }> &
+    ButtonBaseProps
+>
 
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  ButtonOwnProps & {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: any
-    className?: string
-    style?: CSSProperties
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    renderRoot: any
-  }
->(function Button(
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     children,
     size = 'sm',
@@ -38,14 +30,16 @@ const Button = React.forwardRef<
     fullWidth,
     align,
     after,
-    ...props
+    asChild,
+    ...other
   },
   ref
 ) {
+  const Root = asChild ? Slot : 'button'
   return (
     <ButtonBase
-      {...props}
       ref={ref}
+      asChild
       variant={variant}
       disabled={disabled}
       className={cx(styles.button, className, {
@@ -57,14 +51,20 @@ const Button = React.forwardRef<
         [styles['button--align-end']]: align === 'end',
       })}
     >
-      {loading && <Spinner className={styles.button__loading} />}
-      {before && !loading && (
-        <div className={styles.button__before}>{before}</div>
-      )}
-      {children && <span className={styles.button__content}>{children}</span>}
-      {after && <div className={styles.button__after}>{after}</div>}
+      <Root {...other}>
+        {loading && <Spinner className={styles.button__loading} />}
+        {before && !loading && (
+          <div className={styles.button__before}>{before}</div>
+        )}
+        {children && (
+          <Slottable>
+            <span className={styles.button__content}>{children}</span>
+          </Slottable>
+        )}
+        {after && <div className={styles.button__after}>{after}</div>}
+      </Root>
     </ButtonBase>
   )
 })
 
-export default createPolymorphicComponent<'button', ButtonOwnProps>(Button)
+export default Button

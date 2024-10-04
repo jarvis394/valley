@@ -1,7 +1,8 @@
 import React from 'react'
 import cx from 'classnames'
 import styles from './Paper.module.css'
-import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
+import { Slot } from '@radix-ui/react-slot'
+import { AsChildProps } from '../types/AsChildProps'
 
 export type PaperOwnProps = React.PropsWithChildren<
   Partial<{
@@ -13,37 +14,33 @@ export type PaperOwnProps = React.PropsWithChildren<
       | 'warning'
       | 'danger'
     button: boolean
+    className: string
   }>
 >
+export type PaperProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &
+  PaperOwnProps
 
-const Paper = React.forwardRef<
-  HTMLDivElement,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  PaperOwnProps & { component: any; className?: string; renderRoot: any }
->(function Paper(
-  { button, variant, className, component, renderRoot, ...other },
+const Paper = React.forwardRef<HTMLDivElement, PaperProps>(function Paper(
+  { button, variant, className, asChild, ...other },
   ref
 ) {
-  const Root = component || 'div'
-  const props: React.ComponentProps<'div'> = {
-    ...other,
-    ref,
-    className: cx(className, styles.paper, {
-      [styles['paper--primary']]: variant === 'primary',
-      [styles['paper--secondary']]: variant === 'secondary',
-      [styles['paper--secondary-dimmed']]: variant === 'secondary-dimmed',
-      [styles['paper--tertiary']]: variant === 'tertiary',
-      [styles['paper--warning']]: variant === 'warning',
-      [styles['paper--danger']]: variant === 'danger',
-      [styles['paper--button']]: button,
-    }),
-  }
+  const Root = asChild ? Slot : 'div'
 
-  return typeof renderRoot === 'function' ? (
-    renderRoot(props)
-  ) : (
-    <Root {...props} />
+  return (
+    <Root
+      {...other}
+      ref={ref}
+      className={cx(className, styles.paper, {
+        [styles['paper--primary']]: variant === 'primary',
+        [styles['paper--secondary']]: variant === 'secondary',
+        [styles['paper--secondary-dimmed']]: variant === 'secondary-dimmed',
+        [styles['paper--tertiary']]: variant === 'tertiary',
+        [styles['paper--warning']]: variant === 'warning',
+        [styles['paper--danger']]: variant === 'danger',
+        [styles['paper--button']]: button,
+      })}
+    />
   )
 })
 
-export default createPolymorphicComponent<'div', PaperOwnProps>(Paper)
+export default Paper

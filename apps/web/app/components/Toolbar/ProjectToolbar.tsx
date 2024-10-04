@@ -32,14 +32,10 @@ const ProjectToolbar = () => {
     <div className={styles.toolbar}>
       <AnimatedTabs defaultValue={defaultValue}>
         {PROJECT_TOOLBAR_ITEMS.map((tab) => (
-          <TabsItem
-            key={tab.value}
-            component={Link}
-            prefetch
-            href={baseURL + tab.value}
-            value={tab.value}
-          >
-            {tab.label}
+          <TabsItem asChild value={tab.value}>
+            <Link prefetch key={tab.value} href={baseURL + tab.value}>
+              {tab.label}
+            </Link>
           </TabsItem>
         ))}
       </AnimatedTabs>

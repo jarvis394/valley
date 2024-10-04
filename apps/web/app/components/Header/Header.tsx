@@ -26,14 +26,15 @@ const CurrentUser = () => {
       <Slash className="fade" data-fade-in={!!me.data} />
       <Stack gap={4} align={'center'} className="fade" data-fade-in={!!me.data}>
         <Stack
-          component={Link}
-          href={'/projects'}
+          asChild
           gap={3}
           align={'center'}
           className={styles.header__avatarAndNameContainer}
         >
-          <Avatar />
-          {me.data?.user?.username}
+          <Link href={'/projects'}>
+            <Avatar />
+            {me.data?.user?.username}
+          </Link>
         </Stack>
         <IconButton size="sm" variant="secondary-dimmed">
           <MenuIcon />

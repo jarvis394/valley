@@ -5,7 +5,7 @@ import { Modal as BaseModal } from '@mui/base/Modal'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'
-import useMediaQuery from '../hooks/useMediaQuery'
+import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
 import { Drawer } from 'vaul'
 

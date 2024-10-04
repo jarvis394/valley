@@ -8,6 +8,7 @@
     "./MenuSeparator": "./src/MenuSeparator/MenuSeparator.tsx",
     "./Gauge": "./src/Gauge/Gauge.tsx",
     "./useScrollProgress": "./src/useScrollProgress/useScrollProgress.ts",
+    "./useContextMenu": "./src/useContextMenu/useContextMenu.ts",
     "./MenuIconButton": "./src/MenuIconButton/MenuIconButton.tsx",
     "./MenuButton": "./src/MenuButton/MenuButton.tsx",
     "./Dropdown": "./src/Dropdown/Dropdown.tsx",
@@ -31,9 +32,8 @@
     "./Avatar": "./src/Avatar/Avatar.tsx",
     "./ButtonBase": "./src/ButtonBase/ButtonBase.tsx",
     "./Button": "./src/Button/Button.tsx",
-    "./createPolymorphicComponent": "./src/utils/createPolymorphicComponent.ts",
-    "./useViewportVariable": "./src/hooks/useViewportVariable.ts",
-    "./useMediaQuery": "./src/hooks/useMediaQuery.ts",
+    "./useViewportVariable": "./src/useViewportVariable/useViewportVariable.ts",
+    "./useMediaQuery": "./src/useMediaQuery/useMediaQuery.ts",
     "./config/theme": "./src/config/theme.ts",
     "./styles/global.css": "./src/styles/global.css"
   },
@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@mui/base": "^5.0.0-beta.40",
+    "@radix-ui/react-slot": "^1.1.0",
     "classnames": "^2.5.1",
     "geist-ui-icons": "^1.1.1"
   }

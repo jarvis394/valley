@@ -2,26 +2,27 @@ import React from 'react'
 import styles from './Stack.module.css'
 import cx from 'classnames'
 import { CSSProp, ViewportSize } from '../types/ViewportSize'
-import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
-import { useViewportVariable } from '../hooks/useViewportVariable'
+import { useViewportVariable } from '../useViewportVariable/useViewportVariable'
+import { Slot } from '@radix-ui/react-slot'
+import { AsChildProps } from '../types/AsChildProps'
 
 type StackViewportSize = Exclude<ViewportSize, 'xs'>
-export type StackOwnProps = React.PropsWithChildren<
-  Partial<{
+export type StackOwnProps = Partial<
+  React.PropsWithChildren<{
     direction: CSSProp<'flexDirection', StackViewportSize>
     align: CSSProp<'alignItems', StackViewportSize>
     justify: CSSProp<'justifyContent', StackViewportSize>
     gap: CSSProp<'gap', StackViewportSize>
     padding: CSSProp<'padding', StackViewportSize>
     flex: CSSProp<'flex', StackViewportSize>
+    style: React.CSSProperties
+    className: string
   }>
 >
+export type StackProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &
+  StackOwnProps
 
-const Stack = React.forwardRef<
-  HTMLDivElement,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  StackOwnProps & { component: any; className?: string; renderRoot: any }
->(function Stack(
+const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
   {
     direction = 'row',
     align = 'stretch',
@@ -29,40 +30,38 @@ const Stack = React.forwardRef<
     gap = 0,
     padding = 0,
     flex = 'initial',
+    asChild,
     className,
-    component,
-    renderRoot,
+    style,
     ...other
   },
   ref
 ) {
   const { getViewportVariable } = useViewportVariable('stack')
-  const Root = component || 'div'
+  const Root = asChild ? Slot : 'div'
   const stackFlex = getViewportVariable(flex, 'flex')
   const stackAlign = getViewportVariable(align, 'align')
   const stackJustify = getViewportVariable(justify, 'justify')
   const stackPadding = getViewportVariable(padding, 'padding')
   const stackGap = getViewportVariable(gap, 'gap')
   const stackDirection = getViewportVariable(direction, 'direction')
-  const props: React.ComponentProps<'div'> = {
-    ...other,
-    style: {
-      ...stackFlex,
-      ...stackAlign,
-      ...stackJustify,
-      ...stackPadding,
-      ...stackGap,
-      ...stackDirection,
-    },
-    ref,
-    className: cx(styles.stack, className),
-  }
 
-  return typeof renderRoot === 'function' ? (
-    renderRoot(props)
-  ) : (
-    <Root {...props} />
+  return (
+    <Root
+      {...other}
+      ref={ref}
+      className={cx(styles.stack, className)}
+      style={{
+        ...style,
+        ...stackFlex,
+        ...stackAlign,
+        ...stackJustify,
+        ...stackPadding,
+        ...stackGap,
+        ...stackDirection,
+      }}
+    />
   )
 })
 
-export default createPolymorphicComponent<'div', StackOwnProps>(Stack)
+export default Stack

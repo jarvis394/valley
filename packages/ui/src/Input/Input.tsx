@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import Paper, { PaperOwnProps } from '../Paper/Paper'
+import Paper, { PaperProps } from '../Paper/Paper'
 import styles from './Input.module.css'
 
 type InputProps = {
@@ -8,7 +8,7 @@ type InputProps = {
   after?: React.ReactNode
   state?: 'default' | 'error' | 'valid'
   size?: 'md' | 'lg'
-  paperProps?: PaperOwnProps & React.ComponentPropsWithoutRef<'div'>
+  paperProps?: Omit<PaperProps, 'asChild'>
 } & Omit<React.ComponentPropsWithRef<'input'>, 'size'>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -27,7 +27,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <Paper
         {...paperProps}
-        component="div"
         variant="secondary"
         className={cx(styles.input, 'Input', paperProps?.className, {
           [styles['input--withBefore']]: !!before,
