@@ -1,14 +1,30 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
 check_run() {
     if echo "$changed_files" | grep -q "$1"; then
-        echo "📦 Найдено изменение в $1, переустанавливаем зависимости..."
+        echo "📦 Found changes in $1, re-installing dependencies..."
         eval "$2"
     else
-        echo "✨ В $1 нет изменений, не будем переустанавливать зависимости"
+        echo "✨ No changes found in $1, skipping re-installing dependencies."
+    fi
+}
+
+check_env() {
+    if echo "$changed_files" | grep -q ".env.template"; then
+        echo ""
+        echo "_________________________________________________________________"
+        echo ""
+        echo ""
+        echo "🔐  \e[1;96m.env.template\e[0m has been changed"
+        echo "    Please, update your \e[1;90m.env\e[0m file accordingly."
+        echo "    To see what have changed, run:"
+        echo ""
+        echo "      \e[1mgit diff HEAD .env.template\e[0m"
+        echo ""
+        echo "_________________________________________________________________"
+        echo ""
+        eval "yarn dotenv-updater"
     fi
 }
 
 check_run package.json "yarn"
+check_env
