@@ -2423,6 +2423,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@laosb/exifr@^7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@laosb/exifr/-/exifr-7.2.1.tgz#5bef4965efee8b89ccd5d6f2c993361b3af30e8f"
+  integrity sha512-Jv5649kE4x9bcuHus/1laexiiDE6rk3byB0c5ISWGOb8La57jIW4/E9jcArn/LafTzzaYw+zMbRgfZ9Ksg0v7g==
+
 "@ljharb/through@^2.3.12":
   version "2.3.13"
   resolved "https://registry.npmjs.org/@ljharb/through/-/through-2.3.13.tgz"
@@ -8080,7 +8085,7 @@ executable@^4.1.0:
   dependencies:
     pify "^2.2.0"
 
-exifr@^7.0.0, exifr@^7.1.3:
+exifr@^7.0.0:
   version "7.1.3"
   resolved "https://registry.npmjs.org/exifr/-/exifr-7.1.3.tgz"
   integrity sha512-g/aje2noHivrRSLbAUtBPWFbxKdKhgj/xr1vATDdUXPOFYJlQ62Ft0oy+72V6XLIpDJfHs6gXLbBLAolqOXYRw==

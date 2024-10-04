@@ -78,6 +78,7 @@ export class UploadService {
       size: resBuilder.body.size,
       name: resBuilder.body.name,
       type: metadata.type,
+      bucket: resBuilder.body.bucket,
       projectId: Number(metadata['project-id']),
       dateCreated,
     })

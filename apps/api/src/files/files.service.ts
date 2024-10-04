@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'nestjs-prisma'
 import { ConfigService } from '../config/config.service'
 import { File, Folder, Prisma, Project } from '@valley/db'
@@ -12,6 +8,9 @@ import {
   GetObjectCommandOutput,
   DeleteObjectsCommand,
   ObjectIdentifier,
+  HeadObjectCommand,
+  NotFound,
+  GetObjectCommandInput,
 } from '@aws-sdk/client-s3'
 import {
   FolderDeleteRes,
@@ -22,11 +21,11 @@ import { FoldersService } from '../folders/folders.service'
 import { ProjectsService } from '../projects/projects.service'
 import dec2frac from '../utils/dec2frac'
 import sharp from 'sharp'
-import exifr from 'exifr'
+import exifr from '@laosb/exifr'
 import { Upload } from '@aws-sdk/lib-storage'
-import { IncomingMessage } from 'http'
 import { Response } from 'express'
 import { v4 as uuid } from 'uuid'
+import { Readable } from 'stream'
 
 type ExifDataKey =
   | 'Artist'
@@ -55,6 +54,12 @@ type ExifParsedData =
 type ThumbnailCreationResult =
   | { ok: true; key: string }
   | { ok: false; reason: string }
+
+type StrippedS3Object = {
+  key: string
+  bucket: string
+  metadata?: Record<string, string>
+}
 
 const extractFields: ExifDataKey[] = [
   'Artist',
@@ -175,15 +180,45 @@ export class FilesService {
     })
   }
 
+  async exifAWSReader(
+    input: StrippedS3Object,
+    offset?: number,
+    length?: number
+  ) {
+    const params: GetObjectCommandInput = {
+      Key: input.key,
+      Bucket: input.bucket,
+    }
+
+    if (typeof offset === 'number') {
+      const end = length ? offset + length - 1 : undefined
+      params.Range = `bytes=${[offset, end].join('-')}`
+    }
+
+    const getObjectRangeCommand = new GetObjectCommand(params)
+    const res = await this.storage.send(getObjectRangeCommand)
+    const stream = res.Body as Readable
+    const chunks = []
+
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk))
+    }
+
+    return Buffer.concat(chunks)
+  }
+
   /**
-   * Extracts EXIF from image/file (supports RAW, JPEG, WEBP and PNG formats)
-   * @param buffer Image binary data
+   * Extracts EXIF from S3 object (supports RAW, JPEG, WEBP and PNG formats)
    * @returns Parsed EXIF data
    */
-  async extractExifData(image: Uint8Array): Promise<ExifParsedData> {
+  async extractExifData(data: StrippedS3Object): Promise<ExifParsedData> {
     let parsedExif: ExifData | null
+
     try {
-      parsedExif = await exifr.parse(image, FilesService.EXIF_PARSING_OPTIONS)
+      parsedExif = await exifr.parse<StrippedS3Object>(data, {
+        ...FilesService.EXIF_PARSING_OPTIONS,
+        externalReader: this.exifAWSReader.bind(this),
+      })
     } catch (e) {
       if (e instanceof Error) {
         return { ok: false, reason: e.message }
@@ -231,12 +266,12 @@ export class FilesService {
   }
 
   async createFileThumbnail(
-    image: Uint8Array,
-    data: { key: string; bucket: string; metadata: Record<string, string> }
+    data: StrippedS3Object
   ): Promise<ThumbnailCreationResult> {
-    const shouldGenerateThumbnail = this.shouldGenerateThumbnail(
-      data.metadata.type
-    )
+    // Always create thumbnail by default if no metadata is present
+    const shouldGenerateThumbnail = data.metadata
+      ? this.shouldGenerateThumbnail(data.metadata.type)
+      : true
 
     if (!shouldGenerateThumbnail) {
       return {
@@ -247,8 +282,13 @@ export class FilesService {
       }
     }
 
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: this.configService.UPLOAD_BUCKET,
+      Key: data.key,
+    })
+    const object = await this.storage.send(getObjectCommand)
     const thumbnailKey = FilesService.makeThumbnailUploadPath(data.key)
-    const thumbnailBuffer = await sharp(image)
+    const pipeline = sharp()
       .withMetadata()
       .resize({
         fit: sharp.fit.contain,
@@ -257,19 +297,21 @@ export class FilesService {
       .jpeg({
         quality: FilesService.THUMBNAIL_QUALITY,
       })
-      .toBuffer()
 
     const upload = new Upload({
       client: this.storage,
       params: {
         Bucket: data.bucket,
         Key: thumbnailKey,
-        Body: thumbnailBuffer,
+        Body: pipeline,
         Metadata: data.metadata,
       },
       queueSize: 4,
       partSize: MULTIPART_UPLOAD_CHUNK_SIZE,
     })
+
+    // We can safely cast the type union as we are in NodeJS environment
+    ;(object.Body as Readable).pipe(pipeline)
 
     await upload.done()
 
@@ -277,15 +319,15 @@ export class FilesService {
   }
 
   async createFileForProjectFolder(
-    data: Omit<File, 'id' | 'bucket' | 'exifMetadata' | 'thumbnailKey'> & {
+    data: Omit<File, 'id' | 'exifMetadata' | 'thumbnailKey'> & {
       projectId: Project['id']
     }
   ): Promise<File> {
-    const getObjectCommand = new GetObjectCommand({
-      Bucket: this.configService.UPLOAD_BUCKET,
+    const headObjectCommand = new HeadObjectCommand({
+      Bucket: data.bucket,
       Key: data.key,
     })
-    const object = await this.storage.send(getObjectCommand)
+    const objectHead = await this.storage.send(headObjectCommand)
     const fileData: Prisma.FileCreateInput = {
       Folder: {
         connect: {
@@ -297,17 +339,17 @@ export class FilesService {
       size: data.size,
       type: data.type,
       exifMetadata: {},
-      // Files should always be saved in a default upload bucket
-      bucket: this.configService.UPLOAD_BUCKET,
+      bucket: data.bucket,
     }
 
-    if (this.shouldProcessFileAsImage(object)) {
-      const image = await object.Body.transformToByteArray()
-      const exifMetadata = await this.extractExifData(image)
-      const thumbnailResult = await this.createFileThumbnail(image, {
+    if (this.shouldProcessFileAsImage(objectHead)) {
+      const exifMetadata = await this.extractExifData({
         key: data.key,
-        bucket: this.configService.UPLOAD_BUCKET,
-        metadata: object.Metadata,
+        bucket: data.bucket,
+      })
+      const thumbnailResult = await this.createFileThumbnail({
+        key: data.key,
+        bucket: data.bucket,
       })
       fileData.exifMetadata = exifMetadata.ok ? exifMetadata.data : {}
       fileData.thumbnailKey = thumbnailResult.ok ? thumbnailResult.key : null
@@ -322,6 +364,8 @@ export class FilesService {
   }
 
   async streamFile(key: string, res: Response) {
+    // TODO: get db record for file
+
     const command = new GetObjectCommand({
       Bucket: this.configService.UPLOAD_BUCKET,
       Key: key,
@@ -335,22 +379,23 @@ export class FilesService {
         throw new NotFoundException('File not found')
       }
 
-      if (!metadata.type || !metadata['normalized-name']) {
-        throw new InternalServerErrorException(
-          'File is missing required metadata (type, normalilzed-name)'
-        )
-      }
-
-      const fileStream = item.Body as IncomingMessage
+      const fileStream = item.Body as Readable
       res.setHeader(
         'Content-Disposition',
-        `inline; filename="${metadata['normalized-name']}"`
+        `inline; filename="${metadata['normalized-name'] || key}"`
       )
       res.setHeader('Content-Length', item.ContentLength.toString())
-      res.setHeader('Content-Type', item.Metadata.type)
+      res.setHeader(
+        'Content-Type',
+        item.Metadata.type || 'application/octet-stream'
+      )
       fileStream.pipe(res)
     } catch (e) {
-      throw new NotFoundException('File not found')
+      if (e instanceof NotFound) {
+        throw new NotFoundException('File not found')
+      }
+
+      throw e
     }
   }
 
