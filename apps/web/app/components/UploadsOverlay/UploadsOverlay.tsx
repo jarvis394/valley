@@ -131,7 +131,10 @@ const UploadsOverlay: React.FC = () => {
             className={styles.uploadsOverlay__files}
           >
             {Object.values(uploads).map((e) => (
-              <div className={styles.uploadsOverlay__file} key={e.id}>
+              <div
+                className={styles.uploadsOverlay__file}
+                key={'upload_' + e.id}
+              >
                 <p>{e.normalizedName}</p>
                 <div className={styles.uploadsOverlay__fileProgress}>
                   <div data-hidden={!e.isUploading}>

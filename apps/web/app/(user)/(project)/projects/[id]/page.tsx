@@ -190,8 +190,10 @@ const ProjectPage: React.FC = () => {
             projectId={data?.project.id}
             folderId={parsedFolderId}
           />
-          {folderResponse?.files.map((file) => (
-            <FileCard key={file.key} file={file} />
+          {folderResponse?.files.map((file, i) => (
+            // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
+            // TODO: `key={i}` is a quick fix
+            <FileCard key={i} file={file} />
           ))}
         </Wrapper>
       )}
