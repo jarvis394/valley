@@ -4,7 +4,10 @@ import styles from './MenuItem.module.css'
 import cx from 'classnames'
 import Button, { ButtonOwnProps } from '../Button/Button'
 import { ListContext } from '@mui/base/useList'
-import { useMenuItem, useMenuItemContextStabilizer } from '@mui/base'
+import {
+  useMenuItem,
+  useMenuItemContextStabilizer,
+} from '@mui/base/useMenuItem'
 
 type MenuItemProps = Omit<
   ButtonOwnProps,

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Modal as BaseModal } from '@mui/base'
+import { Modal as BaseModal } from '@mui/base/Modal'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'

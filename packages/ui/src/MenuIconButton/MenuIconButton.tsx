@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { useMenuButton } from '@mui/base'
+import { useMenuButton } from '@mui/base/useMenuButton'
 import IconButton, { IconOwnProps } from '../IconButton/IconButton'
 import { createPolymorphicComponent } from '../utils/createPolymorphicComponent'
 

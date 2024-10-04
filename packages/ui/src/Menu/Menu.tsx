@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import styles from './Menu.module.css'
-import { type WithOptionalOwnerState } from '@mui/base'
+import { type WithOptionalOwnerState } from '@mui/base/utils/types'
 import { MenuProvider, useMenu } from '@mui/base/useMenu'
 import { MenuProps as MUIMenuProps, MenuListboxSlotProps } from '@mui/base/Menu'
 import { CssTransition } from '@mui/base/Transitions'
