@@ -12,6 +12,7 @@ import { UploadModule } from '../upload/upload.module'
 import { UsersModule } from '../users/users.module'
 import { AppController } from './app.controller'
 import { FoldersModule } from '../folders/folders.module'
+import { GalleriesModule } from 'src/galleries/galleries.module'
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { FoldersModule } from '../folders/folders.module'
     UsersModule,
     ProjectsModule,
     FoldersModule,
+    GalleriesModule,
   ],
   controllers: [AppController],
   providers: [ConfigService],

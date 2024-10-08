@@ -39,7 +39,7 @@ const ProjectPage: React.FC = () => {
   )
   const folderId = searchParams.get('folder')
   const parsedFolderId = folderId ? Number(folderId) : data?.folders[0]?.id
-  const { data: folderResponse, isLoading: isLoadingFolders } = useSWR<
+  const { data: folderResponse, isLoading: isLoadingFolder } = useSWR<
     FolderGetRes,
     FolderGetReq
   >(
@@ -125,7 +125,7 @@ const ProjectPage: React.FC = () => {
       <div className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
           <div
-            data-fade-in={!isLoadingFolders}
+            data-fade-in={!isLoadingProject}
             className={cx(styles.project__foldersList, 'fade')}
           >
             {data?.folders.map((folder, i) => (
@@ -184,19 +184,21 @@ const ProjectPage: React.FC = () => {
         )}
       </Wrapper>
 
-      {data && parsedFolderId && (
-        <Wrapper className={styles.project__files}>
-          <UploadButton
-            projectId={data?.project.id}
-            folderId={parsedFolderId}
-          />
-          {folderResponse?.files.map((file, i) => (
-            // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
-            // TODO: `key={i}` is a quick fix
-            <FileCard key={i} file={file} />
-          ))}
-        </Wrapper>
-      )}
+      <div data-fade-in={!isLoadingFolder} className="fade">
+        {data && parsedFolderId && (
+          <Wrapper className={styles.project__files}>
+            <UploadButton
+              projectId={data?.project.id}
+              folderId={parsedFolderId}
+            />
+            {folderResponse?.files.map((file, i) => (
+              // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
+              // TODO: `key={i}` is a quick fix
+              <FileCard key={i} file={file} />
+            ))}
+          </Wrapper>
+        )}
+      </div>
     </div>
   )
 }

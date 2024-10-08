@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import Button from './Button'
+import Button, { ButtonProps } from './Button'
+import { RefAttributes } from 'react'
+import { JSX } from 'react/jsx-runtime'
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -40,5 +42,8 @@ export const Default: Story = {
       control: { type: 'select' },
     },
   },
-  render: (args) => <Button {...args} />,
+  render: (
+    args: JSX.IntrinsicAttributes &
+      (ButtonProps & RefAttributes<HTMLButtonElement>)
+  ) => <Button {...args} />,
 }

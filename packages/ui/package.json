@@ -35,7 +35,8 @@
     "./useViewportVariable": "./src/useViewportVariable/useViewportVariable.ts",
     "./useMediaQuery": "./src/useMediaQuery/useMediaQuery.ts",
     "./config/theme": "./src/config/theme.ts",
-    "./styles/global.css": "./src/styles/global.css"
+    "./styles/global.css": "./src/styles/global.css",
+    "./styles/theme.css": "./src/styles/theme.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

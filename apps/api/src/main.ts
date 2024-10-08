@@ -30,8 +30,10 @@ async function bootstrap() {
 
   app.use(cookieParser(config.JWT_KEY))
 
-  await app.listen(config.PORT, '0.0.0.0')
-  Logger.log(`🚀 Application is running on: http://localhost:${config.PORT}`)
+  await app.listen(config.API_PORT, '0.0.0.0')
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${config.API_PORT}`
+  )
 }
 
 bootstrap()

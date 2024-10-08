@@ -9,6 +9,7 @@ export type FolderCreateReq = Omit<
   | 'totalSize'
   | 'dateCreated'
   | 'dateUpdated'
+  | 'files'
 >
 export type FolderCreateRes = {
   folder: SerializedFolder
@@ -18,7 +19,12 @@ export type FolderCreateRes = {
 export type FolderEditReq = Partial<
   Omit<
     SerializedFolder,
-    'id' | 'isDefaultFolder' | 'totalFiles' | 'totalSize' | 'projectId'
+    | 'id'
+    | 'isDefaultFolder'
+    | 'totalFiles'
+    | 'totalSize'
+    | 'projectId'
+    | 'files'
   >
 > & { id: Folder['id'] }
 export type FolderEditRes = {

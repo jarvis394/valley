@@ -62,6 +62,7 @@ model File {
   thumbnailKey String?
   exifMetadata Json
   name         String
+  // Content type
   type         String
   // File size in bytes, string formatted
   size         String

@@ -24,18 +24,14 @@ export class FoldersService {
     this.logger = new Logger('FoldersService')
   }
 
-  serializeFolder(folder: Folder): SerializedFolder {
-    return {
-      ...folder,
-      totalSize: Number(folder.totalSize),
-    }
-  }
-
   async folder(
     folderWhereUniqueInput: Prisma.FolderWhereUniqueInput
-  ): Promise<Folder | null> {
+  ): Promise<(Folder & { files: File[] }) | null> {
     return await this.prismaService.folder.findUnique({
       where: folderWhereUniqueInput,
+      include: {
+        files: true,
+      },
     })
   }
 
@@ -45,31 +41,42 @@ export class FoldersService {
     cursor?: Prisma.FolderWhereUniqueInput
     where?: Prisma.FolderWhereInput
     orderBy?: Prisma.FolderOrderByWithRelationInput
-  }): Promise<Folder[]> {
+  }): Promise<Array<Folder & { files: File[] }>> {
     const { skip, take, cursor, where, orderBy } = params
     return await this.prismaService.folder.findMany({
       skip,
       take,
       cursor,
+      include: {
+        files: true,
+      },
       where,
       orderBy,
     })
   }
 
-  async createFolder(data: Prisma.FolderCreateInput): Promise<Folder> {
+  async createFolder(
+    data: Prisma.FolderCreateInput
+  ): Promise<Folder & { files: File[] }> {
     return await this.prismaService.folder.create({
       data,
+      include: {
+        files: true,
+      },
     })
   }
 
   async updateFolder(params: {
     where: Prisma.FolderWhereUniqueInput
     data: Prisma.FolderUpdateInput
-  }): Promise<Folder> {
+  }): Promise<Folder & { files: File[] }> {
     const { where, data } = params
     return await this.prismaService.folder.update({
       data,
       where,
+      include: {
+        files: true,
+      },
     })
   }
 
@@ -108,7 +115,7 @@ export class FoldersService {
       },
     })
 
-    return res.map((e) => this.serializeFolder(e))
+    return res.map((e) => FoldersService.serializeFolder(e))
   }
 
   async getProjectFolder(props: {
@@ -124,7 +131,7 @@ export class FoldersService {
       throw new NotFoundException('Folder not found')
     }
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async createProjectFolder(props: {
@@ -152,7 +159,7 @@ export class FoldersService {
       files: {},
     })
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async createDefaultProjectFolder(props: {
@@ -179,7 +186,7 @@ export class FoldersService {
       files: {},
     })
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async editProjectFolder(props: {
@@ -218,7 +225,7 @@ export class FoldersService {
           },
           data,
         })
-        return this.serializeFolder(updatedFolder)
+        return FoldersService.serializeFolder(updatedFolder)
       } catch (e) {
         this.logger.error(
           `Caught exception on updating project folder: ${(e as Error).message}`
@@ -255,9 +262,12 @@ export class FoldersService {
             set: newFolderTotalSize.toString(),
           },
         },
+        include: {
+          files: true,
+        },
       })
 
-      return this.serializeFolder(newFolderData)
+      return FoldersService.serializeFolder(newFolderData)
     })
   }
 
@@ -285,9 +295,19 @@ export class FoldersService {
             set: newFolderTotalSize.toString(),
           },
         },
+        include: {
+          files: true,
+        },
       })
 
-      return this.serializeFolder(newFolderData)
+      return FoldersService.serializeFolder(newFolderData)
     })
+  }
+
+  static serializeFolder(folder: Folder & { files: File[] }): SerializedFolder {
+    return {
+      ...folder,
+      totalSize: Number(folder.totalSize),
+    }
   }
 }

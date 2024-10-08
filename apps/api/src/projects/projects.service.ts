@@ -1,25 +1,16 @@
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'nestjs-prisma'
-import { ConfigService } from '../config/config.service'
 import { ProjectCreateReq, SerializedProject } from '@valley/shared'
-import { slugify } from 'transliteration'
 import { File, Project, User, Prisma } from '@valley/db'
+import { UrlService } from 'src/lib/services/url.service'
 
 @Injectable()
 export class ProjectsService {
   constructor(
-    private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
-
-  serializeProject(project: Project): SerializedProject {
-    return {
-      ...project,
-      totalSize: Number(project.totalSize),
-    }
-  }
 
   async project(
     projectWhereUniqueInput: Prisma.ProjectWhereUniqueInput
@@ -79,7 +70,7 @@ export class ProjectsService {
       },
     })
 
-    return projects.map((e) => this.serializeProject(e))
+    return projects.map((e) => ProjectsService.serializeProject(e))
   }
 
   async getUserProject(
@@ -95,16 +86,7 @@ export class ProjectsService {
       throw new NotFoundException('Project not found')
     }
 
-    return this.serializeProject(project)
-  }
-
-  generateProjectURL(title: string) {
-    return (
-      '/' +
-      slugify(title, {
-        trim: true,
-      })
-    )
+    return ProjectsService.serializeProject(project)
   }
 
   async createProjectForUser(
@@ -113,7 +95,7 @@ export class ProjectsService {
   ): Promise<SerializedProject> {
     const project = await this.createProject({
       ...data,
-      url: this.generateProjectURL(data.title),
+      url: UrlService.generateURL(data.title),
       User: {
         connect: {
           id: userId,
@@ -121,7 +103,7 @@ export class ProjectsService {
       },
     })
 
-    return this.serializeProject(project)
+    return ProjectsService.serializeProject(project)
   }
 
   async addFilesToProject(
@@ -150,7 +132,14 @@ export class ProjectsService {
         },
       })
 
-      return this.serializeProject(newProjectData)
+      return ProjectsService.serializeProject(newProjectData)
     })
+  }
+
+  static serializeProject(project: Project): SerializedProject {
+    return {
+      ...project,
+      totalSize: Number(project.totalSize),
+    }
   }
 }

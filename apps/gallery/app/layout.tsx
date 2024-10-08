@@ -3,14 +3,10 @@ import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import cx from 'classnames'
 import styles from './App.module.css'
-import { Modals } from './components/Modals'
-import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
 import './styles/global.css'
 import '@valley/ui/styles/global.css'
 import '@valley/ui/styles/theme.css'
-import '@uppy/core/dist/style.min.css'
-import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
 
 export const viewport: Viewport = {
@@ -69,8 +65,6 @@ const RootLayout = ({
     <html lang="en" className={GeistSans.variable}>
       <body className={cx('valley-themed', styles.app)} data-theme="dark">
         {children}
-        <Modals />
-        <UploadsOverlay />
       </body>
     </html>
   )
