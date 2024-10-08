@@ -1,10 +1,9 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  root: true,
-  extends: ['@valley/eslint-config/react-internal.js'],
-  parser: '@typescript-eslint/parser',
+  extends: ['@valley/eslint-config/remix.js'],
   parserOptions: {
-    project: './tsconfig.lint.json',
+    project: 'tsconfig.json',
     tsconfigRootDir: __dirname,
+    sourceType: 'module',
   },
 }

@@ -1,7 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
-  "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_TUSD_URL"],
+  "globalEnv": [
+    "NODE_ENV",
+    "GALLERY_PORT",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_TUSD_URL"
+  ],
   "tasks": {
     "dev": {
       "dependsOn": ["^db:generate"],
