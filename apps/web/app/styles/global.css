@@ -1,4 +1,3 @@
-.App,
 #storybook-root,
 html,
 body {
@@ -17,11 +16,4 @@ svg {
 
 path {
   fill: currentColor;
-}
-
-.App {
-  --header-zIndex: 100;
-  --toolbar-zIndex: 100;
-  --overlay-zIndex: 500;
-  --logo-zIndex: 200;
 }

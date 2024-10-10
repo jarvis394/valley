@@ -24,13 +24,6 @@ export class FoldersService {
     this.logger = new Logger('FoldersService')
   }
 
-  serializeFolder(folder: Folder): SerializedFolder {
-    return {
-      ...folder,
-      totalSize: Number(folder.totalSize),
-    }
-  }
-
   async folder(
     folderWhereUniqueInput: Prisma.FolderWhereUniqueInput
   ): Promise<Folder | null> {
@@ -108,7 +101,7 @@ export class FoldersService {
       },
     })
 
-    return res.map((e) => this.serializeFolder(e))
+    return res.map((e) => FoldersService.serializeFolder(e))
   }
 
   async getProjectFolder(props: {
@@ -124,7 +117,7 @@ export class FoldersService {
       throw new NotFoundException('Folder not found')
     }
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async createProjectFolder(props: {
@@ -152,7 +145,7 @@ export class FoldersService {
       files: {},
     })
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async createDefaultProjectFolder(props: {
@@ -179,7 +172,7 @@ export class FoldersService {
       files: {},
     })
 
-    return this.serializeFolder(folder)
+    return FoldersService.serializeFolder(folder)
   }
 
   async editProjectFolder(props: {
@@ -218,7 +211,7 @@ export class FoldersService {
           },
           data,
         })
-        return this.serializeFolder(updatedFolder)
+        return FoldersService.serializeFolder(updatedFolder)
       } catch (e) {
         this.logger.error(
           `Caught exception on updating project folder: ${(e as Error).message}`
@@ -257,7 +250,7 @@ export class FoldersService {
         },
       })
 
-      return this.serializeFolder(newFolderData)
+      return FoldersService.serializeFolder(newFolderData)
     })
   }
 
@@ -287,7 +280,14 @@ export class FoldersService {
         },
       })
 
-      return this.serializeFolder(newFolderData)
+      return FoldersService.serializeFolder(newFolderData)
     })
+  }
+
+  static serializeFolder(folder: Folder): SerializedFolder {
+    return {
+      ...folder,
+      totalSize: Number(folder.totalSize),
+    }
   }
 }

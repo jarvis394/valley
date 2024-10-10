@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import cx from 'classnames'
@@ -6,9 +6,9 @@ import styles from './App.module.css'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
-import './styles/theme.css'
-import './styles/global.css'
+import '@valley/ui/styles/theme.css'
 import '@valley/ui/styles/global.css'
+import './styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
@@ -67,9 +67,11 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" className={GeistSans.variable}>
-      <body className={cx('App', styles.app)} data-theme="dark">
+      <body className={cx('valley-themed', styles.app)} data-theme="dark">
         {children}
-        <Modals />
+        <Suspense>
+          <Modals />
+        </Suspense>
         <UploadsOverlay />
       </body>
     </html>
