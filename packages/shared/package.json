@@ -7,7 +7,7 @@
     "dev": "swc src/* --watch --out-dir dist",
     "build": "tsc -b -v",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    "lint": "eslint . --max-warnings 0"
   },
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",

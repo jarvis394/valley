@@ -9,9 +9,12 @@ export const useScrollProgress = (
   props: UseScrollProgressProps = { enabled: true }
 ) => {
   const [scrollProgress, setScrollProgress] = useState(0)
-  const calcScrollProgress = useCallback((scrollY: number) => {
-    return Math.min(scrollY, offset) / offset
-  }, [])
+  const calcScrollProgress = useCallback(
+    (scrollY: number) => {
+      return Math.min(scrollY, offset) / offset
+    },
+    [offset]
+  )
 
   useEffect(() => {
     setScrollProgress(calcScrollProgress(window.scrollY))
@@ -26,7 +29,7 @@ export const useScrollProgress = (
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [props.enabled])
+  }, [calcScrollProgress, props.enabled])
 
   return scrollProgress
 }

@@ -9,4 +9,9 @@
   flex-direction: column;
   gap: 0;
   overflow: auto;
+
+  --header-zIndex: 100;
+  --toolbar-zIndex: 100;
+  --overlay-zIndex: 500;
+  --logo-zIndex: 200;
 }

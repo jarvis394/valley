@@ -1,4 +1,4 @@
-.App[data-theme='dark'] {
+.valley-themed[data-theme='dark'] {
   /** Background */
   --background-default: #0a0a0a;
   --background-paper: #0e0e0e;
@@ -101,7 +101,7 @@
   --modal-backdrop: rgba(10, 10, 10, 0.5);
 }
 
-.App[data-theme='light'] {
+.valley-themed[data-theme='light'] {
   /** Background */
   --background-default: #fafafa;
   --background-paper: #ffffff;
@@ -204,7 +204,7 @@
   --modal-backdrop: rgba(255, 255, 255, 0.5);
 }
 
-.App {
+.valley-themed {
   /** Colors / Gray */
   --gray-100: #1a1a1a;
   --gray-200: #1f1f1f;

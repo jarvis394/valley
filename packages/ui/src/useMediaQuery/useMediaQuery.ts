@@ -90,6 +90,7 @@ export default function useMediaQuery(
   )
 
   if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     React.useDebugValue({ queryInput, match })
   }
 

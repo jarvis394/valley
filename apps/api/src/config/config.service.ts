@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService as BaseConfigService } from '@nestjs/config'
 
 type EnvSchema = {
-  PORT: string
+  API_PORT: string
   JWT_KEY: string
   JWT_REFRESH_TOKEN_TTL: string
   JWT_ACCESS_TOKEN_TTL: string
@@ -25,8 +25,8 @@ export class ConfigService {
     return 60 * 60 * 1000 // 1 hour
   }
 
-  get PORT() {
-    return Number(this.configService.get<string>('PORT')) || 5000
+  get API_PORT() {
+    return Number(this.configService.get<string>('API_PORT')) || 8000
   }
 
   get JWT_KEY() {

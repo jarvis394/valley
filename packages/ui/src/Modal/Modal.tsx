@@ -100,7 +100,7 @@ const Modal: React.FC<ModalProps> = ({
 const Backdrop = React.forwardRef<
   HTMLDivElement,
   { children: React.ReactElement; open: boolean; ownerState: never }
->((props, ref) => {
+>(function Backdrop(props, ref) {
   const { open: propsIsOpen, ownerState: _, ...other } = props
   const [open, setOpen] = useState(false)
 

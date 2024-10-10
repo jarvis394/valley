@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Remix",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "types": ["@remix-run/node", "vite/client"],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": false,
+    "jsx": "preserve",
+    "noEmit": true,
+    "strict": true
+  },
+  "exclude": ["node_modules", ".cache"]
+}

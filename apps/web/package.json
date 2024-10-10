@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "yarn fix-vips-concurrency-env && next dev --turbo --port 4200",
+    "dev": "yarn fix-vips-concurrency-env && next dev --turbo --port \"$(dotenvx get WEB_PORT -f ../../.env)\"",
     "build": "next build",
     "start": "yarn fix-vips-concurrency-env && next start",
     "typecheck": "tsc --noEmit",

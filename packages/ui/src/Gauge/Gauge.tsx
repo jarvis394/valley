@@ -77,7 +77,7 @@ const Gauge: React.FC<GaugeProps> = ({
       secondaryStrokePercent,
       offsetFactor,
     }
-  }, [value, size, arcPriority])
+  }, [circleSize, size, arcPriority, value])
 
   return (
     <div

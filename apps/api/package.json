@@ -8,7 +8,7 @@
     "start": "yarn fix-vips-concurrency-env && nest start",
     "start:debug": "yarn fix-vips-concurrency-env && nest start --debug --watch",
     "start:prod": "yarn fix-vips-concurrency-env && node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "fix-vips-concurrency-env": "VIPS_CONCURRENCY=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
   },

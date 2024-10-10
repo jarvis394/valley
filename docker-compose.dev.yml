@@ -58,7 +58,7 @@ services:
     <<: *defaults
     container_name: valley-tusd
     image: tusproject/tusd:latest
-    command: -port ${TUSD_PORT} -verbose -s3-bucket ${UPLOAD_BUCKET} -s3-endpoint http://nginx:9000 -hooks-http http://host.docker.internal:${PORT}/upload -hooks-enabled-events pre-create,pre-finish
+    command: -port ${TUSD_PORT} -verbose -s3-bucket ${UPLOAD_BUCKET} -s3-endpoint http://nginx:9000 -hooks-http http://host.docker.internal:${API_PORT}/upload -hooks-enabled-events pre-create,pre-finish
     volumes:
       - tusd:/data
     ports:

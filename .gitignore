@@ -62,3 +62,5 @@ pnpm-debug.log*
 *.pem
 
 storybook-static
+
+.cache
