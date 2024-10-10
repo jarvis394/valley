@@ -1,3 +1,5 @@
+exec < /dev/tty
+
 changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
 check_run() {
     if echo "$changed_files" | grep -q "$1"; then
@@ -18,11 +20,11 @@ check_env() {
         echo "    Please, update your \e[1;90m.env\e[0m file accordingly."
         echo "    To see what have changed, run:"
         echo ""
-        echo "      \e[1mgit diff HEAD .env.template\e[0m"
+        echo "      \e[1mgit diff ORIG_HEAD HEAD .env.template\e[0m"
         echo ""
         echo "_________________________________________________________________"
         echo ""
-        eval "yarn dotenv-updater"
+        yarn dotenv-updater
     fi
 }
 
