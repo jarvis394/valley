@@ -56,10 +56,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
         {before && !loading && (
           <div className={styles.button__before}>{before}</div>
         )}
-        {children && (
-          <Slottable>
-            <span className={styles.button__content}>{children}</span>
-          </Slottable>
+        {
+          // Ugly fix for slotting children in the right place (inside <span>)
+          children && asChild && (
+            <Slottable>
+              {React.cloneElement(
+                children as React.ReactElement,
+                undefined,
+                <span className={styles.button__content}>
+                  {(children as React.ReactElement)?.props?.children}
+                </span>
+              )}
+            </Slottable>
+          )
+        }
+        {children && !asChild && (
+          <span className={styles.button__content}>{children}</span>
         )}
         {after && <div className={styles.button__after}>{after}</div>}
       </Root>

@@ -1,0 +1,27 @@
+.Index {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.Index__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 280px !important;
+  width: 100%;
+}
+
+.Index__container > h2 {
+  font-weight: 500;
+  margin: 12px;
+}
+
+.Index__input {
+  align-self: center !important;
+}

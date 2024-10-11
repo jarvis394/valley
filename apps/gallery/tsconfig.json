@@ -1,6 +1,7 @@
 {
   "extends": "@valley/typescript-config/remix.json",
   "include": [
+    ".eslintrc.cjs",
     "**/*.ts",
     "**/*.tsx",
     "**/.server/**/*.ts",

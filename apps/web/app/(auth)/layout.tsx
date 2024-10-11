@@ -62,11 +62,11 @@ const AuthGroupLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <div className={styles.auth__section}>
         <AuthHeader />
         {children}
-        <Link href={linkButtonHref} className={styles.auth__linkButton}>
-          <Button fullWidth variant="tertiary" size="lg">
+        <Button asChild fullWidth variant="tertiary" size="lg">
+          <Link href={linkButtonHref} className={styles.auth__linkButton}>
             {linkButtonText}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
       <div className={styles.auth__section}>
         <div className={styles.auth__illustration}>

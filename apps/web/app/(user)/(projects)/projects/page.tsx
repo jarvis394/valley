@@ -23,15 +23,16 @@ const ProjectsPage: React.FC = () => {
 
   return (
     <div className={styles.projects}>
-      <Link style={{ textDecoration: 'none' }} href="/">
-        <Button>Go back</Button>
-      </Link>
-      <Link
-        style={{ textDecoration: 'none' }}
-        href={{ pathname: '/projects', query: { modal: 'create-project' } }}
-      >
-        <Button variant="secondary-dimmed">projects/create-project</Button>
-      </Link>
+      <Button asChild>
+        <Link href="/">Go back</Link>
+      </Button>
+      <Button asChild variant="secondary-dimmed">
+        <Link
+          href={{ pathname: '/projects', query: { modal: 'create-project' } }}
+        >
+          /projects/create-project
+        </Link>
+      </Button>
       <Wrapper>
         <div className={styles.projects__list}>
           {isLoading && <h2>Loading...</h2>}
