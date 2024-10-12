@@ -3,12 +3,12 @@
   --page-width: 1200px;
   --page-width-with-margin: calc(var(--page-width) + 2 * var(--page-margin));
   display: flex;
-  max-width: 100%;
+  max-width: var(--page-width-with-margin);
   margin-left: auto;
   margin-right: auto;
-  width: var(--page-width-with-margin);
-  padding-left: var(--page-margin);
-  padding-right: var(--page-margin);
+  width: 100%;
+  padding-left: var(--page-margin) !important;
+  padding-right: var(--page-margin) !important;
 }
 
 @media screen and (width < 960px) {

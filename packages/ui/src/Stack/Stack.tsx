@@ -50,7 +50,7 @@ const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
     <Root
       {...other}
       ref={ref}
-      className={cx(styles.stack, className)}
+      className={cx('Stack', styles.stack, className)}
       style={{
         ...style,
         ...stackFlex,

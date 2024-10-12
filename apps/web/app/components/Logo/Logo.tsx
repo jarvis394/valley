@@ -23,20 +23,24 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   const scrollProgress = useScrollProgress(HEADER_HEIGHT)
   const topOffset = map(scrollProgress, 0, 1, 0, -32 * 0.2)
-  const transformStyle = `scale(${map(scrollProgress, 0, 1, 1, 0.8)}) translateY(${topOffset}px) translateZ(0)`
   const style = useMemo<CSSProperties>(() => {
     if (!withScrollAnimation) return {}
     return {
-      position: scrollProgress === 0 ? 'absolute' : 'fixed',
-      transform: transformStyle,
+      position: 'fixed',
+      transform: [
+        `scale(${map(scrollProgress, 0, 1, 1, 0.8)})`,
+        `translateY(${topOffset}px)`,
+        'translateZ(0)',
+      ].join(' '),
     }
-  }, [scrollProgress, transformStyle])
+  }, [scrollProgress])
 
   return (
     <div {...props} className={cx(styles.logo, className)} style={style}>
       <svg
         width="32"
         height="32"
+        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -49,6 +53,7 @@ const Logo: React.FC<LogoProps> = ({
         <svg
           width="91"
           height="32"
+          viewBox="0 0 91 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

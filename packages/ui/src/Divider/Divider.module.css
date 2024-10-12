@@ -1,14 +1,23 @@
 .divider {
   display: flex;
-  background-color: var(--alpha-transparent-12);
+  flex-shrink: 0;
 }
 
 .divider--horizontal {
   width: 100%;
   height: 1px;
+  border-top: 1px solid var(--alpha-transparent-12);
+}
+
+.divider--horizontal.divider--dimmed {
+  border-top: 1px solid var(--alpha-transparent-07);
 }
 
 .divider--vertical {
   height: 100%;
-  width: 1px;
+  border-left: 1px solid var(--alpha-transparent-12);
+}
+
+.divider--vertical.divider--dimmed {
+  border-left: 1px solid var(--alpha-transparent-07);
 }

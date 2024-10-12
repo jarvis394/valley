@@ -7,6 +7,7 @@
     "./Note": "./src/Note/Note.tsx",
     "./MenuSeparator": "./src/MenuSeparator/MenuSeparator.tsx",
     "./Gauge": "./src/Gauge/Gauge.tsx",
+    "./usePageScroll": "./src/usePageScroll/usePageScroll.ts",
     "./useScrollProgress": "./src/useScrollProgress/useScrollProgress.ts",
     "./useContextMenu": "./src/useContextMenu/useContextMenu.ts",
     "./MenuIconButton": "./src/MenuIconButton/MenuIconButton.tsx",

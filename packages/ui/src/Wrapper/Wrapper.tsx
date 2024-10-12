@@ -15,7 +15,7 @@ const Wrapper: React.FC<WrapperProps> = ({
     <Paper
       {...props}
       variant={variant}
-      className={cx(styles.wrapper, className)}
+      className={cx('Wrapper', styles.wrapper, className)}
     >
       {children}
     </Paper>

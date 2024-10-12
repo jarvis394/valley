@@ -15,7 +15,8 @@
   gap: 16px;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  padding-top: 16px;
+  padding-bottom: 16px;
   min-height: 100px;
 }
 
@@ -84,6 +85,7 @@
   display: grid !important;
   grid-template-columns: var(--grid-columns);
   gap: var(--grid-gap);
+  padding-bottom: 24px;
 }
 
 @media screen and (width < 600px) {

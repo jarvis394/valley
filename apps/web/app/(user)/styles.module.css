@@ -1,4 +1,23 @@
+/**
+ * Redefine background color for page
+ * as its the color of Header and Footer
+ */
+body {
+  background: var(--background-paper) !important;
+}
+
 .main {
+  --footerHeight: 121px;
+  display: flex;
+  gap: 0;
+  height: 100%;
+  position: relative;
+  flex-direction: column;
+  min-height: calc(100vh + var(--footerHeight));
+}
+
+.main__wrapper {
+  background: var(--background-default);
   flex: 1 0;
   display: flex;
   flex-direction: column;

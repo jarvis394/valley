@@ -23,8 +23,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconProps>(
           [styles['iconButton--loading']]: loading,
         })}
       >
-        {loading && <Spinner />}
-        {!loading && children}
+        {loading ? <Spinner /> : children}
       </Button>
     )
   }

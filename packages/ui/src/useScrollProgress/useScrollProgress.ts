@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { usePageScroll } from '../usePageScroll/usePageScroll'
 
 type UseScrollProgressProps = {
   enabled?: boolean
@@ -11,25 +12,15 @@ export const useScrollProgress = (
   const [scrollProgress, setScrollProgress] = useState(0)
   const calcScrollProgress = useCallback(
     (scrollY: number) => {
-      return Math.min(scrollY, offset) / offset
+      return Math.max(Math.min(scrollY, offset), 0) / offset
     },
     [offset]
   )
-
-  useEffect(() => {
+  const handlePageScroll = useCallback(() => {
     setScrollProgress(calcScrollProgress(window.scrollY))
+  }, [calcScrollProgress])
 
-    const handleScroll = () => {
-      setScrollProgress(calcScrollProgress(window.scrollY))
-    }
-
-    props.enabled &&
-      window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [calcScrollProgress, props.enabled])
+  usePageScroll(handlePageScroll, props)
 
   return scrollProgress
 }

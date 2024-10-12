@@ -1,6 +1,7 @@
 .menu__listbox {
   padding: 6px;
-  margin: 8px 0;
+  margin-top: 8px;
+  margin-bottom: 8px;
   min-width: 200px;
   display: flex;
   flex-direction: column;
