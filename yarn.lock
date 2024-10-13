@@ -3018,7 +3018,7 @@
     got "^11.8.5"
     os-filter-obj "^2.0.0"
 
-"@mui/base@^5.0.0-beta.40":
+"@mui/base@^5.0.0-beta.58":
   version "5.0.0-beta.58"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-beta.58.tgz#66ae4e1aaef8cfd9ae81bd55a70ce76b02eb5d3e"
   integrity sha512-P0E7ZrxOuyYqBvVv9w8k7wm+Xzx/KRu+BGgFcR2htTsGCpJNQJCSUXNUZ50MUmSU9hzqhwbQWNXhV1MBTl6F7A==

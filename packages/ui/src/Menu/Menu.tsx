@@ -8,7 +8,7 @@ import { CssTransition } from '@mui/base/Transitions'
 import { PopupContext, PopupProps } from '@mui/base/Unstable_Popup'
 import cx from 'classnames'
 import { NoSsr } from '@mui/base/NoSsr'
-import { Popup } from '@mui/base/Unstable_Popup/Popup'
+import { Popup } from './Popup'
 import { ListActionTypes } from '@mui/base/useList'
 
 type MenuProps = React.PropsWithChildren<MUIMenuProps & PopupProps>
@@ -51,7 +51,6 @@ const Menu = React.forwardRef<HTMLDivElement, MenuProps>(function Menu(
     <NoSsr defer>
       <Popup
         {...props}
-        keepMounted
         onClick={stopPropagation}
         open={open}
         anchor={anchor}

@@ -59,7 +59,7 @@
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {
-    "@mui/base": "^5.0.0-beta.40",
+    "@mui/base": "^5.0.0-beta.58",
     "@radix-ui/react-slot": "^1.1.0",
     "classnames": "^2.5.1",
     "geist-ui-icons": "^1.1.1"

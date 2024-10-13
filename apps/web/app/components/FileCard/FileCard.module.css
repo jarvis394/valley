@@ -16,6 +16,7 @@
   border-radius: 16px;
   box-shadow: 0 0 0 1px inset var(--alpha-solid-07);
   overflow: hidden;
+  position: relative;
 }
 
 .fileCard__name {
@@ -45,4 +46,30 @@
   height: auto;
   object-fit: contain;
   border-radius: 8px;
+}
+
+.fileCard__toolbar {
+  opacity: 0;
+  transition: opacity 240ms ease;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.fileCard:hover .fileCard__toolbar {
+  opacity: 1;
+}
+
+.fileCard__menuHeader > h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.fileCard__menuHeader > p {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-hint);
 }
