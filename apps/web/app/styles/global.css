@@ -3,6 +3,7 @@ html,
 body {
   height: 100%;
   margin: 0;
+  font-family: var(--geist-font-family);
   background: var(--background-default);
 }
 
@@ -14,6 +15,6 @@ svg {
   fill: currentColor;
 }
 
-path {
+svg:not(.svg-own-color) path {
   fill: currentColor;
 }

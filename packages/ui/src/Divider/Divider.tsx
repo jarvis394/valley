@@ -6,17 +6,28 @@ type DividerProps = React.PropsWithChildren<{
   orientation?: 'horizontal' | 'vertical'
   variant?: 'default' | 'dimmed'
 }> &
-  React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLSpanElement>,
-    HTMLSpanElement
-  >
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 
 const Divider: React.FC<DividerProps> = ({
   orientation = 'horizontal',
   variant = 'default',
   className,
+  children,
   ...props
 }) => {
+  if (children) {
+    return (
+      <div
+        {...props}
+        className={cx(styles.divider, styles['divider--withText'], className)}
+      >
+        <span className={cx(styles.divider, styles['divider--horizontal'])} />
+        {children}
+        <span className={cx(styles.divider, styles['divider--horizontal'])} />
+      </div>
+    )
+  }
+
   return (
     <span
       {...props}

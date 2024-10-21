@@ -3,7 +3,7 @@ import React, { CSSProperties, useMemo } from 'react'
 import styles from './Logo.module.css'
 import cx from 'classnames'
 import { HEADER_HEIGHT } from '../../config/constants'
-import { map } from '../../utils/map'
+import { map } from '../../utils/misc'
 import { useScrollProgress } from '@valley/ui/useScrollProgress'
 
 type LogoProps = {
@@ -33,7 +33,7 @@ const Logo: React.FC<LogoProps> = ({
         'translateZ(0)',
       ].join(' '),
     }
-  }, [scrollProgress])
+  }, [scrollProgress, topOffset, withScrollAnimation])
 
   return (
     <div {...props} className={cx(styles.logo, className)} style={style}>

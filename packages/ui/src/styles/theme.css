@@ -57,6 +57,24 @@
   --button-disabled-bg: #1a1a1a;
   --button-disabled-border: var(--alpha-transparent-07);
 
+  /** Button / Github Theme */
+  --button-github-theme-fg: var(--text-primary);
+  --button-github-theme-bg: #24292e;
+  --button-github-theme-hovered-fg: var(--text-primary);
+  --button-github-theme-hovered-bg: #313941;
+
+  /** Button / Google Theme */
+  --button-google-theme-fg: var(--text-primary);
+  --button-google-theme-bg: var(--alpha-transparent-07);
+  --button-google-theme-hovered-fg: var(--text-primary);
+  --button-google-theme-hovered-bg: var(--alpha-transparent-12);
+
+  /** Button / VK Theme */
+  --button-vk-theme-fg: var(--text-primary);
+  --button-vk-theme-bg: #0067dc;
+  --button-vk-theme-hovered-fg: var(--text-primary);
+  --button-vk-theme-hovered-bg: #1375e5;
+
   /** Text */
   --text-primary: rgba(237, 237, 237, 1);
   --text-secondary: rgba(237, 237, 237, 0.63);
@@ -159,6 +177,27 @@
   --button-disabled-fg: rgba(23, 23, 23, 0.5);
   --button-disabled-bg: #f3f3f3;
   --button-disabled-border: var(--alpha-transparent-07);
+
+  /** Button / Github Theme */
+  --button-github-theme-fg: var(--text-primary-inversed);
+  --button-github-theme-bg: #24292e;
+  --button-github-theme-hovered-fg: var(--background-default);
+  --button-github-theme-hovered-bg: #313941;
+  --button-github-theme-focused-fg: var(--button-focused-fg-inversed);
+
+  /** Button / Google Theme */
+  --button-google-theme-fg: var(--text-primary);
+  --button-google-theme-bg: var(--alpha-transparent-07);
+  --button-google-theme-hovered-fg: var(--text-primary);
+  --button-google-theme-hovered-bg: var(--alpha-transparent-12);
+  --button-google-theme-focused-fg: var(--button-focused-fg);
+
+  /** Button / VK Theme */
+  --button-vk-theme-fg: var(--text-primary-inversed);
+  --button-vk-theme-bg: #0067dc;
+  --button-vk-theme-hovered-fg: var(--background-default);
+  --button-vk-theme-hovered-bg: #1375e5;
+  --button-vk-theme-focused-fg: var(--button-focused-fg-inversed);
 
   /** Text */
   --text-primary: rgb(23, 23, 23);

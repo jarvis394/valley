@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import styles from './ButtonBase.module.css'
 import cx from 'classnames'
 import { AsChildProps } from '../types/AsChildProps'
@@ -16,6 +16,7 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
   disabled?: boolean
   onClick?: React.MouseEventHandler
   className?: string
+  style?: CSSProperties
 }>
 export type ButtonBaseProps = AsChildProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>

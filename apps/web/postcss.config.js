@@ -1,3 +1,6 @@
-module.exports = {
-  plugins: ['@csstools/postcss-media-minmax'],
+export default {
+  plugins: {
+    autoprefixer: {},
+    '@csstools/postcss-media-minmax': {},
+  },
 }

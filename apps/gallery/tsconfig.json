@@ -10,9 +10,6 @@
     "**/.client/**/*.tsx"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./app/*"]
-    }
+    "baseUrl": "."
   }
 }

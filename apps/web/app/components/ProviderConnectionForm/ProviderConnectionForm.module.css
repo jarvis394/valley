@@ -1,0 +1,5 @@
+.providerConnection__button :global(.Button__before),
+.providerConnection__button :global(.Button__before) > svg {
+  width: 20px;
+  height: 20px;
+}

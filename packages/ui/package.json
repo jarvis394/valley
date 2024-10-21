@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./OTPInput": "./src/OTPInput/OTPInput.tsx",
+    "./Hidden": "./src/Hidden/Hidden.tsx",
     "./Stack": "./src/Stack/Stack.tsx",
     "./Note": "./src/Note/Note.tsx",
     "./MenuSeparator": "./src/MenuSeparator/MenuSeparator.tsx",

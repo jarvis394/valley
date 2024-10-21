@@ -3,9 +3,17 @@
   "globalDependencies": ["**/.env.*local", ".env"],
   "globalEnv": [
     "NODE_ENV",
+    "WEB_PORT",
     "GALLERY_PORT",
     "NEXT_PUBLIC_API_URL",
-    "NEXT_PUBLIC_TUSD_URL"
+    "NEXT_PUBLIC_TUSD_URL",
+    "API_URL",
+    "TUSD_URL",
+    "GITHUB_TOKEN",
+    "GITHUB_CLIENT_ID",
+    "GITHUB_CLIENT_SECRET",
+    "SESSION_SECRET",
+    "HONEYPOT_SECRET"
   ],
   "tasks": {
     "dev": {

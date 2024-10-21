@@ -64,3 +64,4 @@ pnpm-debug.log*
 storybook-static
 
 .cache
+entry.worker.js

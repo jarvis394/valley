@@ -1,0 +1,21 @@
+.otpInput {
+  display: flex;
+}
+
+.otpInputSlot {
+  background-color: var(--background-paper);
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: 0 0 0 1px inset var(--input-border);
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+.otpInputSlot--active {
+  box-shadow:
+    0 0 0 1px inset var(--input-border-focused),
+    0 0 0 3px var(--input-border-focused-shadow);
+}

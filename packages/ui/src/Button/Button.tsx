@@ -42,7 +42,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       asChild
       variant={variant}
       disabled={disabled}
-      className={cx(styles.button, className, {
+      className={cx('Button', styles.button, className, {
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
@@ -54,7 +54,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       <Root {...other}>
         {loading && <Spinner className={styles.button__loading} />}
         {before && !loading && (
-          <div className={styles.button__before}>{before}</div>
+          <div className={cx('Button__before', styles.button__before)}>
+            {before}
+          </div>
         )}
         {
           // Ugly fix for slotting children in the right place (inside <span>)
@@ -63,7 +65,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
               {React.cloneElement(
                 children as React.ReactElement,
                 undefined,
-                <span className={styles.button__content}>
+                <span className={cx('Button__content', styles.button__content)}>
                   {(children as React.ReactElement)?.props?.children}
                 </span>
               )}
@@ -71,9 +73,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
           )
         }
         {children && !asChild && (
-          <span className={styles.button__content}>{children}</span>
+          <span className={cx('Button__content', styles.button__content)}>
+            {children}
+          </span>
         )}
-        {after && <div className={styles.button__after}>{after}</div>}
+        {after && (
+          <div className={cx('Button__after', styles.button__after)}>
+            {after}
+          </div>
+        )}
       </Root>
     </ButtonBase>
   )
