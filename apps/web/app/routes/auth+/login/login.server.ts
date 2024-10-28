@@ -1,17 +1,17 @@
-import { invariant } from '../../utils/invariant'
+import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { getUserId, sessionKey } from '../../server/auth.server'
-import { prisma } from '../../server/db.server'
-import { combineResponseInits } from '../../utils/misc'
-import { authSessionStorage } from '../../server/session.server'
-import { redirectWithToast } from '../../server/toast.server'
-import { verifySessionStorage } from '../../server/verification.server'
+import { getUserId, sessionKey } from '../../../server/auth.server'
+import { prisma } from '../../../server/db.server'
+import { combineResponseInits } from '../../../utils/misc'
+import { authSessionStorage } from '../../../server/session.server'
+import { redirectWithToast } from '../../../server/toast.server'
+import { verifySessionStorage } from '../../../server/verification.server'
 import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
-} from './_verify/verify.server'
-import { twoFAVerificationType } from '../account+/settings.authentication'
+} from '../verify/verify.server'
+import { twoFAVerificationType } from '../../account+/settings.authentication'
 
 const verifiedTimeKey = 'verified-time'
 const unverifiedSessionIdKey = 'unverified-session-id'
@@ -22,12 +22,10 @@ export async function handleNewSession(
     request,
     session,
     redirectTo,
-    remember,
   }: {
     request: Request
     session: { userId: string; id: string; expirationDate: Date }
     redirectTo?: string
-    remember: boolean
   },
   responseInit?: ResponseInit
 ) {
@@ -42,7 +40,6 @@ export async function handleNewSession(
   if (userHasTwoFactor) {
     const verifySession = await verifySessionStorage.getSession()
     verifySession.set(unverifiedSessionIdKey, session.id)
-    verifySession.set(rememberKey, remember)
     const redirectUrl = getRedirectToUrl({
       request,
       type: twoFAVerificationType,
@@ -73,7 +70,7 @@ export async function handleNewSession(
         {
           headers: {
             'set-cookie': await authSessionStorage.commitSession(authSession, {
-              expires: remember ? session.expirationDate : undefined,
+              expires: session.expirationDate,
             }),
           },
         },

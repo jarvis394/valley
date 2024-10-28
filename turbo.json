@@ -13,7 +13,10 @@
     "GITHUB_CLIENT_ID",
     "GITHUB_CLIENT_SECRET",
     "SESSION_SECRET",
-    "HONEYPOT_SECRET"
+    "HONEYPOT_SECRET",
+    "RESEND_API_KEY",
+    "MAGIC_LINK_SECRET",
+    "MOCKS"
   ],
   "tasks": {
     "dev": {

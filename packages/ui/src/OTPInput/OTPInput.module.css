@@ -1,5 +1,17 @@
 .otpInput {
+  --root-height: 48px;
   display: flex;
+  width: 100%;
+  height: var(--root-height);
+  align-items: center;
+  flex-direction: row;
+  gap: 12px;
+  max-width: 320px;
+}
+
+.otpInputGroup {
+  width: 100%;
+  height: 100%;
 }
 
 .otpInputSlot {
@@ -8,14 +20,67 @@
   align-items: center;
   align-self: stretch;
   overflow: hidden;
+  text-align: center;
   padding: 0;
   box-shadow: 0 0 0 1px inset var(--input-border);
   transition-duration: 0.15s;
   transition-timing-function: ease;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 0;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.otpInputSlot:not(:first-child) {
+  margin-left: -1px;
+}
+
+.otpInputSlot:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.otpInputSlot:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .otpInputSlot--active {
+  z-index: 10;
   box-shadow:
     0 0 0 1px inset var(--input-border-focused),
     0 0 0 3px var(--input-border-focused-shadow);
+}
+
+.otpInputSeparator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--text-hint);
+  flex-shrink: 0;
+}
+
+.otpInputFakeCaret {
+  height: 20px;
+  border-left: 1.5px solid var(--text-primary);
+  animation: caret-blink 1.5s ease infinite;
+}
+
+@keyframes caret-blink {
+  0% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -54,6 +54,8 @@
   transform: scale(0.98);
   aspect-ratio: 2 / 3;
   transition: all 1200ms cubic-bezier(1, 0, 0, 1);
+  user-select: none;
+  visibility: hidden;
   box-shadow:
     0 0 4px 0px rgba(0, 0, 0, 0.05),
     0 0 16px 0px rgba(0, 0, 0, 0.05);
@@ -70,24 +72,21 @@
   transition: all 1200ms cubic-bezier(1, 0, 0, 1);
   filter: blur(64px);
   z-index: -1;
+  user-select: none;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .auth__illustrationImage--visible {
   opacity: 1;
+  visibility: visible;
   filter: blur(0px);
   transform: scale(1);
 }
 
 .auth__illustrationImageBlur--visible {
   opacity: 1;
-}
-
-.auth__linkButtonContainer {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
+  visibility: visible;
 }
 
 .auth__linkButton {
@@ -146,7 +145,7 @@
 .auth__form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
   justify-content: center;
   width: 100%;

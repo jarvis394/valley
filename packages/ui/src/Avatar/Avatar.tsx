@@ -1,7 +1,6 @@
 import React from 'react'
 import styles from './Avatar.module.css'
 import cx from 'classnames'
-import Image from 'next/image'
 
 type AvatarProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
@@ -11,9 +10,9 @@ type AvatarProps = React.DetailedHTMLProps<
 const Avatar: React.FC<AvatarProps> = ({ className, ...props }) => {
   return (
     <div {...props} className={cx(styles.avatar, className)}>
-      <Image
+      <img
         src={'https://avatars.githubusercontent.com/u/37776763?v=4'}
-        alt="Picture of the author"
+        alt="Avatar"
         width={28}
         height={28}
       />

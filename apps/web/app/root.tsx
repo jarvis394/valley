@@ -14,7 +14,7 @@ import { ManifestLink } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
-import { useTheme } from './routes/resources+/theme-switch'
+import { useOptionalTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { getDomainUrl } from './utils/misc'
@@ -29,6 +29,8 @@ import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
+import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { honeypot } from './server/honeypot.server'
 
 export const links: LinksFunction = () => [
   {
@@ -62,15 +64,26 @@ export async function loader({ request }: LoaderFunctionArgs) {
             select: {
               id: true,
               username: true,
+              roles: {
+                select: {
+                  name: true,
+                  permissions: {
+                    select: { entity: true, action: true, access: true },
+                  },
+                },
+              },
             },
             where: { id: userId },
           }),
         { timings, type: 'find user', desc: 'find user in root' }
       )
     : null
+
   if (userId && !user) {
     await logout({ request, redirectTo: '/' })
   }
+
+  const honeypotProps = honeypot.getInputProps()
 
   return json(
     {
@@ -83,6 +96,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
           theme: getTheme(request),
         },
       },
+      honeypotProps,
       ENV: getEnv(),
     },
     {
@@ -166,24 +180,27 @@ export function Document({
   )
 }
 
+export function Layout({ children }: { children: React.ReactNode }) {
+  // if there was an error running the loader, data could be missing
+  const data = useLoaderData<typeof loader | null>()
+  const nonce = useNonce()
+  const theme = useOptionalTheme()
+
+  return (
+    <Document nonce={nonce} theme={theme} env={data?.ENV}>
+      {children}
+    </Document>
+  )
+}
+
 export default function App() {
   const data = useLoaderData<typeof loader>()
-  const nonce = useNonce()
-  const theme = useTheme()
 
   return (
-    <Document theme={theme} env={data.ENV} nonce={nonce}>
+    <HoneypotProvider {...data.honeypotProps}>
       <Outlet />
-    </Document>
+    </HoneypotProvider>
   )
 }
 
-export function ErrorBoundary() {
-  const nonce = useNonce()
-
-  return (
-    <Document nonce={nonce}>
-      <GeneralErrorBoundary />
-    </Document>
-  )
-}
+export const ErrorBoundary = GeneralErrorBoundary

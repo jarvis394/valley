@@ -3,11 +3,15 @@ import { useRouteLoaderData } from '@remix-run/react'
 import { type loader as rootLoader } from '../root'
 
 /**
- * @returns the request info from the root loader
+ * @returns the request info from the root loader (throws an error if it does not exist)
  */
 export function useRequestInfo() {
-  const data = useRouteLoaderData<typeof rootLoader>('root')
-  invariant(data?.requestInfo, 'No requestInfo found in root loader')
+	const maybeRequestInfo = useOptionalRequestInfo()
+	invariant(maybeRequestInfo, 'No requestInfo found in root loader')
+	return maybeRequestInfo
+}
 
-  return data.requestInfo
+export function useOptionalRequestInfo() {
+	const data = useRouteLoaderData<typeof rootLoader>('root')
+	return data?.requestInfo
 }

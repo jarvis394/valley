@@ -35,7 +35,7 @@ import { useIsPending } from '../../../utils/misc'
 import { UsernameSchema, NameSchema } from '../../../utils/user-validation'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { z } from 'zod'
-import { onboardingEmailSessionKey } from './route'
+import { onboardingEmailSessionKey } from '.'
 
 export const providerIdKey = 'providerId'
 export const prefilledProfileKey = 'prefilledProfile'

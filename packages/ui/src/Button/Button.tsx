@@ -5,6 +5,7 @@ import ButtonBase, { ButtonBaseProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
 import { Slot, Slottable } from '@radix-ui/react-slot'
+import { isElement } from 'react-is'
 
 export type ButtonProps = Partial<
   React.PropsWithChildren<{
@@ -36,6 +37,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   ref
 ) {
   const Root = asChild ? Slot : 'button'
+
+  if (!isElement(children) && asChild) {
+    console.error('Cannot use `asChild` without a children element:', {
+      children,
+      asChild,
+    })
+    return null
+  }
+
   return (
     <ButtonBase
       ref={ref}
@@ -52,7 +62,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       })}
     >
       <Root {...other}>
-        {loading && <Spinner className={styles.button__loading} />}
+        {loading && (
+          <Spinner
+            className={cx(styles.button__loading, {
+              [styles['button__loading--noAnimation']]: !!before,
+            })}
+          />
+        )}
         {before && !loading && (
           <div className={cx('Button__before', styles.button__before)}>
             {before}

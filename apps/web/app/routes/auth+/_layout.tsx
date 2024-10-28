@@ -45,23 +45,23 @@ const AuthGroupLayout = () => {
   )
   const [activeCoverIndex, setActiveCoverIndex] = useState(0)
   const location = useLocation()
-  const linkButtonHref = useMemo(() => {
-    if (location.pathname === '/auth/login') {
-      return '/auth/register'
-    } else if (location.pathname === '/auth/register') {
-      return '/auth/login'
-    } else {
-      return '#'
-    }
-  }, [location.pathname])
-  const linkButtonText = useMemo(() => {
-    if (location.pathname === '/auth/login') {
-      return 'I do not have an account'
-    } else if (location.pathname === '/auth/register') {
-      return 'I have an account'
+  const linkButton = useMemo(() => {
+    let data = { href: '#', label: '' }
+    if (location.pathname.startsWith('/auth/login')) {
+      data = { href: '/auth/register', label: 'I do not have an account' }
+    } else if (location.pathname.startsWith('/auth/register')) {
+      data = { href: '/auth/login', label: 'I have an account' }
     } else {
       return null
     }
+
+    return (
+      <Button asChild variant="tertiary" size="lg">
+        <Link to={data.href} className={styles.auth__linkButton}>
+          {data.label}
+        </Link>
+      </Button>
+    )
   }, [location.pathname])
 
   useEffect(() => {
@@ -83,13 +83,7 @@ const AuthGroupLayout = () => {
       <div className={styles.auth__section}>
         <AuthHeader />
         <Outlet />
-        <div className={styles.auth__linkButtonContainer}>
-          <Button asChild variant="tertiary" size="lg">
-            <Link to={linkButtonHref} className={styles.auth__linkButton}>
-              {linkButtonText}
-            </Link>
-          </Button>
-        </div>
+        {linkButton}
       </div>
       <Hidden xs sm md asChild>
         <div className={styles.auth__section}>

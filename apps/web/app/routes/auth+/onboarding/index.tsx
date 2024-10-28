@@ -15,7 +15,7 @@ import {
 } from '@remix-run/react'
 import {
   requireAnonymous,
-  signup,
+  register,
   sessionKey,
 } from '../../../server/auth.server'
 import { prisma } from '../../../server/db.server'
@@ -55,7 +55,7 @@ async function requireOnboardingEmail(request: Request) {
   )
   const email = verifySession.get(onboardingEmailSessionKey)
   if (typeof email !== 'string' || !email) {
-    throw redirect('/signup')
+    throw redirect('/auth/register')
   }
   return email
 }
@@ -87,7 +87,7 @@ export async function action({ request }: ActionFunctionArgs) {
       }).transform(async (data) => {
         if (intent !== null) return { ...data, session: null }
 
-        const session = await signup({ ...data, email })
+        const session = await register({ ...data, email })
         return { ...data, session }
       }),
     async: true,

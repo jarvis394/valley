@@ -1,0 +1,18 @@
+.verify__email {
+  color: var(--blue-900);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  height: 20px;
+}
+
+.verify__emailEdit {
+  --blue-bg-hover: rgba(82, 169, 255, 0.12);
+  --themed-color: var(--blue-900);
+  --themed-background-hover: var(--blue-bg-hover);
+  --themed-background-focus: var(--blue-bg-hover);
+  --themed-color-hover: var(--blue-900);
+  --themed-color-focus: var(--blue-600);
+  padding: 8px;
+  margin-left: -4px;
+}

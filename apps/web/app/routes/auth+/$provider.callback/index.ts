@@ -1,32 +1,35 @@
 import { LoaderFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/react'
-import { PROVIDER_LABELS, ProviderNameSchema } from '../../config/connections'
+import {
+  PROVIDER_LABELS,
+  ProviderNameSchema,
+} from '../../../config/connections'
 import {
   authenticator,
   getUserId,
   getSessionExpirationDate,
-} from '../../server/auth.server'
-import { prisma } from '../../server/db.server'
+} from '../../../server/auth.server'
+import { prisma } from '../../../server/db.server'
 import {
   normalizeEmail,
   normalizeUsername,
-} from '../../server/providers/provider'
+} from '../../../server/providers/provider'
 import {
   destroyRedirectToHeader,
   getRedirectCookieValue,
-} from '../../server/redirect-cookie.server'
+} from '../../../server/redirect-cookie.server'
 import {
   redirectWithToast,
   createToastHeaders,
-} from '../../server/toast.server'
-import { verifySessionStorage } from '../../server/verification.server'
-import { combineHeaders } from '../../utils/misc'
-import { handleNewSession } from './login.server'
-import { onboardingEmailSessionKey } from './onboarding/route'
+} from '../../../server/toast.server'
+import { verifySessionStorage } from '../../../server/verification.server'
+import { combineHeaders } from '../../../utils/misc'
+import { handleNewSession } from '../login/login.server'
+import { onboardingEmailSessionKey } from '../onboarding'
 import {
   prefilledProfileKey,
   providerIdKey,
-} from './onboarding/onboarding_.$provider'
+} from '../onboarding/onboarding_.$provider'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
@@ -119,6 +122,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     select: { id: true },
     where: { email: profile.email.toLowerCase() },
   })
+
   if (user) {
     await prisma.connection.create({
       data: {
@@ -181,7 +185,7 @@ async function makeSession(
     },
   })
   return handleNewSession(
-    { request, session, redirectTo, remember: true },
+    { request, session, redirectTo },
     { headers: combineHeaders(responseInit?.headers, destroyRedirectTo) }
   )
 }

@@ -74,10 +74,12 @@ export class GitHubProvider implements AuthProvider {
           // asap and try again.
           context.metadata.ttl = 0
         }
+
         return result
       },
       checkValue: GitHubUserParseResult,
     })
+
     return {
       displayName: result.success ? result.data.login : 'Unknown',
       link: result.success ? `https://github.com/${result.data.login}` : null,

@@ -13,7 +13,12 @@ export const OTPInputGroup = React.forwardRef<
   React.ElementRef<'div'>,
   React.ComponentPropsWithoutRef<'div'>
 >(({ className, ...props }, ref) => (
-  <Stack ref={ref} className={className} align={'center'} {...props} />
+  <Stack
+    ref={ref}
+    className={cx(styles.otpInputGroup, className)}
+    align={'center'}
+    {...props}
+  />
 ))
 OTPInputGroup.displayName = 'OTPInputGroup'
 
@@ -35,7 +40,7 @@ export const OTPInputSlot = React.forwardRef<
       {...props}
     >
       {char}
-      {hasFakeCaret && '|'}
+      {hasFakeCaret && <span className={styles.otpInputFakeCaret} />}
     </div>
   )
 })
@@ -45,50 +50,60 @@ export const OTPInputSeparator = React.forwardRef<
   React.ElementRef<'div'>,
   React.ComponentPropsWithoutRef<'div'>
 >(({ ...props }, ref) => (
-  <div ref={ref} role="separator" {...props}>
-    -
-  </div>
+  <span
+    ref={ref}
+    className={styles.otpInputSeparator}
+    role="separator"
+    {...props}
+  />
 ))
 OTPInputSeparator.displayName = 'OTPInputSeparator'
 
 const OTPInput = React.forwardRef<
   React.ElementRef<typeof Root>,
   {
-    labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
-    inputProps: Partial<OTPInputProps & { render: never }>
+    labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>
+    inputProps?: Partial<OTPInputProps & { render: never }>
     errors?: Array<string | null | undefined> | null
     className?: string
   }
->(({ labelProps, inputProps, errors, className, ...props }, ref) => {
-  const fallbackId = React.useId()
-  const id = inputProps.id ?? fallbackId
-  const errorId = errors?.length ? `${id}-error` : undefined
+>(
+  (
+    { inputProps, labelProps: _labelProps, errors, className, ...props },
+    ref
+  ) => {
+    const fallbackId = React.useId()
+    const id = inputProps?.id ?? fallbackId
+    const errorId = errors?.length ? `${id}-error` : undefined
 
-  return (
-    <Root
-      {...props}
-      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-      maxLength={6}
-      id={id}
-      aria-invalid={errorId ? true : undefined}
-      aria-describedby={errorId}
-      ref={ref}
-      className={cx(styles.otpInput, className)}
-    >
-      <OTPInputGroup>
-        <OTPInputSlot index={0} />
-        <OTPInputSlot index={1} />
-        <OTPInputSlot index={2} />
-      </OTPInputGroup>
-      <OTPInputSeparator />
-      <OTPInputGroup>
-        <OTPInputSlot index={3} />
-        <OTPInputSlot index={4} />
-        <OTPInputSlot index={5} />
-      </OTPInputGroup>
-    </Root>
-  )
-})
+    return (
+      <Root
+        {...props}
+        {...inputProps}
+        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+        maxLength={6}
+        id={id}
+        aria-invalid={errorId ? true : undefined}
+        aria-describedby={errorId}
+        ref={ref}
+        containerClassName={styles.otpInput}
+        className={className}
+      >
+        <OTPInputGroup>
+          <OTPInputSlot index={0} />
+          <OTPInputSlot index={1} />
+          <OTPInputSlot index={2} />
+        </OTPInputGroup>
+        <OTPInputSeparator />
+        <OTPInputGroup>
+          <OTPInputSlot index={3} />
+          <OTPInputSlot index={4} />
+          <OTPInputSlot index={5} />
+        </OTPInputGroup>
+      </Root>
+    )
+  }
+)
 OTPInput.displayName = 'OTPInput'
 
 export default OTPInput

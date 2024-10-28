@@ -23,7 +23,6 @@
   cursor: pointer;
   user-select: none;
   transform: translateZ(0);
-  outline: none;
   border: 0;
   color: var(--themed-color);
   background-color: var(--themed-background);
@@ -33,11 +32,28 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.buttonBase:focus-visible {
+  outline: auto;
+}
+
 .buttonBase:disabled {
   cursor: not-allowed;
   --themed-color: var(--button-disabled-fg) !important;
   --themed-background: var(--button-disabled-bg) !important;
   --themed-border: var(--button-disabled-border) !important;
+}
+
+.buttonBase--tertiary:disabled {
+  --themed-color: var(--text-secondary) !important;
+  --themed-background: transparent !important;
+  --themed-border: none !important;
+}
+
+.buttonBase--tertiary-dimmed:disabled {
+  opacity: 0.8;
+  --themed-color: var(--text-hint) !important;
+  --themed-background: transparent !important;
+  --themed-border: none !important;
 }
 
 .buttonBase:disabled :global(.svg-own-color) path {

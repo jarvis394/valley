@@ -5,6 +5,8 @@ const schema = z.object({
   API_URL: z.string(),
   TUSD_URL: z.string(),
   SESSION_SECRET: z.string(),
+  MAGIC_LINK_SECRET: z.string(),
+  RESEND_API_KEY: z.string(),
   GITHUB_TOKEN: z.string(),
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),

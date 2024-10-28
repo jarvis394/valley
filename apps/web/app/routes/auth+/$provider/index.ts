@@ -1,9 +1,9 @@
 import { redirect, type ActionFunctionArgs } from '@remix-run/node'
-import { authenticator } from '../../server/auth.server'
-import { handleMockAction } from '../../server/connections.server'
-import { ProviderNameSchema } from '../../config/connections'
-import { getReferrerRoute } from '../../utils/misc'
-import { getRedirectCookieHeader } from '../../server/redirect-cookie.server'
+import { authenticator } from '../../../server/auth.server'
+import { handleMockAction } from '../../../server/connections.server'
+import { ProviderNameSchema } from '../../../config/connections'
+import { getReferrerRoute } from '../../../utils/misc'
+import { getRedirectCookieHeader } from '../../../server/redirect-cookie.server'
 
 export async function loader() {
   return redirect('/login')

@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import type { SetURLSearchParams } from 'react-router-dom'
 import { Modal as BaseModal } from '@mui/base/Modal'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
@@ -9,14 +9,20 @@ import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
 import { Drawer } from 'vaul'
 
+const modalKey = 'modal'
+
 type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
+  searchParams: URLSearchParams
+  setSearchParams: SetURLSearchParams
   onDismiss?: () => void
 }>
 
 const Modal: React.FC<ModalProps> = ({
   onDismiss,
+  searchParams,
+  setSearchParams,
   isOpen: propsIsOpen = false,
   children,
   id,
@@ -25,10 +31,7 @@ const Modal: React.FC<ModalProps> = ({
     `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
   )
   const [open, setOpen] = useState(propsIsOpen)
-  const router = useRouter()
-  const pathname = usePathname()
-  const query = useSearchParams()
-  const currentModal = useMemo(() => query.get('modal'), [query])
+  const currentModal = useMemo(() => searchParams.get(modalKey), [searchParams])
 
   const handleClose = () => {
     // Use only user-provided function if it is present
@@ -36,10 +39,10 @@ const Modal: React.FC<ModalProps> = ({
       return onDismiss()
     }
 
-    const newQuery = new URLSearchParams(query.toString())
-    newQuery.delete('modal')
-
-    router.push(pathname + '?' + newQuery.toString())
+    setSearchParams((prev) => {
+      prev.delete(modalKey)
+      return prev
+    })
   }
 
   useEffect(() => {

@@ -5,8 +5,14 @@ import { json, type ActionFunctionArgs } from '@remix-run/node'
 import { redirect, useFetcher, useFetchers } from '@remix-run/react'
 import { ServerOnly } from 'remix-utils/server-only'
 import { z } from 'zod'
-import { useHints } from '../../components/ClientHints/ClientHints'
-import { useRequestInfo } from '../../utils/request-info'
+import {
+  useHints,
+  useOptionalHints,
+} from '../../components/ClientHints/ClientHints'
+import {
+  useOptionalRequestInfo,
+  useRequestInfo,
+} from '../../utils/request-info'
 import { type Theme, setTheme } from '../../utils/theme'
 import React from 'react'
 import Button from '@valley/ui/Button'
@@ -109,4 +115,14 @@ export function useTheme(): Theme {
     return optimisticMode === 'system' ? hints.theme : optimisticMode
   }
   return requestInfo.userSettings.theme ?? hints.theme
+}
+
+export function useOptionalTheme() {
+  const optionalHints = useOptionalHints()
+  const optionalRequestInfo = useOptionalRequestInfo()
+  const optimisticMode = useOptimisticThemeMode()
+  if (optimisticMode) {
+    return optimisticMode === 'system' ? optionalHints?.theme : optimisticMode
+  }
+  return optionalRequestInfo?.userSettings.theme ?? optionalHints?.theme
 }

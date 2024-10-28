@@ -10,7 +10,8 @@ import {
 import { clientHint as timeZoneHint } from '@epic-web/client-hints/time-zone'
 import { useRevalidator } from '@remix-run/react'
 import * as React from 'react'
-import { useRequestInfo } from '../../utils/request-info'
+import { useOptionalRequestInfo, useRequestInfo } from '../../utils/request-info'
+import { useEffect } from 'react'
 
 const hintsUtils = getHintUtils({
   theme: colorSchemeHint,
@@ -27,6 +28,11 @@ export function useHints() {
   return requestInfo.hints
 }
 
+export function useOptionalHints() {
+	const requestInfo = useOptionalRequestInfo()
+	return requestInfo?.hints
+}
+
 /**
  * @returns inline script element that checks for client hints and sets cookies
  * if they are not set then reloads the page if any cookie was set to an
@@ -34,7 +40,8 @@ export function useHints() {
  */
 export function ClientHintCheck({ nonce }: { nonce: string }) {
   const { revalidate } = useRevalidator()
-  React.useEffect(
+
+  useEffect(
     () => subscribeToSchemeChange(() => revalidate()),
     [revalidate]
   )

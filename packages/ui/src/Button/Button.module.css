@@ -88,6 +88,10 @@
   height: 20px;
 }
 
+.button .button__loading.button__loading--noAnimation {
+  animation: none;
+}
+
 @keyframes button-loading-animation {
   from {
     width: 0px;
