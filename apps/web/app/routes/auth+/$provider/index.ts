@@ -6,7 +6,7 @@ import { getReferrerRoute } from '../../../utils/misc'
 import { getRedirectCookieHeader } from '../../../server/redirect-cookie.server'
 
 export async function loader() {
-  return redirect('/login')
+  return redirect('/auth/login')
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {

@@ -11,13 +11,13 @@ import {
   handleVerification as handleLoginTwoFactorVerification,
   shouldRequestTwoFA,
 } from '../login/login.server'
-import { handleVerification as handleOnboardingVerification } from '../onboarding/onboarding.server'
+import { handleVerification as handleOnboardingVerification } from '../onboarding+/onboarding.server'
 import {
   VerifySchema,
-  codeQueryParam,
-  redirectToQueryParam,
-  targetQueryParam,
-  typeQueryParam,
+  verifyCodeKey,
+  redirectToKey,
+  targetKey,
+  verifyTypeKey,
   type VerificationType,
 } from '.'
 import {
@@ -47,11 +47,11 @@ export function getRedirectToUrl({
   redirectTo?: string
 }) {
   const redirectToUrl = new URL(`${getDomainUrl(request)}/auth/verify`)
-  redirectToUrl.searchParams.set(typeQueryParam, type)
-  redirectToUrl.searchParams.set(targetQueryParam, target)
+  redirectToUrl.searchParams.set(verifyTypeKey, type)
+  redirectToUrl.searchParams.set(targetKey, target)
 
   if (redirectTo) {
-    redirectToUrl.searchParams.set(redirectToQueryParam, redirectTo)
+    redirectToUrl.searchParams.set(redirectToKey, redirectTo)
   }
 
   return redirectToUrl
@@ -107,7 +107,7 @@ export async function prepareVerification({
   })
 
   // add the otp to the url we'll email the user.
-  verifyUrl.searchParams.set(codeQueryParam, otp)
+  verifyUrl.searchParams.set(verifyCodeKey, otp)
 
   return { otp, redirectTo, verifyUrl }
 }
@@ -145,9 +145,9 @@ export async function validateRequest(
   const submission = await parseWithZod(body, {
     schema: VerifySchema.superRefine(async (data, ctx) => {
       const codeIsValid = await isCodeValid({
-        code: data[codeQueryParam],
-        type: data[typeQueryParam],
-        target: data[targetQueryParam],
+        code: data[verifyCodeKey],
+        type: data[verifyTypeKey],
+        target: data[targetKey],
       })
       if (!codeIsValid) {
         ctx.addIssue({
@@ -174,14 +174,14 @@ export async function validateRequest(
     await prisma.verification.delete({
       where: {
         target_type: {
-          type: submissionValue[typeQueryParam],
-          target: submissionValue[targetQueryParam],
+          type: submissionValue[verifyTypeKey],
+          target: submissionValue[targetKey],
         },
       },
     })
   }
 
-  switch (submissionValue[typeQueryParam]) {
+  switch (submissionValue[verifyTypeKey]) {
     // case 'reset-password': {
     //   await deleteVerification()
     //   return handleResetPasswordVerification({ request, body, submission })

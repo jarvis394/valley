@@ -62,48 +62,42 @@ OTPInputSeparator.displayName = 'OTPInputSeparator'
 const OTPInput = React.forwardRef<
   React.ElementRef<typeof Root>,
   {
-    labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>
     inputProps?: Partial<OTPInputProps & { render: never }>
     errors?: Array<string | null | undefined> | null
     className?: string
   }
->(
-  (
-    { inputProps, labelProps: _labelProps, errors, className, ...props },
-    ref
-  ) => {
-    const fallbackId = React.useId()
-    const id = inputProps?.id ?? fallbackId
-    const errorId = errors?.length ? `${id}-error` : undefined
+>(({ inputProps, errors, className, ...props }, ref) => {
+  const fallbackId = React.useId()
+  const id = inputProps?.id ?? fallbackId
+  const errorId = errors?.length ? `${id}-error` : undefined
 
-    return (
-      <Root
-        {...props}
-        {...inputProps}
-        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-        maxLength={6}
-        id={id}
-        aria-invalid={errorId ? true : undefined}
-        aria-describedby={errorId}
-        ref={ref}
-        containerClassName={styles.otpInput}
-        className={className}
-      >
-        <OTPInputGroup>
-          <OTPInputSlot index={0} />
-          <OTPInputSlot index={1} />
-          <OTPInputSlot index={2} />
-        </OTPInputGroup>
-        <OTPInputSeparator />
-        <OTPInputGroup>
-          <OTPInputSlot index={3} />
-          <OTPInputSlot index={4} />
-          <OTPInputSlot index={5} />
-        </OTPInputGroup>
-      </Root>
-    )
-  }
-)
+  return (
+    <Root
+      {...props}
+      {...inputProps}
+      pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+      maxLength={6}
+      id={id}
+      aria-invalid={errorId ? true : undefined}
+      aria-describedby={errorId}
+      ref={ref}
+      containerClassName={styles.otpInput}
+      className={className}
+    >
+      <OTPInputGroup>
+        <OTPInputSlot index={0} />
+        <OTPInputSlot index={1} />
+        <OTPInputSlot index={2} />
+      </OTPInputGroup>
+      <OTPInputSeparator />
+      <OTPInputGroup>
+        <OTPInputSlot index={3} />
+        <OTPInputSlot index={4} />
+        <OTPInputSlot index={5} />
+      </OTPInputGroup>
+    </Root>
+  )
+})
 OTPInput.displayName = 'OTPInput'
 
-export default OTPInput
+export default React.memo(OTPInput)

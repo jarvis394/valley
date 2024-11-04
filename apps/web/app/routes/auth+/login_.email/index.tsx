@@ -20,6 +20,8 @@ import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
 import { handleNewSession } from '../login/login.server'
 import { useIsPending } from '../../../utils/misc'
+import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
+import { redirectToKey, targetKey } from '../verify'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -81,7 +83,8 @@ const LoginViaEmailPage: React.FC = () => {
   const actionData = useActionData<typeof action>()
   const [searchParams] = useSearchParams()
   const isPending = useIsPending()
-  const redirectTo = searchParams.get('redirectTo')
+  const redirectTo = searchParams.get(redirectToKey)
+  const target = searchParams.get(targetKey)
   const [form, fields] = useForm({
     id: 'login-form',
     constraint: getZodConstraint(LoginFormSchema),
@@ -95,21 +98,21 @@ const LoginViaEmailPage: React.FC = () => {
 
   return (
     <main className={styles.auth__content}>
-      <h1 className={styles.auth__contentHeader}>Enter the Valley</h1>
-      <Form {...getFormProps(form)} method="POST" className={styles.auth__form}>
-        <Input
-          {...getInputProps(fields.email, {
-            type: 'email',
-          })}
-          state={fields.email.errors ? 'error' : 'default'}
-          required
-          size="lg"
-          placeholder="Email"
-        />
+      <AuthFormHeader type="password" email={target} />
+      <Form
+        {...getFormProps(form)}
+        method="POST"
+        className={styles.auth__form}
+        style={{ viewTransitionName: 'auth-form' }}
+      >
+        {target && <input hidden name="email" value={target} type="email" />}
         <Input
           {...getInputProps(fields.password, {
             type: 'password',
           })}
+          // This should be always auto focused, as we are transitioning within the same form
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
           required
           state={fields.password.errors ? 'error' : 'default'}
           size="lg"
@@ -131,7 +134,9 @@ const LoginViaEmailPage: React.FC = () => {
           before={<ArrowLeft />}
           size="md"
         >
-          <Link to="/auth/login">Other Login options</Link>
+          <Link to="/auth/login" viewTransition>
+            Other Login options
+          </Link>
         </Button>
       </Form>
     </main>

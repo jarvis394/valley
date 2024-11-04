@@ -1,4 +1,3 @@
-'use client'
 import Input from '@valley/ui/Input'
 import React from 'react'
 import styles from '../auth.module.css'
@@ -11,7 +10,7 @@ import {
   useSearchParams,
 } from '@remix-run/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { ActionFunctionArgs } from '@remix-run/node'
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
 import { prisma } from '../../../server/db.server'
 import { checkHoneypot } from '../../../server/honeypot.server'
 import { EmailSchema } from '../../../utils/user-validation'
@@ -20,15 +19,29 @@ import { prepareVerification } from '../verify/verify.server'
 import { useIsPending } from '../../../utils/misc'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
-// import {
-//   removeAuthTokensFromLocalStorage,
-//   setAuthTokensToLocalStorage,
-// } from '../../../utils/accessToken'
-// import { authorizeUser } from '../../../api/auth'
+import { sendRegisterEmail } from '../../../server/email.server'
+import Divider from '@valley/ui/Divider'
+import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
+import { PROVIDER_NAMES } from 'app/config/connections'
+import Stack from '@valley/ui/Stack'
+import { SEOHandle } from '@nasa-gcn/remix-seo'
+import { requireAnonymous } from 'app/server/auth.server'
+import { ArrowRight } from 'geist-ui-icons'
+import { redirectToKey, targetKey } from '../verify'
 
 const SignupSchema = z.object({
   email: EmailSchema,
+  redirectTo: z.string().optional(),
 })
+
+export const handle: SEOHandle = {
+  getSitemapEntries: () => null,
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAnonymous(request)
+  return json({})
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
@@ -68,22 +81,30 @@ export async function action({ request }: ActionFunctionArgs) {
     target: email,
   })
 
-  console.log({ verifyUrl, otp })
+  const response = await sendRegisterEmail({
+    code: otp,
+    email,
+    magicLink: verifyUrl.toString(),
+  })
 
-  // const response = await sendEmail({
-  //   to: email,
-  //   subject: `Welcome to Epic Notes!`,
-  //   react: <SignupEmail onboardingUrl={verifyUrl.toString()} otp={otp} />,
-  // })
-
-  return redirect(redirectTo.toString())
+  if (response.status === 'success') {
+    return redirect(redirectTo.toString())
+  } else {
+    return json(
+      {
+        result: submission.reply({ formErrors: [response.error.message] }),
+      },
+      { status: 500 }
+    )
+  }
 }
 
 const RegisterPage: React.FC = () => {
   const actionData = useActionData<typeof action>()
   const isPending = useIsPending()
   const [searchParams] = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo')
+  const redirectTo = searchParams.get(redirectToKey)
+  const target = searchParams.get(targetKey)
 
   const [form, fields] = useForm({
     id: 'signup-form',
@@ -93,43 +114,66 @@ const RegisterPage: React.FC = () => {
       const result = parseWithZod(formData, { schema: SignupSchema })
       return result
     },
+    defaultValue: { redirectTo, email: target },
     shouldRevalidate: 'onBlur',
   })
 
   return (
     <main className={styles.auth__content}>
       <h1 className={styles.auth__contentHeader}>Create your Valley account</h1>
-      <Form method="POST" {...getFormProps(form)} className={styles.auth__form}>
-        <HoneypotInputs />
-        <Input
-          {...getInputProps(fields.email, {
-            type: 'email',
-          })}
-          state={fields.email.errors ? 'error' : 'default'}
-          required
-          size="lg"
-          placeholder="Email"
-        />
-        {/* <Input
-          {...getInputProps(fields.password, {
-            type: 'password',
-          })}
-          required
-          state={fields.password.errors ? 'error' : 'default'}
-          size="lg"
-          placeholder="Password"
-          autoComplete="current-password"
-        /> */}
-        <Button
+      <Stack fullWidth gap={3} direction={'column'}>
+        <Stack
+          gap={2}
           fullWidth
-          loading={isPending}
-          disabled={isPending}
-          variant="primary"
-          size="lg"
+          direction={'column'}
+          style={{ viewTransitionName: 'auth-providers' }}
         >
-          Continue
-        </Button>
-      </Form>
+          {PROVIDER_NAMES.map((providerName) => (
+            <ProviderConnectionForm
+              key={providerName}
+              providerName={providerName}
+              redirectTo={redirectTo}
+              type="Sign up"
+            />
+          ))}
+        </Stack>
+        <Divider style={{ viewTransitionName: 'auth-divider' }}>OR</Divider>
+        <Stack asChild gap={2} fullWidth direction={'column'}>
+          <Form {...getFormProps(form)} method="POST" viewTransition>
+            <HoneypotInputs />
+            {redirectTo && (
+              <input type="hidden" name="redirectTo" value={redirectTo} />
+            )}
+            <Input
+              {...getInputProps(fields.email, {
+                type: 'email',
+              })}
+              // We want to focus the field when user clicks "email edit" button on the next page
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus={!!target}
+              state={fields.email.errors ? 'error' : 'default'}
+              required
+              size="lg"
+              placeholder="Email"
+              paperProps={{
+                style: { viewTransitionName: 'auth-form-email-input' },
+              }}
+            />
+            <Button
+              fullWidth
+              loading={isPending}
+              disabled={isPending}
+              variant="primary"
+              size="lg"
+              type="submit"
+              after={<ArrowRight />}
+              style={{ viewTransitionName: 'auth-form-submit' }}
+            >
+              Sign up with Email
+            </Button>
+          </Form>
+        </Stack>
+      </Stack>
     </main>
   )
 }

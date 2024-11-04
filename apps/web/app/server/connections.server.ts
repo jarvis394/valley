@@ -3,11 +3,10 @@ import { type ProviderName } from '../config/connections'
 import { GitHubProvider } from './providers/github.server'
 import { type AuthProvider } from './providers/provider'
 import { type Timings } from './timing.server'
-import { TOTPProvider } from './providers/totp.server'
 
 export const connectionSessionStorage = createCookieSessionStorage({
   cookie: {
-    name: 'en_connection',
+    name: 'valley_connection',
     sameSite: 'lax',
     path: '/',
     httpOnly: true,
@@ -23,7 +22,6 @@ export const providers: Record<ProviderName, AuthProvider> = {
   google: new GitHubProvider(),
   // TODO: change me
   vk: new GitHubProvider(),
-  totp: new TOTPProvider(),
 }
 
 export function handleMockAction(providerName: ProviderName, request: Request) {

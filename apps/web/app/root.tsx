@@ -8,9 +8,9 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 import cx from 'classnames'
-import styles from './App.module.css'
+import styles from './root.module.css'
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { ManifestLink } from '@remix-pwa/sw'
+import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -21,6 +21,8 @@ import { getDomainUrl } from './utils/misc'
 import { prisma } from './server/db.server'
 import { makeTimings, time } from './server/timing.server'
 import { getUserId, logout } from './server/auth.server'
+import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { honeypot } from './server/honeypot.server'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -29,8 +31,7 @@ import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
-import { HoneypotProvider } from 'remix-utils/honeypot/react'
-import { honeypot } from './server/honeypot.server'
+import { useEffect } from 'react'
 
 export const links: LinksFunction = () => [
   {
@@ -63,7 +64,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
           prisma.user.findUniqueOrThrow({
             select: {
               id: true,
-              username: true,
+              fullname: true,
+              email: true,
               roles: {
                 select: {
                   name: true,
@@ -165,7 +167,7 @@ export function Document({
         <Meta />
         <Links />
       </head>
-      <body className={cx('valley-themed', styles.App)} data-theme={theme}>
+      <body className={cx('valley-themed', styles.root)} data-theme={theme}>
         {children}
         <script
           nonce={nonce}
@@ -195,6 +197,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const data = useLoaderData<typeof loader>()
+
+  useEffect(() => {
+    // Registering SW manually because Vite remix-pwa plugin
+    // adds <script> tag without CSP nonce value
+    loadServiceWorker()
+  }, [])
 
   return (
     <HoneypotProvider {...data.honeypotProps}>

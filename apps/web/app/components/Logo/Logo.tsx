@@ -1,4 +1,3 @@
-'use client'
 import React, { CSSProperties, useMemo } from 'react'
 import styles from './Logo.module.css'
 import cx from 'classnames'

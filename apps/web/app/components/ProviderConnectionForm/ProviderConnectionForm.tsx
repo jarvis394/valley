@@ -11,10 +11,10 @@ import styles from './ProviderConnectionForm.module.css'
 import cx from 'classnames'
 
 type ProviderConnectionFormProps = {
-  type: 'Connect' | 'Login' | 'Signup'
+  type: 'Connect' | 'Login' | 'Sign up'
   providerName: ProviderName
   redirectTo?: string | null
-  buttonProps?: ButtonProps
+  buttonProps?: Omit<ButtonProps, 'asChild'>
 }
 
 export const ProviderConnectionForm: React.FC<ProviderConnectionFormProps> = ({
@@ -28,9 +28,9 @@ export const ProviderConnectionForm: React.FC<ProviderConnectionFormProps> = ({
 
   return (
     <Form method="POST" action={formAction}>
-      {redirectTo ? (
+      {redirectTo && (
         <input type="hidden" name="redirectTo" value={redirectTo} />
-      ) : null}
+      )}
       <Button
         {...buttonProps}
         style={{
@@ -41,9 +41,11 @@ export const ProviderConnectionForm: React.FC<ProviderConnectionFormProps> = ({
           ['--themed-color-focus' as string]: `var(--button-${providerName}-theme-focused-fg)`,
         }}
         fullWidth
-        variant={providerName === 'google' ? 'primary' : 'tertiary'}
+        variant={'primary'}
         disabled={isPending || buttonProps?.disabled}
+        loading={isPending || buttonProps?.loading}
         size="lg"
+        type="submit"
         className={cx(
           styles.providerConnection__button,
           buttonProps?.className

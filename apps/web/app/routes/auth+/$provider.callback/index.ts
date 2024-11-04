@@ -13,6 +13,7 @@ import { prisma } from '../../../server/db.server'
 import {
   normalizeEmail,
   normalizeUsername,
+  ProviderUser,
 } from '../../../server/providers/provider'
 import {
   destroyRedirectToHeader,
@@ -25,11 +26,17 @@ import {
 import { verifySessionStorage } from '../../../server/verification.server'
 import { combineHeaders } from '../../../utils/misc'
 import { handleNewSession } from '../login/login.server'
-import { onboardingEmailSessionKey } from '../onboarding'
+import {
+  onboardingEmailSessionKey,
+  onboardingStepKey,
+} from '../onboarding+/onboarding.server'
 import {
   prefilledProfileKey,
   providerIdKey,
-} from '../onboarding/onboarding_.$provider'
+  providerNameKey,
+} from '../onboarding_.$provider'
+import { redirectToKey } from '../verify'
+import { onboardingSessionStorage } from 'app/server/onboarding.server'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
@@ -38,17 +45,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const redirectTo = getRedirectCookieValue(request)
   const label = PROVIDER_LABELS[providerName]
 
-  const authResult = await authenticator
-    .authenticate(providerName, request, { throwOnError: true })
-    .then(
-      (data) => ({ success: true, data }) as const,
-      (error) => ({ success: false, error }) as const
-    )
-
-  if (!authResult.success) {
-    console.error(authResult.error)
+  let profile: ProviderUser
+  try {
+    profile = await authenticator.authenticate(providerName, request)
+  } catch (e) {
+    console.error('auth/provider/callback:', e)
     throw await redirectWithToast(
-      '/login',
+      '/auth/login',
       {
         title: 'Auth Failed',
         description: `There was an error authenticating with ${label}.`,
@@ -57,8 +60,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       { headers: destroyRedirectTo }
     )
   }
-
-  const { data: profile } = authResult
 
   const existingConnection = await prisma.connection.findUnique({
     select: { userId: true },
@@ -142,8 +143,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
   }
 
-  // this is a new user, so let's get them onboarded
+  // Any other case -- this is a new user, so let's get them onboarded
   const verifySession = await verifySessionStorage.getSession()
+  const onboardingSession = await onboardingSessionStorage.getSession()
   verifySession.set(onboardingEmailSessionKey, profile.email)
   verifySession.set(prefilledProfileKey, {
     ...profile,
@@ -154,15 +156,35 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         : undefined,
   })
   verifySession.set(providerIdKey, profile.id)
+  verifySession.set(providerNameKey, providerName)
+  let currentOnboardingStep = onboardingSession.get(onboardingStepKey)
+
+  if (!currentOnboardingStep) {
+    currentOnboardingStep = 'language-select'
+    onboardingSession.set(onboardingStepKey, currentOnboardingStep)
+  }
+
+  const onboardingRedirectParams = new URLSearchParams()
+  onboardingRedirectParams.set(providerNameKey, providerName)
+  if (redirectTo) {
+    onboardingRedirectParams.set(redirectToKey, redirectTo)
+  }
+
   const onboardingRedirect = [
-    `/onboarding/${providerName}`,
-    redirectTo ? new URLSearchParams({ redirectTo }) : null,
-  ]
-    .filter(Boolean)
-    .join('?')
+    '/auth/onboarding/',
+    currentOnboardingStep,
+    '?',
+    onboardingRedirectParams.toString(),
+  ].join('')
+
   return redirect(onboardingRedirect, {
     headers: combineHeaders(
       { 'set-cookie': await verifySessionStorage.commitSession(verifySession) },
+      {
+        'set-cookie': await onboardingSessionStorage.commitSession(
+          onboardingSession
+        ),
+      },
       destroyRedirectTo
     ),
   })

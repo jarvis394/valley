@@ -18,3 +18,11 @@ svg {
 svg:not(.svg-own-color) path {
   fill: currentColor;
 }
+
+@media (prefers-reduced-motion) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

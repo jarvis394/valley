@@ -6,6 +6,7 @@ import { redisCache, cachified } from '../cache.server'
 import { connectionSessionStorage } from '../connections.server'
 import { type Timings } from '../timing.server'
 import { normalizeEmail, type AuthProvider } from './provider'
+import { getHostAdress } from '../../utils/misc'
 
 export const MOCK_CODE_GITHUB = 'MOCK_CODE_GITHUB_KODY'
 export const MOCK_CODE_GITHUB_HEADER = 'x-mock-code-github'
@@ -25,6 +26,7 @@ const GitHubUserParseResult = z
 const shouldMock =
   process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
   process.env.NODE_ENV === 'test'
+const redirectURI = getHostAdress() + '/auth/github/callback'
 
 export class GitHubProvider implements AuthProvider {
   getAuthStrategy() {
@@ -32,7 +34,7 @@ export class GitHubProvider implements AuthProvider {
       {
         clientId: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        redirectURI: '/auth/github/callback',
+        redirectURI,
       },
       async ({ profile }) => {
         const email = normalizeEmail(profile.emails[0]?.value)
@@ -102,8 +104,9 @@ export class GitHubProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/github/callback?${searchParams}`, {
       headers: {
-        'set-cookie':
-          await connectionSessionStorage.commitSession(connectionSession),
+        'set-cookie': await connectionSessionStorage.commitSession(
+          connectionSession
+        ),
       },
     })
   }

@@ -7,17 +7,15 @@ import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '../../../components/ErrorBoundary'
 import { checkHoneypot } from '../../../server/honeypot.server'
+import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
 import { useIsPending } from '../../../utils/misc'
 import { validateRequest } from './verify.server'
 import OTPInput from '@valley/ui/OTPInput'
 import Button from '@valley/ui/Button'
 import styles from '../auth.module.css'
-import verifyStyles from './verify.module.css'
-import Stack from '@valley/ui/Stack'
-import { ArrowLeft, PencilEdit } from 'geist-ui-icons'
+import { ArrowLeft } from 'geist-ui-icons'
 import { useCountdown } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
-import ButtonBase from '@valley/ui/ButtonBase'
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
@@ -25,74 +23,19 @@ export const handle: SEOHandle = {
 
 export const TOTP_RESEND_TIMEOUT = 30
 
-export const codeQueryParam = 'code'
-export const targetQueryParam = 'target'
-export const typeQueryParam = 'type'
-export const redirectToQueryParam = 'redirectTo'
+export const targetKey = 'target'
+export const verifyCodeKey = 'code'
+export const verifyTypeKey = 'type'
+export const redirectToKey = 'redirectTo'
 const types = ['onboarding', 'reset-password', 'change-email', '2fa'] as const
 const VerificationTypeSchema = z.enum(types)
 export type VerificationType = z.infer<typeof VerificationTypeSchema>
 export const VerifySchema = z.object({
-  [codeQueryParam]: z.string().length(6),
-  [typeQueryParam]: VerificationTypeSchema,
-  [targetQueryParam]: z.string(),
-  [redirectToQueryParam]: z.string().optional(),
+  [verifyCodeKey]: z.string().length(6),
+  [verifyTypeKey]: VerificationTypeSchema,
+  [targetKey]: z.string(),
+  [redirectToKey]: z.string().optional(),
 })
-
-type HeadingProps = {
-  type?: VerificationType | null
-  email?: string | null
-}
-
-const Heading: React.FC<HeadingProps> = ({ type, email }) => {
-  const emailEditHref = type === 'onboarding' ? '/auth/register' : '/auth/login'
-
-  switch (type) {
-    case 'change-email':
-    case 'onboarding':
-    case 'reset-password':
-      return (
-        <Stack gap={2} direction={'column'}>
-          <h1 className={styles.auth__contentHeader}>Check your email</h1>
-          <Stack gap={0.5} direction="column">
-            <p className={styles.auth__contentSubtitle}>
-              We&apos;ve sent you a code to verify
-              <br /> your email address.
-            </p>
-            <Stack
-              className={verifyStyles.verify__email}
-              direction="row"
-              align="center"
-              justify="center"
-              gap={1}
-            >
-              {email}
-              <ButtonBase
-                asChild
-                className={verifyStyles.verify__emailEdit}
-                variant="tertiary"
-              >
-                <Link to={emailEditHref}>
-                  <PencilEdit />
-                </Link>
-              </ButtonBase>
-            </Stack>
-          </Stack>
-        </Stack>
-      )
-
-    case '2fa':
-    default:
-      return (
-        <Stack gap={2} direction={'column'}>
-          <h1 className={styles.auth__contentHeader}>Check your 2FA app</h1>
-          <p className={styles.auth__contentSubtitle}>
-            Enter your 2FA code to verify your identity.
-          </p>
-        </Stack>
-      )
-  }
-}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
@@ -107,12 +50,12 @@ export default function VerifyRoute() {
   const isPending = useIsPending()
   const actionData = useActionData<typeof action>()
   const parseWithZodType = VerificationTypeSchema.safeParse(
-    searchParams.get(typeQueryParam)
+    searchParams.get(verifyTypeKey)
   )
   const [count, { startCountdown, stopCountdown }] = useCountdown({
     countStart: TOTP_RESEND_TIMEOUT,
   })
-  const target = searchParams.get(targetQueryParam)
+  const target = searchParams.get(targetKey)
   const type = parseWithZodType.success ? parseWithZodType.data : null
   const [form, fields] = useForm({
     id: 'code-verify-form',
@@ -122,8 +65,8 @@ export default function VerifyRoute() {
       return parseWithZod(formData, { schema: VerifySchema })
     },
     defaultValue: {
-      code: searchParams.get(codeQueryParam),
-      redirectTo: searchParams.get(redirectToQueryParam),
+      code: searchParams.get(verifyCodeKey),
+      redirectTo: searchParams.get(redirectToKey),
       type,
       target,
     },
@@ -141,24 +84,27 @@ export default function VerifyRoute() {
 
   return (
     <main className={styles.auth__content}>
-      <Heading type={type} email={target} />
-      <Form method="POST" {...getFormProps(form)} className={styles.auth__form}>
+      <AuthFormHeader type={type} email={target} />
+      <Form
+        {...getFormProps(form)}
+        method="POST"
+        viewTransition
+        className={styles.auth__form}
+      >
         <HoneypotInputs />
         <OTPInput
           inputProps={{
-            ...getInputProps(fields[codeQueryParam], { type: 'text' }),
+            ...getInputProps(fields[verifyCodeKey], { type: 'text' }),
             autoComplete: 'one-time-code',
             autoFocus: true,
             autoCorrect: 'false',
           }}
-          errors={fields[codeQueryParam].errors}
+          errors={fields[verifyCodeKey].errors}
         />
-        <input {...getInputProps(fields[typeQueryParam], { type: 'hidden' })} />
+        <input {...getInputProps(fields[verifyTypeKey], { type: 'hidden' })} />
+        <input {...getInputProps(fields[targetKey], { type: 'hidden' })} />
         <input
-          {...getInputProps(fields[targetQueryParam], { type: 'hidden' })}
-        />
-        <input
-          {...getInputProps(fields[redirectToQueryParam], {
+          {...getInputProps(fields[redirectToKey], {
             type: 'hidden',
           })}
         />
@@ -190,9 +136,13 @@ export default function VerifyRoute() {
           size="md"
         >
           {type === 'onboarding' ? (
-            <Link to="/auth/register">Back to Sign Up options</Link>
+            <Link to="/auth/register" viewTransition>
+              Back to Sign Up options
+            </Link>
           ) : (
-            <Link to="/auth/login">Back to Login options</Link>
+            <Link to="/auth/login" viewTransition>
+              Back to Login options
+            </Link>
           )}
         </Button>
       </Form>

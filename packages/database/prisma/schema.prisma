@@ -9,17 +9,42 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(cuid())
-  username    String       @unique
-  email       String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now()) @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  email     String   @unique
+  fullname  String
+
   image       UserImage?
   password    Password?
   roles       Role[]
   sessions    Session[]
   connections Connection[]
   projects    Project[]
+  /// Contains user settings and social links
+  settings    UserSettings?
+}
+
+model UserSettings {
+  /// User-set gallery domain
+  domain            String?
+  /// Unchangable gallery domain
+  serviceDomain     String
+  interfaceLanguage String  @default("en")
+
+  // Socials
+  phone     String?
+  website   String?
+  telegram  String?
+  whatsapp  String?
+  vk        String?
+  instagram String?
+  facebook  String?
+  vimeo     String?
+  youtube   String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @unique
 }
 
 model Password {
@@ -120,12 +145,12 @@ model Project {
   title              String
   url                String
   totalFiles         Int                 @default(0)
-  // Total size is in bytes, string formatted
+  /// Total size is in bytes, string formatted
   totalSize          String              @default("0")
   dateCreated        DateTime            @default(now())
   dateUpdated        DateTime            @default(now()) @updatedAt
   dateShot           DateTime            @default(now())
-  // "0" means stored indefinitely, unix timestamps in string format are supported
+  /// `null` means stored indefinitely
   storedUntil        DateTime?
   language           String              @default("en")
   protected          Boolean             @default(false)
@@ -176,7 +201,7 @@ model File {
   exifMetadata Json
   name         String
   type         String
-  // File size in bytes, string formatted
+  /// File size in bytes, string formatted
   size         String
   dateCreated  DateTime @default(now())
 

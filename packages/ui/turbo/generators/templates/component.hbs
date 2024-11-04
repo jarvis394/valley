@@ -1,17 +1,17 @@
 import React from 'react'
-import styles from './{{ properCase name }}.module.css'
+import styles from './{{properCase name}}.module.css'
 
-type {{ properCase name}}Props = React.PropsWithChildren<{
+export type {{properCase name}}Props = React.PropsWithChildren<{
 
 }>
 
-const {{ properCase name }}: React.FC<{{ properCase name}}Props> = ({ children }) => {
+const {{properCase name}}: React.FC<{{properCase name}}Props> = ({ children }) => {
   return (
-    <div className={ styles.{{ camelCase name }} }>
-      <h1>{{ properCase name }} Component</h1>
+    <div className={ styles.{{camelCase name}} }>
+      <h1>{{properCase name}} Component</h1>
       {children}
     </div>
   )
 }
 
-export default {{ properCase name }}
+export default {{properCase name}}

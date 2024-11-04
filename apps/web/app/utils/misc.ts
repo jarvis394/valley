@@ -1,5 +1,6 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
 import prettyBytes from 'pretty-bytes'
+import { ip as ipAddress } from 'address'
 
 export function getErrorMessage(error: unknown) {
   if (typeof error === 'string') return error
@@ -148,4 +149,13 @@ export async function downloadFile(url: string, retries: number = 0) {
     if (retries > MAX_RETRIES) throw e
     return downloadFile(url, retries + 1)
   }
+}
+
+export const getHostAdress = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:' + process.env.WEB_PORT
+  }
+
+  const ip = ipAddress()
+  return 'http://' + ip + ':' + process.env.WEB_PORT
 }

@@ -16,12 +16,18 @@
     0 0 0 3px var(--input-border-focused-shadow);
 }
 
+.textArea--error:focus-within {
+  box-shadow:
+    0 0 0 1px inset var(--input-border-error),
+    0 0 0 3px var(--input-border-error-shadow);
+}
+
 .textArea--valid {
   box-shadow: 0 0 0 1px inset var(--alpha-transparent-07);
 }
 
 .textArea--error {
-  box-shadow: 0 0 0 1px inset #ee4f4f;
+  box-shadow: 0 0 0 1px inset var(--input-border-error);
 }
 
 .textArea__textarea {

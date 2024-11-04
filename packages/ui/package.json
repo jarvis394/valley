@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./FormHelperText": "./src/FormHelperText/FormHelperText.tsx",
+    "./FormControl": "./src/FormControl/index.ts",
+    "./TextField": "./src/TextField/TextField.tsx",
     "./OTPInput": "./src/OTPInput/OTPInput.tsx",
     "./Hidden": "./src/Hidden/Hidden.tsx",
     "./Stack": "./src/Stack/Stack.tsx",
@@ -64,10 +67,12 @@
   "dependencies": {
     "@mui/base": "^5.0.0-beta.58",
     "@radix-ui/react-slot": "^1.1.0",
-    "react-router-dom": "^6.27.0",
+    "@storybook/react": "^8.4.1",
     "classnames": "^2.5.1",
     "framer-motion": "^11.11.10",
-    "vaul": "^1.1.0",
-    "geist-ui-icons": "^1.1.1"
+    "geist-ui-icons": "^1.1.1",
+    "react-router-dom": "^6.27.0",
+    "react-textarea-autosize": "^8.5.4",
+    "vaul": "^1.1.0"
   }
 }

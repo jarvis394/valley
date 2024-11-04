@@ -2,12 +2,8 @@ import { vitePlugin as remix } from '@remix-run/dev'
 import { remixPWA } from '@remix-pwa/dev'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import dotenv from '@dotenvx/dotenvx'
-import path from 'path'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
-
-dotenv.config({ path: path.join(__dirname, '../../.env') })
 
 export default defineConfig({
   server: {
@@ -19,7 +15,7 @@ export default defineConfig({
     rollupOptions: {
       external: [/node:.*/, 'fsevents'],
     },
-    assetsInlineLimit: (source: string) => {
+    assetsInlineLimit: (source) => {
       if (
         source.endsWith('sprite.svg') ||
         source.endsWith('favicon.svg') ||
@@ -47,11 +43,6 @@ export default defineConfig({
             '**/*.css',
             '**/*.test.{js,jsx,ts,tsx}',
             '**/__*.*',
-            // This is for server-side utilities you want to colocate
-            // next to your routes without making an additional
-            // directory. If you need a route that includes "server" or
-            // "client" in the filename, use the escape brackets like:
-            // my-route.[server].tsx
             '**/*.server.*',
             '**/*.client.*',
           ],
@@ -63,6 +54,9 @@ export default defineConfig({
         v3_throwAbortReason: true,
       },
     }),
-    remixPWA(),
+    remixPWA({
+      // Registering SW manually because Vite plugin adds <script> tag without CSP nonce
+      registerSW: null,
+    }),
   ],
 })

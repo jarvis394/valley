@@ -16,7 +16,9 @@
     "HONEYPOT_SECRET",
     "RESEND_API_KEY",
     "MAGIC_LINK_SECRET",
-    "MOCKS"
+    "MOCKS",
+    "HOST",
+    "SENTRY_DSN"
   ],
   "tasks": {
     "dev": {

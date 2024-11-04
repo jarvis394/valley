@@ -48,9 +48,9 @@
 
   /** Button / Danger */
   --button-danger-fg: #ffffff;
-  --button-danger-bg: #d93036;
+  --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
-  --button-danger-hovered-bg: #ff585e;
+  --button-danger-hovered-bg: var(--red-900);
 
   /** Button / Disabled */
   --button-disabled-fg: rgba(237, 237, 237, 0.5);
@@ -89,6 +89,8 @@
   --input-border: #2b2b2b;
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(255, 255, 255, 0.24);
+  --input-border-error: var(--red-600);
+  --input-border-error-shadow: rgba(229, 72, 77, 0.24);
 
   /** Alpha */
   --alpha-solid-07: #1c1c1c;
@@ -169,7 +171,7 @@
 
   /** Button / Danger */
   --button-danger-fg: #ffffff;
-  --button-danger-bg: #d93036;
+  --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
   --button-danger-hovered-bg: #b52e33;
 
@@ -213,6 +215,8 @@
   --input-border: rgba(23, 23, 23, 0.12);
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(0, 0, 0, 0.16);
+  --input-border-error: var(--red-600);
+  --input-border-error-shadow: rgba(229, 72, 77, 0.16);
 
   /** Alpha */
   --alpha-solid-07: rgba(23, 23, 23, 0.07);

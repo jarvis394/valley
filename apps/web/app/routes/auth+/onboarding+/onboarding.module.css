@@ -1,0 +1,18 @@
+.onboarding__selectButton:global(.Button) {
+  --themed-border: var(--alpha-transparent-07);
+  --x-padding: 20px;
+  --height: 56px;
+  padding: 14px 20px;
+  border-radius: 16px;
+}
+
+.onboarding__selectButton:disabled {
+  background-color: var(--button-disabled-bg);
+  color: var(--button-disabled-fg);
+  --themed-border: var(--button-disabled-border);
+}
+
+.onboarding__selectButton > span {
+  flex-grow: 1;
+  text-align: initial;
+}

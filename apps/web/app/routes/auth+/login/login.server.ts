@@ -51,8 +51,9 @@ export async function handleNewSession(
       combineResponseInits(
         {
           headers: {
-            'set-cookie':
-              await verifySessionStorage.commitSession(verifySession),
+            'set-cookie': await verifySessionStorage.commitSession(
+              verifySession
+            ),
           },
         },
         responseInit
@@ -110,7 +111,7 @@ export async function handleVerification({
     })
 
     if (!session) {
-      throw await redirectWithToast('/login', {
+      throw await redirectWithToast('/auth/login', {
         type: 'error',
         title: 'Invalid session',
         description: 'Could not find session to verify. Please try again.',

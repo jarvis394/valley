@@ -36,19 +36,6 @@ export const lruCache = {
   delete: (key) => lru.delete(key),
 } satisfies Cache
 
-// const cacheEntrySchema = z.object({
-//   metadata: z.object({
-//     createdTime: z.number(),
-//     ttl: z.number().nullable().optional(),
-//     swr: z.number().nullable().optional(),
-//   }),
-//   value: z.unknown(),
-// })
-// const cacheQueryResultSchema = z.object({
-//   metadata: z.string(),
-//   value: z.string(),
-// })
-
 export async function cachified<Value>(
   {
     timings,

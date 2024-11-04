@@ -1,0 +1,17 @@
+.formHelperText {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-hint);
+  margin: 0;
+}
+
+.formHelperText--error {
+  color: var(--red-700);
+}
+
+.formHelperText--valid {
+  color: var(--green-700);
+}

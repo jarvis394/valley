@@ -2,7 +2,7 @@ import { createCookieSessionStorage } from '@remix-run/node'
 
 export const verifySessionStorage = createCookieSessionStorage({
   cookie: {
-    name: 'en_verification',
+    name: 'valley_verification',
     sameSite: 'lax',
     path: '/',
     httpOnly: true,

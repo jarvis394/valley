@@ -8,6 +8,10 @@
   padding: var(--stack-padding, 0);
 }
 
+.stack--fullWidth {
+  width: 100%;
+}
+
 @media screen and (width < 600px) {
   .stack {
     --stack-direction: var(--sm-stack-direction);

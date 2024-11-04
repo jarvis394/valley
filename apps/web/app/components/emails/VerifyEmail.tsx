@@ -24,9 +24,7 @@ const VerifyEmail: React.FC<VerifyEmailProps> = ({
           </E.Text>
         </p>
         <p>
-          <E.Text>
-            Your authentication email is {email}
-          </E.Text>
+          <E.Text>Your authentication email is {email}</E.Text>
         </p>
         {magicLink && (
           <>

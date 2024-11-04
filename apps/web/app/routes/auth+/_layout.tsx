@@ -1,13 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
-import authCover1 from '../../assets/cover-1.jpg'
-import authCover2 from '../../assets/cover-2.jpg'
-import authCover3 from '../../assets/cover-3.jpg'
-import authCover4 from '../../assets/cover-4.jpg'
-import authCover5 from '../../assets/cover-5.jpg'
-import authCover6 from '../../assets/cover-6.jpg'
-import authCover7 from '../../assets/cover-7.jpg'
-import authCover8 from '../../assets/cover-8.jpg'
 import { Link, Outlet, redirect, useLocation } from '@remix-run/react'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
@@ -19,21 +11,21 @@ import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 
 const covers = [
-  authCover1,
-  authCover2,
-  authCover3,
-  authCover4,
-  authCover5,
-  authCover6,
-  authCover7,
-  authCover8,
+  '/assets/cover-1.jpg',
+  '/assets/cover-2.jpg',
+  '/assets/cover-3.jpg',
+  '/assets/cover-4.jpg',
+  '/assets/cover-5.jpg',
+  '/assets/cover-6.jpg',
+  '/assets/cover-7.jpg',
+  '/assets/cover-8.jpg',
 ]
 const COVER_SWITCH_INTERVAL = 10000
 
 // Redirect from layout to an actual page (/auth/login)
 export const loader = ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url)
-  if (url.pathname === '/auth' || url.pathname === '/auth/') {
+  if (url.pathname === '/auth') {
     return redirect('/auth/login')
   }
   return null
@@ -57,7 +49,7 @@ const AuthGroupLayout = () => {
 
     return (
       <Button asChild variant="tertiary" size="lg">
-        <Link to={data.href} className={styles.auth__linkButton}>
+        <Link to={data.href} viewTransition className={styles.auth__linkButton}>
           {data.label}
         </Link>
       </Button>

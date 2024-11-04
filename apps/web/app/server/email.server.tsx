@@ -1,7 +1,6 @@
 import { render } from '@react-email/components'
 import { type ReactElement } from 'react'
 import { z } from 'zod'
-import axios from 'axios'
 import VerifyEmail from '../components/emails/VerifyEmail'
 
 const resendErrorSchema = z.union([
@@ -52,14 +51,16 @@ export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
     } as const
   }
 
-  const response = await axios.post('https://api.resend.com/emails', {
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
     body: JSON.stringify(email),
     headers: {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
   })
-  const parsedData = resendSuccessSchema.safeParse(response.data)
+  const data = await response.json()
+  const parsedData = resendSuccessSchema.safeParse(data)
 
   if (parsedData.success) {
     return {
@@ -67,7 +68,8 @@ export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
       data: parsedData,
     } as const
   } else {
-    const parseResult = resendErrorSchema.safeParse(response.data)
+    const parseResult = resendErrorSchema.safeParse(data)
+
     if (parseResult.success) {
       return {
         status: 'error',
@@ -80,7 +82,7 @@ export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
           name: 'UnknownError',
           message: 'Unknown Error',
           statusCode: 500,
-          cause: response.data,
+          cause: data,
         } satisfies ResendError,
       } as const
     }
@@ -99,7 +101,20 @@ export const sendAuthEmail = async ({
   magicLink,
 }: SendAuthEmailOptions) => {
   const subject = 'Your verification code for Valley'
-  await sendEmail({
+  return await sendEmail({
+    react: <VerifyEmail code={code} email={email} magicLink={magicLink} />,
+    subject,
+    to: email,
+  })
+}
+
+export const sendRegisterEmail = async ({
+  code,
+  email,
+  magicLink,
+}: SendAuthEmailOptions) => {
+  const subject = 'Welcome to Valley'
+  return await sendEmail({
     react: <VerifyEmail code={code} email={email} magicLink={magicLink} />,
     subject,
     to: email,

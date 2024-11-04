@@ -39,7 +39,7 @@ const handleRequest: HandleDocumentRequestFunction = (
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>
-        <RemixServer context={remixContext} url={request.url} />
+        <RemixServer nonce={nonce} context={remixContext} url={request.url} />
       </NonceProvider>,
       {
         [callbackName]: () => {

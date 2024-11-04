@@ -12,7 +12,6 @@ import {
   type ProviderUser,
 } from './providers/provider'
 import { authSessionStorage } from './session.server'
-import { TOTP_PROVIDER_NAME } from 'app/config/connections'
 
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30 // 30 days
 export const getSessionExpirationDate = () =>
@@ -68,7 +67,7 @@ export async function requireUserId(
 
     const loginParams = new URLSearchParams({ redirectTo })
     const loginSearchParams = redirectTo ? loginParams.toString() : ''
-    const loginRedirect = ['/login', loginSearchParams].join('?')
+    const loginRedirect = ['/auth/login', loginSearchParams].join('?')
     throw redirect(loginRedirect)
   }
 
@@ -84,40 +83,43 @@ export async function requireAnonymous(request: Request) {
   }
 }
 
-/**
- * Sends magic link and OTP code to user's email
- * if no password is connected to the account,
- * otherwise, redirects to `/auth/login/email` form
- */
-export async function doEmailAuthorization({
-  email,
-  request,
-}: {
-  email: User['email']
-  request: Request
-}) {
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: { password: true },
-  })
+// /**
+//  * Sends magic link and OTP code to user's email
+//  * if no password is connected to the account,
+//  * otherwise, redirects to `/auth/login/email` form
+//  */
+// export async function doEmailAuthorization({
+//   email,
+//   request,
+// }: {
+//   email: User['email']
+//   request: Request
+// }) {
+//   const user = await prisma.user.findUnique({
+//     where: { email },
+//     include: { password: true },
+//   })
 
-  if (!user) {
-    return null
-  } else if (user.password) {
-    return null
-  }
-  
-  const authentictedUser = await authenticator.authenticate(TOTP_PROVIDER_NAME, request)
-  const session = await prisma.session.create({
-    select: { id: true, expirationDate: true, userId: true },
-    data: {
-      expirationDate: getSessionExpirationDate(),
-      userId: authentictedUser.id,
-    },
-  })
+//   if (!user) {
+//     return null
+//   } else if (user.password) {
+//     return null
+//   }
 
-  return session
-}
+//   const authentictedUser = await authenticator.authenticate(
+//     TOTP_PROVIDER_NAME,
+//     request
+//   )
+//   const session = await prisma.session.create({
+//     select: { id: true, expirationDate: true, userId: true },
+//     data: {
+//       expirationDate: getSessionExpirationDate(),
+//       userId: authentictedUser.id,
+//     },
+//   })
+
+//   return session
+// }
 
 export async function login({
   email,
@@ -141,15 +143,15 @@ export async function login({
 }
 
 export async function resetUserPassword({
-  username,
+  email,
   password,
 }: {
-  username: User['username']
+  email: User['email']
   password: string
 }) {
   const hashedPassword = await getPasswordHash(password)
   return prisma.user.update({
-    where: { username },
+    where: { email },
     data: {
       password: {
         update: {
@@ -162,11 +164,11 @@ export async function resetUserPassword({
 
 export async function register({
   email,
-  username,
+  fullname,
   password,
 }: {
   email: User['email']
-  username: User['username']
+  fullname: User['fullname']
   password: string
 }) {
   const hashedPassword = await getPasswordHash(password)
@@ -177,7 +179,7 @@ export async function register({
       user: {
         create: {
           email: normalizeEmail(email),
-          username: normalizeUsername(username),
+          fullname: normalizeUsername(fullname),
           roles: { connect: { name: 'user' } },
           password: {
             create: {
@@ -193,15 +195,15 @@ export async function register({
   return session
 }
 
-export async function signupWithConnection({
+export async function registerWithConnection({
   email,
-  username,
+  fullname,
   providerId,
   providerName,
-  // imageUrl,
-}: {
+}: // imageUrl,
+{
   email: User['email']
-  username: User['username']
+  fullname: User['fullname']
   providerId: Connection['providerId']
   providerName: Connection['providerName']
   imageUrl?: string
@@ -212,7 +214,7 @@ export async function signupWithConnection({
       user: {
         create: {
           email: normalizeEmail(email),
-          username: normalizeUsername(username),
+          fullname: normalizeUsername(fullname),
           roles: { connect: { name: 'user' } },
           connections: { create: { providerId, providerName } },
           // TODO: add imageUrl upload

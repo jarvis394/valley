@@ -11,6 +11,8 @@ const schema = z.object({
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
   INTERNAL_COMMAND_TOKEN: z.string(),
+  WEB_PORT: z.string(),
+  HOST: z.string().optional(),
 })
 
 export function init() {

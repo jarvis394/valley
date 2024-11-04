@@ -22,7 +22,7 @@
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "lint-staged": "^15.2.9",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.3",
     "turbo": "^2.2.3",
     "@caxy/dotenv-updater": "^1.0.9"
   },
