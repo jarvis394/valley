@@ -29,7 +29,7 @@ model UserSettings {
   /// User-set gallery domain
   domain            String?
   /// Unchangable gallery domain
-  serviceDomain     String
+  serviceDomain     String  @default(cuid())
   interfaceLanguage String  @default("en")
 
   // Socials

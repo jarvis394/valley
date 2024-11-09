@@ -4,23 +4,47 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
-import { useIsPending } from '../../../utils/misc'
+import { Form, redirect, useLoaderData } from '@remix-run/react'
+import { looseOptional, useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import z from 'zod'
-import { EmailSchema, PasswordSchema } from '../../../utils/user-validation'
+import * as z from 'zod'
+import {
+  EmailSchema,
+  PASSWORD_MIN_LENGTH,
+  PasswordSchema,
+} from '../../../utils/user-validation'
 import Button from '@valley/ui/Button'
 import { ArrowRight } from 'geist-ui-icons'
+import { useRemixForm, getValidatedFormData } from 'remix-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import React from 'react'
+import FormCollapsibleField from '../../../components/FormCollapsibleField/FormCollapsibleField'
+import FormHelperText from '@valley/ui/FormHelperText'
+import PasswordField from '../../../components/PasswordField/PasswordField'
+import { onboardingSessionStorage } from '../../../server/onboarding.server'
 
-const SecurityFormSchema = z.object({
-  email: EmailSchema,
-  password: PasswordSchema,
-})
+const SecurityFormSchema = z
+  .object({
+    email: EmailSchema,
+    usePassword: z.boolean(),
+    password: looseOptional(PasswordSchema),
+  })
+  .superRefine((values, context) => {
+    if (values.usePassword && !values.password) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Password cannot be empty',
+        path: ['password'],
+      })
+    }
+  })
+
+type FormData = z.infer<typeof SecurityFormSchema>
+
+const resolver = zodResolver(SecurityFormSchema)
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await requireOnboardingData(request)
@@ -29,18 +53,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   await requireOnboardingData(request)
-  // const url = new URL(request.url)
-  // const formData = await request.formData()
+  const {
+    errors,
+    data,
+    receivedValues: defaultValues,
+  } = await getValidatedFormData<FormData>(request, resolver)
+  if (errors) {
+    return json({ errors, defaultValues })
+  }
 
-  // const onboardingSession = await onboardingSessionStorage.getSession(
-  //   request.headers.get('cookie')
-  // )
+  const url = new URL(request.url)
+  const onboardingSession = await onboardingSessionStorage.getSession(
+    request.headers.get('cookie')
+  )
 
-  // onboardingSession.set(onboardingStepKey, 'details')
-  // url.pathname = '/auth/onboarding/details'
+  onboardingSession.set('onboardingStep', 'details')
+  onboardingSession.set('usePassword', data.usePassword)
+  if (data.usePassword) {
+    onboardingSession.set('password', data.password)
+  }
 
-  // return redirect(url.toString())
-  return json({})
+  url.pathname = '/auth/onboarding/details'
+
+  return redirect(url.toString(), {
+    headers: {
+      'set-cookie': await onboardingSessionStorage.commitSession(
+        onboardingSession
+      ),
+    },
+  })
 }
 
 export const meta: MetaFunction = () => {
@@ -50,53 +91,78 @@ export const meta: MetaFunction = () => {
 export default function OnboardingSecurityRoute() {
   const data = useLoaderData<typeof loader>()
   const isPending = useIsPending()
-  const [form, fields] = useForm({
-    id: 'onboarding-provider-form',
-    constraint: getZodConstraint(SecurityFormSchema),
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SecurityFormSchema })
-    },
-    lastResult: data.submission,
-    shouldValidate: 'onBlur',
-    shouldRevalidate: 'onInput',
-  })
+  const { handleSubmit, watch, getFieldState, register, formState } =
+    useRemixForm<FormData>({
+      mode: 'all',
+      reValidateMode: 'onChange',
+      resolver,
+      defaultValues: data.submission.data,
+      submitConfig: {
+        viewTransition: true,
+      },
+    })
+  const usePassword = watch('usePassword')
 
   return (
     <main className={styles.auth__content}>
       <h1 className={styles.auth__contentHeader}>Create your Valley account</h1>
       <Stack asChild gap={4} direction={'column'} fullWidth>
-        <Form {...getFormProps(form)} method="post" viewTransition>
+        <Form
+          id="onboarding-security-form"
+          onSubmit={handleSubmit}
+          method="POST"
+          viewTransition
+        >
           <TextField
-            {...getInputProps(fields.email, {
-              type: 'email',
-            })}
+            type="email"
             label="This is your primary email address"
             size="lg"
             id="onboarding-email-input"
             readOnly
             disabled
+            {...register('email')}
           />
-          <TextField
-            {...getInputProps(fields.password, {
-              type: 'password',
-            })}
-            required
-            fieldState={fields.password}
-            helperText="Your password must contain 8 or more characters"
-            size="lg"
-            id="onboarding-password-input"
-          />
-          <Button
-            disabled={isPending}
-            loading={isPending}
-            fullWidth
-            size="lg"
-            after={<ArrowRight />}
-          >
-            Continue
-          </Button>
+          <Stack gap={0} direction={'column'}>
+            <FormCollapsibleField
+              label="Use password"
+              id="onboarding-security-use-password"
+              defaultState={usePassword ? 'expanded' : 'collapsed'}
+              {...register('usePassword')}
+            >
+              <PasswordField
+                size="lg"
+                placeholder="Password"
+                fieldState={getFieldState('password', formState)}
+                helperText={`Your password must contain ${PASSWORD_MIN_LENGTH} or more characters`}
+                validHelperText="Your password meets all requirements"
+                {...register('password')}
+              />
+            </FormCollapsibleField>
+            <FormHelperText animationKey={usePassword ? 'true' : 'false'}>
+              {usePassword ? (
+                <>
+                  <span style={{ color: 'var(--blue-600)' }}>Tip:</span> you can
+                  go password-less and only use magic links for login — just
+                  uncheck the checkbox
+                </>
+              ) : (
+                'You will be able to log in to Valley with magic links'
+              )}
+            </FormHelperText>
+          </Stack>
         </Form>
       </Stack>
+      <Button
+        form="onboarding-security-form"
+        disabled={isPending}
+        loading={isPending}
+        fullWidth
+        size="lg"
+        after={<ArrowRight />}
+        style={{ viewTransitionName: 'onboarding-form-submit' }}
+      >
+        Continue
+      </Button>
     </main>
   )
 }

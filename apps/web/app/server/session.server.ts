@@ -1,6 +1,11 @@
 import { createCookieSessionStorage } from '@remix-run/node'
 
-export const authSessionStorage = createCookieSessionStorage({
+export const authSessionStorage = createCookieSessionStorage<{
+  /** Unix timextamp of when user submitted verification request */
+  verifiedTime: number
+  sessionId: string
+  expires: Date
+}>({
   cookie: {
     name: 'valley_session',
     sameSite: 'strict',
@@ -26,9 +31,8 @@ Object.defineProperty(authSessionStorage, 'commitSession', {
     if (options?.maxAge) {
       session.set('expires', new Date(Date.now() + options.maxAge * 1000))
     }
-    const expires = session.has('expires')
-      ? new Date(session.get('expires'))
-      : undefined
+    const sessionExpires = session.get('expires')
+    const expires = sessionExpires ? new Date(sessionExpires) : undefined
     const setCookieHeader = await originalCommitSession(session, {
       ...options,
       expires,

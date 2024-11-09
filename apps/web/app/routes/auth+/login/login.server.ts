@@ -1,7 +1,7 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { getUserId, sessionKey } from '../../../server/auth.server'
+import { getUserId } from '../../../server/auth.server'
 import { prisma } from '../../../server/db.server'
 import { combineResponseInits } from '../../../utils/misc'
 import { authSessionStorage } from '../../../server/session.server'
@@ -11,11 +11,7 @@ import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
 } from '../verify/verify.server'
-import { twoFAVerificationType } from '../../account+/settings.authentication'
-
-const verifiedTimeKey = 'verified-time'
-const unverifiedSessionIdKey = 'unverified-session-id'
-const rememberKey = 'remember'
+import { twoFAVerificationType } from '../../_user+/account+/settings.authentication'
 
 export async function handleNewSession(
   {
@@ -39,7 +35,7 @@ export async function handleNewSession(
 
   if (userHasTwoFactor) {
     const verifySession = await verifySessionStorage.getSession()
-    verifySession.set(unverifiedSessionIdKey, session.id)
+    verifySession.set('unverifiedSessionId', session.id)
     const redirectUrl = getRedirectToUrl({
       request,
       type: twoFAVerificationType,
@@ -63,7 +59,7 @@ export async function handleNewSession(
     const authSession = await authSessionStorage.getSession(
       request.headers.get('cookie')
     )
-    authSession.set(sessionKey, session.id)
+    authSession.set('sessionId', session.id)
 
     return redirect(
       safeRedirect(redirectTo),
@@ -96,13 +92,12 @@ export async function handleVerification({
     request.headers.get('cookie')
   )
 
-  const remember = verifySession.get(rememberKey)
   const { redirectTo } = submission.value
   const headers = new Headers()
 
-  authSession.set(verifiedTimeKey, Date.now())
+  authSession.set('verifiedTime', Date.now())
 
-  const unverifiedSessionId = verifySession.get(unverifiedSessionIdKey)
+  const unverifiedSessionId = verifySession.get('unverifiedSessionId')
 
   if (unverifiedSessionId) {
     const session = await prisma.session.findUnique({
@@ -118,20 +113,13 @@ export async function handleVerification({
       })
     }
 
-    authSession.set(sessionKey, unverifiedSessionId)
-    headers.append(
-      'set-cookie',
-      await authSessionStorage.commitSession(authSession, {
-        expires: remember ? session.expirationDate : undefined,
-      })
-    )
-  } else {
-    headers.append(
-      'set-cookie',
-      await authSessionStorage.commitSession(authSession)
-    )
+    authSession.set('sessionId', unverifiedSessionId)
   }
 
+  headers.append(
+    'set-cookie',
+    await authSessionStorage.commitSession(authSession)
+  )
   headers.append(
     'set-cookie',
     await verifySessionStorage.destroySession(verifySession)
@@ -148,19 +136,22 @@ export async function shouldRequestTwoFA(request: Request) {
     request.headers.get('cookie')
   )
 
-  if (verifySession.has(unverifiedSessionIdKey)) return true
+  // Session is not verified, should proceed to 2FA
+  if (verifySession.has('unverifiedSessionId')) return true
 
   const userId = await getUserId(request)
   if (!userId) return false
 
-  // if it's over two hours since they last verified, we should request 2FA again
+  // If it's over two hours since they last verified, we should request 2FA again
   const userHasTwoFA = await prisma.verification.findUnique({
     select: { id: true },
     where: { target_type: { target: userId, type: twoFAVerificationType } },
   })
   if (!userHasTwoFA) return false
 
-  const verifiedTime = authSession.get(verifiedTimeKey) ?? new Date(0)
+  const verifiedTime = authSession.get('verifiedTime')
+  // User has not done any verification, proceed to 2FA
+  if (!verifiedTime) return true
   const twoHours = 1000 * 60 * 2
 
   return Date.now() - verifiedTime > twoHours

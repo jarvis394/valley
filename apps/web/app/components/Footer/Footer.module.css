@@ -1,0 +1,23 @@
+.Footer {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background-color: var(--background-paper);
+  --page-margin: 0;
+}
+
+.Footer__logo {
+  color: var(--text-primary);
+  opacity: 0.63;
+  transition: opacity 240ms ease;
+}
+
+.Footer__logo:hover {
+  color: var(--text-primary);
+  opacity: 0.75;
+}
+
+.Footer__logo > svg {
+  height: 24px;
+  width: auto;
+}

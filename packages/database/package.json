@@ -9,19 +9,23 @@
     "db:migrate": "yarn db-env prisma migrate dev",
     "db:migrate:reset": "yarn db-env prisma migrate reset",
     "db:studio": "yarn db-env prisma studio",
+    "db:seed": "yarn db-env ts-node prisma/seed.ts",
     "db-env": "dotenvx run -f ../../.env --",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.14.2",
-    "@prisma/client": "^5.21.1"
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
     "eslint": "^8.56.11",
-    "prisma": "^5.21.1"
+    "prisma": "^5.22.0"
   }
 }

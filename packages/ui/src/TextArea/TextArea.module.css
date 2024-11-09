@@ -23,7 +23,7 @@
 }
 
 .textArea--valid {
-  box-shadow: 0 0 0 1px inset var(--alpha-transparent-07);
+  box-shadow: 0 0 0 1px inset var(--input-border);
 }
 
 .textArea--error {
@@ -40,7 +40,8 @@
   display: flex;
   flex: 1 0;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
+  width: 100%;
   font-family: var(--font-geist-sans);
   resize: none;
 }

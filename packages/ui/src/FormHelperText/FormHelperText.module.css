@@ -6,12 +6,27 @@
   line-height: 16px;
   color: var(--text-hint);
   margin: 0;
+  padding-top: 8px;
+}
+
+.formHelperText > svg {
+  flex-shrink: 0;
 }
 
 .formHelperText--error {
   color: var(--red-700);
 }
 
+.formHelperText--error > span::selection {
+  color: var(--text-primary);
+  background: var(--red-800);
+}
+
 .formHelperText--valid {
   color: var(--green-700);
+}
+
+.formHelperText--valid > span::selection {
+  color: var(--text-primary);
+  background: var(--green-800);
 }

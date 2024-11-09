@@ -5,6 +5,8 @@ import { ProviderNameSchema } from '../../../config/connections'
 import { getReferrerRoute } from '../../../utils/misc'
 import { getRedirectCookieHeader } from '../../../server/redirect-cookie.server'
 
+export const providerNameQueryKey = 'provider'
+
 export async function loader() {
   return redirect('/auth/login')
 }

@@ -1,71 +1,98 @@
-import React, { useId, useMemo } from 'react'
+import React, { useId, useMemo, useState } from 'react'
 import styles from './TextField.module.css'
 import Input, { InputProps } from '../Input/Input'
 import InputLabel from '../InputLabel/InputLabel'
 import FormControl from '../FormControl/FormControl'
 import FormHelperText from '../FormHelperText/FormHelperText'
+import { FieldError } from 'react-hook-form'
 
-type TextFieldProps = InputProps & {
+export type TextFieldProps = InputProps & {
   label?: React.ReactElement | string
   helperText?: React.ReactElement | string
   validHelperText?: React.ReactElement | string
-  errorHelperText?: React.ReactElement | string
-  fieldState?: { errors?: string[]; valid: boolean; dirty: boolean }
+  fieldState?: {
+    invalid: boolean
+    isDirty: boolean
+    isTouched: boolean
+    isValidating: boolean
+    error?: FieldError
+  }
 }
 
-const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
-  function TextField(
-    {
-      label,
-      helperText,
-      validHelperText,
-      errorHelperText,
-      state: propsState,
-      fieldState: propsFieldState,
-      id: propsId,
-      ...props
-    },
-    ref
-  ) {
-    const innerId = useId()
-    const fieldState = useMemo(() => {
-      if (!propsFieldState?.dirty) return 'default'
-      if (propsFieldState?.errors) {
-        return 'error'
-      } else if (propsFieldState?.valid) {
-        return 'valid'
-      } else return 'default'
-    }, [propsFieldState])
-    const state = propsState || fieldState
-    const id = useMemo(() => propsId || innerId, [innerId, propsId])
-    const shouldRenderHelperText = useMemo(() => {
-      if (!helperText) return false
-      if (state === 'default') return true
-      if (state === 'error' && !errorHelperText) return true
-      if (state === 'valid' && !validHelperText) return true
-      return true
-    }, [errorHelperText, helperText, state, validHelperText])
+const TextField = React.forwardRef(function TextField(
+  {
+    label,
+    helperText,
+    validHelperText,
+    onFocus: propsOnFocus,
+    onBlur: propsOnBlur,
+    state: propsState,
+    fieldState: propsFieldState,
+    id: propsId,
+    required,
+    ...props
+  }: TextFieldProps,
+  ref: React.ForwardedRef<HTMLInputElement>
+) {
+  const [focused, setFocused] = useState(false)
+  const innerId = useId()
+  const id = useMemo(() => propsId || innerId, [innerId, propsId])
+  const fieldState = useMemo(() => {
+    if (!propsFieldState?.invalid && propsFieldState?.isDirty) return 'valid'
+    if (focused && helperText) return 'default'
+    if (propsFieldState?.invalid && propsFieldState.isTouched) return 'error'
+    return 'default'
+  }, [
+    focused,
+    helperText,
+    propsFieldState?.invalid,
+    propsFieldState?.isDirty,
+    propsFieldState?.isTouched,
+  ])
+  const state = propsState || fieldState
+  const shouldShowPropsHelperText = useMemo(() => {
+    if (!helperText) return false
+    if (state === 'default') return true
+    if (state === 'valid' && !validHelperText) return false
+    return false
+  }, [helperText, state, validHelperText])
+  const shouldShowErrorMessage = state === 'error' && propsFieldState?.error
+  const shouldShowValidMessage = state === 'valid' && validHelperText
 
-    return (
-      <FormControl state={state} className={styles.textField}>
-        {label && (
-          <InputLabel htmlFor={id} id={id + '-label'}>
-            {label}
-          </InputLabel>
-        )}
-        <Input ref={ref} id={id} {...props} />
-        {shouldRenderHelperText && (
-          <FormHelperText>{helperText}</FormHelperText>
-        )}
-        {state === 'error' && errorHelperText && (
-          <FormHelperText>{errorHelperText}</FormHelperText>
-        )}
-        {state === 'valid' && validHelperText && (
-          <FormHelperText>{validHelperText}</FormHelperText>
-        )}
-      </FormControl>
-    )
+  const onFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    setFocused(true)
+    propsOnFocus?.(e)
   }
-)
+
+  const onBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    setFocused(false)
+    propsOnBlur?.(e)
+  }
+
+  return (
+    <FormControl state={state} className={styles.textField}>
+      {label && (
+        <InputLabel required={required} htmlFor={id} id={id + '-label'}>
+          {label}
+        </InputLabel>
+      )}
+      <Input
+        {...props}
+        aria-invalid={propsFieldState?.error ? 'true' : 'false'}
+        ref={ref}
+        id={id}
+        required={required}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />
+
+      <FormHelperText>
+        {shouldShowPropsHelperText && helperText}
+        {shouldShowErrorMessage && propsFieldState?.error?.message}
+        {shouldShowValidMessage && validHelperText}
+      </FormHelperText>
+    </FormControl>
+  )
+})
 
 export default TextField

@@ -15,6 +15,7 @@ export type StackOwnProps = Partial<
     gap: CSSProp<'gap', StackViewportSize>
     padding: CSSProp<'padding', StackViewportSize>
     flex: CSSProp<'flex', StackViewportSize>
+    wrap: boolean
     fullWidth: boolean
     style: React.CSSProperties
     className: string
@@ -32,6 +33,7 @@ const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
     padding = 0,
     flex = 'initial',
     fullWidth,
+    wrap,
     asChild,
     className,
     style,
@@ -54,6 +56,7 @@ const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
       ref={ref}
       className={cx('Stack', styles.stack, className, {
         [styles['stack--fullWidth']]: fullWidth,
+        [styles['stack--wrap']]: wrap,
       })}
       style={{
         ...style,

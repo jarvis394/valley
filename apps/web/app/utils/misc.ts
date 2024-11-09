@@ -1,6 +1,7 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
 import prettyBytes from 'pretty-bytes'
 import { ip as ipAddress } from 'address'
+import * as z from 'zod'
 
 export function getErrorMessage(error: unknown) {
   if (typeof error === 'string') return error
@@ -159,3 +160,13 @@ export const getHostAdress = () => {
   const ip = ipAddress()
   return 'http://' + ip + ':' + process.env.WEB_PORT
 }
+
+/** Optional type that formats `''` to `undefined` for Zod schema */
+export const looseOptional = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess(
+    (value: unknown) =>
+      value === null || (typeof value === 'string' && value === '')
+        ? undefined
+        : value,
+    schema.optional()
+  )

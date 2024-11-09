@@ -10,11 +10,8 @@ import {
   useSearchParams,
 } from '@remix-run/react'
 import { login, requireAnonymous } from '../../../server/auth.server'
-import Input from '@valley/ui/Input'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { checkHoneypot } from '../../../server/honeypot.server'
 import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
@@ -22,12 +19,21 @@ import { handleNewSession } from '../login/login.server'
 import { useIsPending } from '../../../utils/misc'
 import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
 import { redirectToKey, targetKey } from '../verify'
+import PasswordField from '../../../components/PasswordField/PasswordField'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
+import { FieldErrors } from 'react-hook-form'
+import { HoneypotInputs } from 'remix-utils/honeypot/react'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
   password: PasswordSchema,
   redirectTo: z.string().optional(),
 })
+
+type FormData = z.infer<typeof LoginFormSchema>
+
+const resolver = zodResolver(LoginFormSchema)
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
@@ -44,38 +50,32 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
   checkHoneypot(formData)
 
-  const submission = await parseWithZod(formData, {
-    schema: (intent) =>
-      LoginFormSchema.transform(async (data, ctx) => {
-        if (intent !== null) return { ...data, session: null }
-
-        const session = await login(data)
-        if (!session) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Invalid username or password',
-          })
-          return z.NEVER
-        }
-
-        return { ...data, session }
-      }),
-    async: true,
-  })
-
-  if (submission.status !== 'success' || !submission.value.session) {
-    return json(
-      { result: submission.reply({ hideFields: ['password'] }) },
-      { status: submission.status === 'error' ? 400 : 200 }
-    )
+  const {
+    errors,
+    data,
+    receivedValues: defaultValues,
+  } = await getValidatedFormData<FormData>(formData, resolver)
+  if (errors) {
+    return json({ errors, defaultValues })
   }
 
-  const { session, redirectTo } = submission.value
+  const session = await login(data)
+  if (!session) {
+    return json({
+      errors: {
+        password: {
+          type: 'validate',
+          message: 'Invalid email or password',
+        },
+      } satisfies FieldErrors<FormData>,
+      defaultValues: data,
+    })
+  }
 
   return handleNewSession({
     request,
     session,
-    redirectTo,
+    redirectTo: data.redirectTo,
   })
 }
 
@@ -85,36 +85,37 @@ const LoginViaEmailPage: React.FC = () => {
   const isPending = useIsPending()
   const redirectTo = searchParams.get(redirectToKey)
   const target = searchParams.get(targetKey)
-  const [form, fields] = useForm({
-    id: 'login-form',
-    constraint: getZodConstraint(LoginFormSchema),
-    defaultValue: { redirectTo },
-    lastResult: actionData?.result,
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: LoginFormSchema })
-    },
-    shouldRevalidate: 'onBlur',
-  })
+  const { handleSubmit, getFieldState, formState, register } =
+    useRemixForm<FormData>({
+      mode: 'onSubmit',
+      reValidateMode: 'onChange',
+      resolver,
+      defaultValues: actionData?.defaultValues || {
+        email: target || undefined,
+        redirectTo: redirectTo || undefined,
+      },
+      errors: actionData?.errors as FieldErrors<FormData>,
+    })
 
   return (
     <main className={styles.auth__content}>
       <AuthFormHeader type="password" email={target} />
       <Form
-        {...getFormProps(form)}
+        onSubmit={handleSubmit}
         method="POST"
         className={styles.auth__form}
         style={{ viewTransitionName: 'auth-form' }}
       >
-        {target && <input hidden name="email" value={target} type="email" />}
-        <Input
-          {...getInputProps(fields.password, {
-            type: 'password',
-          })}
+        <HoneypotInputs />
+        {redirectTo && <input {...register('redirectTo')} hidden />}
+        {target && <input {...register('email')} type="email" hidden />}
+        <PasswordField
+          {...register('password')}
           // This should be always auto focused, as we are transitioning within the same form
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
           required
-          state={fields.password.errors ? 'error' : 'default'}
+          fieldState={getFieldState('password', formState)}
           size="lg"
           placeholder="Password"
           autoComplete="current-password"

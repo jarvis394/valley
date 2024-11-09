@@ -6,8 +6,9 @@ import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
 import { Slot, Slottable } from '@radix-ui/react-slot'
 import { isElement } from 'react-is'
+import { AsChildProps } from '../types/AsChildProps'
 
-export type ButtonProps = Partial<
+export type ButtonOwnProps = Partial<
   React.PropsWithChildren<{
     size: Exclude<ViewportSize, 'xs' | 'xl'>
     fullWidth: boolean
@@ -18,6 +19,11 @@ export type ButtonProps = Partial<
   }> &
     ButtonBaseProps
 >
+
+export type ButtonProps = AsChildProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+> &
+  ButtonOwnProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {

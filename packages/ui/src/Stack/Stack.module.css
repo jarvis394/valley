@@ -12,6 +12,21 @@
   width: 100%;
 }
 
+.stack--wrap {
+  flex-wrap: wrap;
+}
+
+@media screen and (width < 600px) {
+  .stack {
+    --stack-direction: var(--sm-stack-direction);
+    --stack-align: var(--sm-stack-align);
+    --stack-justify: var(--sm-stack-justify);
+    --stack-padding: var(--sm-stack-padding);
+    --stack-gap: var(--sm-stack-gap);
+    --stack-flex: var(--sm-stack-flex);
+  }
+}
+
 @media screen and (width < 600px) {
   .stack {
     --stack-direction: var(--sm-stack-direction);

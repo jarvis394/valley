@@ -14,15 +14,18 @@ import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
-import { useOptionalTheme } from './routes/resources+/theme-switch'
+import { useOptionalTheme, useTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
-import { getDomainUrl } from './utils/misc'
+import { combineHeaders, getDomainUrl } from './utils/misc'
 import { prisma } from './server/db.server'
 import { makeTimings, time } from './server/timing.server'
 import { getUserId, logout } from './server/auth.server'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { honeypot } from './server/honeypot.server'
+import { useEffect } from 'react'
+import Toaster, { useToast } from './components/Toast/Toast'
+import { getToast } from './server/toast.server'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -31,7 +34,6 @@ import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
-import { useEffect } from 'react'
 
 export const links: LinksFunction = () => [
   {
@@ -86,6 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const honeypotProps = honeypot.getInputProps()
+  const { toast, headers: toastHeaders } = await getToast(request)
 
   return json(
     {
@@ -98,11 +101,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
           theme: getTheme(request),
         },
       },
+      toast,
       honeypotProps,
       ENV: getEnv(),
     },
     {
-      headers: { 'Server-Timing': timings.toString() },
+      headers: combineHeaders(
+        { 'Server-Timing': timings.toString() },
+        toastHeaders
+      ),
     }
   )
 }
@@ -196,7 +203,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const theme = useTheme()
   const data = useLoaderData<typeof loader>()
+  useToast(data.toast)
 
   useEffect(() => {
     // Registering SW manually because Vite remix-pwa plugin
@@ -207,6 +216,7 @@ export default function App() {
   return (
     <HoneypotProvider {...data.honeypotProps}>
       <Outlet />
+      <Toaster closeButton position="bottom-right" theme={theme} />
     </HoneypotProvider>
   )
 }

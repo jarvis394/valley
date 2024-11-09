@@ -1,29 +1,20 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
-import { verifySessionStorage } from '../../../server/verification.server'
 import { type VerifyFunctionArgs } from '../verify/verify.server'
 import { authenticator, requireAnonymous } from '../../../server/auth.server'
 import { z } from 'zod'
-import {
-  prefilledProfileKey,
-  providerIdKey,
-  providerNameKey,
-} from '../onboarding_.$provider'
-import { SubmissionResult } from '@conform-to/react'
 import { connectionSessionStorage } from '../../../server/connections.server'
-import { combineHeaders } from 'app/utils/misc'
-import { onboardingSessionStorage } from 'app/server/onboarding.server'
-
-export const onboardingEmailSessionKey = 'onboardingEmail'
-export const onboardingStepKey = 'onboardingStep'
+import { combineHeaders } from '../../../utils/misc'
+import { onboardingSessionStorage } from '../../../server/onboarding.server'
+import { ProviderUser } from '../../../server/providers/provider'
 
 export async function requireOnboardingEmail(request: Request) {
   await requireAnonymous(request)
 
-  const verifySession = await verifySessionStorage.getSession(
+  const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const email = verifySession.get(onboardingEmailSessionKey)
+  const email = onboardingSession.get('email')
 
   if (typeof email !== 'string' || !email) {
     throw redirect('/auth/register')
@@ -35,11 +26,11 @@ export async function requireOnboardingEmail(request: Request) {
 export async function requireProviderData(request: Request) {
   await requireAnonymous(request)
 
-  const verifySession = await verifySessionStorage.getSession(
+  const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const email = verifySession.get(onboardingEmailSessionKey)
-  const providerId = verifySession.get(providerIdKey)
+  const email = onboardingSession.get('email')
+  const providerId = onboardingSession.get('providerUserId')
   const result = z
     .object({
       email: z.string(),
@@ -55,39 +46,67 @@ export async function requireProviderData(request: Request) {
 }
 
 export async function requireOnboardingData(request: Request) {
-  const verifySession = await verifySessionStorage.getSession(
+  const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const currentOnboardingStep = verifySession.get(onboardingStepKey)
-  const providerName = verifySession.get(providerNameKey)
+  const providerName = onboardingSession.get('provider')
+  const interfaceLanguage = onboardingSession.get('interfaceLanguage')
+  const usePassword = onboardingSession.get('usePassword')
+  const password = onboardingSession.get('password')
+  const firstName = onboardingSession.get('firstName')
+  const lastName = onboardingSession.get('lastName')
+  const phone = onboardingSession.get('phone')
+  let currentOnboardingStep = onboardingSession.get('onboardingStep')
+
+  if (!currentOnboardingStep) {
+    currentOnboardingStep = 'language-select'
+    onboardingSession.set('onboardingStep', currentOnboardingStep)
+  }
 
   if (providerName) {
     const { email } = await requireProviderData(request)
     const connectionSession = await connectionSessionStorage.getSession(
       request.headers.get('cookie')
     )
-    const prefilledProfile = verifySession.get(prefilledProfileKey)
+    const prefilledProfile = onboardingSession.get('prefilledProfile')
     const formError = connectionSession.get(authenticator.sessionErrorKey)
     const hasError = typeof formError === 'string'
 
     return {
-      email,
       currentOnboardingStep,
       submission: {
         status: hasError ? 'error' : undefined,
-        initialValue: prefilledProfile ?? {},
+        prefilledProfile,
+        data: {
+          interfaceLanguage,
+          usePassword,
+          password,
+          firstName,
+          lastName,
+          phone,
+          email,
+        },
         error: { '': hasError ? [formError] : [] },
-      } as SubmissionResult,
+      },
     }
   } else {
     const email = await requireOnboardingEmail(request)
 
     return {
-      email,
       currentOnboardingStep,
       submission: {
-        initialValue: { email },
-      } as SubmissionResult,
+        status: undefined,
+        prefilledProfile: {} as ProviderUser,
+        data: {
+          email,
+          interfaceLanguage,
+          usePassword,
+          password,
+          firstName,
+          lastName,
+          phone,
+        },
+      },
     }
   }
 }
@@ -98,26 +117,20 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
     'Submission should be successful by now'
   )
 
-  const verifySession = await verifySessionStorage.getSession()
   const onboardingSession = await onboardingSessionStorage.getSession()
-  let currentOnboardingStep = verifySession.get(onboardingStepKey)
-  verifySession.set(onboardingEmailSessionKey, submission.value.target)
+  let currentOnboardingStep = onboardingSession.get('onboardingStep')
+  onboardingSession.set('email', submission.value.target)
 
   if (!currentOnboardingStep) {
     currentOnboardingStep = 'language-select'
-    onboardingSession.set(onboardingStepKey, currentOnboardingStep)
+    onboardingSession.set('onboardingStep', currentOnboardingStep)
   }
 
   return redirect('/auth/onboarding/' + currentOnboardingStep, {
-    headers: combineHeaders(
-      {
-        'set-cookie': await verifySessionStorage.commitSession(verifySession),
-      },
-      {
-        'set-cookie': await onboardingSessionStorage.commitSession(
-          onboardingSession
-        ),
-      }
-    ),
+    headers: combineHeaders({
+      'set-cookie': await onboardingSessionStorage.commitSession(
+        onboardingSession
+      ),
+    }),
   })
 }

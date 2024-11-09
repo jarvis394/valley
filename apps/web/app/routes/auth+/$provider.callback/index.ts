@@ -26,17 +26,9 @@ import {
 import { verifySessionStorage } from '../../../server/verification.server'
 import { combineHeaders } from '../../../utils/misc'
 import { handleNewSession } from '../login/login.server'
-import {
-  onboardingEmailSessionKey,
-  onboardingStepKey,
-} from '../onboarding+/onboarding.server'
-import {
-  prefilledProfileKey,
-  providerIdKey,
-  providerNameKey,
-} from '../onboarding_.$provider'
 import { redirectToKey } from '../verify'
 import { onboardingSessionStorage } from 'app/server/onboarding.server'
+import { providerNameQueryKey } from '../$provider'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
 
@@ -146,8 +138,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   // Any other case -- this is a new user, so let's get them onboarded
   const verifySession = await verifySessionStorage.getSession()
   const onboardingSession = await onboardingSessionStorage.getSession()
-  verifySession.set(onboardingEmailSessionKey, profile.email)
-  verifySession.set(prefilledProfileKey, {
+  onboardingSession.set('email', profile.email)
+  onboardingSession.set('prefilledProfile', {
     ...profile,
     email: normalizeEmail(profile.email),
     username:
@@ -155,17 +147,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         ? normalizeUsername(profile.username)
         : undefined,
   })
-  verifySession.set(providerIdKey, profile.id)
-  verifySession.set(providerNameKey, providerName)
-  let currentOnboardingStep = onboardingSession.get(onboardingStepKey)
+  onboardingSession.set('providerUserId', profile.id)
+  onboardingSession.set('provider', providerName)
+  let currentOnboardingStep = onboardingSession.get('onboardingStep')
 
   if (!currentOnboardingStep) {
     currentOnboardingStep = 'language-select'
-    onboardingSession.set(onboardingStepKey, currentOnboardingStep)
+    onboardingSession.set('onboardingStep', currentOnboardingStep)
   }
 
   const onboardingRedirectParams = new URLSearchParams()
-  onboardingRedirectParams.set(providerNameKey, providerName)
+  onboardingRedirectParams.set(providerNameQueryKey, providerName)
   if (redirectTo) {
     onboardingRedirectParams.set(redirectToKey, redirectTo)
   }

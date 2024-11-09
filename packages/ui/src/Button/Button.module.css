@@ -48,7 +48,7 @@
 }
 
 .button.button--size-lg {
-  border-radius: 12px;
+  border-radius: 16px;
   gap: 12px;
   font-weight: 500;
   --x-padding: 20px;

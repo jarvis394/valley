@@ -6,7 +6,7 @@ import {
 } from '@remix-run/node'
 import { Form, redirect, useNavigation } from '@remix-run/react'
 import { useIsPending } from '../../../utils/misc'
-import { requireOnboardingData, onboardingStepKey } from './onboarding.server'
+import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
 import onboardingStyles from './onboarding.module.css'
 import Button from '@valley/ui/Button'
@@ -48,11 +48,17 @@ export async function action({ request }: ActionFunctionArgs) {
     })
   }
 
-  onboardingSession.set(onboardingStepKey, 'security')
+  onboardingSession.set('onboardingStep', 'security')
   onboardingSession.set(interfaceLanguageKey, parsedLanguageResult.data)
   url.pathname = '/auth/onboarding/security'
 
-  return redirect(url.toString())
+  return redirect(url.toString(), {
+    headers: {
+      'set-cookie': await onboardingSessionStorage.commitSession(
+        onboardingSession
+      ),
+    },
+  })
 }
 
 export const meta: MetaFunction = () => {

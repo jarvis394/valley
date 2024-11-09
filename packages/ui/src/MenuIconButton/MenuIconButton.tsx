@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
 import { useMenuButton } from '@mui/base/useMenuButton'
-import IconButton, { IconProps } from '../IconButton/IconButton'
+import IconButton, { IconButtonProps } from '../IconButton/IconButton'
 
-type MenuIconButtonProps = IconProps & {
+type MenuIconButtonProps = IconButtonProps & {
   focusableWhenDisabled?: boolean
 }
 

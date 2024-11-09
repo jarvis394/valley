@@ -23,7 +23,7 @@ import {
 import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
-} from '../../account+/settings.authentication'
+} from '../../_user+/account+/settings.authentication'
 
 export type VerifyFunctionArgs = {
   request: Request

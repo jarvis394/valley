@@ -1,0 +1,49 @@
+.header {
+  background: var(--background-paper);
+  position: relative;
+  padding: 16px 24px;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  align-items: center;
+}
+
+.header__nav {
+  /** Logo width + gap + visual padding */
+  padding-left: calc(32px + 8px + 4px);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.header a {
+  text-decoration: none;
+}
+
+.header__logo {
+  display: inline-flex;
+  text-decoration: none;
+  left: 24px;
+  top: 16px;
+  z-index: var(--logo-zIndex);
+}
+
+.header__avatarAndNameContainer {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+  transition-duration: 120ms;
+  transition-timing-function: ease;
+  transition-property: scale;
+  user-select: none;
+  cursor: pointer;
+}
+
+.header__avatarAndNameContainer:active {
+  scale: 0.98;
+}

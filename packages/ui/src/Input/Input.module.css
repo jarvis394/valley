@@ -11,17 +11,19 @@
 }
 
 .input:focus-within {
-  box-shadow: 0 0 0 1px inset var(--input-border-focused),
+  box-shadow:
+    0 0 0 1px inset var(--input-border-focused),
     0 0 0 3px var(--input-border-focused-shadow);
 }
 
 .input--error:focus-within {
-  box-shadow: 0 0 0 1px inset var(--input-border-error),
+  box-shadow:
+    0 0 0 1px inset var(--input-border-error),
     0 0 0 3px var(--input-border-error-shadow);
 }
 
 .input--valid {
-  box-shadow: 0 0 0 1px inset var(--alpha-transparent-07);
+  box-shadow: 0 0 0 1px inset var(--input-border);
 }
 
 .input--error {
@@ -38,7 +40,8 @@
   display: flex;
   flex: 1 0;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
+  width: 100%;
   font-family: var(--font-geist-sans);
 }
 
@@ -53,19 +56,19 @@
   box-shadow: inset 0 0 0 0 transparent;
 }
 
-.input--withBefore > .input__input {
-  padding-left: 0;
-}
-
-.input--withAfter > .input__input {
-  padding-right: 0;
-}
-
 .input__before,
 .input__after {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.input__before {
+  padding-left: 8px;
+}
+
+.input__after {
+  padding-right: 8px;
 }
 
 .input--size-md {
