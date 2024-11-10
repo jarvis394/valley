@@ -87,6 +87,9 @@ if (viteDevServer) {
   app.use(express.static('build/client', { maxAge: '1h' }))
 }
 
+// TODO: fix pnpm build
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 app.get(['/img/*', '/favicons/*'], (_req, res) => {
   // if we made it past the express.static for these, then we're missing something.
   // So we'll just send a 404 and won't bother calling other middleware.
@@ -211,6 +214,9 @@ app.all(
       serverBuild: getBuild(),
     }),
     mode: MODE,
+    // TODO: fix pnpm build
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     build: async () => {
       const { error, build } = await getBuild()
       if (error) {

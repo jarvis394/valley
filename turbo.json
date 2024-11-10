@@ -2,6 +2,11 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
   "globalEnv": [
+    "VIPS_CONCURRENCY",
+    "INTERNAL_COMMAND_TOKEN",
+    "TUSD_PORT",
+    "API_PORT",
+    "DATABASE_URL",
     "NODE_ENV",
     "WEB_PORT",
     "GALLERY_PORT",

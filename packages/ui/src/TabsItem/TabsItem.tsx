@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import styles from './TabsItem.module.css'
 import cx from 'classnames'
@@ -35,7 +34,9 @@ const TabsItem = React.forwardRef<HTMLButtonElement, TabsItemProps>(
   ) {
     const Root = asChild ? Slot : 'button'
     const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-      value !== undefined && onClick?.(value, e)
+      if (value !== undefined) {
+        onClick?.(value, e)
+      }
     }
 
     return (

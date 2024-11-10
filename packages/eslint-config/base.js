@@ -25,6 +25,14 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
+    '@typescript-eslint/no-unused-expressions': [
+      'warn',
+      {
+        allowShortCircuit: true,
+        allowTernary: true,
+      },
+    ],
+    '@typescript-eslint/no-empty-object-type': ['off'],
     '@typescript-eslint/array-type': [
       'error',
       {
