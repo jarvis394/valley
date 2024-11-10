@@ -10,18 +10,18 @@
     "storybook": "turbo dev --filter storybook",
     "docker:dev": "docker compose -f docker-compose.dev.yml up",
     "build": "NODE_ENV=production turbo build",
-    "db:seed": "yarn workspace @valley/db db:seed",
-    "db:studio": "yarn workspace @valley/db db:studio",
-    "db:migrate": "yarn workspace @valley/db db:migrate",
-    "db:migrate:reset": "yarn workspace @valley/db db:migrate:reset",
+    "db:seed": "pnpm workspace @valley/db db:seed",
+    "db:studio": "pnpm workspace @valley/db db:studio",
+    "db:migrate": "pnpm workspace @valley/db db:migrate",
+    "db:migrate:reset": "pnpm workspace @valley/db db:migrate:reset",
     "prepare": "husky",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@valley/eslint-config": "*",
-    "@valley/typescript-config": "*",
+    "@valley/eslint-config": "workspace:*",
+    "@valley/typescript-config": "workspace:*",
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "turbo": "^2.2.3",
@@ -30,7 +30,7 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "pnpm@6.32.4",
   "workspaces": [
     "apps/*",
     "packages/*"

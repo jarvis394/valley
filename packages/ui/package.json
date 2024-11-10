@@ -59,14 +59,14 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-is": "^18.3.0",
-    "@valley/eslint-config": "*",
-    "@valley/typescript-config": "*",
+    "@valley/eslint-config": "workspace:*",
+    "@valley/typescript-config": "workspace:*",
     "eslint": "^8.56.11",
     "typescript": "^5.3.3",
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {
-    "@valley/shared": "*",
+    "@valley/shared": "workspace:*",
     "react": "^18.3.1",
     "@formkit/auto-animate": "^0.8.2",
     "@mui/base": "^5.0.0-beta.58",
