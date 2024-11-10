@@ -36,7 +36,7 @@ This `Turborepo` has some additional tools already set for you:
 
 ```bash
 # Will build all the app & packages with the supported `build` script.
-pnpm build
+yarn build
 
 # ℹ️ If you plan to only build apps individually,
 # Please make sure you've built the packages first.
@@ -46,7 +46,7 @@ pnpm build
 
 ```bash
 # Will run the development server for all the app & packages with the supported `dev` script.
-pnpm dev
+yarn dev
 ```
 
 #### Lint
@@ -54,7 +54,7 @@ pnpm dev
 ```bash
 # Will lint all the app & packages with the supported `lint` script.
 # See `@valley/eslint-config` to customize the behavior.
-pnpm lint
+yarn lint
 ```
 
 #### Format
@@ -62,7 +62,7 @@ pnpm lint
 ```bash
 # Will format all the supported `.ts,.js,json,.tsx,.jsx` files.
 # See `@valley/eslint-config/prettier-base.js` to customize the behavior.
-pnpm format
+yarn format
 ```
 
 ## Installation and running issues

@@ -12,7 +12,7 @@
     "@storybook/react": "^8.4.2",
     "@uppy/core": "^4.1.0",
     "@uppy/progress-bar": "^4.0.0",
-    "@valley/ui": "workspace:*",
+    "@valley/ui": "*",
     "storybook": "^8.4.2"
   },
   "devDependencies": {

@@ -44,9 +44,9 @@
     "@swc/core": "^1.7.5",
     "@swc/helpers": "^0.5.12",
     "@types/node": "^20.3.1",
-    "@valley/db": "workspace:*",
-    "@valley/eslint-config": "workspace:*",
-    "@valley/typescript-config": "workspace:*",
+    "@valley/db": "*",
+    "@valley/eslint-config": "*",
+    "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
     "typescript": "^5.3.3"
   }
