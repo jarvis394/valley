@@ -31,7 +31,7 @@ type SendEmailOptions = {
 )
 
 export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
-  const from = 'verify@valley.app'
+  const from = 'onboarding@resend.dev'
 
   const email = {
     from,
