@@ -28,7 +28,7 @@ if (SENTRY_ENABLED) {
 }
 
 if (MOCKS_ENABLED) {
-  await import('./mocks')
+  await import('./mocks/index.js')
 }
 
 const viteDevServer = IS_PROD
