@@ -2,15 +2,14 @@ import Input from '@valley/ui/Input'
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import {
-  Form,
-  json,
-  redirect,
-  useActionData,
-  useSearchParams,
-} from '@remix-run/react'
+import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
+import {
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  redirect,
+  json,
+} from '@remix-run/node'
 import { prisma } from '../../../server/db.server'
 import { checkHoneypot } from '../../../server/honeypot.server'
 import { EmailSchema } from '../../../utils/user-validation'

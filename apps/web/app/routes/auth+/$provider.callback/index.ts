@@ -1,5 +1,4 @@
-import { LoaderFunctionArgs } from '@remix-run/node'
-import { redirect } from '@remix-run/react'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import {
   PROVIDER_LABELS,
   ProviderNameSchema,

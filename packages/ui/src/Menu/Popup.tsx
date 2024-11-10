@@ -2,7 +2,6 @@
 // to fix https://github.com/mui/material-ui/pull/41007
 // TODO: remove, when fixed in @mui/base
 
-'use client'
 import * as React from 'react'
 import {
   autoUpdate,
@@ -71,7 +70,7 @@ function resolveAnchor(
  * - [Popup API](https://mui.com/base-ui/react-popup/components-api/#popup)
  */
 const Popup = React.forwardRef(function Popup<
-  RootComponentType extends React.ElementType,
+  RootComponentType extends React.ElementType
 >(
   props: PopupProps<RootComponentType>,
   forwardedRef: React.ForwardedRef<Element>

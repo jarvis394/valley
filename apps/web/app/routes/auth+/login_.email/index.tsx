@@ -1,14 +1,12 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
 import {
-  Form,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
   json,
-  Link,
-  useActionData,
-  useSearchParams,
-} from '@remix-run/react'
+} from '@remix-run/node'
+import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { login, requireAnonymous } from '../../../server/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'

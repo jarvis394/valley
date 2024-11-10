@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import styles from './Menu.module.css'
 import { type WithOptionalOwnerState } from '@mui/base/utils/types'

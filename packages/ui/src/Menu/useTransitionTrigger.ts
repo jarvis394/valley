@@ -2,7 +2,6 @@
 // to fix https://github.com/mui/material-ui/pull/41007
 // TODO: remove, when fixed in @mui/base
 
-'use client'
 import * as React from 'react'
 import useEnhancedEffect from '@mui/utils/useEnhancedEffect'
 import { TransitionContextValue } from '@mui/base/useTransition/TransitionContext'

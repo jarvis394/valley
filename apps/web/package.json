@@ -9,7 +9,8 @@
     "dev": "cross-env NODE_ENV=development tsx watch --clear-screen=true --ignore \".cache/**\" --ignore \"app/**\" --ignore \"vite.config.ts.timestamp-*\" --ignore \"build/**\" --ignore \"node_modules/**\" --inspect ./server/index.ts",
     "start": "cross-env NODE_ENV=production node ./build/runner/index.js",
     "lint": "eslint . --max-warnings 0 --ignore-path ../../.gitignore --cache --cache-location ./node_modules/.cache/eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dotenv": "dotenvx run -f ../../.env --"
   },
   "dependencies": {
     "@conform-to/react": "^1.2.2",
@@ -38,6 +39,7 @@
     "@valley/db": "*",
     "@valley/shared": "*",
     "@valley/ui": "*",
+    "@vercel/remix": "^2.13.1",
     "address": "^2.0.3",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
@@ -61,6 +63,7 @@
     "isbot": "^4.1.0",
     "libphonenumber-js": "^1.11.13",
     "lru-cache": "^11.0.1",
+    "memfs": "^4.14.0",
     "morgan": "^1.10.0",
     "msw": "^2.6.0",
     "overlayscrollbars": "^2.10.0",
@@ -80,6 +83,7 @@
     "source-map-support": "^0.5.21",
     "usehooks-ts": "^3.1.0",
     "vite-env-only": "^3.0.3",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

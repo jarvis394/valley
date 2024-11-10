@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import { useMenuButton } from '@mui/base/useMenuButton'
 import Button, { ButtonProps } from '../Button/Button'

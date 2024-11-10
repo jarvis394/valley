@@ -11,9 +11,10 @@ export default defineConfig({
     port: Number(process.env.WEB_PORT) || 4200,
   },
   build: {
+    ssr: true,
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
-      external: [/node:.*/, 'fsevents'],
+      // external: [/node:.*/, 'fsevents'],
     },
     assetsInlineLimit: (source) => {
       if (
@@ -53,7 +54,7 @@ export default defineConfig({
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
         v3_lazyRouteDiscovery: true,
-        v3_singleFetch: true,
+        v3_singleFetch: false,
       },
     }),
     remixPWA({

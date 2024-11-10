@@ -1,4 +1,3 @@
-'use client'
 import React, {
   CSSProperties,
   useCallback,
@@ -166,7 +165,9 @@ const Tabs = <T extends TabValue = TabValue>({
   if (rootBoundingRect && hoveredRect) {
     hoverStyles.transform = `translate3d(${
       hoveredRect.left - rootBoundingRect.left
-    }px,${hoveredRect.top - rootBoundingRect.top + HOVER_CONTAINER_PADDING}px,0px)`
+    }px,${
+      hoveredRect.top - rootBoundingRect.top + HOVER_CONTAINER_PADDING
+    }px,0px)`
     hoverStyles.width = hoveredRect.width
     hoverStyles.height = hoveredRect.height - HOVER_CONTAINER_PADDING * 2
     hoverStyles.opacity = hoveredTab !== null ? 1 : 0

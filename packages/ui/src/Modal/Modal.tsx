@@ -1,4 +1,3 @@
-'use client'
 import React, { useEffect, useMemo, useState } from 'react'
 import type { SetURLSearchParams } from 'react-router-dom'
 import { Modal as BaseModal } from '@mui/base/Modal'

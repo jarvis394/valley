@@ -9,7 +9,8 @@
         "name": "typescript-plugin-css-modules"
       }
     ],
-    "module": "ESNext",
+    "target": "ES2022",
+    "module": "ES2022",
     "moduleResolution": "Bundler",
     "skipLibCheck": true,
     "allowJs": false,

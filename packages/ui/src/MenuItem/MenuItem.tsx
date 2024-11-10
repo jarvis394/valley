@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import styles from './MenuItem.module.css'
 import cx from 'classnames'

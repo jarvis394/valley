@@ -1,10 +1,11 @@
 import {
-  ActionFunctionArgs,
-  json,
+  type ActionFunctionArgs,
   type LoaderFunctionArgs,
   type MetaFunction,
+  redirect,
+  json,
 } from '@remix-run/node'
-import { Form, redirect, useLoaderData } from '@remix-run/react'
+import { Form, useLoaderData } from '@remix-run/react'
 import { looseOptional, useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'

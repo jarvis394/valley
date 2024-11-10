@@ -38,7 +38,8 @@
         ".next/**",
         "!.next/cache/**",
         "storybook-static/**",
-        "dist/**"
+        "dist/**",
+        "build/**"
       ]
     },
     "build:storybook": {},

@@ -1,6 +1,5 @@
 import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
-import { json } from '@remix-run/node'
 import { z } from 'zod'
 import { requireUserId } from '../../../server/auth.server'
 import { prisma } from '../../../server/db.server'
@@ -24,6 +23,7 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
 } from '../../_user+/account+/settings.authentication'
+import { json } from '@remix-run/node'
 
 export type VerifyFunctionArgs = {
   request: Request
