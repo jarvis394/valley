@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
-import path from 'node:path'
+import { vercelPreset } from '@vercel/remix/vite'
 
 declare module '@remix-run/server-runtime' {
   interface Future {
@@ -16,13 +16,6 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: true,
     port: Number(process.env.WEB_PORT) || 4200,
-  },
-  resolve: {
-    alias: {
-      ...(mode === 'development' && {
-        postgres: path.resolve(__dirname, 'node_modules/postgres/src/index.js'),
-      }),
-    },
   },
   build: {
     ssr: true,
@@ -76,5 +69,6 @@ export default defineConfig(({ mode }) => ({
       // Registering SW manually because Vite plugin adds <script> tag without CSP nonce
       registerSW: null,
     }),
+    vercelPreset(),
   ],
 }))
