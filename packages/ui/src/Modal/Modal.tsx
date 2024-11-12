@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import type { SetURLSearchParams } from 'react-router-dom'
-import { Modal as BaseModal } from '@mui/base/Modal'
+import { Modal as BaseModal } from '@mui/base'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'
