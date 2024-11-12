@@ -10,7 +10,7 @@ import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
 import { Await, Link, useParams } from '@remix-run/react'
-import { User } from '@prisma/client'
+import { User } from '@valley/db'
 
 const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
   return (

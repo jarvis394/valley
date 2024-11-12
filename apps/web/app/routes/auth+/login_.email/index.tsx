@@ -9,7 +9,6 @@ import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { login, requireAnonymous } from '../../../server/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
-import { checkHoneypot } from '../../../server/honeypot.server'
 import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
 import { handleNewSession } from '../login/login.server'
@@ -45,7 +44,6 @@ export async function action({ request }: ActionFunctionArgs) {
   await requireAnonymous(request)
 
   const formData = await request.formData()
-  checkHoneypot(formData)
 
   const {
     errors,

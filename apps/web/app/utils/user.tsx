@@ -2,7 +2,7 @@ import { useRouteLoaderData } from '@remix-run/react'
 import { type loader as userLayoutLoader } from '../routes/_user+/_layout'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { User } from '@prisma/client'
+import { User } from '@valley/db'
 
 type UserState = {
   data: User | null
@@ -40,7 +40,7 @@ export function parsePermissionString(permissionString: PermissionString) {
   const [action, entity, access] = permissionString.split(':') as [
     Action,
     Entity,
-    Access | undefined
+    Access | undefined,
   ]
   return {
     action,
