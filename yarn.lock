@@ -3088,14 +3088,6 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
-"@prisma/adapter-pg-worker@5.22.0":
-  version "5.22.0"
-  resolved "https://registry.yarnpkg.com/@prisma/adapter-pg-worker/-/adapter-pg-worker-5.22.0.tgz#af65514ab86f2590742665937be03f43b5fd7c7b"
-  integrity sha512-y4gMRkPcmlxLdXJr5Xh3H/AGv4cO2QIbIbQ/IvkBW410Rh+wKCsL7w74ahfE5GSpr/tJF3gH/8gMI2qW2UBPwg==
-  dependencies:
-    "@prisma/driver-adapter-utils" "5.22.0"
-    postgres-array "3.0.2"
-
 "@prisma/adapter-pg@5.22.0":
   version "5.22.0"
   resolved "https://registry.yarnpkg.com/@prisma/adapter-pg/-/adapter-pg-5.22.0.tgz#d21ed12b751908b47d70fa7ae25adcf02e0d98da"
@@ -3160,13 +3152,6 @@
     "@opentelemetry/api" "^1.8"
     "@opentelemetry/instrumentation" "^0.49 || ^0.50 || ^0.51 || ^0.52.0"
     "@opentelemetry/sdk-trace-base" "^1.22"
-
-"@prisma/pg-worker@^5.22.0":
-  version "5.22.0"
-  resolved "https://registry.yarnpkg.com/@prisma/pg-worker/-/pg-worker-5.22.0.tgz#a403e7cd0e9a05444e310548dc232d0d65c8c32b"
-  integrity sha512-6blnMpo/8dW8lXxZ944g19CxYhciqyFsL6eM92N07AV0coGR/NHj4hxbFYnonQsnGmJLxGYeyVn6dlJItp9Pbg==
-  dependencies:
-    "@types/pg" "8.11.6"
 
 "@radix-ui/primitive@1.1.0":
   version "1.1.0"
@@ -5029,15 +5014,6 @@
     pg-protocol "*"
     pg-types "^4.0.1"
 
-"@types/pg@8.11.6":
-  version "8.11.6"
-  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.11.6.tgz#a2d0fb0a14b53951a17df5197401569fb9c0c54b"
-  integrity sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==
-  dependencies:
-    "@types/node" "*"
-    pg-protocol "*"
-    pg-types "^4.0.1"
-
 "@types/pg@8.6.1":
   version "8.6.1"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.1.tgz#099450b8dc977e8197a44f5229cedef95c8747f9"
@@ -5485,7 +5461,7 @@
   resolved "https://registry.yarnpkg.com/@vanilla-extract/private/-/private-1.0.6.tgz#f10bbf3189f7b827d0bd7f804a6219dd03ddbdd4"
   integrity sha512-ytsG/JLweEjw7DBuZ/0JCN4WAQgM9erfSTdS1NQY778hFQSZ6cfCDEZZ0sgVm4k54uNz6ImKB33AYvSR//fjxw==
 
-"@vercel/remix@^2.14.0":
+"@vercel/remix@2.14.0", "@vercel/remix@^2.14.0":
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/@vercel/remix/-/remix-2.14.0.tgz#309d750519e8454559c96b3ec2dc2f7faef1e4d4"
   integrity sha512-pyN/JMpC8DYshWkgzFfKmUydqQJr1NZfDtjIY3DaP6GxnArnylxe+6IlWhCLUYUi47gGwib63rtqZvC/VtwUQA==

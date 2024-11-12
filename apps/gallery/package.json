@@ -19,6 +19,7 @@
     "@valley/db": "*",
     "@valley/shared": "*",
     "@valley/ui": "*",
+    "@vercel/remix": "2.14.0",
     "chalk": "^5.3.0",
     "classnames": "^2.5.1",
     "isbot": "^4.1.0",

@@ -6,7 +6,6 @@ import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '../../../components/ErrorBoundary'
-import { checkHoneypot } from '../../../server/honeypot.server'
 import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
 import { useIsPending } from '../../../utils/misc'
 import { validateRequest } from './verify.server'
@@ -39,7 +38,6 @@ export const VerifySchema = z.object({
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
-  checkHoneypot(formData)
   return validateRequest(request, formData)
 }
 

@@ -11,7 +11,6 @@ import {
   HeadersFunction,
 } from '@remix-run/node'
 import { prisma } from '../../../server/db.server'
-import { checkHoneypot } from '../../../server/honeypot.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
 import { prepareVerification } from '../verify/verify.server'
@@ -38,8 +37,6 @@ export const handle: SEOHandle = {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
-
-  checkHoneypot(formData)
 
   const submission = await parseWithZod(formData, {
     schema: SignupSchema.superRefine(async (data, ctx) => {

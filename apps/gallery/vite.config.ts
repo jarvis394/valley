@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import dotenv from '@dotenvx/dotenvx'
 import path from 'path'
+import { vercelPreset } from '@vercel/remix/vite'
 
 declare module '@remix-run/server-runtime' {
   interface Future {
@@ -30,5 +31,6 @@ export default defineConfig({
       },
     }),
     tsconfigPaths(),
+    vercelPreset(),
   ],
 })
