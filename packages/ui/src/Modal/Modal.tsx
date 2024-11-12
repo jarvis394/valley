@@ -19,18 +19,21 @@ type ModalProps = React.PropsWithChildren<{
 }>
 
 const Modal: React.FC<ModalProps> = ({
-  onDismiss,
-  searchParams,
-  setSearchParams,
   isOpen: propsIsOpen = false,
   children,
   id,
+  onDismiss,
+  searchParams,
+  setSearchParams,
 }) => {
   const shouldShowDrawer = useMediaQuery(
     `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
   )
   const [open, setOpen] = useState(propsIsOpen)
-  const currentModal = useMemo(() => searchParams.get(modalKey), [searchParams])
+  const currentModal = useMemo(
+    () => searchParams?.get(modalKey),
+    [searchParams]
+  )
 
   const handleClose = () => {
     // Use only user-provided function if it is present

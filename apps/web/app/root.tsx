@@ -1,15 +1,20 @@
 import {
-  json,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  ShouldRevalidateFunction,
   useLoaderData,
 } from '@remix-run/react'
 import cx from 'classnames'
 import styles from './root.module.css'
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
+import {
+  type HeadersFunction,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+  data,
+} from '@remix-run/node'
 import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
@@ -18,9 +23,7 @@ import { useOptionalTheme, useTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { combineHeaders, getDomainUrl } from './utils/misc'
-import { prisma } from './server/db.server'
 import { makeTimings, time } from './server/timing.server'
-import { getUserId, logout } from './server/auth.server'
 import { HoneypotProvider } from 'remix-utils/honeypot/react'
 import { honeypot } from './server/honeypot.server'
 import { useEffect } from 'react'
@@ -34,6 +37,7 @@ import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/progress-bar/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
+import { Modals } from './components/Modals'
 
 export const links: LinksFunction = () => [
   {
@@ -54,45 +58,13 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const timings = makeTimings('root loader')
-  const userId = await time(() => getUserId(request), {
-    timings,
-    type: 'getUserId',
-    desc: 'getUserId in root',
+  const honeypotProps = honeypot.getInputProps()
+  const { toast, headers: toastHeaders } = await time(() => getToast(request), {
+    type: 'getToast',
   })
 
-  const user = userId
-    ? await time(
-        () =>
-          prisma.user.findUniqueOrThrow({
-            select: {
-              id: true,
-              fullname: true,
-              email: true,
-              roles: {
-                select: {
-                  name: true,
-                  permissions: {
-                    select: { entity: true, action: true, access: true },
-                  },
-                },
-              },
-            },
-            where: { id: userId },
-          }),
-        { timings, type: 'find user', desc: 'find user in root' }
-      )
-    : null
-
-  if (userId && !user) {
-    await logout({ request, redirectTo: '/' })
-  }
-
-  const honeypotProps = honeypot.getInputProps()
-  const { toast, headers: toastHeaders } = await getToast(request)
-
-  return json(
+  return data(
     {
-      user,
       requestInfo: {
         hints: getHints(request),
         origin: getDomainUrl(request),
@@ -112,6 +84,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ),
     }
   )
+}
+
+export const headers: HeadersFunction = ({
+  loaderHeaders,
+  actionHeaders,
+  parentHeaders,
+}) => {
+  return {
+    ...Object.fromEntries(loaderHeaders.entries()),
+    ...Object.fromEntries(actionHeaders.entries()),
+    ...Object.fromEntries(parentHeaders.entries()),
+  }
+}
+
+// Should never revalidate, as we return only ENV, toast and other persistent data
+export const shouldRevalidate: ShouldRevalidateFunction = () => {
+  return false
 }
 
 export function Document({
@@ -203,9 +192,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const value = useLoaderData<typeof loader>()
   const theme = useTheme()
-  const data = useLoaderData<typeof loader>()
-  useToast(data.toast)
+
+  useToast(value.toast)
 
   useEffect(() => {
     // Registering SW manually because Vite remix-pwa plugin
@@ -214,8 +204,9 @@ export default function App() {
   }, [])
 
   return (
-    <HoneypotProvider {...data.honeypotProps}>
+    <HoneypotProvider {...value.honeypotProps}>
       <Outlet />
+      <Modals />
       <Toaster closeButton position="bottom-right" theme={theme} />
     </HoneypotProvider>
   )

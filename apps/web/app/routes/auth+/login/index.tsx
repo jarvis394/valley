@@ -9,10 +9,9 @@ import Passkey from '../../../components/svg/Passkey'
 import { ProviderConnectionForm } from '../../../components/ProviderConnectionForm/ProviderConnectionForm'
 import { Form, useSearchParams } from '@remix-run/react'
 import {
-  type LoaderFunctionArgs,
   type ActionFunctionArgs,
   redirect,
-  json,
+  HeadersFunction,
 } from '@remix-run/node'
 import { requireAnonymous } from '../../../server/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
@@ -34,11 +33,6 @@ const EmailFormSchema = z.object({
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
-}
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  await requireAnonymous(request)
-  return json({})
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -93,6 +87,10 @@ export async function action({ request }: ActionFunctionArgs) {
     session,
     redirectTo,
   })
+}
+
+export const headers: HeadersFunction = ({ actionHeaders }) => {
+  return actionHeaders
 }
 
 const LoginPage: React.FC = () => {

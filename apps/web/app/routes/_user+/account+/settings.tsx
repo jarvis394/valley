@@ -1,17 +1,22 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { type LoaderFunctionArgs, json } from '@remix-run/node'
-import { Outlet } from '@remix-run/react'
-import { requireUser } from '../../../server/auth.server'
+import { Link, Outlet } from '@remix-run/react'
+import Button from '@valley/ui/Button'
+import Stack from '@valley/ui/Stack'
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await requireUser(request)
-  return json({ user })
-}
-
 export default function AccountSettings() {
-  return <Outlet />
+  return (
+    <Stack direction={'column'} gap={4} padding={4}>
+      <Button asChild>
+        <Link to="./authentication">authentication</Link>
+      </Button>
+      <Button asChild variant="secondary-dimmed">
+        <Link to="/projects">/projects</Link>
+      </Button>
+      <Outlet />
+    </Stack>
+  )
 }

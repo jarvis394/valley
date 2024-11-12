@@ -1,10 +1,10 @@
-/**
+/* *
  * Redefine background color for page
  * as its the color of Header and Footer
  */
- body {
+/* body {
   background: var(--background-paper) !important;
-}
+} */
 
 .main {
   --footerHeight: 121px;

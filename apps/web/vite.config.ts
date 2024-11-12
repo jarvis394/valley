@@ -5,6 +5,12 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
 
+declare module '@remix-run/server-runtime' {
+  interface Future {
+    v3_singleFetch: true
+  }
+}
+
 export default defineConfig({
   server: {
     host: true,
@@ -14,6 +20,7 @@ export default defineConfig({
     ssr: true,
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
+      // TODO: fix external node:* packages being put in client code
       // external: [/node:.*/, 'fsevents'],
     },
     assetsInlineLimit: (source) => {
@@ -54,7 +61,7 @@ export default defineConfig({
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
         v3_lazyRouteDiscovery: true,
-        v3_singleFetch: false,
+        v3_singleFetch: true,
       },
     }),
     remixPWA({

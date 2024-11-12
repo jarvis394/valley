@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import styles from './Header.module.css'
 import Logo from '../Logo/Logo'
 import Slash from '../Slash/Slash'
@@ -9,12 +9,10 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { useUser } from 'app/utils/user'
-import { Link, useParams } from '@remix-run/react'
+import { Await, Link, useParams } from '@remix-run/react'
+import { User } from '@prisma/client'
 
-const CurrentUser = () => {
-  const user = useUser()
-
+const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
   return (
     <>
       <Slash className="fade" data-fade-in={!!user} />
@@ -57,7 +55,11 @@ const CurrentProject = () => {
   )
 }
 
-const Header = () => {
+type HeaderProps = {
+  user?: Promise<User>
+}
+
+const Header: React.FC<HeaderProps> = ({ user }) => {
   return (
     <header
       className={styles.header}
@@ -70,7 +72,13 @@ const Header = () => {
       </Link>
       <nav className={styles.header__nav}>
         <Stack gap={2} align={'center'}>
-          <CurrentUser />
+          {user && (
+            <Suspense fallback={<h1>loading...</h1>}>
+              <Await resolve={user} errorElement={<h1>error</h1>}>
+                {(resolvedUser) => <CurrentUser user={resolvedUser} />}
+              </Await>
+            </Suspense>
+          )}
           <CurrentProject />
         </Stack>
         <Stack gap={2} align={'center'}>

@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
-import { Link, Outlet, useLocation } from '@remix-run/react'
+import { Link, Outlet, useLocation, useNavigate } from '@remix-run/react'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
 import Button from '@valley/ui/Button'
 import AuthHeader from '../../components/AuthHeader/AuthHeader'
-import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
+import { requireAnonymous } from 'app/server/auth.server'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 
 const covers = [
   '/assets/cover-1.jpg',
@@ -21,15 +22,14 @@ const covers = [
   '/assets/cover-8.jpg',
 ]
 const COVER_SWITCH_INTERVAL = 10000
+const ALLOWED_PATHS = ['/auth/login', '/auth/login/email', '/auth/register']
 
-// Redirect from layout to an actual page (/auth/login)
-export const loader = ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url)
-  if (url.pathname === '/auth') {
-    return redirect('/auth/login')
-  }
-  return null
+export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAnonymous(request)
+  return {}
 }
+
+export const shouldRevalidate = () => false
 
 const AuthGroupLayout = () => {
   const shouldShowCovers = useMediaQuery(
@@ -37,6 +37,7 @@ const AuthGroupLayout = () => {
   )
   const [activeCoverIndex, setActiveCoverIndex] = useState(0)
   const location = useLocation()
+  const navigate = useNavigate()
   const linkButton = useMemo(() => {
     let data = { href: '#', label: '' }
     if (location.pathname.startsWith('/auth/login')) {
@@ -69,6 +70,15 @@ const AuthGroupLayout = () => {
       clearInterval(id)
     }
   }, [shouldShowCovers])
+
+  // Redirect from layout to an actual page (/auth/login)
+  useEffect(() => {
+    if (!ALLOWED_PATHS.includes(location.pathname)) {
+      return navigate('/auth/login' + location.search, {
+        viewTransition: true,
+      })
+    }
+  }, [location.pathname, location.search, navigate])
 
   return (
     <div className={styles.auth}>

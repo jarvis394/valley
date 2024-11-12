@@ -1,8 +1,9 @@
 import { useForm, getFormProps } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '../../utils/invariant'
-import { type ActionFunctionArgs, redirect, json } from '@remix-run/node'
-import { useFetcher, useFetchers } from '@remix-run/react'
+import { type ActionFunctionArgs, redirect } from '@remix-run/node'
+import { useFetcher } from '@remix-run/react'
+import { data } from '@remix-run/node'
 import { ServerOnly } from 'remix-utils/server-only'
 import { z } from 'zod'
 import {
@@ -22,6 +23,8 @@ const ThemeFormSchema = z.object({
   redirectTo: z.string().optional(),
 })
 
+export const themeFetcherKey = 'theme-switch-fetcher'
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData()
   const submission = parseWithZod(formData, {
@@ -38,14 +41,14 @@ export async function action({ request }: ActionFunctionArgs) {
   if (redirectTo) {
     return redirect(redirectTo, responseInit)
   } else {
-    return json({ result: submission.reply() }, responseInit)
+    return data({ result: submission.reply() }, responseInit)
   }
 }
 
 export const ThemeSwitch: React.FC<{
   userPreference?: Theme | null
 }> = ({ userPreference }) => {
-  const fetcher = useFetcher<typeof action>()
+  const fetcher = useFetcher<typeof action>({ key: themeFetcherKey })
   const requestInfo = useRequestInfo()
   const optimisticMode = useOptimisticThemeMode()
   const [form] = useForm({
@@ -83,13 +86,10 @@ export const ThemeSwitch: React.FC<{
  * value it's being changed to.
  */
 export function useOptimisticThemeMode(): Theme | 'system' | undefined {
-  const fetchers = useFetchers()
-  const themeFetcher = fetchers.find(
-    (f) => f.formAction === '/resources/theme-switch'
-  )
+  const fetchers = useFetcher({ key: themeFetcherKey })
 
-  if (themeFetcher && themeFetcher.formData) {
-    const submission = parseWithZod(themeFetcher.formData, {
+  if (fetchers && fetchers.formData) {
+    const submission = parseWithZod(fetchers.formData, {
       schema: ThemeFormSchema,
     })
 

@@ -3,7 +3,6 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
   redirect,
-  json,
 } from '@remix-run/node'
 import { Form, useNavigation } from '@remix-run/react'
 import { useIsPending } from '../../../utils/misc'
@@ -25,7 +24,7 @@ export const interfaceLanguageKey = 'interfaceLanguage'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await requireOnboardingData(request)
-  return json(data)
+  return data
 }
 
 export async function action({ request }: ActionFunctionArgs) {

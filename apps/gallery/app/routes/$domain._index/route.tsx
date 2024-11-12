@@ -1,4 +1,4 @@
-import { defer, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 import React, { Suspense } from 'react'
 import { prisma } from '../../server/db.server'
 import { Await, useLoaderData } from '@remix-run/react'
@@ -26,7 +26,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     })
   )
 
-  return defer({ user, projects })
+  return { user, projects }
 }
 
 export default function UserPage() {

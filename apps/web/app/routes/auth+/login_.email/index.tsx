@@ -4,7 +4,6 @@ import { SEOHandle } from '@nasa-gcn/remix-seo'
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  json,
 } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { login, requireAnonymous } from '../../../server/auth.server'
@@ -39,7 +38,7 @@ export const handle: SEOHandle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
-  return json({})
+  return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -54,12 +53,12 @@ export async function action({ request }: ActionFunctionArgs) {
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(formData, resolver)
   if (errors) {
-    return json({ errors, defaultValues })
+    return { errors, defaultValues }
   }
 
   const session = await login(data)
   if (!session) {
-    return json({
+    return {
       errors: {
         password: {
           type: 'validate',
@@ -67,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
         },
       } satisfies FieldErrors<FormData>,
       defaultValues: data,
-    })
+    }
   }
 
   return handleNewSession({

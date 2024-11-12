@@ -10,3 +10,5 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   return redirect(redirectUrl.toString())
 }
+
+export const shouldRevalidate = () => false

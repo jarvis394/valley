@@ -6,9 +6,9 @@ import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import {
   type ActionFunctionArgs,
-  type LoaderFunctionArgs,
   redirect,
-  json,
+  data,
+  HeadersFunction,
 } from '@remix-run/node'
 import { prisma } from '../../../server/db.server'
 import { checkHoneypot } from '../../../server/honeypot.server'
@@ -24,7 +24,6 @@ import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/Pr
 import { PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
-import { requireAnonymous } from 'app/server/auth.server'
 import { ArrowRight } from 'geist-ui-icons'
 import { redirectToKey, targetKey } from '../verify'
 
@@ -35,11 +34,6 @@ const SignupSchema = z.object({
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
-}
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  await requireAnonymous(request)
-  return json({})
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -66,7 +60,7 @@ export async function action({ request }: ActionFunctionArgs) {
   })
 
   if (submission.status !== 'success') {
-    return json(
+    return data(
       { result: submission.reply() },
       { status: submission.status === 'error' ? 400 : 200 }
     )
@@ -89,13 +83,17 @@ export async function action({ request }: ActionFunctionArgs) {
   if (response.status === 'success') {
     return redirect(redirectTo.toString())
   } else {
-    return json(
+    return data(
       {
         result: submission.reply({ formErrors: [response.error.message] }),
       },
       { status: 500 }
     )
   }
+}
+
+export const headers: HeadersFunction = ({ actionHeaders }) => {
+  return actionHeaders
 }
 
 const RegisterPage: React.FC = () => {

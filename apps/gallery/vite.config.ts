@@ -4,6 +4,12 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import dotenv from '@dotenvx/dotenvx'
 import path from 'path'
 
+declare module '@remix-run/server-runtime' {
+  interface Future {
+    v3_singleFetch: true
+  }
+}
+
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
 export default defineConfig({
@@ -19,6 +25,8 @@ export default defineConfig({
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
+        v3_singleFetch: true,
+        v3_lazyRouteDiscovery: true,
       },
     }),
     tsconfigPaths(),
