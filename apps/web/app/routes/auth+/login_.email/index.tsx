@@ -6,7 +6,7 @@ import {
   type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
-import { login, requireAnonymous } from '../../../server/auth.server'
+import { login, requireAnonymous } from '../../../server/auth/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
 import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'

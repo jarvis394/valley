@@ -1,6 +1,6 @@
 import { redirect, type ActionFunctionArgs } from '@remix-run/node'
-import { authenticator } from '../../../server/auth.server'
-import { handleMockAction } from '../../../server/connections.server'
+import { authenticator } from '../../../server/auth/auth.server'
+import { handleMockAction } from '../../../server/auth/connections.server'
 import { ProviderNameSchema } from '../../../config/connections'
 import { getReferrerRoute } from '../../../utils/misc'
 import { getRedirectCookieHeader } from '../../../server/redirect-cookie.server'

@@ -8,7 +8,7 @@ import AuthHeader from '../../components/AuthHeader/AuthHeader'
 import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
-import { requireAnonymous } from 'app/server/auth.server'
+import { requireAnonymous } from 'app/server/auth/auth.server'
 import { type LoaderFunctionArgs } from '@remix-run/node'
 
 const covers = [

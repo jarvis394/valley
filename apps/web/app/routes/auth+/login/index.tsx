@@ -13,7 +13,7 @@ import {
   redirect,
   HeadersFunction,
 } from '@remix-run/node'
-import { requireAnonymous } from '../../../server/auth.server'
+import { requireAnonymous } from '../../../server/auth/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import Input from '@valley/ui/Input'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'

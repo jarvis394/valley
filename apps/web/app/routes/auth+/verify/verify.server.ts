@@ -1,7 +1,7 @@
 import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { z } from 'zod'
-import { requireUserId } from '../../../server/auth.server'
+import { requireUserId } from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'
 import { getDomainUrl } from '../../../utils/misc'
 import { redirectWithToast } from '../../../server/toast.server'

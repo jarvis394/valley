@@ -8,9 +8,9 @@ import {
   totalTtl,
   type CreateReporter,
 } from '@epic-web/cachified'
-import { remember } from '../utils/remember'
+import { remember } from 'app/utils/remember'
 import { LRUCache } from 'lru-cache'
-import { cachifiedTimingReporter, type Timings } from './timing.server'
+import { cachifiedTimingReporter, type Timings } from 'app/server/timing.server'
 import { redisJsonCacheAdapter } from 'cachified-redis-json-adapter'
 import { createClient } from 'redis'
 

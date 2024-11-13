@@ -1,12 +1,12 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { getUserId } from '../../../server/auth.server'
+import { getUserId } from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'
 import { combineResponseInits } from '../../../utils/misc'
-import { authSessionStorage } from '../../../server/session.server'
+import { authSessionStorage } from '../../../server/auth/session.server'
 import { redirectWithToast } from '../../../server/toast.server'
-import { verifySessionStorage } from '../../../server/verification.server'
+import { verifySessionStorage } from '../../../server/auth/verification.server'
 import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
@@ -47,9 +47,8 @@ export async function handleNewSession(
       combineResponseInits(
         {
           headers: {
-            'set-cookie': await verifySessionStorage.commitSession(
-              verifySession
-            ),
+            'set-cookie':
+              await verifySessionStorage.commitSession(verifySession),
           },
         },
         responseInit
@@ -60,19 +59,16 @@ export async function handleNewSession(
       request.headers.get('cookie')
     )
     authSession.set('sessionId', session.id)
+    const authCookie = await authSessionStorage.commitSession(authSession, {
+      expires: session.expirationDate,
+    })
+    const headers = {
+      'set-cookie': authCookie,
+    }
 
     return redirect(
       safeRedirect(redirectTo),
-      combineResponseInits(
-        {
-          headers: {
-            'set-cookie': await authSessionStorage.commitSession(authSession, {
-              expires: session.expirationDate,
-            }),
-          },
-        },
-        responseInit
-      )
+      combineResponseInits({ headers }, responseInit)
     )
   }
 }

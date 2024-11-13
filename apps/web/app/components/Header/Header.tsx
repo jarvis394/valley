@@ -74,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
         <Stack gap={2} align={'center'}>
           {user && (
             <Suspense fallback={<h1>loading...</h1>}>
-              <Await resolve={user} errorElement={<h1>error</h1>}>
+              <Await resolve={user}>
                 {(resolvedUser) => <CurrentUser user={resolvedUser} />}
               </Await>
             </Suspense>

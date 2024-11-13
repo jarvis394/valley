@@ -31,6 +31,7 @@ type SendEmailOptions = {
 )
 
 export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
+  // TODO: move out to a env variable
   const from = 'onboarding@resend.dev'
 
   const email = {

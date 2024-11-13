@@ -18,7 +18,7 @@ import {
 import { ChevronRight } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
 import { redirectWithToast } from '../../../server/toast.server'
-import { onboardingSessionStorage } from 'app/server/onboarding.server'
+import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 
 export const interfaceLanguageKey = 'interfaceLanguage'
 
@@ -54,9 +54,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

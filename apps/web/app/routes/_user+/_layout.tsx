@@ -4,14 +4,15 @@ import styles from './styles.module.css'
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import { requireUser } from '../../server/auth.server'
+import { requireLoggedIn, requireUser } from '../../server/auth/auth.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = requireUser(request)
-  return { user }
+  await requireLoggedIn(request)
+  const userPromise = requireUser(request)
+  return { user: userPromise }
 }
 
-export const shouldRevalidate = () => false
+export const shouldRevalidate = () => true
 
 const UserGroupLayout: React.FC = () => {
   const data = useLoaderData<typeof loader>()

@@ -1,7 +1,5 @@
 import React from 'react'
 import Button from '@valley/ui/Button'
-import Input from '@valley/ui/Input'
-import InputLabel from '@valley/ui/InputLabel'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import styles from './CreateProject.module.css'
@@ -9,6 +7,7 @@ import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useIsPending } from 'app/utils/misc'
+import TextField from '@valley/ui/TextField'
 
 const CreateProjectSchema = z.object({
   projectName: z.string(),
@@ -53,27 +52,40 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
         onSubmit={handleSubmit}
       >
         <div>
-          <InputLabel htmlFor="project-name-input">Project Name *</InputLabel>
-          <Input
+          <TextField
             {...register('projectName')}
+            label="Project Name"
+            required
+            size="lg"
             id="project-name-input"
             placeholder="my-project"
           />
         </div>
         <div>
-          <InputLabel htmlFor="store-until-select">Store until *</InputLabel>
-          <Input id="store-until-select" placeholder="my-project" />
+          <TextField
+            label="Store until"
+            required
+            size="lg"
+            id="store-until-select"
+            placeholder="my-project"
+          />
         </div>
         <div>
-          <InputLabel htmlFor="visibility-select">Visibility *</InputLabel>
-          <Input id="visibility-select" placeholder="my-project" />
+          <TextField
+            label="Visibility"
+            required
+            size="lg"
+            id="visibility-select"
+            placeholder="my-project"
+          />
         </div>
         <div>
-          <InputLabel htmlFor="date-shot-input">Date shot</InputLabel>
-          <Input
+          <TextField
             {...register('dateShot', {
               valueAsDate: true,
             })}
+            label="Date shot"
+            size="lg"
             id="date-shot-input"
             type="date"
             placeholder="dd.mm.yyyy"

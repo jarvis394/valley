@@ -22,7 +22,7 @@ export default defineConfig(() => ({
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
       // TODO: fix external node:* packages being put in client code
-      // external: [/node:.*/, 'fsevents'],
+      external: [/node:.*/, 'fsevents'],
     },
     assetsInlineLimit: (source) => {
       if (

@@ -25,7 +25,7 @@ import React from 'react'
 import FormCollapsibleField from '../../../components/FormCollapsibleField/FormCollapsibleField'
 import FormHelperText from '@valley/ui/FormHelperText'
 import PasswordField from '../../../components/PasswordField/PasswordField'
-import { onboardingSessionStorage } from '../../../server/onboarding.server'
+import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
 
 const SecurityFormSchema = z
   .object({
@@ -83,9 +83,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

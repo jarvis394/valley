@@ -30,6 +30,7 @@ const TextField = React.forwardRef(function TextField(
     fieldState: propsFieldState,
     id: propsId,
     required,
+    size,
     ...props
   }: TextFieldProps,
   ref: React.ForwardedRef<HTMLInputElement>
@@ -72,12 +73,18 @@ const TextField = React.forwardRef(function TextField(
   return (
     <FormControl state={state} className={styles.textField}>
       {label && (
-        <InputLabel required={required} htmlFor={id} id={id + '-label'}>
+        <InputLabel
+          size={size}
+          required={required}
+          htmlFor={id}
+          id={id + '-label'}
+        >
           {label}
         </InputLabel>
       )}
       <Input
         {...props}
+        size={size}
         aria-invalid={propsFieldState?.error ? 'true' : 'false'}
         ref={ref}
         id={id}

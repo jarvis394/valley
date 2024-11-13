@@ -5,7 +5,7 @@ import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
-import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
+import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
 import { Drawer } from 'vaul'
 
 const modalKey = 'modal'
@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({
   setSearchParams,
 }) => {
   const shouldShowDrawer = useMediaQuery(
-    `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
+    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
   const [open, setOpen] = useState(propsIsOpen)
   const currentModal = useMemo(

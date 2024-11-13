@@ -3,6 +3,7 @@ import { PrismaClient } from '@valley/db'
 import pkg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import chalk from 'chalk'
+
 const { Pool } = pkg
 
 // NOTE: if you change anything in this function you'll need to restart

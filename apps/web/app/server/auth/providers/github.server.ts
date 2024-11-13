@@ -2,11 +2,11 @@ import { createId as cuid } from '@paralleldrive/cuid2'
 import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
-import { redisCache, cachified } from '../cache.server'
+import { redisCache, cachified } from '../../cache'
 import { connectionSessionStorage } from '../connections.server'
-import { type Timings } from '../timing.server'
+import { type Timings } from '../../timing.server'
 import { normalizeEmail, type AuthProvider } from './provider'
-import { getHostAdress } from '../../utils/misc'
+import { getHostAdress } from '../../../utils/misc'
 
 export const MOCK_CODE_GITHUB = 'MOCK_CODE_GITHUB_KODY'
 export const MOCK_CODE_GITHUB_HEADER = 'x-mock-code-github'
@@ -104,9 +104,8 @@ export class GitHubProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/github/callback?${searchParams}`, {
       headers: {
-        'set-cookie': await connectionSessionStorage.commitSession(
-          connectionSession
-        ),
+        'set-cookie':
+          await connectionSessionStorage.commitSession(connectionSession),
       },
     })
   }

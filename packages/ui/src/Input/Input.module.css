@@ -40,7 +40,6 @@
   display: flex;
   flex: 1 0;
   font-weight: 400;
-  font-size: 16px;
   width: 100%;
   font-family: var(--font-geist-sans);
 }
@@ -74,11 +73,22 @@
 .input--size-md {
   height: 40px;
   font-size: 14px;
+  border-radius: 12px;
+}
+
+.input--size-md > .input__input {
+  font-size: 14px;
 }
 
 .input--size-lg {
   height: 48px;
   font-size: 16px;
+  border-radius: 16px;
+}
+
+.input--size-lg > .input__input {
+  font-size: 16px;
+  padding: 0 14px;
 }
 
 .input .input__input:disabled {

@@ -7,13 +7,13 @@ import {
   authenticator,
   getUserId,
   getSessionExpirationDate,
-} from '../../../server/auth.server'
+} from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'
 import {
   normalizeEmail,
   normalizeUsername,
   ProviderUser,
-} from '../../../server/providers/provider'
+} from '../../../server/auth/providers/provider'
 import {
   destroyRedirectToHeader,
   getRedirectCookieValue,
@@ -22,11 +22,11 @@ import {
   redirectWithToast,
   createToastHeaders,
 } from '../../../server/toast.server'
-import { verifySessionStorage } from '../../../server/verification.server'
+import { verifySessionStorage } from '../../../server/auth/verification.server'
 import { combineHeaders } from '../../../utils/misc'
 import { handleNewSession } from '../login/login.server'
 import { redirectToKey } from '../verify'
-import { onboardingSessionStorage } from 'app/server/onboarding.server'
+import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 import { providerNameQueryKey } from '../$provider'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
@@ -172,9 +172,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     headers: combineHeaders(
       { 'set-cookie': await verifySessionStorage.commitSession(verifySession) },
       {
-        'set-cookie': await onboardingSessionStorage.commitSession(
-          onboardingSession
-        ),
+        'set-cookie':
+          await onboardingSessionStorage.commitSession(onboardingSession),
       },
       destroyRedirectTo
     ),
@@ -189,7 +188,7 @@ async function makeSession(
   }: { request: Request; userId: string; redirectTo?: string | null },
   responseInit?: ResponseInit
 ) {
-  redirectTo ??= '/'
+  redirectTo ??= '/projects'
   const session = await prisma.session.create({
     select: { id: true, expirationDate: true, userId: true },
     data: {
@@ -199,6 +198,8 @@ async function makeSession(
   })
   return handleNewSession(
     { request, session, redirectTo },
-    { headers: combineHeaders(responseInit?.headers, destroyRedirectTo) }
+    {
+      headers: combineHeaders(responseInit?.headers, destroyRedirectTo),
+    }
   )
 }
