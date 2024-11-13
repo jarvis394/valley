@@ -43,6 +43,7 @@ export default defineConfig(() => ({
     envOnlyMacros(),
     tsconfigPaths(),
     remix({
+      presets: [vercelPreset()],
       ignoredRouteFiles: ['**/*'],
       serverModuleFormat: 'esm',
       routes: async (defineRoutes) => {
@@ -69,6 +70,5 @@ export default defineConfig(() => ({
       // Registering SW manually because Vite plugin adds <script> tag without CSP nonce
       registerSW: null,
     }),
-    vercelPreset(),
   ],
 }))
