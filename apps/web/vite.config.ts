@@ -17,6 +17,9 @@ export default defineConfig(() => ({
     host: true,
     port: Number(process.env.WEB_PORT) || 4200,
   },
+  ssr: {
+    noExternal: ['remix-utils'],
+  },
   build: {
     ssr: true,
     cssMinify: process.env.NODE_ENV === 'production',
@@ -43,6 +46,7 @@ export default defineConfig(() => ({
     envOnlyMacros(),
     tsconfigPaths(),
     remix({
+      ssr: true,
       presets: [vercelPreset()],
       ignoredRouteFiles: ['**/*'],
       serverModuleFormat: 'esm',

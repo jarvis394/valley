@@ -86,6 +86,7 @@ const AuthFormHeader: React.FC<AuthFormHeaderProps> = ({ type, email }) => {
     case 'change-email':
     case 'onboarding':
     case 'reset-password':
+    case 'auth':
       return (
         <Header
           title="Check your email"

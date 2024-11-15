@@ -9,7 +9,7 @@ const { Pool } = pkg
 // NOTE: if you change anything in this function you'll need to restart
 // the dev server to see your changes.
 export const prisma = remember('prisma', () => {
-  const logThreshold = 40
+  const logThreshold = 60
   const pool = new Pool({ connectionString: process.env.DATABASE_URL })
   const adapter = new PrismaPg(pool)
   const client = new PrismaClient({
@@ -27,12 +27,12 @@ export const prisma = remember('prisma', () => {
       e.duration < logThreshold * 1.1
         ? 'green'
         : e.duration < logThreshold * 1.2
-          ? 'blue'
-          : e.duration < logThreshold * 1.3
-            ? 'yellow'
-            : e.duration < logThreshold * 1.4
-              ? 'redBright'
-              : 'red'
+        ? 'blue'
+        : e.duration < logThreshold * 1.3
+        ? 'yellow'
+        : e.duration < logThreshold * 1.4
+        ? 'redBright'
+        : 'red'
     const dur = chalk[color](`${e.duration}ms`)
     console.info(`prisma:query - ${dur} - ${e.query}`)
   })

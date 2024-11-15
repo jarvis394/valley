@@ -52,7 +52,7 @@ export function getReferrerRoute(request: Request) {
   if (referrer?.startsWith(domain)) {
     return referrer.slice(domain.length)
   } else {
-    return '/'
+    return '/auth/login'
   }
 }
 

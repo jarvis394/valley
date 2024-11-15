@@ -91,7 +91,10 @@ export async function action({ request }: ActionFunctionArgs) {
   if (existingUser) {
     return redirectWithToast(
       request.url.toString(),
-      { title: 'Welcome', description: 'Thanks for signing up!' },
+      {
+        type: 'error',
+        description: 'A user already exists with this email',
+      },
       { headers }
     )
   }
@@ -133,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirectWithToast(
     safeRedirect(redirectTo || '/projects'),
-    { title: 'Welcome', description: 'Thanks for signing up!' },
+    { description: 'You are now logged in', type: 'info' },
     { headers }
   )
 }

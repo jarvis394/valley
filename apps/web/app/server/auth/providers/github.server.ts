@@ -83,7 +83,7 @@ export class GitHubProvider implements AuthProvider {
     })
 
     return {
-      displayName: result.success ? result.data.login : 'Unknown',
+      displayName: result.success ? result.data.login : '',
       link: result.success ? `https://github.com/${result.data.login}` : null,
     } as const
   }
@@ -104,8 +104,9 @@ export class GitHubProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/github/callback?${searchParams}`, {
       headers: {
-        'set-cookie':
-          await connectionSessionStorage.commitSession(connectionSession),
+        'set-cookie': await connectionSessionStorage.commitSession(
+          connectionSession
+        ),
       },
     })
   }

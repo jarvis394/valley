@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
-import { Link, Outlet, useLocation, useNavigate } from '@remix-run/react'
+import {
+  Link,
+  Outlet,
+  ShouldRevalidateFunction,
+  useLocation,
+} from '@remix-run/react'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
 import Button from '@valley/ui/Button'
@@ -9,27 +14,47 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 
 const covers = [
-  '/assets/cover-1.jpg',
-  '/assets/cover-2.jpg',
-  '/assets/cover-3.jpg',
-  '/assets/cover-4.jpg',
-  '/assets/cover-5.jpg',
-  '/assets/cover-6.jpg',
-  '/assets/cover-7.jpg',
-  '/assets/cover-8.jpg',
+  '/assets/cover-1.webp',
+  '/assets/cover-2.webp',
+  '/assets/cover-3.webp',
+  '/assets/cover-4.webp',
+  '/assets/cover-5.webp',
+  '/assets/cover-6.webp',
+  '/assets/cover-7.webp',
+  '/assets/cover-8.webp',
 ]
 const COVER_SWITCH_INTERVAL = 10000
-const ALLOWED_PATHS = ['/auth/login', '/auth/login/email', '/auth/register']
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
-  return {}
+  return null
 }
 
-export const shouldRevalidate = () => false
+export const meta: MetaFunction = () => {
+  return [
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: light)',
+      content: '#fafafa',
+    },
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: dark)',
+      content: '#0a0a0a',
+    },
+  ]
+}
+
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
+  if (formAction) {
+    return true
+  }
+
+  return false
+}
 
 const AuthGroupLayout = () => {
   const shouldShowCovers = useMediaQuery(
@@ -37,7 +62,6 @@ const AuthGroupLayout = () => {
   )
   const [activeCoverIndex, setActiveCoverIndex] = useState(0)
   const location = useLocation()
-  const navigate = useNavigate()
   const linkButton = useMemo(() => {
     let data = { href: '#', label: '' }
     if (location.pathname.startsWith('/auth/login')) {
@@ -50,7 +74,12 @@ const AuthGroupLayout = () => {
 
     return (
       <Button asChild variant="tertiary" size="lg">
-        <Link to={data.href} viewTransition className={styles.auth__linkButton}>
+        <Link
+          rel="prefetch"
+          to={data.href}
+          viewTransition
+          className={styles.auth__linkButton}
+        >
           {data.label}
         </Link>
       </Button>
@@ -70,15 +99,6 @@ const AuthGroupLayout = () => {
       clearInterval(id)
     }
   }, [shouldShowCovers])
-
-  // Redirect from layout to an actual page (/auth/login)
-  useEffect(() => {
-    if (!ALLOWED_PATHS.includes(location.pathname)) {
-      return navigate('/auth/login' + location.search, {
-        viewTransition: true,
-      })
-    }
-  }, [location.pathname, location.search, navigate])
 
   return (
     <div className={styles.auth}>

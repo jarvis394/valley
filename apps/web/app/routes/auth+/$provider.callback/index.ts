@@ -66,7 +66,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return redirectWithToast(
         '/settings/profile/connections',
         {
-          title: 'Already Connected',
           description: `Your "${profile.username}" ${label} account is already connected.`,
         },
         { headers: destroyRedirectTo }
@@ -75,8 +74,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return redirectWithToast(
         '/settings/profile/connections',
         {
-          title: 'Already Connected',
-          description: `The "${profile.username}" ${label} account is already connected to another account.`,
+          title: 'Error',
+          description: `${label} account "${profile.username}" is already connected to another account.`,
+          type: 'error',
         },
         { headers: destroyRedirectTo }
       )
@@ -97,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         title: 'Connected',
         type: 'success',
-        description: `Your "${profile.username}" ${label} account has been connected.`,
+        description: `Your ${label} account "${profile.username}" account has been connected`,
       },
       { headers: destroyRedirectTo }
     )
@@ -105,7 +105,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   // Connection exists already? Make a new session
   if (existingConnection) {
-    return makeSession({ request, userId: existingConnection.userId })
+    return makeSession(
+      { request, userId: existingConnection.userId },
+      {
+        headers: await createToastHeaders({
+          description: 'You are now logged in',
+          type: 'info',
+        }),
+      }
+    )
   }
 
   // if the email matches a user in the db, then link the account and
@@ -128,7 +136,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         headers: await createToastHeaders({
           title: 'Connected',
-          description: `Your "${profile.username}" ${label} account has been connected.`,
+          type: 'success',
+          description: `Your ${label} account "${profile.username}" has been connected`,
         }),
       }
     )
@@ -172,8 +181,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     headers: combineHeaders(
       { 'set-cookie': await verifySessionStorage.commitSession(verifySession) },
       {
-        'set-cookie':
-          await onboardingSessionStorage.commitSession(onboardingSession),
+        'set-cookie': await onboardingSessionStorage.commitSession(
+          onboardingSession
+        ),
       },
       destroyRedirectTo
     ),

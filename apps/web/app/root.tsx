@@ -1,6 +1,7 @@
 import {
   Links,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -24,20 +25,21 @@ import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { combineHeaders, getDomainUrl } from './utils/misc'
 import { makeTimings, time } from './server/timing.server'
-import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { HoneypotProvider } from './components/Honeypot/Honeypot'
 import { honeypot } from './server/honeypot.server'
 import { useEffect } from 'react'
 import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
+import { Modals } from './components/Modals'
 
 import './styles/fonts.css'
 import './styles/global.css'
 import '@valley/ui/styles/theme.css'
 import '@valley/ui/styles/global.css'
-import '@uppy/core/dist/style.min.css'
-import '@uppy/progress-bar/dist/style.min.css'
-import 'overlayscrollbars/overlayscrollbars.css'
-import { Modals } from './components/Modals'
+import 'remix-image/remix-image.css?url'
+import '@uppy/core/dist/style.min.css?url'
+import '@uppy/progress-bar/dist/style.min.css?url'
+import 'overlayscrollbars/overlayscrollbars.css?url'
 
 export const links: LinksFunction = () => [
   {
@@ -98,9 +100,28 @@ export const headers: HeadersFunction = ({
   }
 }
 
-// Should never revalidate, as we return only ENV, toast and other persistent data
-export const shouldRevalidate: ShouldRevalidateFunction = () => {
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
+  // Revalidate if formAction is present (it can return a toast)
+  if (formAction) {
+    return true
+  }
+
   return false
+}
+
+export const meta: MetaFunction = () => {
+  return [
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: light)',
+      content: '#ffffff',
+    },
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: dark)',
+      content: '#0e0e0e',
+    },
+  ]
 }
 
 export function Document({
@@ -123,16 +144,6 @@ export function Document({
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: light)"
-          content="#ffffff"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: dark)"
-          content="#0e0e0e"
         />
         <meta name="color-scheme" content="light dark" />
         <link
@@ -192,10 +203,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const value = useLoaderData<typeof loader>()
+  const loaderData = useLoaderData<typeof loader>()
   const theme = useTheme()
 
-  useToast(value.toast)
+  useToast(loaderData.toast)
 
   useEffect(() => {
     // Registering SW manually because Vite remix-pwa plugin
@@ -204,10 +215,10 @@ export default function App() {
   }, [])
 
   return (
-    <HoneypotProvider {...value.honeypotProps}>
+    <HoneypotProvider {...loaderData.honeypotProps}>
       <Outlet />
       <Modals />
-      <Toaster closeButton position="bottom-right" theme={theme} />
+      <Toaster theme={theme} />
     </HoneypotProvider>
   )
 }

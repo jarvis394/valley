@@ -6,9 +6,14 @@ import { combineHeaders } from '../utils/misc'
 const toastKey = 'toast'
 const ToastSchema = z.object({
   description: z.string(),
-  id: z.string().default(() => cuid()),
+  id: z
+    .string()
+    .or(z.number())
+    .default(() => cuid()),
   title: z.string().optional(),
-  type: z.enum(['message', 'success', 'error']).default('message'),
+  type: z
+    .enum(['default', 'success', 'info', 'warning', 'error'])
+    .default('default'),
 })
 
 export type Toast = z.infer<typeof ToastSchema>

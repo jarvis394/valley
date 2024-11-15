@@ -7,7 +7,7 @@ import { getDomainUrl } from '../../../utils/misc'
 import { redirectWithToast } from '../../../server/toast.server'
 import { generateTOTP, verifyTOTP } from '../../../server/totp.server'
 import {
-  handleVerification as handleLoginTwoFactorVerification,
+  handleVerification as handleLoginVerification,
   shouldRequestTwoFA,
 } from '../login/login.server'
 import { handleVerification as handleOnboardingVerification } from '../onboarding+/onboarding.server'
@@ -23,7 +23,7 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
 } from '../../_user+/account+/settings.authentication'
-import { json } from '@remix-run/node'
+import { data } from '@remix-run/node'
 
 export type VerifyFunctionArgs = {
   request: Request
@@ -71,7 +71,7 @@ export async function requireRecentVerification(request: Request) {
     })
 
     throw await redirectWithToast(redirectUrl.toString(), {
-      title: 'Please Reverify',
+      title: 'Verification',
       description: 'Please reverify your account before proceeding',
     })
   }
@@ -82,14 +82,16 @@ export async function prepareVerification({
   request,
   type,
   target,
+  redirectTo,
 }: {
   period: number
   request: Request
   type: VerificationType
   target: string
+  redirectTo?: string
 }) {
-  const verifyUrl = getRedirectToUrl({ request, type, target })
-  const redirectTo = new URL(verifyUrl.toString())
+  const verifyUrl = getRedirectToUrl({ request, type, target, redirectTo })
+  const verifyRedirectTo = new URL(verifyUrl.toString())
   const { otp, ...verificationConfig } = await generateTOTP({
     period,
   })
@@ -109,7 +111,7 @@ export async function prepareVerification({
   // add the otp to the url we'll email the user.
   verifyUrl.searchParams.set(verifyCodeKey, otp)
 
-  return { otp, redirectTo, verifyUrl }
+  return { otp, redirectTo: verifyRedirectTo, verifyUrl }
 }
 
 export async function isCodeValid({
@@ -129,7 +131,7 @@ export async function isCodeValid({
     select: { algorithm: true, secret: true, period: true, charSet: true },
   })
   if (!verification) return false
-  const result = verifyTOTP({
+  const result = await verifyTOTP({
     otp: code,
     ...verification,
   })
@@ -149,6 +151,7 @@ export async function validateRequest(
         type: data[verifyTypeKey],
         target: data[targetKey],
       })
+
       if (!codeIsValid) {
         ctx.addIssue({
           path: ['code'],
@@ -162,7 +165,7 @@ export async function validateRequest(
   })
 
   if (submission.status !== 'success') {
-    return json(
+    return data(
       { result: submission.reply() },
       { status: submission.status === 'error' ? 400 : 200 }
     )
@@ -194,12 +197,14 @@ export async function validateRequest(
     //   await deleteVerification()
     //   return handleChangeEmailVerification({ request, body, submission })
     // }
+    case 'auth':
     case '2fa': {
-      return handleLoginTwoFactorVerification({ request, body, submission })
+      return handleLoginVerification({ request, body, submission })
     }
     default:
-      return redirectWithToast('/', {
+      return redirectWithToast('/auth/login', {
         title: 'Not Implemented',
+        type: 'error',
         description: 'This function was not implemented on backend',
       })
   }

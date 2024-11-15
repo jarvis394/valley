@@ -11,7 +11,7 @@ import { authSessionStorage } from './session.server'
 import { UserSettings } from '@valley/db'
 import { invariantResponse } from '../../utils/invariant'
 
-// TODO: think about refresh tokens
+// TODO: think about refreshing sessions
 export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30 // 30 days
 export const getSessionExpirationDate = () =>
   new Date(Date.now() + SESSION_EXPIRATION_TIME)
@@ -57,7 +57,7 @@ export async function getUserId(request: Request) {
   // Other handlers might un-authenticate user,
   // redirect them to the home page
   if (!session?.user) {
-    throw redirect('/', {
+    throw redirect('/auth/login', {
       headers: {
         'set-cookie': await authSessionStorage.destroySession(authSession),
       },
@@ -93,16 +93,21 @@ export async function requireUser(
   return user
 }
 
-/**
- * Redirects to the auth login page if client is not logged in
- * NOTE: checks only isLoggedIn cookie
- */
-export async function requireLoggedIn(request: Request) {
+export async function isLoggedIn(request: Request) {
   const authSession = await authSessionStorage.getSession(
     request.headers.get('cookie')
   )
+  return !!authSession.data.sessionId
+}
+
+/**
+ * Redirects to the auth login page if client is not logged in
+ * NOTE: checks only auth cookie
+ */
+export async function requireLoggedIn(request: Request) {
+  const loggedIn = await isLoggedIn(request)
   const redirectUrl = getUnauthenticatedRedirectUrl(request)
-  if (!authSession.data.sessionId) throw redirect(redirectUrl)
+  if (!loggedIn) throw redirect(redirectUrl)
 
   return true
 }
@@ -114,6 +119,18 @@ export async function requireAnonymous(request: Request) {
   if (userId) {
     throw redirect('/projects')
   }
+}
+
+export async function canPerformPasswordLogin(email: User['email']) {
+  const password = await prisma.password.findFirst({
+    where: {
+      user: {
+        email,
+      },
+    },
+  })
+
+  return !!password
 }
 
 export async function login({
@@ -218,7 +235,7 @@ export async function register({
 export async function logout(
   {
     request,
-    redirectTo = '/',
+    redirectTo = '/home',
   }: {
     request: Request
     redirectTo?: string

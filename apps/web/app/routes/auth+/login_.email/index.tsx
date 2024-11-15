@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import Stack from '@valley/ui/Stack'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -95,46 +96,51 @@ const LoginViaEmailPage: React.FC = () => {
   return (
     <main className={styles.auth__content}>
       <AuthFormHeader type="password" email={target} />
-      <Form
-        onSubmit={handleSubmit}
-        method="POST"
-        className={styles.auth__form}
-        style={{ viewTransitionName: 'auth-form' }}
-      >
-        <HoneypotInputs />
-        {redirectTo && <input {...register('redirectTo')} hidden />}
-        {target && <input {...register('email')} type="email" hidden />}
-        <PasswordField
-          {...register('password')}
-          // This should be always auto focused, as we are transitioning within the same form
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-          required
-          fieldState={getFieldState('password', formState)}
-          size="lg"
-          placeholder="Password"
-          autoComplete="current-password"
-        />
-        <Button
-          fullWidth
-          loading={isPending}
-          disabled={isPending}
-          variant="primary"
-          size="lg"
+      <Stack asChild gap={2} align={'center'} fullWidth direction={'column'}>
+        <Form
+          onSubmit={handleSubmit}
+          method="POST"
+          style={{ viewTransitionName: 'auth-form' }}
         >
-          Continue
-        </Button>
-        <Button
-          asChild
-          variant="tertiary-dimmed"
-          before={<ArrowLeft />}
-          size="md"
-        >
-          <Link to="/auth/login" viewTransition>
-            Other Login options
-          </Link>
-        </Button>
-      </Form>
+          <HoneypotInputs />
+          {redirectTo && <input {...register('redirectTo')} hidden />}
+          {target && <input {...register('email')} type="email" hidden />}
+          <PasswordField
+            {...register('password')}
+            // This should be always auto focused, as we are transitioning within the same form
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            required
+            fieldState={getFieldState('password', formState)}
+            size="lg"
+            placeholder="Password"
+            autoComplete="current-password"
+            paperProps={{
+              style: { viewTransitionName: 'auth-form-email-input' },
+            }}
+          />
+          <Button
+            fullWidth
+            loading={isPending}
+            disabled={isPending}
+            variant="primary"
+            size="lg"
+            style={{ viewTransitionName: 'auth-form-submit' }}
+          >
+            Continue
+          </Button>
+          <Button
+            asChild
+            variant="tertiary-dimmed"
+            before={<ArrowLeft />}
+            size="md"
+          >
+            <Link to="/auth/login" viewTransition>
+              Other Login options
+            </Link>
+          </Button>
+        </Form>
+      </Stack>
     </main>
   )
 }

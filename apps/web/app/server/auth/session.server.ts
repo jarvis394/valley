@@ -8,7 +8,7 @@ export const authSessionStorage = createCookieSessionStorage<{
 }>({
   cookie: {
     name: 'valley_session',
-    sameSite: 'strict',
+    sameSite: 'lax',
     path: '/',
     httpOnly: true,
     secrets: process.env.SESSION_SECRET.split(','),

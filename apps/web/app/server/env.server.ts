@@ -8,12 +8,18 @@ const schema = z.object({
   SESSION_SECRET: z.string(),
   MAGIC_LINK_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
-  GITHUB_TOKEN: z.string(),
-  GITHUB_CLIENT_ID: z.string(),
-  GITHUB_CLIENT_SECRET: z.string(),
   INTERNAL_COMMAND_TOKEN: z.string(),
   WEB_PORT: z.string(),
   HOST: z.string().optional(),
+
+  // GitHub OAuth
+  GITHUB_TOKEN: z.string(),
+  GITHUB_CLIENT_ID: z.string(),
+  GITHUB_CLIENT_SECRET: z.string(),
+
+  // Google OAuth
+  GOOGLE_CLIENT_ID: z.string().default('MOCK_GOOGLE_CLIENT_ID'),
+  GOOGLE_CLIENT_SECRET: z.string().default('MOCK_GOOGLE_CLIENT_SECRET'),
 })
 
 export function init() {

@@ -15,6 +15,7 @@ import styles from '../auth.module.css'
 import { ArrowLeft } from 'geist-ui-icons'
 import { useCountdown } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
+import { showToast } from 'app/components/Toast/Toast'
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
@@ -26,7 +27,13 @@ export const targetKey = 'target'
 export const verifyCodeKey = 'code'
 export const verifyTypeKey = 'type'
 export const redirectToKey = 'redirectTo'
-const types = ['onboarding', 'reset-password', 'change-email', '2fa'] as const
+const types = [
+  'auth',
+  'onboarding',
+  'reset-password',
+  'change-email',
+  '2fa',
+] as const
 const VerificationTypeSchema = z.enum(types)
 export type VerificationType = z.infer<typeof VerificationTypeSchema>
 export const VerifySchema = z.object({
@@ -80,6 +87,16 @@ export default function VerifyRoute() {
     startCountdown()
   }, [startCountdown])
 
+  useEffect(() => {
+    if (actionData?.result.error) {
+      showToast({
+        description: actionData?.result.error.code?.[0] || 'Unexpected error',
+        type: 'error',
+        id: 'verify-code',
+      })
+    }
+  }, [actionData?.result.error])
+
   return (
     <main className={styles.auth__content}>
       <AuthFormHeader type={type} email={target} />
@@ -124,6 +141,7 @@ export default function VerifyRoute() {
           size="lg"
           loading={isPending}
           disabled={isPending}
+          style={{ viewTransitionName: 'auth-form-submit' }}
         >
           Submit
         </Button>

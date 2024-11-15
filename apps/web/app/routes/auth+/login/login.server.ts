@@ -42,29 +42,27 @@ export async function handleNewSession(
       target: session.userId,
       redirectTo,
     })
+    const headers = new Headers()
+    headers.append(
+      'set-cookie',
+      await verifySessionStorage.commitSession(verifySession)
+    )
     return redirect(
       `${redirectUrl.pathname}?${redirectUrl.searchParams}`,
-      combineResponseInits(
-        {
-          headers: {
-            'set-cookie':
-              await verifySessionStorage.commitSession(verifySession),
-          },
-        },
-        responseInit
-      )
+      combineResponseInits({ headers }, responseInit)
     )
   } else {
     const authSession = await authSessionStorage.getSession(
       request.headers.get('cookie')
     )
     authSession.set('sessionId', session.id)
-    const authCookie = await authSessionStorage.commitSession(authSession, {
-      expires: session.expirationDate,
-    })
-    const headers = {
-      'set-cookie': authCookie,
-    }
+    const headers = new Headers()
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession, {
+        expires: session.expirationDate,
+      })
+    )
 
     return redirect(
       safeRedirect(redirectTo),
@@ -110,18 +108,33 @@ export async function handleVerification({
     }
 
     authSession.set('sessionId', unverifiedSessionId)
+
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession, {
+        expires: session.expirationDate,
+      })
+    )
+  } else {
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession)
+    )
   }
 
-  headers.append(
-    'set-cookie',
-    await authSessionStorage.commitSession(authSession)
-  )
   headers.append(
     'set-cookie',
     await verifySessionStorage.destroySession(verifySession)
   )
 
-  return redirect(safeRedirect(redirectTo), { headers })
+  return redirectWithToast(
+    safeRedirect(redirectTo),
+    {
+      type: 'info',
+      description: 'You are now logged in',
+    },
+    { headers }
+  )
 }
 
 export async function shouldRequestTwoFA(request: Request) {
