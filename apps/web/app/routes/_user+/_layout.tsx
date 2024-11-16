@@ -14,7 +14,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return { user: userPromise }
 }
 
-export const shouldRevalidate = () => true
+export const shouldRevalidate = () => {
+  return false
+}
 
 const UserGroupLayout: React.FC = () => {
   const data = useLoaderData<typeof loader>()
