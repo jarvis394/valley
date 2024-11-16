@@ -20,6 +20,10 @@ const schema = z.object({
   // Google OAuth
   GOOGLE_CLIENT_ID: z.string().default('MOCK_GOOGLE_CLIENT_ID'),
   GOOGLE_CLIENT_SECRET: z.string().default('MOCK_GOOGLE_CLIENT_SECRET'),
+
+  // VK OAuth
+  VK_CLIENT_ID: z.string().default('MOCK_VK_CLIENT_ID'),
+  VK_CLIENT_SECRET: z.string().default('MOCK_VK_CLIENT_SECRET'),
 })
 
 export function init() {
