@@ -2,8 +2,8 @@ import { redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { authenticator } from '../../../server/auth/auth.server'
 import { handleMockAction } from '../../../server/auth/connections.server'
 import { ProviderNameSchema } from '../../../config/connections'
-import { getReferrerRoute } from '../../../utils/misc'
-import { getRedirectCookieHeader } from '../../../server/redirect-cookie.server'
+import { getRedirectCookieHeader } from 'app/server/redirect-cookie.server'
+import { getReferrerRoute } from 'app/utils/misc'
 
 export const providerNameQueryKey = 'provider'
 
@@ -12,9 +12,8 @@ export async function loader() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const providerName = ProviderNameSchema.parse(params.provider)
-
   try {
+    const providerName = ProviderNameSchema.parse(params.provider)
     await handleMockAction(providerName, request)
     return await authenticator.authenticate(providerName, request)
   } catch (error: unknown) {
@@ -30,6 +29,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         error.headers.append('set-cookie', redirectToCookie)
       }
     }
-    throw error
+    return error
   }
 }

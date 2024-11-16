@@ -11,7 +11,7 @@ import {
 import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
-import { prepareVerification } from '../verify/verify.server'
+import { prepareVerification } from '../verify+/verify.server'
 import { useIsPending } from '../../../utils/misc'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
 import { sendRegisterEmail } from '../../../server/email.server'
@@ -21,7 +21,7 @@ import { PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
-import { redirectToKey, targetKey } from '../verify'
+import { redirectToKey, targetKey } from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkHoneypot } from 'app/server/honeypot.server'
 import {
@@ -180,11 +180,8 @@ const RegisterPage: React.FC = () => {
                 required
                 size="lg"
                 placeholder="Email"
-                formHelperTextProps={{
-                  style: {
-                    paddingBottom: 4,
-                  },
-                }}
+                autoComplete="email"
+                type="email"
                 paperProps={{
                   style: { viewTransitionName: 'auth-form-email-input' },
                 }}

@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "db:generate": "yarn db-env prisma generate --no-hints",
-    "db:push": "yarn db-env prisma db push --skip-generate --no-hints",
-    "db:migrate": "yarn db-env prisma migrate dev --no-hints",
-    "db:migrate:reset": "yarn db-env prisma migrate reset --no-hints",
+    "db:push": "yarn db-env prisma db push --skip-generate",
+    "db:migrate": "yarn db-env prisma migrate dev",
+    "db:migrate:reset": "yarn db-env prisma migrate reset",
     "db:studio": "yarn db-env prisma studio",
     "db:seed": "yarn db-env ts-node prisma/seed.ts",
     "db-env": "dotenvx run -f ../../.env --",

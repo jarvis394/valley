@@ -10,7 +10,7 @@ import { verifySessionStorage } from '../../../server/auth/verification.server'
 import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
-} from '../verify/verify.server'
+} from '../verify+/verify.server'
 import { twoFAVerificationType } from '../../_user+/account+/settings.authentication'
 
 export async function handleNewSession(

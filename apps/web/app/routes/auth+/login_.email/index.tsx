@@ -14,13 +14,14 @@ import { z } from 'zod'
 import { handleNewSession } from '../login/login.server'
 import { useIsPending } from '../../../utils/misc'
 import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
-import { redirectToKey, targetKey } from '../verify'
+import { redirectToKey, targetKey } from '../verify+'
 import PasswordField from '../../../components/PasswordField/PasswordField'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import Stack from '@valley/ui/Stack'
+import { createToastHeaders } from 'app/server/toast.server'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -68,11 +69,19 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
-  return handleNewSession({
-    request,
-    session,
-    redirectTo: data.redirectTo,
-  })
+  return handleNewSession(
+    {
+      request,
+      session,
+      redirectTo: data.redirectTo,
+    },
+    {
+      headers: await createToastHeaders({
+        type: 'info',
+        description: 'You are now logged in',
+      }),
+    }
+  )
 }
 
 const LoginViaEmailPage: React.FC = () => {

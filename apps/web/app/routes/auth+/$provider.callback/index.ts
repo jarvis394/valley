@@ -25,7 +25,7 @@ import {
 import { verifySessionStorage } from '../../../server/auth/verification.server'
 import { combineHeaders } from '../../../utils/misc'
 import { handleNewSession } from '../login/login.server'
-import { redirectToKey } from '../verify'
+import { redirectToKey } from '../verify+'
 import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 import { providerNameQueryKey } from '../$provider'
 

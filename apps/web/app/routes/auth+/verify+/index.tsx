@@ -14,7 +14,7 @@ import Button from '@valley/ui/Button'
 import styles from '../auth.module.css'
 import { ArrowLeft } from 'geist-ui-icons'
 import { useCountdown } from 'usehooks-ts'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { showToast } from 'app/components/Toast/Toast'
 
 export const handle: SEOHandle = {
@@ -78,7 +78,10 @@ export default function VerifyRoute() {
   })
   const isResendButtonDisabled = count !== 0 || didResendVerificationCode
 
-  const handleCodeResend = () => {
+  const handleCodeResend: React.MouseEventHandler = (e) => {
+    e.preventDefault()
+    if (!form.value) return
+
     stopCountdown()
     setDidResendVerificationCode(true)
   }

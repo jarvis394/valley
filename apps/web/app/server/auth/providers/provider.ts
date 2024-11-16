@@ -10,9 +10,9 @@ export type ProviderUser = {
   imageUrl?: string
 }
 
-export interface AuthProvider {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getAuthStrategy(): Strategy<ProviderUser, any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface AuthProvider<T = Strategy<ProviderUser, any>> {
+  getAuthStrategy(): T
   handleMockAction(request: Request): Promise<void>
   resolveConnectionData(
     providerId: string,

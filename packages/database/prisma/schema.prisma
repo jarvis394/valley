@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
   previewFeatures = ["driverAdapters"]
 }
 
@@ -16,14 +16,14 @@ model User {
   email     String   @unique
   fullname  String
 
-  image       UserImage?
-  password    Password?
-  roles       Role[]
-  sessions    Session[]
-  connections Connection[]
-  projects    Project[]
+  image          UserImage?
+  password       Password?
+  roles          Role[]
+  sessions       Session[]
+  connections    Connection[]
+  projects       Project[]
   /// Contains user settings and social links
-  settings    UserSettings?
+  settings       UserSettings?
 }
 
 model UserSettings {

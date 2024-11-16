@@ -5,7 +5,6 @@ import { PROVIDER_NAMES } from '../../../config/connections'
 import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
-import Passkey from '../../../components/svg/Passkey'
 import { ProviderConnectionForm } from '../../../components/ProviderConnectionForm/ProviderConnectionForm'
 import { data, Form, useSearchParams } from '@remix-run/react'
 import {
@@ -24,7 +23,7 @@ import { checkHoneypot } from '../../../server/honeypot.server'
 import { z } from 'zod'
 import { EmailSchema } from '../../../utils/user-validation'
 import { HoneypotInputs } from '../../../components/Honeypot/Honeypot'
-import { redirectToKey, targetKey } from '../verify'
+import { redirectToKey, targetKey } from '../verify+'
 import TextField from '@valley/ui/TextField'
 import {
   getValidatedFormData,
@@ -32,7 +31,7 @@ import {
   useRemixForm,
 } from 'remix-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { prepareVerification } from '../verify/verify.server'
+import { prepareVerification } from '../verify+/verify.server'
 import { sendAuthEmail } from 'app/server/email.server'
 import { FieldErrors } from 'react-hook-form'
 import { prisma } from 'app/server/db.server'
@@ -196,6 +195,12 @@ const LoginPage: React.FC = () => {
                   type="hidden"
                 />
               )}
+              <input
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                hidden
+              />
               <TextField
                 {...methods.register('email')}
                 // We want to focus the field when user clicks "email edit" button on the next page
@@ -205,11 +210,8 @@ const LoginPage: React.FC = () => {
                 required
                 size="lg"
                 placeholder="Email"
-                formHelperTextProps={{
-                  style: {
-                    paddingBottom: 4,
-                  },
-                }}
+                autoComplete="email"
+                type="email"
                 paperProps={{
                   style: { viewTransitionName: 'auth-form-email-input' },
                 }}
@@ -225,14 +227,6 @@ const LoginPage: React.FC = () => {
                 style={{ viewTransitionName: 'auth-form-submit' }}
               >
                 Continue with Email
-              </Button>
-              <Button
-                fullWidth
-                before={<Passkey />}
-                variant="secondary"
-                size="lg"
-              >
-                Login with Passkey
               </Button>
             </Form>
           </Stack>

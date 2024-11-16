@@ -34,6 +34,7 @@
   flex-direction: column;
   padding: 12px;
   padding-top: 0;
+  padding-bottom: 8px;
   opacity: 1;
   transition: opacity 500ms cubic-bezier(0.62, 0, 0, 1);
 }
