@@ -74,12 +74,7 @@ const AuthGroupLayout = () => {
 
     return (
       <Button asChild variant="tertiary" size="lg">
-        <Link
-          rel="prefetch"
-          to={data.href}
-          viewTransition
-          className={styles.auth__linkButton}
-        >
+        <Link to={data.href} viewTransition className={styles.auth__linkButton}>
           {data.label}
         </Link>
       </Button>

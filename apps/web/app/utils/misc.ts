@@ -1,6 +1,5 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
 import prettyBytes from 'pretty-bytes'
-import { ip as ipAddress } from 'address'
 import * as z from 'zod'
 
 export function getErrorMessage(error: unknown) {
@@ -150,19 +149,6 @@ export async function downloadFile(url: string, retries: number = 0) {
     if (retries > MAX_RETRIES) throw e
     return downloadFile(url, retries + 1)
   }
-}
-
-export const getHostAdress = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:' + process.env.WEB_PORT
-  }
-
-  if (process.env.HOST) {
-    return process.env.HOST
-  }
-
-  const ip = ipAddress()
-  return 'http://' + ip + ':' + process.env.WEB_PORT
 }
 
 /** Optional type that formats `''` to `undefined` for Zod schema */

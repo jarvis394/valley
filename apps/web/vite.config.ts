@@ -5,12 +5,17 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
 import { vercelPreset } from '@vercel/remix/vite'
+import { installGlobals } from '@remix-run/node'
 
 declare module '@remix-run/server-runtime' {
   interface Future {
     v3_singleFetch: true
   }
 }
+
+installGlobals()
+
+const isVercel = process.env.VERCEL === '1'
 
 export default defineConfig(() => ({
   server: {
@@ -24,8 +29,7 @@ export default defineConfig(() => ({
     ssr: true,
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
-      // TODO: fix external node:* packages being put in client code
-      // external: [/node:.*/, 'fsevents'],
+      external: [/node:.*/, 'fsevents'],
     },
     assetsInlineLimit: (source) => {
       if (
@@ -46,8 +50,8 @@ export default defineConfig(() => ({
     envOnlyMacros(),
     tsconfigPaths(),
     remix({
+      ...(isVercel && { presets: [vercelPreset()] }),
       ssr: true,
-      presets: [vercelPreset()],
       ignoredRouteFiles: ['**/*'],
       serverModuleFormat: 'esm',
       routes: async (defineRoutes) => {

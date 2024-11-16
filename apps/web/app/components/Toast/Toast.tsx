@@ -14,8 +14,8 @@ export const ToastElement: React.FC<{ toast: Toast }> = ({ toast }) => {
 
   return (
     <Stack
-      fullWidth
       gap={2}
+      padding={4}
       justify={'space-between'}
       align={'center'}
       className={cx(styles.toast, {

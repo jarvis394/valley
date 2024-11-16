@@ -4,7 +4,7 @@ import { OIDCStrategy } from 'web-oidc/remix'
 import { connectionSessionStorage } from '../connections.server'
 import { redirectWithToast } from '../../toast.server'
 import { type AuthProvider } from './provider'
-import { getHostAdress } from '../../../utils/misc'
+import { getHostAdress } from '../../../server/utils/misc.server'
 
 const shouldMock = process.env.GOOGLE_CLIENT_ID?.startsWith('MOCK_')
 const redirectURI = getHostAdress() + '/auth/google/callback'
@@ -58,9 +58,8 @@ export class GoogleProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/google/callback?${searchParams}`, {
       headers: {
-        'set-cookie': await connectionSessionStorage.commitSession(
-          connectionSession
-        ),
+        'set-cookie':
+          await connectionSessionStorage.commitSession(connectionSession),
       },
     })
   }
