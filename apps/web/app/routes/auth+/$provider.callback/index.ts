@@ -7,13 +7,13 @@ import {
   authenticator,
   getUserId,
   getSessionExpirationDate,
-} from '../../../server/auth.server'
+} from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'
 import {
   normalizeEmail,
   normalizeUsername,
   ProviderUser,
-} from '../../../server/providers/provider'
+} from '../../../server/auth/providers/provider'
 import {
   destroyRedirectToHeader,
   getRedirectCookieValue,
@@ -22,11 +22,11 @@ import {
   redirectWithToast,
   createToastHeaders,
 } from '../../../server/toast.server'
-import { verifySessionStorage } from '../../../server/verification.server'
+import { verifySessionStorage } from '../../../server/auth/verification.server'
 import { combineHeaders } from '../../../utils/misc'
 import { handleNewSession } from '../login/login.server'
-import { redirectToKey } from '../verify'
-import { onboardingSessionStorage } from 'app/server/onboarding.server'
+import { redirectToKey } from '../verify+'
+import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 import { providerNameQueryKey } from '../$provider'
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader }
@@ -66,7 +66,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return redirectWithToast(
         '/settings/profile/connections',
         {
-          title: 'Already Connected',
           description: `Your "${profile.username}" ${label} account is already connected.`,
         },
         { headers: destroyRedirectTo }
@@ -75,8 +74,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       return redirectWithToast(
         '/settings/profile/connections',
         {
-          title: 'Already Connected',
-          description: `The "${profile.username}" ${label} account is already connected to another account.`,
+          title: 'Error',
+          description: `${label} account "${profile.username}" is already connected to another account.`,
+          type: 'error',
         },
         { headers: destroyRedirectTo }
       )
@@ -97,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         title: 'Connected',
         type: 'success',
-        description: `Your "${profile.username}" ${label} account has been connected.`,
+        description: `Your ${label} account "${profile.username}" account has been connected`,
       },
       { headers: destroyRedirectTo }
     )
@@ -105,7 +105,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   // Connection exists already? Make a new session
   if (existingConnection) {
-    return makeSession({ request, userId: existingConnection.userId })
+    return makeSession(
+      { request, userId: existingConnection.userId },
+      {
+        headers: await createToastHeaders({
+          description: 'You are now logged in',
+          type: 'info',
+        }),
+      }
+    )
   }
 
   // if the email matches a user in the db, then link the account and
@@ -128,7 +136,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       {
         headers: await createToastHeaders({
           title: 'Connected',
-          description: `Your "${profile.username}" ${label} account has been connected.`,
+          type: 'success',
+          description: `Your ${label} account "${profile.username}" has been connected`,
         }),
       }
     )
@@ -189,7 +198,7 @@ async function makeSession(
   }: { request: Request; userId: string; redirectTo?: string | null },
   responseInit?: ResponseInit
 ) {
-  redirectTo ??= '/'
+  redirectTo ??= '/projects'
   const session = await prisma.session.create({
     select: { id: true, expirationDate: true, userId: true },
     data: {
@@ -199,6 +208,8 @@ async function makeSession(
   })
   return handleNewSession(
     { request, session, redirectTo },
-    { headers: combineHeaders(responseInit?.headers, destroyRedirectTo) }
+    {
+      headers: combineHeaders(responseInit?.headers, destroyRedirectTo),
+    }
   )
 }

@@ -1,15 +1,21 @@
 import {
-  json,
   Links,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
+  ShouldRevalidateFunction,
   useLoaderData,
 } from '@remix-run/react'
 import cx from 'classnames'
 import styles from './root.module.css'
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
+import {
+  type HeadersFunction,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+  data,
+} from '@remix-run/node'
 import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
@@ -18,22 +24,22 @@ import { useOptionalTheme, useTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { combineHeaders, getDomainUrl } from './utils/misc'
-import { prisma } from './server/db.server'
 import { makeTimings, time } from './server/timing.server'
-import { getUserId, logout } from './server/auth.server'
-import { HoneypotProvider } from 'remix-utils/honeypot/react'
+import { HoneypotProvider } from './components/Honeypot/Honeypot'
 import { honeypot } from './server/honeypot.server'
 import { useEffect } from 'react'
 import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
+import { Modals } from './components/Modals'
 
 import './styles/fonts.css'
 import './styles/global.css'
 import '@valley/ui/styles/theme.css'
 import '@valley/ui/styles/global.css'
-import '@uppy/core/dist/style.min.css'
-import '@uppy/progress-bar/dist/style.min.css'
-import 'overlayscrollbars/overlayscrollbars.css'
+import 'remix-image/remix-image.css?url'
+import '@uppy/core/dist/style.min.css?url'
+import '@uppy/progress-bar/dist/style.min.css?url'
+import 'overlayscrollbars/overlayscrollbars.css?url'
 
 export const links: LinksFunction = () => [
   {
@@ -54,45 +60,13 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const timings = makeTimings('root loader')
-  const userId = await time(() => getUserId(request), {
-    timings,
-    type: 'getUserId',
-    desc: 'getUserId in root',
+  const honeypotProps = honeypot.getInputProps()
+  const { toast, headers: toastHeaders } = await time(() => getToast(request), {
+    type: 'getToast',
   })
 
-  const user = userId
-    ? await time(
-        () =>
-          prisma.user.findUniqueOrThrow({
-            select: {
-              id: true,
-              fullname: true,
-              email: true,
-              roles: {
-                select: {
-                  name: true,
-                  permissions: {
-                    select: { entity: true, action: true, access: true },
-                  },
-                },
-              },
-            },
-            where: { id: userId },
-          }),
-        { timings, type: 'find user', desc: 'find user in root' }
-      )
-    : null
-
-  if (userId && !user) {
-    await logout({ request, redirectTo: '/' })
-  }
-
-  const honeypotProps = honeypot.getInputProps()
-  const { toast, headers: toastHeaders } = await getToast(request)
-
-  return json(
+  return data(
     {
-      user,
       requestInfo: {
         hints: getHints(request),
         origin: getDomainUrl(request),
@@ -112,6 +86,42 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ),
     }
   )
+}
+
+export const headers: HeadersFunction = ({
+  loaderHeaders,
+  actionHeaders,
+  parentHeaders,
+}) => {
+  return {
+    ...Object.fromEntries(loaderHeaders.entries()),
+    ...Object.fromEntries(actionHeaders.entries()),
+    ...Object.fromEntries(parentHeaders.entries()),
+  }
+}
+
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
+  // Revalidate if formAction is present (it can return a toast)
+  if (formAction) {
+    return true
+  }
+
+  return false
+}
+
+export const meta: MetaFunction = () => {
+  return [
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: light)',
+      content: '#ffffff',
+    },
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: dark)',
+      content: '#0e0e0e',
+    },
+  ]
 }
 
 export function Document({
@@ -134,16 +144,6 @@ export function Document({
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: light)"
-          content="#ffffff"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: dark)"
-          content="#0e0e0e"
         />
         <meta name="color-scheme" content="light dark" />
         <link
@@ -203,9 +203,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const loaderData = useLoaderData<typeof loader>()
   const theme = useTheme()
-  const data = useLoaderData<typeof loader>()
-  useToast(data.toast)
+
+  useToast(loaderData.toast)
 
   useEffect(() => {
     // Registering SW manually because Vite remix-pwa plugin
@@ -214,9 +215,10 @@ export default function App() {
   }, [])
 
   return (
-    <HoneypotProvider {...data.honeypotProps}>
+    <HoneypotProvider {...loaderData.honeypotProps}>
       <Outlet />
-      <Toaster closeButton position="bottom-right" theme={theme} />
+      <Modals />
+      <Toaster theme={theme} />
     </HoneypotProvider>
   )
 }

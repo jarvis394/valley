@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { HttpResponse, http, type HttpHandler } from 'msw'
-import { requireHeader } from './utils'
+import { requireHeader } from './utils.js'
 import { z } from 'zod'
 
 const { json } = HttpResponse

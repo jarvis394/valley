@@ -1,28 +1,32 @@
-import { type SerializeFrom } from '@remix-run/node'
 import { useRouteLoaderData } from '@remix-run/react'
-import { type loader as rootLoader } from '../root'
+import { type loader as userLayoutLoader } from '../routes/_user+/_layout'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+import { User } from '@valley/db'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isUser(user: any): user is SerializeFrom<typeof rootLoader>['user'] {
-  return user && typeof user === 'object' && typeof user.id === 'string'
+type UserState = {
+  data: User | null
+}
+type UserActions = {
+  setUser: (data: UserState['data']) => void
 }
 
-export function useOptionalUser() {
-  const data = useRouteLoaderData<typeof rootLoader>('root')
-  if (!data || !isUser(data.user)) {
-    return undefined
-  }
-  return data.user
-}
+export const useUserStore = create<UserState & UserActions>()(
+  immer((set) => ({
+    data: null,
+    setUser: (data) =>
+      set((state) => {
+        state.data = data
+      }),
+  }))
+)
 
-export function useUser() {
-  const maybeUser = useOptionalUser()
-  if (!maybeUser) {
-    throw new Error(
-      'No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.'
-    )
-  }
-  return maybeUser
+export function useUserAwait() {
+  const data = useRouteLoaderData<typeof userLayoutLoader>(
+    'routes/_user+/_layout'
+  )
+
+  return data?.user
 }
 
 type Action = 'create' | 'read' | 'update' | 'delete'
@@ -36,35 +40,11 @@ export function parsePermissionString(permissionString: PermissionString) {
   const [action, entity, access] = permissionString.split(':') as [
     Action,
     Entity,
-    Access | undefined
+    Access | undefined,
   ]
   return {
     action,
     entity,
     access: access ? (access.split(',') as Access[]) : undefined,
   }
-}
-
-export function userHasPermission(
-  user: Pick<ReturnType<typeof useUser>, 'roles'> | null | undefined,
-  permission: PermissionString
-) {
-  if (!user) return false
-  const { action, entity, access } = parsePermissionString(permission)
-  return user.roles.some((role) =>
-    role.permissions.some(
-      (permission) =>
-        permission.entity === entity &&
-        permission.action === action &&
-        (!access || access.includes(permission.access as Access))
-    )
-  )
-}
-
-export function userHasRole(
-  user: Pick<ReturnType<typeof useUser>, 'roles'> | null,
-  role: string
-) {
-  if (!user) return false
-  return user.roles.some((r) => r.name === role)
 }

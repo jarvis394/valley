@@ -5,94 +5,143 @@ import { PROVIDER_NAMES } from '../../../config/connections'
 import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
-import Passkey from '../../../components/svg/Passkey'
 import { ProviderConnectionForm } from '../../../components/ProviderConnectionForm/ProviderConnectionForm'
-import { Form, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from '@remix-run/react'
 import {
-  type LoaderFunctionArgs,
   type ActionFunctionArgs,
   redirect,
-  json,
+  HeadersFunction,
 } from '@remix-run/node'
-import { requireAnonymous } from '../../../server/auth.server'
+import {
+  canPerformPasswordLogin,
+  getSessionExpirationDate,
+  requireAnonymous,
+} from '../../../server/auth/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import Input from '@valley/ui/Input'
-import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { getDomainUrl, useIsPending } from '../../../utils/misc'
+import { useIsPending } from '../../../utils/misc'
 import { checkHoneypot } from '../../../server/honeypot.server'
 import { z } from 'zod'
 import { EmailSchema } from '../../../utils/user-validation'
-import { HoneypotInputs } from 'remix-utils/honeypot/react'
-import { handleNewSession } from './login.server'
-import { redirectToKey, targetKey } from '../verify'
+import { HoneypotInputs } from '../../../components/Honeypot/Honeypot'
+import { redirectToKey, targetKey } from '../verify+'
+import TextField from '@valley/ui/TextField'
+import {
+  getValidatedFormData,
+  RemixFormProvider,
+  useRemixForm,
+} from 'remix-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { prepareVerification } from '../verify+/verify.server'
+import { sendAuthEmail } from 'app/server/email.server'
+import { FieldErrors } from 'react-hook-form'
+import { prisma } from 'app/server/db.server'
+import { verifySessionStorage } from 'app/server/auth/verification.server'
 
-const EmailFormSchema = z.object({
-  email: EmailSchema,
-  redirectTo: z.string().optional(),
-})
+const EmailFormSchema = z.intersection(
+  z.object({
+    email: EmailSchema,
+    redirectTo: z.string().optional(),
+  }),
+  z.record(z.string(), z.string().optional())
+)
+
+type FormData = z.infer<typeof EmailFormSchema>
+
+const resolver = zodResolver(EmailFormSchema)
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  await requireAnonymous(request)
-  return json({})
-}
-
 export async function action({ request }: ActionFunctionArgs) {
   await requireAnonymous(request)
 
-  const formData = await request.formData()
-  checkHoneypot(formData)
+  const {
+    errors,
+    data: submissionData,
+    receivedValues,
+  } = await getValidatedFormData<FormData>(request, resolver)
 
-  const submission = await parseWithZod(formData, {
-    schema: (intent) =>
-      EmailFormSchema.transform(async (data, ctx) => {
-        if (intent !== null) return { ...data, session: null }
+  checkHoneypot(receivedValues)
 
-        // const session = await doEmailAuthorization({
-        //   email: data.email,
-        //   request,
-        // })
-        // if (!session) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Redirect to password login',
-        })
-        return z.NEVER
-        // }
-
-        // return { ...data, session }
-      }),
-    async: true,
-  })
-
-  if (submission.status !== 'success' || !submission.value.session) {
-    const redirectToUrl = new URL(`${getDomainUrl(request)}/auth/login/email`)
-    redirectToUrl.searchParams.set(
-      targetKey,
-      submission.payload.email.toString()
+  if (errors) {
+    return data(
+      { errors },
+      {
+        status: 400,
+      }
     )
-
-    if (submission.payload.redirectTo) {
-      redirectToUrl.searchParams.set(
-        redirectToKey,
-        submission.payload.redirectTo.toString()
-      )
-    }
-
-    return redirect(redirectToUrl.toString())
   }
 
-  const { session, redirectTo } = submission.value
-
-  return handleNewSession({
-    request,
-    session,
-    redirectTo,
+  const searchParams = new URLSearchParams({
+    target: submissionData.email,
+    ...(submissionData.redirectTo && { redirectTo: submissionData.redirectTo }),
   })
+  const user = await prisma.user.findUnique({
+    where: {
+      email: submissionData.email,
+    },
+  })
+  // Redirect to password login if no user to not to give any additional info to spambots
+  if (!user) {
+    return redirect('/auth/login/email?' + searchParams.toString())
+  }
+
+  const userHasPassword = await canPerformPasswordLogin(submissionData.email)
+  if (userHasPassword) {
+    return redirect('/auth/login/email?' + searchParams.toString())
+  }
+
+  const session = await prisma.session.create({
+    select: { id: true, expirationDate: true, userId: true },
+    data: {
+      expirationDate: getSessionExpirationDate(),
+      userId: user.id,
+    },
+  })
+  const verifySession = await verifySessionStorage.getSession()
+  verifySession.set('unverifiedSessionId', session.id)
+
+  const { verifyUrl, redirectTo, otp } = await prepareVerification({
+    period: 10 * 60,
+    request,
+    type: 'auth',
+    target: submissionData.email,
+  })
+
+  const response = await sendAuthEmail({
+    code: otp,
+    email: submissionData.email,
+    magicLink: verifyUrl.toString(),
+  })
+
+  const headers = new Headers()
+  headers.append(
+    'set-cookie',
+    await verifySessionStorage.commitSession(verifySession)
+  )
+
+  if (response.status === 'success') {
+    return redirect(redirectTo.toString(), {
+      headers,
+    })
+  } else {
+    return data(
+      {
+        errors: {
+          email: {
+            type: 'value',
+            message: response.error.message,
+          },
+        } satisfies FieldErrors<FormData>,
+      },
+      { status: 500 }
+    )
+  }
+}
+
+export const headers: HeadersFunction = ({ actionHeaders }) => {
+  return actionHeaders
 }
 
 const LoginPage: React.FC = () => {
@@ -100,14 +149,18 @@ const LoginPage: React.FC = () => {
   const isPending = useIsPending()
   const redirectTo = searchParams.get(redirectToKey)
   const target = searchParams.get(targetKey)
-  const [form, fields] = useForm({
-    id: 'login-form',
-    constraint: getZodConstraint(EmailFormSchema),
-    defaultValue: { redirectTo, email: target },
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: EmailFormSchema })
+
+  const methods = useRemixForm<FormData>({
+    mode: 'all',
+    reValidateMode: 'onChange',
+    resolver,
+    defaultValues: {
+      redirectTo: redirectTo || undefined,
+      email: target || undefined,
     },
-    shouldRevalidate: 'onBlur',
+    submitConfig: {
+      viewTransition: true,
+    },
   })
 
   return (
@@ -130,49 +183,54 @@ const LoginPage: React.FC = () => {
           ))}
         </Stack>
         <Divider style={{ viewTransitionName: 'auth-divider' }}>OR</Divider>
-        <Stack asChild gap={2} fullWidth direction={'column'}>
-          <Form {...getFormProps(form)} viewTransition method="POST">
-            <HoneypotInputs />
-            {redirectTo && (
-              <input type="hidden" name="redirectTo" value={redirectTo} />
-            )}
-            <Input
-              {...getInputProps(fields.email, {
-                type: 'email',
-              })}
-              // We want to focus the field when user clicks "email edit" button on the next page
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus={!!target}
-              state={fields.email.errors ? 'error' : 'default'}
-              required
-              size="lg"
-              placeholder="Email"
-              paperProps={{
-                style: { viewTransitionName: 'auth-form-email-input' },
-              }}
-            />
-            <Button
-              fullWidth
-              loading={isPending}
-              disabled={isPending}
-              variant="primary"
-              size="lg"
-              type="submit"
-              after={<ArrowRight />}
-              style={{ viewTransitionName: 'auth-form-submit' }}
-            >
-              Continue with Email
-            </Button>
-            <Button
-              fullWidth
-              before={<Passkey />}
-              variant="secondary"
-              size="lg"
-            >
-              Login with Passkey
-            </Button>
-          </Form>
-        </Stack>
+        <RemixFormProvider {...methods}>
+          <Stack asChild gap={2} fullWidth direction={'column'}>
+            <Form onSubmit={methods.handleSubmit} viewTransition method="POST">
+              <HoneypotInputs />
+              {redirectTo && (
+                <input
+                  {...methods.register('redirectTo', {
+                    value: redirectTo,
+                  })}
+                  type="hidden"
+                />
+              )}
+              <input
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                hidden
+              />
+              <TextField
+                {...methods.register('email')}
+                // We want to focus the field when user clicks "email edit" button on the next page
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus={!!target}
+                fieldState={methods.getFieldState('email', methods.formState)}
+                required
+                size="lg"
+                placeholder="Email"
+                autoComplete="email"
+                type="email"
+                paperProps={{
+                  style: { viewTransitionName: 'auth-form-email-input' },
+                }}
+              />
+              <Button
+                fullWidth
+                loading={isPending}
+                disabled={isPending}
+                variant="primary"
+                size="lg"
+                type="submit"
+                after={<ArrowRight />}
+                style={{ viewTransitionName: 'auth-form-submit' }}
+              >
+                Continue with Email
+              </Button>
+            </Form>
+          </Stack>
+        </RemixFormProvider>
       </Stack>
     </main>
   )

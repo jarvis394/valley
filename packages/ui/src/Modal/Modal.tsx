@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import type { SetURLSearchParams } from 'react-router-dom'
-import { Modal as BaseModal } from '@mui/base/Modal'
+import { Modal as BaseModal } from '@mui/base'
 import styles from './Modal.module.css'
 import Grow from '../Grow/Grow'
 import cx from 'classnames'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
-import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
+import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
 import { Drawer } from 'vaul'
 
 const modalKey = 'modal'
@@ -19,18 +19,21 @@ type ModalProps = React.PropsWithChildren<{
 }>
 
 const Modal: React.FC<ModalProps> = ({
-  onDismiss,
-  searchParams,
-  setSearchParams,
   isOpen: propsIsOpen = false,
   children,
   id,
+  onDismiss,
+  searchParams,
+  setSearchParams,
 }) => {
   const shouldShowDrawer = useMediaQuery(
-    `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
+    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
   const [open, setOpen] = useState(propsIsOpen)
-  const currentModal = useMemo(() => searchParams.get(modalKey), [searchParams])
+  const currentModal = useMemo(
+    () => searchParams?.get(modalKey),
+    [searchParams]
+  )
 
   const handleClose = () => {
     // Use only user-provided function if it is present

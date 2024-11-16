@@ -24,7 +24,7 @@ const IS_PROD = MODE === 'production'
 const SENTRY_ENABLED = IS_PROD && process.env.SENTRY_DSN
 
 if (SENTRY_ENABLED) {
-  void import('./utils/monitoring').then(({ init }) => init())
+  void import('./utils/monitoring.js').then(({ init }) => init())
 }
 
 if (MOCKS_ENABLED) {

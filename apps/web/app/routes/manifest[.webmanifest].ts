@@ -1,8 +1,9 @@
 import type { WebAppManifest } from '@remix-pwa/dev'
-import { json } from '@remix-run/node'
+import { data } from '@remix-run/node'
+import { ShouldRevalidateFunction } from 'react-router'
 
 export const loader = () => {
-  return json(
+  return data(
     {
       title: 'Valley',
       name: 'Valley',
@@ -33,3 +34,5 @@ export const loader = () => {
     }
   )
 }
+
+export const shouldRevalidate: ShouldRevalidateFunction = () => false

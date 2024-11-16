@@ -1,10 +1,3 @@
-import { useForm, getFormProps } from '@conform-to/react'
-import { parseWithZod } from '@conform-to/zod'
-import { invariantResponse } from '../../utils/invariant'
-import { type ActionFunctionArgs, redirect, json } from '@remix-run/node'
-import { useFetcher, useFetchers } from '@remix-run/react'
-import { ServerOnly } from 'remix-utils/server-only'
-import { z } from 'zod'
 import {
   useHints,
   useOptionalHints,
@@ -13,46 +6,40 @@ import {
   useOptionalRequestInfo,
   useRequestInfo,
 } from '../../utils/request-info'
-import { type Theme, setTheme } from '../../utils/theme'
+import { type Theme, setTheme as getThemeCookie } from '../../utils/theme'
 import React from 'react'
 import Button from '@valley/ui/Button'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
-const ThemeFormSchema = z.object({
-  theme: z.enum(['system', 'light', 'dark']),
-  redirectTo: z.string().optional(),
-})
+export const themeFetcherKey = 'theme-switch-fetcher'
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData()
-  const submission = parseWithZod(formData, {
-    schema: ThemeFormSchema,
-  })
-
-  invariantResponse(submission.status === 'success', 'Invalid theme received')
-
-  const { theme, redirectTo } = submission.value
-  const responseInit = {
-    headers: { 'set-cookie': setTheme(theme) },
-  }
-
-  if (redirectTo) {
-    return redirect(redirectTo, responseInit)
-  } else {
-    return json({ result: submission.reply() }, responseInit)
-  }
+type ThemeStoreState = {
+  theme: Theme | 'system' | null
 }
+type ThemeStoreActions = {
+  setTheme: (data: ThemeStoreState['theme']) => void
+}
+
+export const useThemeStore = create<ThemeStoreState & ThemeStoreActions>()(
+  immer((set) => ({
+    theme: null,
+    setTheme: (theme) =>
+      set((state) => {
+        const themeCookie = getThemeCookie(theme || 'system')
+        document.cookie = themeCookie
+        state.theme = theme
+        return state
+      }),
+  }))
+)
 
 export const ThemeSwitch: React.FC<{
   userPreference?: Theme | null
 }> = ({ userPreference }) => {
-  const fetcher = useFetcher<typeof action>()
-  const requestInfo = useRequestInfo()
-  const optimisticMode = useOptimisticThemeMode()
-  const [form] = useForm({
-    id: 'theme-switch',
-    lastResult: fetcher.data?.result,
-  })
-  const mode = optimisticMode || userPreference || 'system'
+  const theme = useThemeStore((store) => store.theme)
+  const setTheme = useThemeStore((store) => store.setTheme)
+  const mode = theme || userPreference || 'system'
   const nextMode =
     mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
   const modeLabel = {
@@ -61,46 +48,11 @@ export const ThemeSwitch: React.FC<{
     system: 'System',
   }
 
-  return (
-    <fetcher.Form
-      {...getFormProps(form)}
-      method="POST"
-      action="/resources/theme-switch"
-    >
-      <ServerOnly>
-        {() => (
-          <input type="hidden" name="redirectTo" value={requestInfo.path} />
-        )}
-      </ServerOnly>
-      <input type="hidden" name="theme" value={nextMode} />
-      <Button type="submit">{modeLabel[mode]}</Button>
-    </fetcher.Form>
-  )
-}
-
-/**
- * If the user's changing their theme mode preference, this will return the
- * value it's being changed to.
- */
-export function useOptimisticThemeMode(): Theme | 'system' | undefined {
-  const fetchers = useFetchers()
-  const themeFetcher = fetchers.find(
-    (f) => f.formAction === '/resources/theme-switch'
-  )
-
-  if (themeFetcher && themeFetcher.formData) {
-    const submission = parseWithZod(themeFetcher.formData, {
-      schema: ThemeFormSchema,
-    })
-
-    if (submission.status === 'success') {
-      return submission.value.theme
-    }
-
-    return
+  const handleThemeSwitch = () => {
+    setTheme(nextMode)
   }
 
-  return
+  return <Button onClick={handleThemeSwitch}>{modeLabel[mode]}</Button>
 }
 
 /**
@@ -110,19 +62,26 @@ export function useOptimisticThemeMode(): Theme | 'system' | undefined {
 export function useTheme(): Theme {
   const hints = useHints()
   const requestInfo = useRequestInfo()
-  const optimisticMode = useOptimisticThemeMode()
-  if (optimisticMode) {
-    return optimisticMode === 'system' ? hints.theme : optimisticMode
+  const theme = useThemeStore((store) => store.theme)
+
+  // Theme can be present in store when user changed it while app is running
+  if (theme) {
+    return theme === 'system' ? hints.theme : theme
   }
+
+  // Theme should not be present on first load
   return requestInfo.userSettings.theme ?? hints.theme
 }
 
 export function useOptionalTheme() {
   const optionalHints = useOptionalHints()
   const optionalRequestInfo = useOptionalRequestInfo()
-  const optimisticMode = useOptimisticThemeMode()
-  if (optimisticMode) {
-    return optimisticMode === 'system' ? optionalHints?.theme : optimisticMode
+  const theme = useThemeStore((store) => store.theme)
+
+  if (theme) {
+    return theme === 'system' ? optionalHints?.theme : theme
   }
+
+  // Request info could not be present if app has errored
   return optionalRequestInfo?.userSettings.theme ?? optionalHints?.theme
 }

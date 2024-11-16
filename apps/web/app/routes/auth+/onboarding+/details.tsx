@@ -1,8 +1,9 @@
 import {
+  type HeadersFunction,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
   type MetaFunction,
-  json,
+  data,
 } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { looseOptional, useIsPending } from '../../../utils/misc'
@@ -10,7 +11,7 @@ import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-import { onboardingSessionStorage } from 'app/server/onboarding.server'
+import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -18,12 +19,12 @@ import { NameSchema, PhoneSchema } from '../../../utils/user-validation'
 import TextField from '@valley/ui/TextField'
 import { Controller } from 'react-hook-form'
 import PhoneInput from 'react-phone-number-input/input'
-import { verifySessionStorage } from 'app/server/verification.server'
+import { verifySessionStorage } from 'app/server/auth/verification.server'
 import { prisma } from 'app/server/db.server'
 import { redirectWithToast } from 'app/server/toast.server'
-import { register } from 'app/server/auth.server'
+import { register } from 'app/server/auth/auth.server'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { authSessionStorage } from 'app/server/session.server'
+import { authSessionStorage } from 'app/server/auth/session.server'
 
 const DetailsFormSchema = z.object({
   firstName: NameSchema,
@@ -37,18 +38,27 @@ const resolver = zodResolver(DetailsFormSchema)
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await requireOnboardingData(request)
-  return json(data)
+  return data
+}
+
+export const headers: HeadersFunction = ({ actionHeaders }) => {
+  return actionHeaders
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const { submission } = await requireOnboardingData(request)
   const {
     errors,
-    data,
+    data: submissionData,
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
-    return json({ errors, defaultValues })
+    return data(
+      { errors, defaultValues },
+      {
+        status: 400,
+      }
+    )
   }
   const url = new URL(request.url)
   const redirectTo = url.searchParams.get('redirectTo')
@@ -63,9 +73,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const providerName = onboardingSession.get('provider')
 
-  onboardingSession.set('firstName', data.firstName)
-  data.lastName && onboardingSession.set('lastName', data.lastName)
-  data.phone && onboardingSession.set('phone', data.phone)
+  onboardingSession.set('firstName', submissionData.firstName)
+  submissionData.lastName &&
+    onboardingSession.set('lastName', submissionData.lastName)
+  submissionData.phone && onboardingSession.set('phone', submissionData.phone)
 
   headers.append(
     'set-cookie',
@@ -80,7 +91,10 @@ export async function action({ request }: ActionFunctionArgs) {
   if (existingUser) {
     return redirectWithToast(
       request.url.toString(),
-      { title: 'Welcome', description: 'Thanks for signing up!' },
+      {
+        type: 'error',
+        description: 'A user already exists with this email',
+      },
       { headers }
     )
   }
@@ -97,7 +111,9 @@ export async function action({ request }: ActionFunctionArgs) {
             providerName,
           }
         : undefined,
-    fullname: [data.firstName, data.lastName].filter(Boolean).join(' '),
+    fullname: [submissionData.firstName, submissionData.lastName]
+      .filter(Boolean)
+      .join(' '),
   })
 
   const authSession = await authSessionStorage.getSession(
@@ -120,7 +136,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirectWithToast(
     safeRedirect(redirectTo || '/projects'),
-    { title: 'Welcome', description: 'Thanks for signing up!' },
+    { description: 'You are now logged in', type: 'info' },
     { headers }
   )
 }

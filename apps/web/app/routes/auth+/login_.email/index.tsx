@@ -4,24 +4,24 @@ import { SEOHandle } from '@nasa-gcn/remix-seo'
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  json,
 } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
-import { login, requireAnonymous } from '../../../server/auth.server'
+import { login, requireAnonymous } from '../../../server/auth/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
-import { checkHoneypot } from '../../../server/honeypot.server'
 import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
 import { handleNewSession } from '../login/login.server'
 import { useIsPending } from '../../../utils/misc'
 import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
-import { redirectToKey, targetKey } from '../verify'
+import { redirectToKey, targetKey } from '../verify+'
 import PasswordField from '../../../components/PasswordField/PasswordField'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
+import Stack from '@valley/ui/Stack'
+import { createToastHeaders } from 'app/server/toast.server'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -39,14 +39,13 @@ export const handle: SEOHandle = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
-  return json({})
+  return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   await requireAnonymous(request)
 
   const formData = await request.formData()
-  checkHoneypot(formData)
 
   const {
     errors,
@@ -54,12 +53,12 @@ export async function action({ request }: ActionFunctionArgs) {
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(formData, resolver)
   if (errors) {
-    return json({ errors, defaultValues })
+    return { errors, defaultValues }
   }
 
   const session = await login(data)
   if (!session) {
-    return json({
+    return {
       errors: {
         password: {
           type: 'validate',
@@ -67,14 +66,22 @@ export async function action({ request }: ActionFunctionArgs) {
         },
       } satisfies FieldErrors<FormData>,
       defaultValues: data,
-    })
+    }
   }
 
-  return handleNewSession({
-    request,
-    session,
-    redirectTo: data.redirectTo,
-  })
+  return handleNewSession(
+    {
+      request,
+      session,
+      redirectTo: data.redirectTo,
+    },
+    {
+      headers: await createToastHeaders({
+        type: 'info',
+        description: 'You are now logged in',
+      }),
+    }
+  )
 }
 
 const LoginViaEmailPage: React.FC = () => {
@@ -98,46 +105,51 @@ const LoginViaEmailPage: React.FC = () => {
   return (
     <main className={styles.auth__content}>
       <AuthFormHeader type="password" email={target} />
-      <Form
-        onSubmit={handleSubmit}
-        method="POST"
-        className={styles.auth__form}
-        style={{ viewTransitionName: 'auth-form' }}
-      >
-        <HoneypotInputs />
-        {redirectTo && <input {...register('redirectTo')} hidden />}
-        {target && <input {...register('email')} type="email" hidden />}
-        <PasswordField
-          {...register('password')}
-          // This should be always auto focused, as we are transitioning within the same form
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-          required
-          fieldState={getFieldState('password', formState)}
-          size="lg"
-          placeholder="Password"
-          autoComplete="current-password"
-        />
-        <Button
-          fullWidth
-          loading={isPending}
-          disabled={isPending}
-          variant="primary"
-          size="lg"
+      <Stack asChild gap={2} align={'center'} fullWidth direction={'column'}>
+        <Form
+          onSubmit={handleSubmit}
+          method="POST"
+          style={{ viewTransitionName: 'auth-form' }}
         >
-          Continue
-        </Button>
-        <Button
-          asChild
-          variant="tertiary-dimmed"
-          before={<ArrowLeft />}
-          size="md"
-        >
-          <Link to="/auth/login" viewTransition>
-            Other Login options
-          </Link>
-        </Button>
-      </Form>
+          <HoneypotInputs />
+          {redirectTo && <input {...register('redirectTo')} hidden />}
+          {target && <input {...register('email')} type="email" hidden />}
+          <PasswordField
+            {...register('password')}
+            // This should be always auto focused, as we are transitioning within the same form
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            required
+            fieldState={getFieldState('password', formState)}
+            size="lg"
+            placeholder="Password"
+            autoComplete="current-password"
+            paperProps={{
+              style: { viewTransitionName: 'auth-form-email-input' },
+            }}
+          />
+          <Button
+            fullWidth
+            loading={isPending}
+            disabled={isPending}
+            variant="primary"
+            size="lg"
+            style={{ viewTransitionName: 'auth-form-submit' }}
+          >
+            Continue
+          </Button>
+          <Button
+            asChild
+            variant="tertiary-dimmed"
+            before={<ArrowLeft />}
+            size="md"
+          >
+            <Link to="/auth/login" viewTransition>
+              Other Login options
+            </Link>
+          </Button>
+        </Form>
+      </Stack>
     </main>
   )
 }

@@ -1,16 +1,16 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { getUserId } from '../../../server/auth.server'
+import { getUserId } from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'
 import { combineResponseInits } from '../../../utils/misc'
-import { authSessionStorage } from '../../../server/session.server'
+import { authSessionStorage } from '../../../server/auth/session.server'
 import { redirectWithToast } from '../../../server/toast.server'
-import { verifySessionStorage } from '../../../server/verification.server'
+import { verifySessionStorage } from '../../../server/auth/verification.server'
 import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
-} from '../verify/verify.server'
+} from '../verify+/verify.server'
 import { twoFAVerificationType } from '../../_user+/account+/settings.authentication'
 
 export async function handleNewSession(
@@ -42,37 +42,31 @@ export async function handleNewSession(
       target: session.userId,
       redirectTo,
     })
+    const headers = new Headers()
+    headers.append(
+      'set-cookie',
+      await verifySessionStorage.commitSession(verifySession)
+    )
     return redirect(
       `${redirectUrl.pathname}?${redirectUrl.searchParams}`,
-      combineResponseInits(
-        {
-          headers: {
-            'set-cookie': await verifySessionStorage.commitSession(
-              verifySession
-            ),
-          },
-        },
-        responseInit
-      )
+      combineResponseInits({ headers }, responseInit)
     )
   } else {
     const authSession = await authSessionStorage.getSession(
       request.headers.get('cookie')
     )
     authSession.set('sessionId', session.id)
+    const headers = new Headers()
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession, {
+        expires: session.expirationDate,
+      })
+    )
 
     return redirect(
       safeRedirect(redirectTo),
-      combineResponseInits(
-        {
-          headers: {
-            'set-cookie': await authSessionStorage.commitSession(authSession, {
-              expires: session.expirationDate,
-            }),
-          },
-        },
-        responseInit
-      )
+      combineResponseInits({ headers }, responseInit)
     )
   }
 }
@@ -114,18 +108,33 @@ export async function handleVerification({
     }
 
     authSession.set('sessionId', unverifiedSessionId)
+
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession, {
+        expires: session.expirationDate,
+      })
+    )
+  } else {
+    headers.append(
+      'set-cookie',
+      await authSessionStorage.commitSession(authSession)
+    )
   }
 
-  headers.append(
-    'set-cookie',
-    await authSessionStorage.commitSession(authSession)
-  )
   headers.append(
     'set-cookie',
     await verifySessionStorage.destroySession(verifySession)
   )
 
-  return redirect(safeRedirect(redirectTo), { headers })
+  return redirectWithToast(
+    safeRedirect(redirectTo),
+    {
+      type: 'info',
+      description: 'You are now logged in',
+    },
+    { headers }
+  )
 }
 
 export async function shouldRequestTwoFA(request: Request) {

@@ -4,17 +4,32 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
+import { vercelPreset } from '@vercel/remix/vite'
+import { installGlobals } from '@remix-run/node'
 
-export default defineConfig({
+declare module '@remix-run/server-runtime' {
+  interface Future {
+    v3_singleFetch: true
+  }
+}
+
+installGlobals()
+
+const isVercel = process.env.VERCEL === '1'
+
+export default defineConfig(() => ({
   server: {
     host: true,
     port: Number(process.env.WEB_PORT) || 4200,
+  },
+  ssr: {
+    noExternal: ['remix-utils'],
   },
   build: {
     ssr: true,
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
-      // external: [/node:.*/, 'fsevents'],
+      external: [/node:.*/, 'fsevents'],
     },
     assetsInlineLimit: (source) => {
       if (
@@ -35,6 +50,8 @@ export default defineConfig({
     envOnlyMacros(),
     tsconfigPaths(),
     remix({
+      ...(isVercel && { presets: [vercelPreset()] }),
+      ssr: true,
       ignoredRouteFiles: ['**/*'],
       serverModuleFormat: 'esm',
       routes: async (defineRoutes) => {
@@ -54,7 +71,7 @@ export default defineConfig({
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
         v3_lazyRouteDiscovery: true,
-        v3_singleFetch: false,
+        v3_singleFetch: true,
       },
     }),
     remixPWA({
@@ -62,4 +79,4 @@ export default defineConfig({
       registerSW: null,
     }),
   ],
-})
+}))

@@ -1,34 +1,59 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import cx from 'classnames'
-import { Link, Outlet, useLocation } from '@remix-run/react'
+import {
+  Link,
+  Outlet,
+  ShouldRevalidateFunction,
+  useLocation,
+} from '@remix-run/react'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
 import Button from '@valley/ui/Button'
 import AuthHeader from '../../components/AuthHeader/AuthHeader'
-import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
+import { requireAnonymous } from 'app/server/auth/auth.server'
+import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 
 const covers = [
-  '/assets/cover-1.jpg',
-  '/assets/cover-2.jpg',
-  '/assets/cover-3.jpg',
-  '/assets/cover-4.jpg',
-  '/assets/cover-5.jpg',
-  '/assets/cover-6.jpg',
-  '/assets/cover-7.jpg',
-  '/assets/cover-8.jpg',
+  '/assets/cover-1.webp',
+  '/assets/cover-2.webp',
+  '/assets/cover-3.webp',
+  '/assets/cover-4.webp',
+  '/assets/cover-5.webp',
+  '/assets/cover-6.webp',
+  '/assets/cover-7.webp',
+  '/assets/cover-8.webp',
 ]
 const COVER_SWITCH_INTERVAL = 10000
 
-// Redirect from layout to an actual page (/auth/login)
-export const loader = ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url)
-  if (url.pathname === '/auth') {
-    return redirect('/auth/login')
-  }
+export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAnonymous(request)
   return null
+}
+
+export const meta: MetaFunction = () => {
+  return [
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: light)',
+      content: '#fafafa',
+    },
+    {
+      name: 'theme-color',
+      media: '(prefers-color-scheme: dark)',
+      content: '#0a0a0a',
+    },
+  ]
+}
+
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
+  if (formAction) {
+    return true
+  }
+
+  return false
 }
 
 const AuthGroupLayout = () => {

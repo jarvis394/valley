@@ -3,7 +3,7 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
   redirect,
-  json,
+  data,
 } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { looseOptional, useIsPending } from '../../../utils/misc'
@@ -25,7 +25,7 @@ import React from 'react'
 import FormCollapsibleField from '../../../components/FormCollapsibleField/FormCollapsibleField'
 import FormHelperText from '@valley/ui/FormHelperText'
 import PasswordField from '../../../components/PasswordField/PasswordField'
-import { onboardingSessionStorage } from '../../../server/onboarding.server'
+import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
 
 const SecurityFormSchema = z
   .object({
@@ -49,18 +49,23 @@ const resolver = zodResolver(SecurityFormSchema)
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await requireOnboardingData(request)
-  return json(data)
+  return data
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   await requireOnboardingData(request)
   const {
     errors,
-    data,
+    data: submissionData,
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
-    return json({ errors, defaultValues })
+    return data(
+      { errors, defaultValues },
+      {
+        status: 400,
+      }
+    )
   }
 
   const url = new URL(request.url)
@@ -69,18 +74,17 @@ export async function action({ request }: ActionFunctionArgs) {
   )
 
   onboardingSession.set('onboardingStep', 'details')
-  onboardingSession.set('usePassword', data.usePassword)
-  if (data.usePassword) {
-    onboardingSession.set('password', data.password)
+  onboardingSession.set('usePassword', submissionData.usePassword)
+  if (submissionData.usePassword) {
+    onboardingSession.set('password', submissionData.password)
   }
 
   url.pathname = '/auth/onboarding/details'
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

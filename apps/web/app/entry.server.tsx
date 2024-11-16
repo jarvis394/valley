@@ -16,6 +16,7 @@ import chalk from 'chalk'
 import * as Sentry from '@sentry/remix'
 
 const ABORT_DELAY = 5_000
+export const STREAMING_TIMEOUT = 5_000
 
 envInit()
 
@@ -64,7 +65,7 @@ const handleRequest: HandleDocumentRequestFunction = (
       }
     )
 
-    setTimeout(abort, ABORT_DELAY)
+    setTimeout(abort, STREAMING_TIMEOUT + ABORT_DELAY)
   })
 }
 

@@ -3,13 +3,16 @@ import styles from './TextField.module.css'
 import Input, { InputProps } from '../Input/Input'
 import InputLabel from '../InputLabel/InputLabel'
 import FormControl from '../FormControl/FormControl'
-import FormHelperText from '../FormHelperText/FormHelperText'
+import FormHelperText, {
+  FormHelperTextProps,
+} from '../FormHelperText/FormHelperText'
 import { FieldError } from 'react-hook-form'
 
 export type TextFieldProps = InputProps & {
   label?: React.ReactElement | string
   helperText?: React.ReactElement | string
   validHelperText?: React.ReactElement | string
+  formHelperTextProps?: FormHelperTextProps
   fieldState?: {
     invalid: boolean
     isDirty: boolean
@@ -30,6 +33,8 @@ const TextField = React.forwardRef(function TextField(
     fieldState: propsFieldState,
     id: propsId,
     required,
+    size,
+    formHelperTextProps,
     ...props
   }: TextFieldProps,
   ref: React.ForwardedRef<HTMLInputElement>
@@ -72,12 +77,18 @@ const TextField = React.forwardRef(function TextField(
   return (
     <FormControl state={state} className={styles.textField}>
       {label && (
-        <InputLabel required={required} htmlFor={id} id={id + '-label'}>
+        <InputLabel
+          size={size}
+          required={required}
+          htmlFor={id}
+          id={id + '-label'}
+        >
           {label}
         </InputLabel>
       )}
       <Input
         {...props}
+        size={size}
         aria-invalid={propsFieldState?.error ? 'true' : 'false'}
         ref={ref}
         id={id}
@@ -86,7 +97,7 @@ const TextField = React.forwardRef(function TextField(
         onBlur={onBlur}
       />
 
-      <FormHelperText>
+      <FormHelperText {...formHelperTextProps}>
         {shouldShowPropsHelperText && helperText}
         {shouldShowErrorMessage && propsFieldState?.error?.message}
         {shouldShowValidMessage && validHelperText}

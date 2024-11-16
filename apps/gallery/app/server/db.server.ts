@@ -1,5 +1,5 @@
 import { remember } from '../utils/remember'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@valley/db'
 import chalk from 'chalk'
 
 // NOTE: if you change anything in this function you'll need to restart

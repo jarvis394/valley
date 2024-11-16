@@ -3,7 +3,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  font-family: var(--geist-font-family);
+  font-family: var(--font-geist-sans);
   background: var(--background-default);
 }
 

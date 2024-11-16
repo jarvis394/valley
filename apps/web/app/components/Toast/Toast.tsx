@@ -1,16 +1,55 @@
 import React, { useEffect } from 'react'
-import { toast as showToast, Toaster as Sonner } from 'sonner'
+import { toast as toaster, Toaster as Sonner } from 'sonner'
 import { type Toast } from '../../server/toast.server'
+import styles from './Toast.module.css'
+import IconButton from '@valley/ui/IconButton'
+import { Cross } from 'geist-ui-icons'
+import Stack from '@valley/ui/Stack'
+import cx from 'classnames'
+
+export const ToastElement: React.FC<{ toast: Toast }> = ({ toast }) => {
+  const handleClose = () => {
+    toaster.dismiss(toast.id)
+  }
+
+  return (
+    <Stack
+      gap={2}
+      padding={4}
+      justify={'space-between'}
+      align={'center'}
+      className={cx(styles.toast, {
+        [styles['toast--info']]: toast.type === 'info',
+        [styles['toast--success']]: toast.type === 'success',
+        [styles['toast--warning']]: toast.type === 'warning',
+        [styles['toast--error']]: toast.type === 'error',
+      })}
+    >
+      <Stack direction={'column'} gap={1} className={styles.toast__content}>
+        {toast.title && <h1>{toast.title}</h1>}
+        {toast.description && <p>{toast.description}</p>}
+      </Stack>
+      <IconButton
+        className={styles.toast__closeButton}
+        onClick={handleClose}
+        variant="tertiary-dimmed"
+      >
+        <Cross />
+      </IconButton>
+    </Stack>
+  )
+}
+
+export const showToast = (toast: Toast) => {
+  setTimeout(() => {
+    toaster.custom((id) => <ToastElement toast={{ ...toast, id }} />)
+  }, 0)
+}
 
 export const useToast = (toast?: Toast | null) => {
   useEffect(() => {
     if (toast) {
-      setTimeout(() => {
-        showToast[toast.type](toast.title, {
-          id: toast.id,
-          description: toast.description,
-        })
-      }, 0)
+      showToast(toast)
     }
   }, [toast])
 }
@@ -21,18 +60,9 @@ const Toaster: React.FC<ToasterProps> = ({ theme, ...props }) => {
   return (
     <Sonner
       theme={theme}
-      className="toaster group"
-      toastOptions={{
-        classNames: {
-          toast:
-            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
-          description: 'group-[.toast]:text-muted-foreground',
-          actionButton:
-            'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
-          cancelButton:
-            'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-        },
-      }}
+      richColors
+      position="bottom-right"
+      closeButton
       {...props}
     />
   )
