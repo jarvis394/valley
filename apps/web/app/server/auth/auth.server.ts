@@ -43,6 +43,12 @@ function getUnauthenticatedRedirectUrl(
   return loginRedirect
 }
 
+export async function getUserIdFromSession(request: Request) {
+  const cookieHeader = request.headers.get('cookie')
+  const authSession = await authSessionStorage.getSession(cookieHeader)
+  return authSession.get('userId')
+}
+
 export async function getUserId(request: Request) {
   const cookieHeader = request.headers.get('cookie')
   const authSession = await authSessionStorage.getSession(cookieHeader)
@@ -226,7 +232,7 @@ export async function register({
         },
       },
     },
-    select: { id: true, expirationDate: true },
+    select: { id: true, expirationDate: true, userId: true },
   })
 
   return session

@@ -56,6 +56,7 @@ export async function handleNewSession(
       request.headers.get('cookie')
     )
     authSession.set('sessionId', session.id)
+    authSession.set('userId', session.userId)
     const headers = new Headers()
     headers.append(
       'set-cookie',

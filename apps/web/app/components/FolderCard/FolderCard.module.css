@@ -1,0 +1,54 @@
+.folderCard {
+  --folder-card-width: 240px;
+  padding: 12px 8px 12px 16px;
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 16px;
+  width: var(--folder-card-width);
+}
+
+.folderCard--active {
+  background-color: var(--button-secondary-hovered-bg);
+  --themed-border: var(--alpha-transparent-32);
+}
+
+.folderCard__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  flex-grow: 1;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.folderCard__contentTitle {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.folderCard__contentSubtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.folderCard__contentSubtitle > p {
+  margin: 0;
+}
+
+.folderCard__contentSubtitle > span {
+  color: var(--text-hint);
+}

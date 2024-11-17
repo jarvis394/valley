@@ -1,12 +1,12 @@
 import React from 'react'
 import { Outlet } from '@remix-run/react'
-import ProjectsToolbar from '../../../components/Toolbar/ProjectsToolbar'
+import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 
-const ProjectsLayout: React.FC = () => {
+const ProjectLayout: React.FC = () => {
   return (
     <>
-      <ProjectsToolbar />
+      <ProjectToolbar />
       <Outlet />
     </>
   )
@@ -14,4 +14,4 @@ const ProjectsLayout: React.FC = () => {
 
 export const ErrorBoundary = GeneralErrorBoundary
 
-export default ProjectsLayout
+export default ProjectLayout

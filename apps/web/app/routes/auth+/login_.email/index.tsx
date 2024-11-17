@@ -45,13 +45,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   await requireAnonymous(request)
 
-  const formData = await request.formData()
-
   const {
     errors,
     data,
     receivedValues: defaultValues,
-  } = await getValidatedFormData<FormData>(formData, resolver)
+  } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
     return { errors, defaultValues }
   }

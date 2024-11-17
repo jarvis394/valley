@@ -5,7 +5,7 @@ export const authSessionStorage = createCookieSessionStorage<{
   verifiedTime: number
   sessionId: string
   expires: Date
-  challenge?: string
+  userId: string
 }>({
   cookie: {
     name: 'valley_session',

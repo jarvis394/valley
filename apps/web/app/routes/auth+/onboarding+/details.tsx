@@ -120,10 +120,13 @@ export async function action({ request }: ActionFunctionArgs) {
     request.headers.get('cookie')
   )
   authSession.set('sessionId', session.id)
+  authSession.set('userId', session.userId)
 
   headers.append(
     'set-cookie',
-    await authSessionStorage.commitSession(authSession)
+    await authSessionStorage.commitSession(authSession, {
+      expires: session.expirationDate,
+    })
   )
   headers.append(
     'set-cookie',

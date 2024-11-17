@@ -19,7 +19,7 @@ type ModalProps = React.PropsWithChildren<{
 }>
 
 const Modal: React.FC<ModalProps> = ({
-  isOpen: propsIsOpen = false,
+  isOpen: propsIsOpen,
   children,
   id,
   onDismiss,
@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({
   const shouldShowDrawer = useMediaQuery(
     `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
-  const [open, setOpen] = useState(propsIsOpen)
+  const [open, setOpen] = useState(propsIsOpen || false)
   const currentModal = useMemo(
     () => searchParams?.get(modalKey),
     [searchParams]
@@ -48,8 +48,14 @@ const Modal: React.FC<ModalProps> = ({
   }
 
   useEffect(() => {
+    if (propsIsOpen === undefined) return
+    setOpen(propsIsOpen)
+  }, [propsIsOpen])
+
+  useEffect(() => {
+    if (propsIsOpen !== undefined) return
     setOpen(currentModal === id)
-  }, [currentModal, id])
+  }, [currentModal, id, propsIsOpen])
 
   const handleDrawerOpenChange = (isOpen: boolean) => {
     if (!isOpen) {

@@ -40,8 +40,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
     profile = await authenticator.authenticate(providerName, request)
   } catch (e) {
-    console.error('auth/provider/callback:', e)
-    throw await redirectWithToast(
+    if (e instanceof Response) {
+      console.error('auth/provider/callback:', await e.json())
+    } else {
+      console.error('auth/provider/callback:', e)
+    }
+
+    return await redirectWithToast(
       '/auth/login',
       {
         title: 'Auth Failed',

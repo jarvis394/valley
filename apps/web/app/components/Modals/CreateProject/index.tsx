@@ -6,92 +6,80 @@ import styles from './CreateProject.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useIsPending } from 'app/utils/misc'
 import TextField from '@valley/ui/TextField'
+import { Form, useFetcher } from '@remix-run/react'
+import {
+  ProjectsCreateSchema,
+  type action as createAction,
+} from 'app/routes/api+/projects+/create'
 
-const CreateProjectSchema = z.object({
-  projectName: z.string(),
-  dateShot: z.date(),
-})
+type FormData = z.infer<typeof ProjectsCreateSchema>
 
-type FormData = z.infer<typeof CreateProjectSchema>
-
-const resolver = zodResolver(CreateProjectSchema)
+const resolver = zodResolver(ProjectsCreateSchema)
 
 type CreateProjectModalProps = {
   onClose: () => void
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
-  // const router = useRouter()
+  const fetcher = useFetcher<typeof createAction>({
+    key: 'projects-create',
+  })
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
+    submitConfig: {
+      viewTransition: true,
+      action: '/api/projects/create',
+      method: 'POST',
+      navigate: false,
+    },
+    fetcher,
   })
-  const isPending = useIsPending()
-
-  // const onSubmit = async (e) => {
-  //   setIsLoading(true)
-  //   // const res = await createProject({
-  //   //   dateShot: values.dateShot,
-  //   //   protected: false,
-  //   //   title: values.projectName,
-  //   //   storedUntil: new Date(),
-  //   //   translationStringsId: null,
-  //   // })
-
-  //   onClose()
-  //   // router.replace('/projects/' + res.project.id)
-  // }
+  const isPending = fetcher.state !== 'idle'
 
   return (
     <>
       <ModalHeader>Create Project</ModalHeader>
-      <form
-        id="create-project-form"
-        className={styles.createProjectModal__form}
+      <Form
         onSubmit={handleSubmit}
+        className={styles.createProjectModal__form}
+        id="create-project-form"
+        method="POST"
+        action="/api/projects/create"
       >
-        <div>
-          <TextField
-            {...register('projectName')}
-            label="Project Name"
-            required
-            size="lg"
-            id="project-name-input"
-            placeholder="my-project"
-          />
-        </div>
-        <div>
-          <TextField
-            label="Store until"
-            required
-            size="lg"
-            id="store-until-select"
-            placeholder="my-project"
-          />
-        </div>
-        <div>
-          <TextField
-            label="Visibility"
-            required
-            size="lg"
-            id="visibility-select"
-            placeholder="my-project"
-          />
-        </div>
-        <div>
-          <TextField
-            {...register('dateShot', {
-              valueAsDate: true,
-            })}
-            label="Date shot"
-            size="lg"
-            id="date-shot-input"
-            type="date"
-            placeholder="dd.mm.yyyy"
-          />
-        </div>
-      </form>
+        <TextField
+          {...register('projectName')}
+          label="Project Name"
+          required
+          size="lg"
+          id="project-name-input"
+          placeholder="my-project"
+        />
+        <TextField
+          label="Store until"
+          required
+          size="lg"
+          id="store-until-select"
+          placeholder="my-project"
+        />
+        <TextField
+          label="Visibility"
+          required
+          size="lg"
+          id="visibility-select"
+          placeholder="my-project"
+        />
+        <TextField
+          {...register('dateShot', {
+            valueAsDate: true,
+          })}
+          label="Date shot"
+          size="lg"
+          id="date-shot-input"
+          type="date"
+          placeholder="dd.mm.yyyy"
+        />
+      </Form>
       <ModalFooter
         before={
           <Button

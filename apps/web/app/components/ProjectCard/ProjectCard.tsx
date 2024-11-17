@@ -1,0 +1,90 @@
+import React from 'react'
+import styles from './ProjectCard.module.css'
+import {
+  Copy,
+  Download,
+  Heart,
+  LineChart,
+  Link as LinkIcon,
+  MoreHorizontal,
+  Share,
+} from 'geist-ui-icons'
+import Button from '@valley/ui/Button'
+import IconButton from '@valley/ui/IconButton'
+import dayjs from 'dayjs'
+import { Link } from '@remix-run/react'
+import { Project } from '@valley/db'
+
+type ProjectCardProps = {
+  data: Project
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
+  const timestamp = dayjs(data.dateShot).format('MMMM D, YYYY')
+  const projectLink = `/projects${data.url}`
+
+  return (
+    <div className={styles.projectCard}>
+      <Link
+        viewTransition
+        to={projectLink}
+        className={styles.projectCard__cover}
+      >
+        {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
+      </Link>
+      <div className={styles.projectCard__content}>
+        <Link
+          viewTransition
+          to={projectLink}
+          className={styles.projectCard__header}
+        >
+          <h3 className={styles.projectCard__contentTitle}>{data.title}</h3>
+          <p className={styles.projectCard__contentSubtitle}>
+            {data.totalFiles} photos
+            <span className={styles.projectCard__bullet}>•</span>
+            {timestamp}
+          </p>
+        </Link>
+        <div className={styles.projectCard__linkContainer}>
+          <div className={styles.projectCard__link}>
+            <LinkIcon />
+            <div>{data.url}</div>
+          </div>
+          <Button size="sm" variant="secondary-dimmed" before={<Copy />}>
+            Copy URL
+          </Button>
+        </div>
+      </div>
+      <div className={styles.projectCard__divider} />
+      <div className={styles.projectCard__bottomBar}>
+        <div className={styles.projectCard__statistics}>
+          <div className={styles.projectCard__statisticsItem}>
+            <LineChart />
+            128
+          </div>
+          <div className={styles.projectCard__statisticsItem}>
+            <Download />
+            11
+          </div>
+          <div className={styles.projectCard__statisticsItem}>
+            <Heart />1
+          </div>
+        </div>
+        <div className={styles.projectCard__shareButton}>
+          <IconButton size="sm" variant="secondary-dimmed">
+            <Share />
+          </IconButton>
+        </div>
+      </div>
+      <IconButton
+        className={styles.projectCard__menu}
+        size="sm"
+        variant="secondary-dimmed"
+      >
+        <MoreHorizontal />
+      </IconButton>
+    </div>
+  )
+}
+
+export default ProjectCard
