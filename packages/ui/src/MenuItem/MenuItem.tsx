@@ -2,11 +2,11 @@ import React from 'react'
 import styles from './MenuItem.module.css'
 import cx from 'classnames'
 import Button, { ButtonProps } from '../Button/Button'
-import { ListContext } from '@mui/base/useList'
-import {
-  useMenuItem,
-  useMenuItemContextStabilizer,
-} from '@mui/base/useMenuItem'
+import * as useListPackage from '@mui/base/useList'
+import * as useMenuItemPackage from '@mui/base/useMenuItem'
+
+const { ListContext } = useListPackage
+const { useMenuItem, useMenuItemContextStabilizer } = useMenuItemPackage
 
 type MenuItemProps = Omit<
   ButtonProps,

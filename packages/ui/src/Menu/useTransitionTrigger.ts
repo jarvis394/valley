@@ -3,8 +3,8 @@
 // TODO: remove, when fixed in @mui/base
 
 import * as React from 'react'
-import useEnhancedEffect from '@mui/utils/useEnhancedEffect'
-import { TransitionContextValue } from '@mui/base/useTransition/TransitionContext'
+import useEnhancedEffect from '@mui/utils/useEnhancedEffect/index.js'
+import { type TransitionContextValue } from '@mui/base/useTransition'
 
 /**
  * Allows child elements to be transitioned in and out.

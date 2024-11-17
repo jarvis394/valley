@@ -15,27 +15,26 @@ import {
   unstable_useEnhancedEffect as useEnhancedEffect,
   unstable_useForkRef as useForkRef,
 } from '@mui/utils'
-import { unstable_composeClasses as composeClasses } from '@mui/base/composeClasses'
-import { Portal } from '@mui/base/Portal'
 import {
+  unstable_composeClasses as composeClasses,
+  Portal,
   useSlotProps,
   WithOptionalOwnerState,
   PolymorphicComponent,
-} from '@mui/base/utils'
-import { useClassNamesOverride } from '@mui/base/utils/ClassNameConfigurator'
-import { getPopupUtilityClass } from '@mui/base/Unstable_Popup/popupClasses'
-import {
+  getPopupUtilityClass,
   PopupOwnerState,
   PopupProps,
   PopupRootSlotProps,
   PopupTypeMap,
-} from '@mui/base/Unstable_Popup/Popup.types'
-import { useTransitionTrigger } from './useTransitionTrigger'
-import { TransitionContext } from '@mui/base/useTransition/TransitionContext'
-import {
   PopupContext,
   PopupContextValue,
-} from '@mui/base/Unstable_Popup/PopupContext'
+} from '@mui/base'
+import * as classNameConfiguratorPackage from '@mui/base/utils/ClassNameConfigurator'
+import { useTransitionTrigger } from './useTransitionTrigger'
+import * as useTransitionPackage from '@mui/base/useTransition/index'
+
+const { useClassNamesOverride } = classNameConfiguratorPackage
+const { TransitionContext } = useTransitionPackage
 
 function useUtilityClasses(ownerState: PopupOwnerState) {
   const { open } = ownerState

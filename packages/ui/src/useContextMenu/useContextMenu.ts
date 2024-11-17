@@ -1,4 +1,4 @@
-import { DropdownProps } from '@mui/base/Dropdown'
+import { DropdownProps } from '@mui/base'
 import React, { useState } from 'react'
 
 export type Anchor = {

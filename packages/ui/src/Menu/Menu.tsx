@@ -1,14 +1,31 @@
 import React from 'react'
 import styles from './Menu.module.css'
-import { type WithOptionalOwnerState } from '@mui/base/utils/types'
-import { MenuProvider, useMenu } from '@mui/base/useMenu'
-import { MenuProps as MUIMenuProps, MenuListboxSlotProps } from '@mui/base/Menu'
-import { CssTransition } from '@mui/base/Transitions'
-import { PopupContext, PopupProps } from '@mui/base/Unstable_Popup'
+import {
+  type WithOptionalOwnerState,
+  MenuProvider,
+  useMenu,
+  MenuProps as MUIMenuProps,
+  MenuListboxSlotProps,
+  CssTransition,
+  PopupContext,
+  PopupProps,
+  NoSsr,
+} from '@mui/base'
 import cx from 'classnames'
-import { NoSsr } from '@mui/base/NoSsr'
 import { Popup } from './Popup'
-import { ListActionTypes } from '@mui/base/useList'
+
+export const ListActionTypes = {
+  blur: 'list:blur',
+  focus: 'list:focus',
+  itemClick: 'list:itemClick',
+  itemHover: 'list:itemHover',
+  itemsChange: 'list:itemsChange',
+  keyDown: 'list:keyDown',
+  resetHighlight: 'list:resetHighlight',
+  highlightLast: 'list:highlightLast',
+  textNavigation: 'list:textNavigation',
+  clearSelection: 'list:clearSelection',
+} as const
 
 type MenuProps = React.PropsWithChildren<MUIMenuProps & PopupProps>
 

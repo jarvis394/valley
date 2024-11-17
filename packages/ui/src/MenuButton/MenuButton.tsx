@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMenuButton } from '@mui/base/useMenuButton'
+import { useMenuButton } from '@mui/base'
 import Button, { ButtonProps } from '../Button/Button'
 import { Slot } from '@radix-ui/react-slot'
 

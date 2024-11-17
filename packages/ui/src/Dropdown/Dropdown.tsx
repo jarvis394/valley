@@ -1,3 +1,3 @@
-import { Dropdown } from '@mui/base/Dropdown'
+import { Dropdown } from '@mui/base'
 
 export default Dropdown

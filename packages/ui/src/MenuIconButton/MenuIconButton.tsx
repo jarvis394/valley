@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMenuButton } from '@mui/base/useMenuButton'
+import { useMenuButton } from '@mui/base'
 import IconButton, { IconButtonProps } from '../IconButton/IconButton'
 
 type MenuIconButtonProps = IconButtonProps & {
