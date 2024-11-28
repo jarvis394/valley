@@ -119,8 +119,8 @@ app.use(
         'connect-src': [
           MODE === 'development' ? 'ws:' : null,
           SENTRY_ENABLED ? '*.sentry.io' : null,
-          process.env.TUSD_URL,
-          process.env.UPLOAD_SERVICE_URL,
+          process.env.TUSD_URL || null,
+          process.env.UPLOAD_SERVICE_URL || null,
           "'self'",
         ].filter((e) => e !== null),
         'font-src': ["'self'"],
@@ -129,8 +129,8 @@ app.use(
           "'self'",
           'data:',
           'https://avatars.githubusercontent.com',
-          process.env.UPLOAD_SERVICE_URL,
-        ],
+          process.env.UPLOAD_SERVICE_URL || null,
+        ].filter((e) => e !== null),
         'script-src': [
           "'strict-dynamic'",
           "'self'",

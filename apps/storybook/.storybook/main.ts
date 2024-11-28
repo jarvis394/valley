@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/nextjs'
+import type { StorybookConfig } from '@storybook/react-vite'
 import { join, dirname } from 'path'
 
 function getAbsolutePath(value: string): any {
@@ -9,13 +9,7 @@ const config: StorybookConfig = {
   stories: ['../../../packages/ui/src/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
   staticDirs: ['../public'],
   addons: [getAbsolutePath('@storybook/addon-essentials')],
-  framework: {
-    name: getAbsolutePath('@storybook/nextjs'),
-    options: {
-      nextConfigPath: '../next.config.mjs',
-      builder: {},
-    },
-  },
+  framework: getAbsolutePath('@storybook/react-vite'),
   docs: {},
   typescript: {
     reactDocgen: 'react-docgen-typescript',
