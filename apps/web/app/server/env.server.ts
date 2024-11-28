@@ -3,12 +3,10 @@ import { z } from 'zod'
 const schema = z.object({
   NODE_ENV: z.enum(['production', 'development', 'staging', 'test'] as const),
   DATABASE_URL: z.string(),
-  API_URL: z.string(),
   TUSD_URL: z.string(),
+  UPLOAD_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
-  MAGIC_LINK_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
-  INTERNAL_COMMAND_TOKEN: z.string(),
   WEB_PORT: z.string(),
   HOST: z.string().optional(),
 
@@ -51,7 +49,7 @@ export function init() {
 export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
-    API_URL: process.env.API_URL,
+    UPLOAD_SERVICE_URL: process.env.UPLOAD_SERVICE_URL,
     TUSD_URL: process.env.TUSD_URL,
   }
 }

@@ -8,6 +8,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   invariantResponse(userId, 'User not found', { status: 404 })
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: { settings: true, projects: true },
   })
   invariantResponse(user, 'User not found', { status: 404 })
 

@@ -1,5 +1,5 @@
-import { SerializedFolder } from '../SerializedFolder'
-import { SerializedProject } from '../SerializedProject'
+import { SerializedFolder } from '../SerializedFolder.js'
+import { SerializedProject } from '../SerializedProject.js'
 
 export type ProjectGetAllReq = unknown
 export type ProjectGetAllRes = {

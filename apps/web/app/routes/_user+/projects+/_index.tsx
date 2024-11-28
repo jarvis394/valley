@@ -15,7 +15,6 @@ import {
   makeTimings,
   time,
 } from 'app/server/timing.server'
-import ProjectCardSkeleton from 'app/components/svg/ProjectCardSkeleton'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
@@ -40,6 +39,10 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   return {
     'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
   }
+}
+
+export const shouldRevalidate = () => {
+  return false
 }
 
 const ProjectsRoute = () => {
@@ -69,14 +72,14 @@ const ProjectsRoute = () => {
       <Wrapper>
         <div className={styles.projects__list}>
           <Suspense
-            fallback={[1, 2, 3, 4, 5, 6].map((_, i) => (
-              <ProjectCardSkeleton key={i} />
+            fallback={new Array(8).fill(null).map((_, i) => (
+              <ProjectCard loading key={i} />
             ))}
           >
             <Await resolve={data.projects}>
               {(projects) =>
                 projects?.map((project, i) => (
-                  <ProjectCard data={project} key={i} />
+                  <ProjectCard project={project} key={i} />
                 ))
               }
             </Await>

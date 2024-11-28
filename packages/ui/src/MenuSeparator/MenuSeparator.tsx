@@ -11,7 +11,14 @@ const MenuSeparator: React.FC<MenuSeparatorProps> = ({
   className,
   ...props
 }) => {
-  return <span className={cx(styles.menuSeparator, className)} {...props} />
+  return (
+    <span
+      role="separator"
+      aria-orientation="horizontal"
+      className={cx(styles.menuSeparator, className)}
+      {...props}
+    />
+  )
 }
 
 export default MenuSeparator

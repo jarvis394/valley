@@ -5,4 +5,10 @@
   --line-height: 18px !important;
   gap: 14px !important;
   list-style: none;
+  outline: none !important;
+}
+
+.menuItem[data-highlighted] {
+  background-color: var(--themed-background-hover);
+  color: var(--themed-color-hover);
 }

@@ -40,6 +40,7 @@ import 'remix-image/remix-image.css?url'
 import '@uppy/core/dist/style.min.css?url'
 import '@uppy/progress-bar/dist/style.min.css?url'
 import 'overlayscrollbars/overlayscrollbars.css?url'
+import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
 export const links: LinksFunction = () => [
   {
@@ -218,6 +219,7 @@ export default function App() {
     <HoneypotProvider {...loaderData.honeypotProps}>
       <Outlet />
       <Modals />
+      <UploadsOverlay />
       <Toaster theme={theme} />
     </HoneypotProvider>
   )

@@ -9,52 +9,76 @@ import {
   MoreHorizontal,
   Share,
 } from 'geist-ui-icons'
-import Button from '@valley/ui/Button'
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
 import { Link } from '@remix-run/react'
 import { Project } from '@valley/db'
+import Skeleton from '@valley/ui/Skeleton'
 
-type ProjectCardProps = {
-  data: Project
-}
+type ProjectCardProps =
+  | {
+      project: Project
+      loading?: false
+    }
+  | {
+      project?: never
+      loading: true
+    }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
-  const timestamp = dayjs(data.dateShot).format('MMMM D, YYYY')
-  const projectLink = `/projects${data.url}`
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
+  const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
+  const projectLink = `/projects/${project?.url}`
 
   return (
     <div className={styles.projectCard}>
-      <Link
-        viewTransition
-        to={projectLink}
-        className={styles.projectCard__cover}
-      >
-        {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
-      </Link>
-      <div className={styles.projectCard__content}>
-        <Link
-          viewTransition
-          to={projectLink}
-          className={styles.projectCard__header}
-        >
-          <h3 className={styles.projectCard__contentTitle}>{data.title}</h3>
+      {loading && <div className={styles.projectCard__cover} />}
+      {!loading && (
+        <Link to={projectLink} className={styles.projectCard__cover}>
+          {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
+        </Link>
+      )}
+      {loading && (
+        <div className={styles.projectCard__header}>
+          <h3 className={styles.projectCard__contentTitle}>
+            <Skeleton width={'40%'} height={25} />
+            <Skeleton width={'25%'} height={25} />
+          </h3>
           <p className={styles.projectCard__contentSubtitle}>
-            {data.totalFiles} photos
+            <Skeleton width={'30%'} height={20} />
+            <Skeleton width={'50%'} height={20} />
+          </p>
+        </div>
+      )}
+      {!loading && (
+        <Link to={projectLink} className={styles.projectCard__header}>
+          <h3 className={styles.projectCard__contentTitle}>{project?.title}</h3>
+          <p className={styles.projectCard__contentSubtitle}>
+            {project?.totalFiles} photos
             <span className={styles.projectCard__bullet}>•</span>
             {timestamp}
           </p>
         </Link>
+      )}
+      {loading && (
+        <div className={styles.projectCard__linkContainer}>
+          <div className={styles.projectCard__link} style={{ height: 32 }}>
+            <Skeleton variant="rectangular" width={16} height={16} />
+            <Skeleton variant="rectangular" width={'30%'} height={16} />
+            <Skeleton variant="rectangular" width={'45%'} height={16} />
+          </div>
+        </div>
+      )}
+      {!loading && (
         <div className={styles.projectCard__linkContainer}>
           <div className={styles.projectCard__link}>
             <LinkIcon />
-            <div>{data.url}</div>
+            <div>{project?.url}</div>
           </div>
-          <Button size="sm" variant="secondary-dimmed" before={<Copy />}>
-            Copy URL
-          </Button>
+          <IconButton size="sm" variant="secondary-dimmed">
+            <Copy />
+          </IconButton>
         </div>
-      </div>
+      )}
       <div className={styles.projectCard__divider} />
       <div className={styles.projectCard__bottomBar}>
         <div className={styles.projectCard__statistics}>

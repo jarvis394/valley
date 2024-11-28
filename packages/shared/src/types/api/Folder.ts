@@ -1,5 +1,5 @@
 import { File, Folder } from '@valley/db'
-import { SerializedFolder } from '../SerializedFolder'
+import { SerializedFolder } from '../SerializedFolder.js'
 
 export type FolderCreateReq = Omit<
   SerializedFolder,

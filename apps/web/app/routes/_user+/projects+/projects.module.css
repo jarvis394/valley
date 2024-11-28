@@ -6,10 +6,17 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
 }
 
 @media screen and (min-width: 900px) {
   .projects__list {
     grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .projects__list {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }

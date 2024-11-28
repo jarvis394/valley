@@ -60,6 +60,10 @@
   opacity: 1;
 }
 
+.fileCard__toolbar[data-menu-open='true'] {
+  opacity: 1;
+}
+
 .fileCard__menuHeader > h6 {
   margin: 0;
   font-weight: 600;

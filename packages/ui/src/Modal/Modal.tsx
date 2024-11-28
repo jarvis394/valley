@@ -1,16 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import type { SetURLSearchParams } from 'react-router-dom'
-import { Modal as BaseModal } from '@mui/base'
 import styles from './Modal.module.css'
-import Grow from '../Grow/Grow'
-import cx from 'classnames'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
 import { Drawer } from 'vaul'
+import * as Dialog from '@radix-ui/react-dialog'
 
-const modalKey = 'modal'
+export const modalKey = 'modal'
 
-type ModalProps = React.PropsWithChildren<{
+export type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
   searchParams: URLSearchParams
@@ -80,55 +78,27 @@ const Modal: React.FC<ModalProps> = ({
             </Drawer.Description>
             {children}
           </Drawer.Content>
-          <Drawer.Overlay className={styles.modal__drawerOverlay} />
+          <Drawer.Overlay className={styles.modal__dialogOverlay} />
         </Drawer.Portal>
       </Drawer.Root>
     )
   }
 
   return (
-    <BaseModal
-      open={open}
-      onClose={handleClose}
-      className={styles.modal}
-      closeAfterTransition
-      slots={{
-        backdrop: Backdrop,
-      }}
-    >
-      <Grow
-        in={open}
-        transformTemplate={(e) => `translate(-50%, -50%) scale(${e.scale})`}
-        transition={{ duration: 0.32, ease: 'circInOut' }}
-        className={styles.modal__dialog}
-      >
-        {children}
-      </Grow>
-    </BaseModal>
+    <Dialog.Root open={open} onOpenChange={handleDrawerOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className={styles.modal__dialogOverlay} />
+        <Dialog.Content className={styles.modal__dialog}>
+          <Drawer.Description style={{ display: 'none' }}>
+            {currentModal}
+          </Drawer.Description>
+          {children}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
-const Backdrop = React.forwardRef<
-  HTMLDivElement,
-  { children: React.ReactElement; open: boolean; ownerState: never }
->(function Backdrop(props, ref) {
-  const { open: propsIsOpen, ownerState: _, ...other } = props
-  const [open, setOpen] = useState(false)
-
-  // To make fade animation work, first value in DOM for `data-fade-in` should be `false`
-  // After initial render, we can catch up to the latest props `open` value
-  useEffect(() => {
-    setOpen(propsIsOpen)
-  }, [propsIsOpen])
-
-  return (
-    <div
-      {...other}
-      ref={ref}
-      data-fade-in={open}
-      className={cx(styles.modal__dialogBackdrop, 'fade')}
-    />
-  )
-})
-
 export default Modal
+
+export * from '@radix-ui/react-dialog'

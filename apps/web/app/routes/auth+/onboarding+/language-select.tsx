@@ -54,8 +54,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie':
-        await onboardingSessionStorage.commitSession(onboardingSession),
+      'set-cookie': await onboardingSessionStorage.commitSession(
+        onboardingSession
+      ),
     },
   })
 }

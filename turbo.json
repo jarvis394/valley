@@ -4,7 +4,7 @@
   "globalEnv": ["*"],
   "tasks": {
     "dev": {
-      "dependsOn": ["^db:generate"],
+      "dependsOn": ["^db:generate", "@valley/shared#build"],
       "cache": false,
       "persistent": true
     },

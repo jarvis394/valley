@@ -1,5 +1,5 @@
 {
-  "extends": "@valley/typescript-config/nestjs.json",
+  "extends": "@valley/typescript-config/adonis.json",
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": "src",

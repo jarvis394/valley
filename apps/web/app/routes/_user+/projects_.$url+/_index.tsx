@@ -20,6 +20,7 @@ import {
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { Await, useLoaderData } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
+import UploadButton from 'app/components/UploadButton/UploadButton'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { url } = params
@@ -30,7 +31,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   })
   const project = time(
     prisma.project.findFirst({
-      where: { url: '/' + url },
+      where: { url },
       include: {
         folders: true,
       },
@@ -41,7 +42,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     prisma.folder.findFirst({
       where: {
         Project: {
-          url: '/' + url,
+          url,
           userId,
         },
         isDefaultFolder: true,
@@ -63,6 +64,10 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   return {
     'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
   }
+}
+
+export const shouldRevalidate = () => {
+  return true
 }
 
 const ProjectRoute = () => {
@@ -139,12 +144,7 @@ const ProjectRoute = () => {
                 <Wrapper className={styles.project__folders}>
                   <div className={cx(styles.project__foldersList)}>
                     {project?.folders.map((folder, i) => (
-                      <FolderCard
-                        // onClick={handleFolderClick}
-                        // active={parsedFolderId === folder.id}
-                        key={i}
-                        folder={folder}
-                      />
+                      <FolderCard key={i} folder={folder} />
                     ))}
                     <IconButton
                       // disabled={isCreatingFolder}
@@ -156,14 +156,11 @@ const ProjectRoute = () => {
                       <Plus />
                     </IconButton>
                   </div>
-                  <div
-                    // data-fade-in={!!projectTotalSize}
-                    className={cx(styles.project__foldersTotalSizeContainer)}
-                  >
+                  <div className={styles.project__foldersTotalSizeContainer}>
                     <span className={styles.project__foldersTotalSizeCaption}>
                       Total size
                     </span>
-                    {formatBytes(Number(project?.totalSize))}
+                    {formatBytes(Number(project?.totalSize || 0))}
                   </div>
                 </Wrapper>
               </div>
@@ -200,10 +197,12 @@ const ProjectRoute = () => {
         <Await resolve={data.folder}>
           {(folder) => (
             <Wrapper className={styles.project__files}>
-              {/* <UploadButton
-                projectId={folder?.projectId}
-                folderId={folder?.id}
-              /> */}
+              {folder && (
+                <UploadButton
+                  projectId={folder.projectId}
+                  folderId={folder.id}
+                />
+              )}
               {folder?.files.map((file, i) => (
                 // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
                 // TODO: `key={i}` is a quick fix
@@ -216,110 +215,6 @@ const ProjectRoute = () => {
     </div>
   )
 }
-
-/**
- * <PageHeader
-        // headerProps={{
-        //   className: 'fade',
-        //   ['data-fade-in' as string]: !isLoadingProject,
-        // }}
-        before={
-          <>
-            <Button size="lg" variant="secondary" before={<Share />}>
-              Share project
-            </Button>
-            <Button
-              // onClick={handleEditFolderDescription}
-              size="lg"
-              variant="secondary"
-              before={<PencilEdit />}
-            >
-              Edit description
-            </Button>
-            <Button size="lg" variant="primary">
-              Preview
-            </Button>
-          </>
-        }
-      >
-        {data?.project.title}
-      </PageHeader>
-      <Divider />
-      <div className={styles.project__foldersContainer}>
-        <Wrapper className={styles.project__folders}>
-          <div
-            data-fade-in={!isLoadingFolders}
-            className={cx(styles.project__foldersList, 'fade')}
-          >
-            {data?.folders.map((folder, i) => (
-              <FolderCard
-                onClick={handleFolderClick}
-                active={parsedFolderId === folder.id}
-                key={i}
-                folder={folder}
-              />
-            ))}
-            <IconButton
-              disabled={isCreatingFolder}
-              loading={isCreatingFolder}
-              variant="tertiary"
-              size="lg"
-              onClick={handleCreateFolder}
-            >
-              <Plus />
-            </IconButton>
-          </div>
-          <div
-            data-fade-in={!!projectTotalSize}
-            className={cx(styles.project__foldersTotalSizeContainer, 'fade')}
-          >
-            <span className={styles.project__foldersTotalSizeCaption}>
-              Total size
-            </span>
-            {projectTotalSize}
-          </div>
-        </Wrapper>
-      </div>
-      <Divider />
-
-      <Wrapper className={styles.project__folderInfo}>
-        {currentFolder?.title && (
-          <div className={styles.project__folderTitleContainer}>
-            {currentFolder?.title}
-            <IconButton
-              onClick={handleEditFolderTitle}
-              variant="tertiary-dimmed"
-            >
-              <PencilEdit />
-            </IconButton>
-          </div>
-        )}
-        {currentFolder?.description && (
-          <div className={styles.project__folderDescriptionContainer}>
-            <p>{currentFolder?.description}</p>
-            <IconButton
-              onClick={handleEditFolderDescription}
-              variant="tertiary-dimmed"
-            >
-              <PencilEdit />
-            </IconButton>
-          </div>
-        )}
-      </Wrapper>
-
-      {data && parsedFolderId && (
-        <Wrapper className={styles.project__files}>
-          <UploadButton
-            projectId={data?.project.id}
-            folderId={parsedFolderId}
-          />
-          {folderResponse?.files.map((file, i) => (
-            // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
-            // TODO: `key={i}` is a quick fix
-            <FileCard key={i} file={file} />
-          ))}
-        </Wrapper>
- */
 
 export const ErrorBoundary = GeneralErrorBoundary
 

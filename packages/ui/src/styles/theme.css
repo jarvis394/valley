@@ -94,6 +94,7 @@
 
   /** Alpha */
   --alpha-solid-07: #1c1c1c;
+  --alpha-transparent-03: rgba(255, 255, 255, 0.03);
   --alpha-transparent-07: rgba(255, 255, 255, 0.07);
   --alpha-transparent-12: rgba(255, 255, 255, 0.12);
   --alpha-transparent-24: rgba(255, 255, 255, 0.24);
@@ -238,6 +239,7 @@
 
   /** Alpha */
   --alpha-solid-07: rgba(23, 23, 23, 0.07);
+  --alpha-transparent-03: rgba(23, 23, 23, 0.03);
   --alpha-transparent-07: rgba(23, 23, 23, 0.07);
   --alpha-transparent-12: rgba(23, 23, 23, 0.12);
   --alpha-transparent-24: rgba(23, 23, 23, 0.24);

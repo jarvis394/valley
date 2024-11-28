@@ -10,11 +10,10 @@ export class UrlService {
 
   /**
    * Generate a URL path for a given project title
-   * Starts with a forward slash (/)
+   * DOES NOT start with a forward slash (/)
    */
   static generateURL(title: string) {
     return (
-      '/' +
       UrlService.generateRandomString() +
       '-' +
       slugify(title, {

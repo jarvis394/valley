@@ -87,9 +87,9 @@ if (viteDevServer) {
   app.use(express.static('build/client', { maxAge: '1h' }))
 }
 
-// TODO: fix pnpm build
+// TODO: fix types
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 app.get(['/img/*', '/favicons/*'], (_req, res) => {
   // if we made it past the express.static for these, then we're missing something.
   // So we'll just send a 404 and won't bother calling other middleware.
@@ -119,11 +119,18 @@ app.use(
         'connect-src': [
           MODE === 'development' ? 'ws:' : null,
           SENTRY_ENABLED ? '*.sentry.io' : null,
+          process.env.TUSD_URL,
+          process.env.UPLOAD_SERVICE_URL,
           "'self'",
         ].filter((e) => e !== null),
         'font-src': ["'self'"],
         'frame-src': ["'self'"],
-        'img-src': ["'self'", 'data:', 'https://avatars.githubusercontent.com'],
+        'img-src': [
+          "'self'",
+          'data:',
+          'https://avatars.githubusercontent.com',
+          process.env.UPLOAD_SERVICE_URL,
+        ],
         'script-src': [
           "'strict-dynamic'",
           "'self'",
@@ -214,9 +221,6 @@ app.all(
       serverBuild: getBuild(),
     }),
     mode: MODE,
-    // TODO: fix pnpm build
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     build: async () => {
       const { error, build } = await getBuild()
       if (error) {
