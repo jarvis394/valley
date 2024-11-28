@@ -3,7 +3,7 @@ import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
 import Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
-import chalk from 'chalk'
+import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import express, { Response } from 'express'
@@ -247,7 +247,7 @@ if (!portAvailable && IS_PROD) {
 const server = app.listen(portToUse, () => {
   if (!portAvailable) {
     console.warn(
-      chalk.yellow(
+      ansis.yellow(
         `⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`
       )
     )
@@ -267,19 +267,19 @@ const server = app.listen(portToUse, () => {
 
   console.log()
   console.log(
-    `  ${chalk.bgBlack.bold.white(' Valley ')}  ${chalk.gray(
+    `  ${ansis.bgBlack.bold.white(' Valley ')}  ${ansis.gray(
       'ready in'
-    )} ${chalk.bold.white(elapsedTimeMs)} ${chalk.white('ms')}`
+    )} ${ansis.bold.white(elapsedTimeMs.toString())} ${ansis.white('ms')}`
   )
   console.log()
   console.log(
-    `  ${chalk.bold.green('➜')}  ${chalk.bold('Local:')}   ${chalk.cyan(
+    `  ${ansis.bold.green('➜')}  ${ansis.bold('Local:')}   ${ansis.cyan(
       localUrl
     )}`
   )
   lanUrl &&
     console.log(
-      `  ${chalk.bold.green('➜')}  ${chalk.bold('Network:')} ${chalk.cyan(
+      `  ${ansis.bold.green('➜')}  ${ansis.bold('Network:')} ${ansis.cyan(
         lanUrl
       )}`
     )
@@ -292,8 +292,7 @@ closeWithGrace(async ({ err }) => {
   })
 
   if (err) {
-    console.error(chalk.red(err))
-    console.error(chalk.red(err.stack))
+    console.error(ansis.red(err.stack || err.message))
 
     SENTRY_ENABLED && Sentry.captureException(err)
     SENTRY_ENABLED && (await Sentry.flush(500))

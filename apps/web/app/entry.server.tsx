@@ -12,7 +12,7 @@ import { renderToPipeableStream } from 'react-dom/server'
 import { NonceProvider } from './components/NonceProvider/NonceProvider'
 import { init as envInit } from './server/env.server'
 import { makeTimings } from './server/timing.server'
-import chalk from 'chalk'
+import ansis from 'ansis'
 import * as Sentry from '@sentry/remix'
 
 const ABORT_DELAY = 5_000
@@ -80,7 +80,7 @@ export function handleError(
   }
 
   if (error instanceof Error) {
-    console.error(chalk.red(error.stack))
+    console.error(ansis.red(error.stack || error.message))
     void Sentry.captureRemixServerException(
       error,
       'remix.server',

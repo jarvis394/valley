@@ -5,8 +5,6 @@ import { GeneralErrorBoundary } from '../../components/ErrorBoundary'
 import styles from './ErrorBoundaryPage.module.css'
 import Stack from '@valley/ui/Stack'
 
-export const config = { runtime: 'edge' }
-
 export async function loader() {
   throw new Response('Not found', { status: 404 })
 }

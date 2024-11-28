@@ -2,7 +2,7 @@ import { remember } from '../utils/remember'
 import { PrismaClient } from '@valley/db'
 import pkg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
-import chalk from 'chalk'
+import ansis from 'ansis'
 
 const { Pool } = pkg
 
@@ -27,13 +27,13 @@ export const prisma = remember('prisma', () => {
       e.duration < logThreshold * 1.1
         ? 'green'
         : e.duration < logThreshold * 1.2
-        ? 'blue'
-        : e.duration < logThreshold * 1.3
-        ? 'yellow'
-        : e.duration < logThreshold * 1.4
-        ? 'redBright'
-        : 'red'
-    const dur = chalk[color](`${e.duration}ms`)
+          ? 'blue'
+          : e.duration < logThreshold * 1.3
+            ? 'yellow'
+            : e.duration < logThreshold * 1.4
+              ? 'redBright'
+              : 'red'
+    const dur = ansis[color](`${e.duration}ms`)
     console.info(`prisma:query - ${dur} - ${e.query}`)
   })
 

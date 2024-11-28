@@ -3,8 +3,6 @@ import { Link, Outlet } from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 
-export const config = { runtime: 'edge' }
-
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }
