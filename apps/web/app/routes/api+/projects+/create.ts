@@ -15,6 +15,8 @@ type FormData = z.infer<typeof ProjectsCreateSchema>
 
 const resolver = zodResolver(ProjectsCreateSchema)
 
+export const config = { runtime: 'edge' }
+
 export const loader = () => redirect('/projects')
 
 export const action = async ({ request }: LoaderFunctionArgs) => {

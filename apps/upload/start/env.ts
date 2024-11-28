@@ -3,7 +3,11 @@ import { Env } from '@adonisjs/core/env'
 /**
  * Locate .env file from monorepo root
  */
-const APP_ROOT = new URL('../../../', import.meta.url)
+let APP_ROOT = new URL('../../../', import.meta.url)
+
+if (import.meta.url.includes('build')) {
+  APP_ROOT = new URL('../../../../', import.meta.url)
+}
 
 export default await Env.create(APP_ROOT, {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),

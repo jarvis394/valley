@@ -3,6 +3,8 @@ import { getUserId } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { invariantResponse } from 'app/utils/invariant'
 
+export const config = { runtime: 'edge' }
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   invariantResponse(userId, 'User not found', { status: 404 })

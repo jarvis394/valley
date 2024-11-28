@@ -16,6 +16,8 @@ import {
   time,
 } from 'app/server/timing.server'
 
+export const config = { runtime: 'edge' }
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
   const userId = await time(getUserIdFromSession(request), {

@@ -6,6 +6,8 @@ import { Await, Link } from '@remix-run/react'
 import Stack from '@valley/ui/Stack'
 import Button from '@valley/ui/Button'
 
+export const config = { runtime: 'edge' }
+
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }

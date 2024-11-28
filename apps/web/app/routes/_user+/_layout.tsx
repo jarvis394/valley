@@ -8,6 +8,8 @@ import { requireLoggedIn, requireUser } from '../../server/auth/auth.server'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
 
+export const config = { runtime: 'edge' }
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireLoggedIn(request)
   const userPromise = requireUser(request)
