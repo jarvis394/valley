@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  strtok3: 8.0.1
+
 importers:
 
   .:
@@ -40,13 +43,16 @@ importers:
         specifier: ^1.14.2
         version: 1.25.1
       '@remix-run/node':
-        specifier: ^2.12.1
+        specifier: ^2.15.0
         version: 2.15.0(typescript@5.6.3)
       '@remix-run/react':
-        specifier: ^2.12.1
+        specifier: ^2.15.0
         version: 2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       '@remix-run/serve':
-        specifier: ^2.12.1
+        specifier: ^2.15.0
+        version: 2.15.0(typescript@5.6.3)
+      '@remix-run/server-runtime':
+        specifier: ^2.15.0
         version: 2.15.0(typescript@5.6.3)
       '@valley/db':
         specifier: workspace:*
@@ -58,8 +64,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@vercel/remix':
-        specifier: 2.14.0
-        version: 2.14.0(@remix-run/dev@2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(@remix-run/node@2.15.0(typescript@5.6.3))(@remix-run/server-runtime@2.15.0(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 2.15.0
+        version: 2.15.0(@remix-run/dev@2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(@remix-run/node@2.15.0(typescript@5.6.3))(@remix-run/server-runtime@2.15.0(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -80,7 +86,7 @@ importers:
         specifier: ^2.0.1
         version: 2.0.5(postcss@8.4.49)
       '@remix-run/dev':
-        specifier: ^2.12.1
+        specifier: ^2.15.0
         version: 2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0))
       '@types/react':
         specifier: ^18.3.12
@@ -313,16 +319,16 @@ importers:
         specifier: ^2.15.0
         version: 2.15.0(@cloudflare/workers-types@4.20241127.0)(typescript@5.6.3)
       '@remix-run/express':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: 2.15.0(express@4.21.1)(typescript@5.6.3)
       '@remix-run/node':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: 2.15.0(typescript@5.6.3)
       '@remix-run/react':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: 2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       '@remix-run/serve':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: 2.15.0(typescript@5.6.3)
       '@remix-run/server-runtime':
         specifier: ^2.15.0
@@ -351,6 +357,9 @@ importers:
       '@valley/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@vercel/remix':
+        specifier: ^2.15.0
+        version: 2.15.0(@remix-run/dev@2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(@remix-run/node@2.15.0(typescript@5.6.3))(@remix-run/server-runtime@2.15.0(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       address:
         specifier: ^2.0.3
         version: 2.0.3
@@ -536,7 +545,7 @@ importers:
         specifier: ^0.0.0-nightly-bf7ecb711-20240911
         version: 0.0.0-nightly-bf7ecb711-20240911(@react-router/dev@0.0.0-nightly-f763fd2eb-20241122(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(react-router@0.0.0)(sass@1.81.0)(stylus@0.62.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(typescript@5.6.3)
       '@remix-run/dev':
-        specifier: ^2.14.0
+        specifier: ^2.15.0
         version: 2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0))
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -5299,13 +5308,13 @@ packages:
   '@vanilla-extract/private@1.0.6':
     resolution: {integrity: sha512-ytsG/JLweEjw7DBuZ/0JCN4WAQgM9erfSTdS1NQY778hFQSZ6cfCDEZZ0sgVm4k54uNz6ImKB33AYvSR//fjxw==}
 
-  '@vercel/remix@2.14.0':
-    resolution: {integrity: sha512-pyN/JMpC8DYshWkgzFfKmUydqQJr1NZfDtjIY3DaP6GxnArnylxe+6IlWhCLUYUi47gGwib63rtqZvC/VtwUQA==}
+  '@vercel/remix@2.15.0':
+    resolution: {integrity: sha512-V8zJU8CuA2E8OeDgLoOPcoRgcZAYOseHCzVnKTtJq2wPRRJ1Y/Y6yu2Tje2Sjmd370eyIZCGf26NOFeZiLNf2g==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@remix-run/dev': 2.14.0
-      '@remix-run/node': 2.14.0
-      '@remix-run/server-runtime': 2.14.0
+      '@remix-run/dev': 2.15.0
+      '@remix-run/node': 2.15.0
+      '@remix-run/server-runtime': 2.15.0
       react: '*'
       react-dom: '*'
 
@@ -10445,12 +10454,8 @@ packages:
   strnum@1.0.5:
     resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}
 
-  strtok3@7.1.1:
-    resolution: {integrity: sha512-mKX8HA/cdBqMKUr0MMZAFssCkIGoZeSCMXgnt79yKxNFguMLVFgRe6wB+fsL0NmoHDbeyZXczy7vEPSoo3rkzg==}
-    engines: {node: '>=16'}
-
-  strtok3@9.1.1:
-    resolution: {integrity: sha512-FhwotcEqjr241ZbjFzjlIYg6c5/L/s4yBGWSMvJ9UoExiSqL+FnFA/CaeZx17WGaZMS/4SOZp8wH18jSS4R4lw==}
+  strtok3@8.0.1:
+    resolution: {integrity: sha512-HNkTAnNWQj2YBzfTtoC5OQyu1QwPsMwiB7VyQmNvQKCrmEDSvFB857Vh97UY9InGLNRAB91sdS1ztifRo/3hdA==}
     engines: {node: '>=16'}
 
   stubs@3.0.0:
@@ -16597,7 +16602,7 @@ snapshots:
 
   '@vanilla-extract/private@1.0.6': {}
 
-  '@vercel/remix@2.14.0(@remix-run/dev@2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(@remix-run/node@2.15.0(typescript@5.6.3))(@remix-run/server-runtime@2.15.0(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@vercel/remix@2.15.0(@remix-run/dev@2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0)))(@remix-run/node@2.15.0(typescript@5.6.3))(@remix-run/server-runtime@2.15.0(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@remix-run/dev': 2.15.0(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.15.0(typescript@5.6.3))(@types/node@22.10.1)(babel-plugin-macros@3.1.0)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.15))(@types/node@22.10.1)(typescript@5.6.3))(typescript@5.6.3)(vite@5.4.11(@types/node@22.10.1)(less@4.2.1)(sass@1.81.0)(stylus@0.62.0))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0))
       '@remix-run/node': 2.15.0(typescript@5.6.3)
@@ -18863,13 +18868,13 @@ snapshots:
   file-type@17.1.6:
     dependencies:
       readable-web-to-node-stream: 3.0.2
-      strtok3: 7.1.1
+      strtok3: 8.0.1
       token-types: 5.0.1
 
   file-type@19.6.0:
     dependencies:
       get-stream: 9.0.1
-      strtok3: 9.1.1
+      strtok3: 8.0.1
       token-types: 6.0.0
       uint8array-extras: 1.4.0
 
@@ -22731,12 +22736,7 @@ snapshots:
 
   strnum@1.0.5: {}
 
-  strtok3@7.1.1:
-    dependencies:
-      '@tokenizer/token': 0.3.0
-      peek-readable: 5.3.1
-
-  strtok3@9.1.1:
+  strtok3@8.0.1:
     dependencies:
       '@tokenizer/token': 0.3.0
       peek-readable: 5.3.1
