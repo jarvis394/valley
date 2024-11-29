@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node'
+import { createCookieSessionStorage } from '@vercel/remix'
 
 export const authSessionStorage = createCookieSessionStorage<{
   /** Unix timextamp of when user submitted verification request */

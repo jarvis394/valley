@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node'
+import { createCookieSessionStorage } from '@vercel/remix'
 import { type ProviderName } from '../../config/connections'
 import { type AuthProvider } from './providers/provider'
 import { type Timings } from '../timing.server'

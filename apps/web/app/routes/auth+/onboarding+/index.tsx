@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { type LoaderFunctionArgs, redirect } from '@vercel/remix'
 import { requireOnboardingData } from './onboarding.server'
 
 /** Redirect user to the current onboarding step */

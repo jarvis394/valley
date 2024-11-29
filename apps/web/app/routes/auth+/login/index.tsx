@@ -11,7 +11,7 @@ import {
   type ActionFunctionArgs,
   redirect,
   HeadersFunction,
-} from '@remix-run/node'
+} from '@vercel/remix'
 import {
   canPerformPasswordLogin,
   getSessionExpirationDate,

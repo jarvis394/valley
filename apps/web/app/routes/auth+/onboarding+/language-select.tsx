@@ -3,7 +3,7 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
   redirect,
-} from '@remix-run/node'
+} from '@vercel/remix'
 import { Form, useNavigation } from '@remix-run/react'
 import { useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { LoaderFunctionArgs, redirect } from '@vercel/remix'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { UrlService } from 'app/server/services/url.server'

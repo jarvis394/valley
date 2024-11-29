@@ -1,5 +1,5 @@
 import type { WebAppManifest } from '@remix-pwa/dev'
-import { data } from '@remix-run/node'
+import { data } from '@vercel/remix'
 import { ShouldRevalidateFunction } from 'react-router'
 
 export const loader = () => {

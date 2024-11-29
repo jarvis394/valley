@@ -1,4 +1,4 @@
-import { redirect, type ActionFunctionArgs } from '@remix-run/node'
+import { redirect, type ActionFunctionArgs } from '@vercel/remix'
 import { authenticator } from '../../../server/auth/auth.server'
 import { handleMockAction } from '../../../server/auth/connections.server'
 import { ProviderNameSchema } from '../../../config/connections'

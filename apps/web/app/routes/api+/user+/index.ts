@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs } from '@remix-run/node'
+import { LoaderFunctionArgs } from '@vercel/remix'
 import { getUserId } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { invariantResponse } from 'app/utils/invariant'
