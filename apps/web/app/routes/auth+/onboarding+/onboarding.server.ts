@@ -1,5 +1,5 @@
 import { invariant } from '../../../utils/invariant'
-import { redirect } from '@vercel/remix'
+import { redirect } from '@remix-run/cloudflare'
 import { type VerifyFunctionArgs } from '../verify+/verify.server'
 import {
   authenticator,

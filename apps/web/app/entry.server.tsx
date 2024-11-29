@@ -2,9 +2,10 @@ import { PassThrough } from 'node:stream'
 import type {
   ActionFunctionArgs,
   EntryContext,
+  HandleDocumentRequestFunction,
   LoaderFunctionArgs,
-} from '@vercel/remix'
-import { handleRequest as vercelHandleRequest } from '@vercel/remix'
+} from '@remix-run/node'
+import { createReadableStreamFromReadable } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
@@ -16,43 +17,26 @@ import * as Sentry from '@sentry/remix'
 
 const ABORT_DELAY = 5_000
 export const STREAMING_TIMEOUT = 5_000
-const isVercel = process.env.VERCEL === '1'
 
 envInit()
 
-const handleRequest = (
+const handleRequest: HandleDocumentRequestFunction = (
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
-  loadContext: { cspNonce: string }
+  loadContext
 ) => {
   const nonce = loadContext.cspNonce?.toString() ?? ''
   const callbackName = isbot(request.headers.get('user-agent'))
     ? 'onAllReady'
     : 'onShellReady'
 
-  const remixServer = (
-    <NonceProvider value={nonce}>
-      <RemixServer nonce={nonce} context={remixContext} url={request.url} />
-    </NonceProvider>
-  )
-
-  if (isVercel) {
-    return vercelHandleRequest(
-      request,
-      responseStatusCode,
-      responseHeaders,
-      remixServer
-    )
-  }
-
   return new Promise(async (resolve, reject) => {
     let didError = false
     // NOTE: this timing will only include things that are rendered in the shell
     // and will not include suspended components and deferred loaders
     const timings = makeTimings('render', 'renderToPipeableStream')
-    const { createReadableStreamFromReadable } = await import('@remix-run/node')
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>

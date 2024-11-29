@@ -21,9 +21,16 @@ export default defineConfig(() => ({
   },
   ssr: {
     noExternal: ['remix-utils'],
+    resolve: {
+      conditions: ['workerd', 'worker', 'browser'],
+    },
+  },
+  resolve: {
+    mainFields: ['browser', 'module', 'main'],
   },
   build: {
     ssr: true,
+    minify: true,
     cssMinify: process.env.NODE_ENV === 'production',
     rollupOptions: {
       external: [/node:.*/, 'fsevents'],

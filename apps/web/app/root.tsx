@@ -15,7 +15,7 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@vercel/remix'
+} from '@remix-run/cloudflare'
 import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'

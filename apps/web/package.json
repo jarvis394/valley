@@ -29,6 +29,7 @@
     "@remix-pwa/dev": "^3.1.0",
     "@remix-pwa/sw": "^3.0.10",
     "@remix-pwa/worker-runtime": "^2.1.4",
+    "@remix-run/cloudflare": "^2.15.0",
     "@remix-run/express": "^2.14.0",
     "@remix-run/node": "^2.14.0",
     "@remix-run/react": "^2.14.0",
@@ -41,7 +42,6 @@
     "@valley/db": "*",
     "@valley/shared": "*",
     "@valley/ui": "*",
-    "@vercel/remix": "^2.15.0",
     "address": "^2.0.3",
     "ansis": "^3.3.2",
     "axios": "^1.7.7",
@@ -97,6 +97,7 @@
     "vite-env-only": "^3.0.3",
     "vite-plugin-node-polyfills": "^0.22.0",
     "web-oidc": "^0.0.19",
+    "wrangler": "^3.91.0",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"
   },

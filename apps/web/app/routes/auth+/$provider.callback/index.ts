@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from '@vercel/remix'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/cloudflare'
 import {
   PROVIDER_LABELS,
   ProviderNameSchema,

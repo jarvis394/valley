@@ -1,4 +1,4 @@
-import type { HeadersFunction, LoaderFunctionArgs } from '@vercel/remix'
+import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
 import { Await, data, Link, useLoaderData } from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'

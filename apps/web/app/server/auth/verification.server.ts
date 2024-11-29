@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@vercel/remix'
+import { createCookieSessionStorage } from '@remix-run/cloudflare'
 
 export const verifySessionStorage = createCookieSessionStorage<{
   unverifiedSessionId: string

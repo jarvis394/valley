@@ -1,5 +1,5 @@
 import { invariant } from '../../../utils/invariant'
-import { redirect } from '@vercel/remix'
+import { redirect } from '@remix-run/cloudflare'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { getUserId } from '../../../server/auth/auth.server'
 import { prisma } from '../../../server/db.server'

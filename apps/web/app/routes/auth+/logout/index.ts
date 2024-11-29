@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@vercel/remix'
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/cloudflare'
 import { logout } from 'app/server/auth/auth.server'
 
 export async function loader({ request }: LoaderFunctionArgs) {

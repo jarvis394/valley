@@ -1,5 +1,5 @@
 import { createId as cuid } from '@paralleldrive/cuid2'
-import { redirect } from '@vercel/remix'
+import { redirect } from '@remix-run/cloudflare'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
 import { redisCache, cachified } from '../../cache'
