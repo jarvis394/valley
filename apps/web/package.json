@@ -39,9 +39,9 @@
     "@uppy/core": "^4.1.0",
     "@uppy/progress-bar": "^4.0.0",
     "@uppy/tus": "^4.1.4",
-    "@valley/db": "*",
-    "@valley/shared": "*",
-    "@valley/ui": "*",
+    "@valley/db": "workspace:*",
+    "@valley/shared": "workspace:*",
+    "@valley/ui": "workspace:*",
     "address": "^2.0.3",
     "ansis": "^3.3.2",
     "axios": "^1.7.7",
@@ -99,7 +99,8 @@
     "web-oidc": "^0.0.19",
     "wrangler": "^3.91.0",
     "zod": "^3.23.8",
-    "zustand": "^5.0.1"
+    "zustand": "^5.0.1",
+    "@remix-run/server-runtime": "^2.15.0"
   },
   "devDependencies": {
     "@csstools/postcss-media-minmax": "^2.0.1",
@@ -114,8 +115,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/source-map-support": "^0.5.10",
-    "@valley/eslint-config": "*",
-    "@valley/typescript-config": "*",
+    "@valley/eslint-config": "workspace:*",
+    "@valley/typescript-config": "workspace:*",
     "autoprefixer": "^10.4.19",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.11",
