@@ -38,7 +38,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.56.11",
     "postcss": "^8.4.38",
-    "typescript": "^5.3.3",
+    "typescript": "^5.7.2",
     "vite": "^5.1.0",
     "vite-tsconfig-paths": "^4.2.1"
   },

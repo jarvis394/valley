@@ -15,7 +15,7 @@ module.exports = {
     'no-self-compare': 'error',
     'no-template-curly-in-string': 'error',
     'no-unmodified-loop-condition': 'error',
-    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
     eqeqeq: ['error', 'smart'],
     '@typescript-eslint/no-unused-vars': [
       'warn',

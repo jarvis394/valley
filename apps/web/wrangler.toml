@@ -1,20 +1,15 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "valley"
-compatibility_date = "2024-09-26"
-# main = "./server.ts"
-# workers_dev = true
+type = "javascript"
+workers_dev = true
 
-compatibility_flags = [ "nodejs_compat" ]
-pages_build_output_dir = "./build/client"
+[site]
+bucket = "./public"
+entry-point = "."
 
-# https://developers.cloudflare.com/workers/static-assets/binding/
-# [assets]
-# directory = "./build/client"
+[build]
+command = "pnpm build"
+watch_dir = "app"
 
-# Workers Logs
-# Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
-[observability]
-enabled = true
-
-# [build]
-# command = "yarn build"
+[build.upload]
+format = "service-worker"

@@ -38,7 +38,7 @@ declare module '@laosb/exifr' {
       input: T,
       offset?: number,
       length?: number
-    ) => Promise<ArrayBuffer>
+    ) => Promise<Buffer<ArrayBuffer>>
   }
 
   type Input =

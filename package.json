@@ -18,7 +18,8 @@
     "prepare": "husky",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "preinstall": "pnpm add -g node-gyp"
   },
   "devDependencies": {
     "@caxy/dotenv-updater": "^1.0.9",

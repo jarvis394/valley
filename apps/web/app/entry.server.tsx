@@ -27,7 +27,8 @@ const handleRequest: HandleDocumentRequestFunction = (
   remixContext: EntryContext,
   loadContext
 ) => {
-  const nonce = loadContext.cspNonce?.toString() ?? ''
+  const cspNonce = crypto.randomUUID()
+  const nonce = loadContext.cspNonce?.toString() ?? cspNonce
   const callbackName = isbot(request.headers.get('user-agent'))
     ? 'onAllReady'
     : 'onShellReady'

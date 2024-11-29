@@ -33,7 +33,9 @@
     "@remix-run/express": "^2.15.0",
     "@remix-run/node": "^2.15.0",
     "@remix-run/react": "^2.15.0",
+    "@remix-run/router": "^1.21.0",
     "@remix-run/serve": "^2.15.0",
+    "@remix-run/server-runtime": "^2.15.0",
     "@sentry/profiling-node": "^8.36.0",
     "@sentry/remix": "^8.36.0",
     "@uppy/core": "^4.1.0",
@@ -42,6 +44,7 @@
     "@valley/db": "workspace:*",
     "@valley/shared": "workspace:*",
     "@valley/ui": "workspace:*",
+    "@vercel/remix": "^2.15.0",
     "address": "^2.0.3",
     "ansis": "^3.3.2",
     "axios": "^1.7.7",
@@ -95,13 +98,10 @@
     "tus-js-client": "^4.2.3",
     "usehooks-ts": "^3.1.0",
     "vite-env-only": "^3.0.3",
-    "vite-plugin-node-polyfills": "^0.22.0",
     "web-oidc": "^0.0.19",
     "wrangler": "^3.91.0",
     "zod": "^3.23.8",
-    "zustand": "^5.0.1",
-    "@vercel/remix": "^2.15.0",
-    "@remix-run/server-runtime": "^2.15.0"
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@csstools/postcss-media-minmax": "^2.0.1",
@@ -125,7 +125,7 @@
     "react-email": "^3.0.1",
     "remix-flat-routes": "^0.6.5",
     "tsx": "^4.19.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.7.2",
     "vite": "^5.1.0",
     "vite-tsconfig-paths": "^4.2.1"
   },
