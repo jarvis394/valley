@@ -22,8 +22,6 @@ import { Await, useLoaderData } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
 
-export const config = { runtime: 'edge' }
-
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { url } = params
   const timings = makeTimings('project loader')
