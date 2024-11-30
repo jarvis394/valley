@@ -24,11 +24,9 @@ export default defineConfig(() => ({
   },
   build: {
     ssr: true,
-    minify: true,
+    minify: process.env.NODE_ENV === 'production',
     cssMinify: process.env.NODE_ENV === 'production',
-    rollupOptions: {
-      external: [/node:.*/, 'fsevents'],
-    },
+    rollupOptions: { external: [/node:.*/, 'fsevents'] },
     assetsInlineLimit: (source) => {
       if (
         source.endsWith('sprite.svg') ||

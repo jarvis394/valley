@@ -29,6 +29,7 @@
     "@remix-pwa/dev": "^3.1.0",
     "@remix-pwa/sw": "^3.0.10",
     "@remix-pwa/worker-runtime": "^2.1.4",
+    "@remix-run/cloudflare": "^2.15.0",
     "@remix-run/express": "^2.15.0",
     "@remix-run/node": "^2.15.0",
     "@remix-run/react": "^2.15.0",
@@ -78,7 +79,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.1",
     "react-phone-number-input": "^3.4.9",
-    "react-router": "^0.0.0-nightly-f47048541-20240813",
+    "react-router": "^7.0.1",
     "redis": "^4.7.0",
     "remix-auth": "^3.7.0",
     "remix-auth-github": "^2.0.0",
@@ -101,6 +102,7 @@
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
     "@csstools/postcss-media-minmax": "^2.0.1",
     "@hookform/devtools": "^4.3.1",
     "@react-router/remix-config-routes-adapter": "^0.0.0-nightly-bf7ecb711-20240911",
@@ -115,6 +117,7 @@
     "@types/source-map-support": "^0.5.10",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
+    "@vercel/remix": "2.15.0",
     "autoprefixer": "^10.4.19",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.11",
@@ -122,10 +125,10 @@
     "react-email": "^3.0.1",
     "remix-flat-routes": "^0.6.5",
     "tsx": "^4.19.2",
-    "@vercel/remix": "2.15.0",
     "typescript": "^5.7.2",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "wrangler": "^3.91.0"
   },
   "engines": {
     "node": ">=20.0.0"

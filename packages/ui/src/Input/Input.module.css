@@ -10,6 +10,11 @@
   transition-timing-function: ease;
 }
 
+.input input::placeholder,
+.input input::-webkit-input-placeholder {
+  user-select: none;
+}
+
 .input:focus-within {
   box-shadow:
     0 0 0 1px inset var(--input-border-focused),
