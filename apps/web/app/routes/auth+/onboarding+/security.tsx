@@ -4,7 +4,7 @@ import {
   type MetaFunction,
   redirect,
   data,
-} from '@remix-run/cloudflare'
+} from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { looseOptional, useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
@@ -83,9 +83,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

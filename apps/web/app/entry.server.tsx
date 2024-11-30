@@ -27,7 +27,8 @@ const handleRequest: HandleDocumentRequestFunction = (
   remixContext: EntryContext,
   loadContext
 ) => {
-  const nonce = loadContext.cspNonce?.toString() ?? ''
+  const cspNonce = crypto.randomUUID()
+  const nonce = loadContext.cspNonce?.toString() ?? cspNonce
   const callbackName = isbot(request.headers.get('user-agent'))
     ? 'onAllReady'
     : 'onShellReady'
@@ -36,7 +37,7 @@ const handleRequest: HandleDocumentRequestFunction = (
     let didError = false
     // NOTE: this timing will only include things that are rendered in the shell
     // and will not include suspended components and deferred loaders
-    const timings = makeTimings('render', 'renderToPipeableStream')
+    const timings = makeTimings('render')
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>

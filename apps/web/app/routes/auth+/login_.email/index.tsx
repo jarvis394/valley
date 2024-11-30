@@ -4,7 +4,7 @@ import { SEOHandle } from '@nasa-gcn/remix-seo'
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-} from '@remix-run/cloudflare'
+} from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
 import { login, requireAnonymous } from '../../../server/auth/auth.server'
 import Button from '@valley/ui/Button'

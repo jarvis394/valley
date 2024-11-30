@@ -14,7 +14,7 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
+import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 
 const covers = [
   '/assets/cover-1.webp',

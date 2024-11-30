@@ -23,7 +23,7 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.14.2",
     "@prisma/client": "^5.22.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   },
   "devDependencies": {
     "eslint": "^8.56.11",

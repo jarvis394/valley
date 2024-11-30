@@ -1,5 +1,5 @@
 import React from 'react'
-import type { MetaFunction } from '@remix-run/cloudflare'
+import type { MetaFunction } from '@remix-run/node'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import { Link, useNavigation, useRouteLoaderData } from '@remix-run/react'

@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from '@remix-run/cloudflare'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import {
   PROVIDER_LABELS,
   ProviderNameSchema,
@@ -186,9 +186,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     headers: combineHeaders(
       { 'set-cookie': await verifySessionStorage.commitSession(verifySession) },
       {
-        'set-cookie': await onboardingSessionStorage.commitSession(
-          onboardingSession
-        ),
+        'set-cookie':
+          await onboardingSessionStorage.commitSession(onboardingSession),
       },
       destroyRedirectTo
     ),

@@ -15,7 +15,7 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@remix-run/cloudflare'
+} from '@remix-run/node'
 import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
@@ -31,6 +31,7 @@ import { useEffect } from 'react'
 import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
+import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -40,7 +41,6 @@ import 'remix-image/remix-image.css?url'
 import '@uppy/core/dist/style.min.css?url'
 import '@uppy/progress-bar/dist/style.min.css?url'
 import 'overlayscrollbars/overlayscrollbars.css?url'
-import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 
 export const links: LinksFunction = () => [
   {

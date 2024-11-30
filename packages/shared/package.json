@@ -47,6 +47,6 @@
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   }
 }

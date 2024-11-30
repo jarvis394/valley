@@ -21,12 +21,6 @@ export default defineConfig(() => ({
   },
   ssr: {
     noExternal: ['remix-utils'],
-    resolve: {
-      conditions: ['workerd', 'worker', 'browser'],
-    },
-  },
-  resolve: {
-    mainFields: ['browser', 'module', 'main'],
   },
   build: {
     ssr: true,
