@@ -1,13 +1,13 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import { Form, useSearchParams } from '@remix-run/react'
+import { Form, useSearchParams } from 'react-router'
 import {
   type ActionFunctionArgs,
   redirect,
   data,
   HeadersFunction,
-} from '@remix-run/cloudflare'
+} from 'react-router'
 import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
@@ -19,7 +19,6 @@ import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
 import { PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
-import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
 import { redirectToKey, targetKey } from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -43,10 +42,6 @@ const SignupSchema = z.intersection(
 type FormData = z.infer<typeof SignupSchema>
 
 const resolver = zodResolver(SignupSchema)
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export async function action({ request }: ActionFunctionArgs) {
   const {

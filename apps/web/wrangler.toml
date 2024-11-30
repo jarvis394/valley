@@ -8,7 +8,7 @@ bucket = "./public"
 entry-point = "."
 
 [build]
-command = "pnpm build"
+command = "yarn build"
 watch_dir = "app"
 
 [build.upload]

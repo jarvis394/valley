@@ -2,7 +2,7 @@ import type { BaseTusHookResponseBody, TusHookResponse } from '@valley/shared'
 
 export class TusHookResponseBuilder<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ResBody extends Record<string, any> = BaseTusHookResponseBody
+  ResBody extends Record<string, any> = BaseTusHookResponseBody,
 > {
   private readonly data: TusHookResponse
   #body: ResBody = { ok: true } as unknown as ResBody

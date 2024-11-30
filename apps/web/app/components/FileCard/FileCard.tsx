@@ -19,7 +19,7 @@ import MenuItem from '@valley/ui/MenuItem'
 import MenuSeparator from '@valley/ui/MenuSeparator'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData } from 'react-router'
 import { loader as rootLoader } from 'app/root'
 
 type FileCardProps = {

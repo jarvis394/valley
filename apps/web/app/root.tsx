@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
   ShouldRevalidateFunction,
   useLoaderData,
-} from '@remix-run/react'
+} from 'react-router'
 import cx from 'classnames'
 import styles from './root.module.css'
 import {
@@ -15,8 +15,8 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@remix-run/cloudflare'
-import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
+} from 'react-router'
+// import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -171,7 +171,7 @@ export function Document({
           href="/apple-touch-icon.png"
           sizes="180x180"
         />
-        <ManifestLink />
+        {/* <ManifestLink /> */}
         <Meta />
         <Links />
       </head>
@@ -209,11 +209,11 @@ export default function App() {
 
   useToast(loaderData.toast)
 
-  useEffect(() => {
-    // Registering SW manually because Vite remix-pwa plugin
-    // adds <script> tag without CSP nonce value
-    loadServiceWorker()
-  }, [])
+  // useEffect(() => {
+  //   // Registering SW manually because Vite remix-pwa plugin
+  //   // adds <script> tag without CSP nonce value
+  //   loadServiceWorker()
+  // }, [])
 
   return (
     <HoneypotProvider {...loaderData.honeypotProps}>

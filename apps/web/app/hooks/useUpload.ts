@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import { Folder, Project } from '@valley/db'
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData } from 'react-router'
 import { loader as rootLoader } from 'app/root'
 
 type Upload = {

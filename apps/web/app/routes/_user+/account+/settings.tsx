@@ -1,11 +1,6 @@
-import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { Link, Outlet } from '@remix-run/react'
+import { Link, Outlet } from 'react-router'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export default function AccountSettings() {
   return (

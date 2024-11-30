@@ -11,7 +11,7 @@ import {
 } from 'geist-ui-icons'
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 import { Project } from '@valley/db'
 import Skeleton from '@valley/ui/Skeleton'
 

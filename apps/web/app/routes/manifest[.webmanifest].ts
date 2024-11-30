@@ -1,6 +1,6 @@
 import type { WebAppManifest } from '@remix-pwa/dev'
-import { data } from '@remix-run/cloudflare'
-import { ShouldRevalidateFunction } from '@remix-run/react'
+import { data } from 'react-router'
+import { ShouldRevalidateFunction } from 'react-router'
 
 export const loader = () => {
   return data(

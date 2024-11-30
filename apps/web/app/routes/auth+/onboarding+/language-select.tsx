@@ -3,8 +3,8 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
   redirect,
-} from '@remix-run/cloudflare'
-import { Form, useNavigation } from '@remix-run/react'
+} from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import { useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
@@ -54,9 +54,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

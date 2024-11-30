@@ -1,11 +1,7 @@
 import React from 'react'
 import styles from '../auth.module.css'
-import { SEOHandle } from '@nasa-gcn/remix-seo'
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-} from '@remix-run/cloudflare'
-import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
+import { type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
+import { Form, Link, useActionData, useSearchParams } from 'react-router'
 import { login, requireAnonymous } from '../../../server/auth/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
@@ -32,10 +28,6 @@ const LoginFormSchema = z.object({
 type FormData = z.infer<typeof LoginFormSchema>
 
 const resolver = zodResolver(LoginFormSchema)
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)

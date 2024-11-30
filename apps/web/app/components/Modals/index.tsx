@@ -1,6 +1,6 @@
 import Modal from '@valley/ui/Modal'
 import CreateProjectModal from './CreateProject'
-import { useSearchParams } from '@remix-run/react'
+import { useSearchParams } from 'react-router'
 
 export const Modals = () => {
   const [searchParams, setSearchParams] = useSearchParams()

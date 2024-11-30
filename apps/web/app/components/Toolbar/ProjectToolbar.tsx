@@ -3,7 +3,7 @@ import styles from './Toolbar.module.css'
 import TabsItem from '@valley/ui/TabsItem'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
 import { ToolbarItem } from './ToolbarItem'
-import { Link, useLocation, useParams } from '@remix-run/react'
+import { Link, useLocation, useParams } from 'react-router'
 
 const PROJECT_TOOLBAR_ITEMS: ToolbarItem[] = [
   {

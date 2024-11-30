@@ -68,3 +68,5 @@ storybook-static
 entry.worker.js
 
 vite.config.ts.timestamp-*
+
+.react-router/

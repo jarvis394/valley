@@ -9,7 +9,7 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { Await, Link, useParams } from '@remix-run/react'
+import { Await, Link, useParams } from 'react-router'
 import { User } from '@valley/db'
 
 const CurrentUser: React.FC<{ user: User }> = ({ user }) => {

@@ -16,7 +16,7 @@ import { Folder } from '@valley/db'
 import * as DropdownMenu from '@valley/ui/DropdownMenu'
 import * as ContextMenu from '@valley/ui/ContextMenu'
 import IconButton from '@valley/ui/IconButton'
-import { Link, useParams, useSearchParams } from '@remix-run/react'
+import { Link, useParams, useSearchParams } from 'react-router'
 
 type FolderCardProps = {
   folder: Folder

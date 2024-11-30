@@ -1,14 +1,9 @@
-import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { type VerificationType } from '../../auth+/verify+'
 import { useUserAwait } from 'app/utils/user'
 import { Suspense } from 'react'
-import { Await, Link } from '@remix-run/react'
+import { Await, Link } from 'react-router'
 import Stack from '@valley/ui/Stack'
 import Button from '@valley/ui/Button'
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export const twoFAVerificationType = '2fa' satisfies VerificationType
 export const twoFAVerifyVerificationType = '2fa-verify'

@@ -1,8 +1,7 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
-import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { type ActionFunctionArgs } from '@remix-run/cloudflare'
-import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
+import { type ActionFunctionArgs } from 'react-router'
+import { Form, Link, useActionData, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from '../../../components/ErrorBoundary'
@@ -16,10 +15,6 @@ import { ArrowLeft } from 'geist-ui-icons'
 import { useCountdown } from 'usehooks-ts'
 import React, { useEffect, useState } from 'react'
 import { showToast } from 'app/components/Toast/Toast'
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export const TOTP_RESEND_TIMEOUT = 30
 

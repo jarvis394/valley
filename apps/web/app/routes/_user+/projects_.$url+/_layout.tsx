@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet } from '@remix-run/react'
+import { Outlet } from 'react-router'
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 

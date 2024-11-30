@@ -6,18 +6,17 @@ import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
 import { ProviderConnectionForm } from '../../../components/ProviderConnectionForm/ProviderConnectionForm'
-import { data, Form, useSearchParams } from '@remix-run/react'
+import { data, Form, useSearchParams } from 'react-router'
 import {
   type ActionFunctionArgs,
   redirect,
   HeadersFunction,
-} from '@remix-run/cloudflare'
+} from 'react-router'
 import {
   canPerformPasswordLogin,
   getSessionExpirationDate,
   requireAnonymous,
 } from '../../../server/auth/auth.server'
-import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useIsPending } from '../../../utils/misc'
 import { checkHoneypot } from '../../../server/honeypot.server'
 import { z } from 'zod'
@@ -48,10 +47,6 @@ const EmailFormSchema = z.intersection(
 type FormData = z.infer<typeof EmailFormSchema>
 
 const resolver = zodResolver(EmailFormSchema)
-
-export const handle: SEOHandle = {
-  getSitemapEntries: () => null,
-}
 
 export async function action({ request }: ActionFunctionArgs) {
   await requireAnonymous(request)

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
-import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/cloudflare'
+import { createRequestHandler } from '@react-router/express'
+import { type ServerBuild } from 'react-router'
 import Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
@@ -202,7 +202,7 @@ app.use((req, res, next) => {
 async function getBuild() {
   try {
     const build = viteDevServer
-      ? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+      ? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
       : await import('../server/index.js')
 
     return { build: build as unknown as ServerBuild, error: null }

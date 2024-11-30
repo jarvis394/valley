@@ -4,9 +4,9 @@ import type {
   EntryContext,
   HandleDocumentRequestFunction,
   LoaderFunctionArgs,
-} from '@remix-run/node'
-import { createReadableStreamFromReadable } from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
+} from 'react-router'
+import { createReadableStreamFromReadable } from '@react-router/node'
+import { ServerRouter } from 'react-router'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 import { NonceProvider } from './components/NonceProvider/NonceProvider'
@@ -24,7 +24,7 @@ const handleRequest: HandleDocumentRequestFunction = (
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext,
+  reactRouterContext: EntryContext,
   loadContext
 ) => {
   const cspNonce = crypto.randomUUID()
@@ -41,7 +41,11 @@ const handleRequest: HandleDocumentRequestFunction = (
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>
-        <RemixServer nonce={nonce} context={remixContext} url={request.url} />
+        <ServerRouter
+          nonce={nonce}
+          context={reactRouterContext}
+          url={request.url}
+        />
       </NonceProvider>,
       {
         [callbackName]: () => {
