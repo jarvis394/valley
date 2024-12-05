@@ -11,179 +11,15 @@ import {
 } from '@valley/shared'
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
-import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
-import { Folder, Project } from '@valley/db'
-import { useRouteLoaderData } from '@remix-run/react'
+import { File, Folder, Project } from '@valley/db'
+import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
-
-type Upload = {
-  id: string
-  normalizedName: string
-  filetype: string
-  bytesUploaded: number
-  totalBytes: number
-  progress: number
-  uploadError: string | null
-  isUploading: boolean
-  isUploaded: boolean
-}
-
-type UploadsState = {
-  uploads: Record<string, Upload>
-  uploadsCount: number
-  totalBytes: number
-  bytesUploaded: number
-  /** Bytes in second */
-  uploadSpeed: number
-  /** Unix timestamp of last execution of setUploadProgress */
-  lastUploadProgressTimestamp: number
-  lastBytesUploaded: number
-  /** Upload remaining time based on upload speed in seconds */
-  remainingTime: number
-  uploadSpeedIntervalID: NodeJS.Timeout | null
-  isUploading: boolean
-  folderId: Folder['id'] | null
-  projectId: Project['id'] | null
-}
-
-type UploadsAction = {
-  setIsUploading: (state: UploadsState['isUploading']) => void
-  setFileUploadError: (id: Upload['id'], err: Upload['uploadError']) => void
-  addUpload: (
-    upload: Pick<Upload, 'id' | 'totalBytes' | 'filetype' | 'normalizedName'>
-  ) => void
-  setFileUploadProgress: (
-    id: Upload['id'],
-    bytesUploaded: Upload['bytesUploaded']
-  ) => void
-  setFileUploaded: (id: Upload['id']) => void
-  clearSuccessfulUploads: () => void
-  setFolderId: (id: UploadsState['folderId']) => void
-  setProjectId: (id: UploadsState['projectId']) => void
-  setUploadSpeed: (uploadSpeed: UploadsState['uploadSpeed']) => void
-  updateUploadSpeed: () => void
-}
+import { useUploadsStore } from 'app/stores/uploads'
+import { useProjectsStore } from 'app/stores/projects'
+import { createUploadToken } from 'app/api/uploads'
 
 const isClientSide = typeof document !== 'undefined'
-
-export const useUploadsStore = create<UploadsState & UploadsAction>()(
-  immer((set) => ({
-    uploads: {},
-    uploadsCount: 0,
-    totalBytes: 0,
-    bytesUploaded: 0,
-    uploadSpeed: 0,
-    lastBytesUploaded: 0,
-    lastUploadProgressTimestamp: 0,
-    remainingTime: 0,
-    isUploading: false,
-    folderId: null,
-    projectId: null,
-    uploadSpeedIntervalID: null,
-    updateUploadSpeed: () =>
-      set((state) => {
-        state.uploadSpeed = state.bytesUploaded - state.lastBytesUploaded
-        state.lastBytesUploaded = state.bytesUploaded
-        state.remainingTime =
-          (state.totalBytes - state.bytesUploaded) / state.uploadSpeed
-      }),
-    setIsUploading: (newIsUploading) =>
-      set((state) => {
-        state.isUploading = newIsUploading
-      }),
-    setFolderId: (id) =>
-      set((state) => {
-        state.folderId = id
-      }),
-    setUploadSpeed: (uploadSpeed) =>
-      set((state) => {
-        state.uploadSpeed = uploadSpeed
-      }),
-    setProjectId: (id) =>
-      set((state) => {
-        state.projectId = id
-      }),
-    setFileUploadError: (id, err) =>
-      set((state) => {
-        if (!state.uploads[id]) {
-          throw new Error(
-            `Cannot set upload error to an unknown upload, got: ${id}`
-          )
-        }
-
-        state.uploads[id].isUploading = false
-        state.uploads[id].isUploaded = false
-        state.uploads[id].uploadError = err
-      }),
-    addUpload: (upload) =>
-      set((state) => {
-        state.uploads[upload.id] = {
-          ...upload,
-          bytesUploaded: 0,
-          isUploaded: false,
-          isUploading: true,
-          progress: 0,
-          uploadError: null,
-        }
-        state.uploadsCount += 1
-        state.totalBytes += upload.totalBytes
-      }),
-    setFileUploadProgress: (id, bytesUploaded) =>
-      set((state) => {
-        const upload = state.uploads[id]
-        if (!upload) {
-          throw new Error(
-            `Cannot set upload progress of an unknown upload, got: ${id}`
-          )
-        }
-
-        const prevBytesUploaded = upload.bytesUploaded
-        const progress = bytesUploaded / upload.totalBytes
-        state.uploads[id].uploadError = null
-        state.uploads[id].isUploading = true
-        state.uploads[id].bytesUploaded = bytesUploaded
-        state.uploads[id].progress = progress
-        state.uploads[id].isUploaded = false
-        state.bytesUploaded += bytesUploaded - prevBytesUploaded
-      }),
-    setFileUploaded: (id) =>
-      set((state) => {
-        if (!state.uploads[id]) {
-          throw new Error(
-            `Cannot set upload progress of an unknown upload, got: ${id}`
-          )
-        }
-
-        state.uploads[id].uploadError = null
-        state.uploads[id].isUploaded = true
-        state.uploads[id].isUploading = false
-      }),
-    clearSuccessfulUploads: () =>
-      set((state) => {
-        const erroredUploads: UploadsState['uploads'] = {}
-        let erroredUploadsCount = 0
-        let erroredUploadsTotalBytes = 0
-        let erroredUploadsBytesUploaded = 0
-
-        for (const id of Object.keys(state.uploads)) {
-          if (state.uploads[id].uploadError) {
-            erroredUploads[id] = state.uploads[id]
-            erroredUploadsCount += 1
-            erroredUploadsTotalBytes += state.uploads[id].totalBytes
-            erroredUploadsBytesUploaded += state.uploads[id].bytesUploaded
-          }
-        }
-
-        state.isUploading = false
-        state.uploads = erroredUploads
-        state.uploadsCount = erroredUploadsCount
-        state.totalBytes = erroredUploadsTotalBytes
-        state.bytesUploaded = erroredUploadsBytesUploaded
-      }),
-  }))
-)
 
 type UseUploadProps = {
   projectId: Project['id']
@@ -197,6 +33,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null
   )
+  const revalidator = useRevalidator()
   const setIsUploading = useUploadsStore((state) => state.setIsUploading)
   const setFolderId = useUploadsStore((state) => state.setFolderId)
   const setProjectId = useUploadsStore((state) => state.setProjectId)
@@ -212,15 +49,11 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const clearSuccessfulUploads = useUploadsStore(
     (state) => state.clearSuccessfulUploads
   )
+  const addFileToProjectFiles = useProjectsStore((state) => state.addFile)
   const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
 
-  const getUppyHeaders = (): Record<string, string> => {
-    // TODO -- implement
-    return { Authorization: 'Bearer' }
-  }
-
   const addUploadedFileToSWRCache = (file: TusHookPreFinishResponse) => {
-    const _newFile = {
+    const newFile: File = {
       bucket: file.bucket,
       dateCreated: new Date(file.dateCreated),
       exifMetadata: file.exifMetadata,
@@ -231,16 +64,12 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       size: file.size,
       thumbnailKey: file.thumbnailKey || null,
       type: file.contentType,
+      isPendingDeletion: false,
     }
 
-    // TODO -- implement
-    // mutate((data) => {
-    //   if (!data) return undefined
-    //   return {
-    //     ...data,
-    //     files: [...data.files, newFile],
-    //   }
-    // })
+    revalidator.revalidate()
+
+    addFileToProjectFiles(newFile)
   }
 
   const handleUploadResponse = async (_req: HttpRequest, res: HttpResponse) => {
@@ -280,13 +109,14 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     }).use(Tus, {
       endpoint: rootContext?.ENV.TUSD_URL + '/files',
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
-      headers: getUppyHeaders,
       onAfterResponse: handleUploadResponse,
     })
   )
 
   const uploadFiles = useCallback(
     async (fileList: FileList) => {
+      const token = await createUploadToken({ projectId, folderId })
+
       const files = [...fileList]
       const fileIDs: string[] = []
       let totalSize = 0
@@ -297,8 +127,10 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         const metadata: TusUploadMetadata = {
           'normalized-name': deburr(file.name),
           'upload-id': fileId,
-          'folder-id': folderId.toString(),
-          'project-id': projectId.toString(),
+          'user-id': token.userId,
+          'folder-id': token.uploadFolderId,
+          'project-id': token.uploadProjectId,
+          'upload-token': token.hash,
           type: file.type,
         }
         uppy.setFileMeta(fileId, metadata)

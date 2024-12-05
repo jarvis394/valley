@@ -19,6 +19,12 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   position: relative;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.tabsItem:active {
+  scale: 0.98;
 }
 
 .tabsItem--selected {

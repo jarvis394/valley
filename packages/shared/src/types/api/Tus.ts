@@ -10,13 +10,15 @@ export enum TusHookType {
 }
 
 export type TusUploadMetadata = {
+  type: string
   filename?: string
   filetype?: string
   'normalized-name': string
-  type: string
+  'user-id': string
   'upload-id': string
   'project-id': string
   'folder-id': string
+  'upload-token': string
 }
 
 export type TusHookData = {

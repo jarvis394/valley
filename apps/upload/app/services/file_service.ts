@@ -9,6 +9,7 @@ import FolderService from '#services/folder_service'
 import ProjectService from '#services/project_service'
 import drive from '@adonisjs/drive/services/main'
 import { errors } from 'flydrive'
+import contentDisposition from 'content-disposition'
 
 type FileData = Omit<File, 'exifMetadata' | 'thumbnailKey'> & {
   projectId: Project['id']
@@ -75,6 +76,10 @@ export default class FileService {
   }
 
   async createFileForProjectFolder(data: FileData): Promise<File> {
+    if (!data.folderId) {
+      throw new Error('createFileForProjectFolder: Folder ID is null')
+    }
+
     const fileData: Prisma.FileCreateInput = {
       Folder: {
         connect: {
@@ -146,7 +151,9 @@ export default class FileService {
 
       res.header(
         'Content-Disposition',
-        `inline; filename="${databaseFile.name || key}"`
+        contentDisposition(databaseFile.name || key, {
+          type: 'inline',
+        })
       )
       res.header('Content-Length', metadata.contentLength)
       res.header(

@@ -36,10 +36,11 @@ import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 import './styles/fonts.css'
 import './styles/global.css'
 import '@valley/ui/styles/theme.css'
+import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
-import '@uppy/core/dist/style.min.css?url'
-import '@uppy/progress-bar/dist/style.min.css?url'
-import 'overlayscrollbars/overlayscrollbars.css?url'
+import '@uppy/core/dist/style.min.css'
+import '@uppy/progress-bar/dist/style.min.css'
+import 'overlayscrollbars/overlayscrollbars.css'
 
 export const links: LinksFunction = () => [
   {

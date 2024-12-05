@@ -135,7 +135,8 @@ const Tabs = <T extends TabValue = TabValue>({
       const childValue = (
         child.props.value === undefined ? childIndex : child.props.value
       ) as T
-      const selected = childValue === value
+      const childSelected = child.props.selected
+      const selected = childSelected || childValue === value
 
       childIndex += 1
 

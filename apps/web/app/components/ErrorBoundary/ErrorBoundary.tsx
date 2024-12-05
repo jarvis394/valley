@@ -12,6 +12,7 @@ import Stack from '@valley/ui/Stack'
 import '../../styles/fonts.css'
 import '../../styles/global.css'
 import '@valley/ui/styles/theme.css'
+import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
 
 type StatusHandler = (info: {

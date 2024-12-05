@@ -22,9 +22,4 @@ export default class UploadsController {
         return UploadService.defaultTusHandler(data)
     }
   }
-
-  // TODO -- implement
-  async getUploadToken() {
-    return {}
-  }
 }

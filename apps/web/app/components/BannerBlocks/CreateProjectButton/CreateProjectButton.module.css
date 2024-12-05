@@ -1,0 +1,29 @@
+.createProjectButton {
+  isolation: isolate;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.createProjectButton > h3 {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.createProjectButton > p {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  opacity: 0.32;
+}
+
+.createProjectButton__icon {
+  position: absolute;
+  color: var(--background-default);
+  width: auto;
+  height: 100%;
+  right: -32px;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+}

@@ -39,6 +39,7 @@ const Modal: React.FC<ModalProps> = ({
       return onDismiss()
     }
 
+    // TODO: navigate back and handle empty history
     setSearchParams((prev) => {
       prev.delete(modalKey)
       return prev
