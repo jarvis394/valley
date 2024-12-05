@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { Folder } from '@valley/db'
 import {
   PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
@@ -43,7 +43,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
-    return Response.json(
+    return data(
       { ok: false, errors, defaultValues },
       {
         status: 400,
@@ -60,7 +60,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
       },
     })
   } catch (e) {
-    return Response.json(
+    return data(
       {
         ok: true,
         errors: {
@@ -77,7 +77,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
-  return Response.json(
+  return data(
     {
       ok: true,
       folder,

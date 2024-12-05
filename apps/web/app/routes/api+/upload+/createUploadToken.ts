@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { FieldErrors } from 'react-hook-form'
@@ -28,7 +28,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
-    return Response.json(
+    return data(
       { ok: false, errors, defaultValues },
       {
         status: 400,
@@ -51,7 +51,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
   })
 
   if (!uploadFolder) {
-    return Response.json(
+    return data(
       {
         ok: false,
         defaultValues,
@@ -86,7 +86,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     },
   })
 
-  return Response.json({
+  return data({
     ok: true,
     data: uploadToken,
     defaultValues,
