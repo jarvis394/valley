@@ -12,12 +12,14 @@ import {
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
-import { File, Folder, Project } from '@valley/db'
+import { Folder, Project } from '@valley/db'
 import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
-import { useProjectsStore } from 'app/stores/projects'
 import { createUploadToken } from 'app/api/uploads'
+import { cache } from 'app/utils/client-cache'
+import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
+import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -49,27 +51,17 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const clearSuccessfulUploads = useUploadsStore(
     (state) => state.clearSuccessfulUploads
   )
-  const addFileToProjectFiles = useProjectsStore((state) => state.addFile)
   const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
 
-  const addUploadedFileToSWRCache = (file: TusHookPreFinishResponse) => {
-    const newFile: File = {
-      bucket: file.bucket,
-      dateCreated: new Date(file.dateCreated),
-      exifMetadata: file.exifMetadata,
-      folderId: file.folderId,
-      id: file.id,
-      key: file.key,
-      name: file.name,
-      size: file.size,
-      thumbnailKey: file.thumbnailKey || null,
-      type: file.contentType,
-      isPendingDeletion: false,
-    }
+  const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
+    await Promise.all([
+      cache.removeItem(getFolderCacheKey(file.folderId)),
+      cache.removeItem(getProjectCacheKey(file.projectId)),
+    ])
 
-    revalidator.revalidate()
-
-    addFileToProjectFiles(newFile)
+    try {
+      revalidator.revalidate()
+    } catch (e) {}
   }
 
   const handleUploadResponse = async (_req: HttpRequest, res: HttpResponse) => {
@@ -84,7 +76,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
           case TusHookType.PRE_CREATE:
             break
           case TusHookType.PRE_FINISH:
-            addUploadedFileToSWRCache(parsedBody)
+            await addUploadedFileToCache(parsedBody)
             break
           default:
             exhaustivnessCheck(parsedBody)

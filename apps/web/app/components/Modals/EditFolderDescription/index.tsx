@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,16 +6,10 @@ import styles from './EditFolderDescription.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextArea from '@valley/ui/TextArea'
-import {
-  Form,
-  useLocation,
-  useParams,
-  useRevalidator,
-  useSearchParams,
-} from '@remix-run/react'
+import { Form, useLocation, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { editFolder } from 'app/api/folders'
+import { useRemixForm } from 'remix-hook-form'
+import { useIsPending } from 'app/utils/misc'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -34,33 +28,28 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
   const modalPropsFolderId = searchParams.get('modal-folderId')
   const defaultDescription = location.state?.defaultDescription
   const folderId = modalPropsFolderId || paramsFolderId
-  const { register, handleSubmit } = useForm<FormData>({ resolver })
-  const [isPending, setPending] = useState(false)
-  const revalidator = useRevalidator()
-
-  const onSubmit: SubmitHandler<FormData> = async (data, e) => {
-    e?.preventDefault()
-    if (!folderId) return
-
-    setPending(true)
-    await editFolder({
-      folderId,
-      description: data.description,
-    })
-    setPending(false)
-    onClose()
-    revalidator.revalidate()
-  }
+  const formAction = '/api/folders/' + folderId + '/edit'
+  const { register, handleSubmit } = useRemixForm<FormData>({
+    resolver,
+    submitConfig: {
+      action: formAction,
+      method: 'POST',
+    },
+  })
+  const isPending = useIsPending({
+    formMethod: 'POST',
+    formAction,
+  })
 
   return (
     <>
       <ModalHeader>Edit Folder Description</ModalHeader>
       <Form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit}
         className={styles.editFolderDescription__form}
         id="edit-folder-description-form"
         method="POST"
-        action={'/api/folders/' + folderId + '/edit'}
+        action={formAction}
       >
         <div>
           <TextArea

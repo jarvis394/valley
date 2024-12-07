@@ -132,6 +132,7 @@ export default class UploadService {
         exifMetadata: {},
         id: data.Event.Upload.ID,
         uploadId: metadata['upload-id'],
+        projectId: metadata['project-id'],
         isPendingDeletion: false,
         contentType: metadata.type || 'application/octet-stream',
       })

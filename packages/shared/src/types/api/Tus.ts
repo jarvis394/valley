@@ -1,4 +1,4 @@
-import { File } from '@valley/db'
+import { File, Folder, Project } from '@valley/db'
 
 export enum TusHookType {
   PRE_CREATE = 'pre-create',
@@ -87,8 +87,10 @@ export type TusHookPreFinishResponse = BaseTusHookResponseBody & {
   dateCreated: string
   thumbnailKey?: string
   uploadId: string
+  projectId: Project['id']
+  folderId: Folder['id']
   contentType: string
-} & Omit<File, 'dateCreated' | 'thumbnailKey' | 'type'>
+} & Omit<File, 'dateCreated' | 'thumbnailKey' | 'type' | 'folderId'>
 
 export type TusHookResponseBody =
   | TusHookPreCreateResponse

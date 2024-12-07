@@ -6,56 +6,58 @@ import { Await, useLocation, useParams } from '@remix-run/react'
 import { useProjectAwait } from 'app/utils/project'
 import LinkTabItem from './LinkTabItem'
 
-const ProjectsToolbarTabItem = React.forwardRef<HTMLButtonElement, ToolbarItem>(
-  function ProjectsToolbarTabItem({ value, label, ...props }, ref) {
-    const { url: projectUrl, folderId } = useParams()
-    const projectBaseUrl = `/projects/${projectUrl}`
-    const projectData = useProjectAwait()
-    const fallbackProjectOverviewUrl = useMemo(() => {
-      if (folderId) return projectBaseUrl + '/folder/' + folderId
-      else return projectBaseUrl
-    }, [folderId, projectBaseUrl])
+const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
+  HTMLButtonElement,
+  ToolbarItem
+>(function ProjectsToolbarTabItem({ value, label, ...props }, ref) {
+  const { projectId, folderId } = useParams()
+  const projectBaseUrl = `/projects/${projectId}`
+  const projectData = useProjectAwait()
+  const fallbackProjectOverviewUrl = useMemo(() => {
+    if (folderId) return projectBaseUrl + '/folder/' + folderId
+    else return projectBaseUrl
+  }, [folderId, projectBaseUrl])
 
-    if (value === projectBaseUrl) {
-      return (
-        <Suspense
-          fallback={
-            <LinkTabItem
-              {...props}
-              ref={ref}
-              to={fallbackProjectOverviewUrl}
-              value={value}
-              label={label}
-            />
-          }
-        >
-          <Await resolve={projectData?.project}>
-            {(project) => {
-              const defaultFolder =
-                project?.folders.find((e) => e.isDefaultFolder)?.id || folderId
-              return (
-                <LinkTabItem
-                  {...props}
-                  ref={ref}
-                  value={value}
-                  label={label}
-                  to={projectBaseUrl + '/folder/' + defaultFolder}
-                />
-              )
-            }}
-          </Await>
-        </Suspense>
-      )
-    }
-
-    return <LinkTabItem {...props} ref={ref} value={value} label={label} />
+  if (value === projectBaseUrl) {
+    return (
+      <Suspense
+        fallback={
+          <LinkTabItem
+            {...props}
+            ref={ref}
+            to={fallbackProjectOverviewUrl}
+            value={value}
+            label={label}
+          />
+        }
+      >
+        <Await resolve={projectData?.project}>
+          {(project) => {
+            const defaultFolder =
+              project?.folders.find((e) => e.isDefaultFolder)?.id || folderId
+            return (
+              <LinkTabItem
+                {...props}
+                ref={ref}
+                value={value}
+                label={label}
+                to={projectBaseUrl + '/folder/' + defaultFolder}
+              />
+            )
+          }}
+        </Await>
+      </Suspense>
+    )
   }
-)
+
+  return <LinkTabItem {...props} ref={ref} value={value} label={label} />
+})
+const ProjectsToolbarTabItem = React.memo(ProjectsToolbarTabItemUnmemoized)
 
 const ProjectsToolbar = () => {
-  const { url: projectUrl, folderId } = useParams()
+  const { projectId, folderId } = useParams()
   const location = useLocation()
-  const projectBaseUrl = `/projects/${projectUrl}`
+  const projectBaseUrl = `/projects/${projectId}`
   const projectToolbarItems: ToolbarItem[] = useMemo(
     () => [
       {

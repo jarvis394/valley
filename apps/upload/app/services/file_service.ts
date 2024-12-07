@@ -106,8 +106,10 @@ export default class FileService {
 
     const databaseFile = await this.createFile(fileData)
 
-    await this.folderService.addFilesToFolder(data.folderId, [databaseFile])
-    await this.projectService.addFilesToProject(data.projectId, [databaseFile])
+    await Promise.all([
+      this.folderService.addFilesToFolder(data.folderId, [databaseFile]),
+      this.projectService.addFilesToProject(data.projectId, [databaseFile]),
+    ])
 
     return databaseFile
   }

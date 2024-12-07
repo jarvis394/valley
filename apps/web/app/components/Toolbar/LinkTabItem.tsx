@@ -15,4 +15,4 @@ const LinkTabItem = React.forwardRef<HTMLButtonElement, ToolbarItem>(
   }
 )
 
-export default LinkTabItem
+export default React.memo(LinkTabItem)

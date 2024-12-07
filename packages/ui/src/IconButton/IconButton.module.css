@@ -1,5 +1,6 @@
 .iconButton {
   --x-padding: 8px;
+  flex-shrink: 0;
 }
 
 .iconButton.iconButton--size-sm {

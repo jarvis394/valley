@@ -3,10 +3,10 @@ import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { url } = params
+  const { projectId } = params
   const userId = await getUserIdFromSession(request)
   const project = await prisma.project.findFirst({
-    where: { url, userId },
+    where: { id: projectId, userId },
     include: {
       folders: true,
     },
@@ -15,5 +15,5 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   if (!project || !defaultFolder) return redirect('/projects')
 
-  return redirect('/projects/' + project.url + '/folder/' + defaultFolder.id)
+  return redirect('/projects/' + project.id + '/folder/' + defaultFolder.id)
 }

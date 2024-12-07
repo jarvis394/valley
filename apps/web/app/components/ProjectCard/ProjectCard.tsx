@@ -30,7 +30,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
   const defaultFolderId =
     project?.folders.find((e) => e.isDefaultFolder)?.id ||
     project?.folders[0]?.id
-  const projectLink = `/projects/${project?.url}/folder/${defaultFolderId}`
+  const projectLink = `/projects/${project?.id}/folder/${defaultFolderId}`
 
   return (
     <div className={styles.projectCard}>

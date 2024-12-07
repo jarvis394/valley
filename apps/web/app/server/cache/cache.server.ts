@@ -11,11 +11,16 @@ import {
 import { remember } from 'app/utils/remember'
 import { LRUCache } from 'lru-cache'
 import { cachifiedTimingReporter, type Timings } from 'app/server/timing.server'
-import { redisJsonCacheAdapter } from 'cachified-redis-json-adapter'
-import { createClient } from 'redis'
+// import { redisJsonCacheAdapter } from 'cachified-redis-json-adapter'
+// import { createClient } from 'redis'
 
-const redisClient = remember('redis-cache', () => createClient())
-export const redisCache = redisJsonCacheAdapter(redisClient)
+// TODO: resolve JSON module redis
+// const redisClient = remember('redis-cache', () =>
+//   createClient({
+//     url: process.env.REDIS_URL,
+//   })
+// )
+// export const redisCache = redisJsonCacheAdapter(redisClient)
 
 const lru = remember(
   'lru-cache',
@@ -50,3 +55,5 @@ export async function cachified<Value>(
     mergeReporters(cachifiedTimingReporter(timings), reporter)
   )
 }
+
+export { softPurge } from '@epic-web/cachified'

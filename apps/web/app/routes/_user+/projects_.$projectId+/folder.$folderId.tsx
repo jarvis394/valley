@@ -9,7 +9,7 @@ import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import IconButton from '@valley/ui/IconButton'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
-import { formatBytes } from 'app/utils/misc'
+import { formatBytes, useIsPending } from 'app/utils/misc'
 import {
   data,
   HeadersFunction,
@@ -26,6 +26,8 @@ import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import {
   Await,
   ClientLoaderFunctionArgs,
+  Form,
+  redirect,
   ShouldRevalidateFunction,
   useLoaderData,
   useNavigate,
@@ -40,42 +42,82 @@ import Animated from '@valley/ui/Animated'
 import { useProjectAwait } from 'app/utils/project'
 import { FolderWithFiles, ProjectWithFolders } from '@valley/shared'
 import { formatNewLine } from 'app/utils/format-new-line'
+import { cache } from 'app/utils/client-cache'
+import { invariantResponse } from 'app/utils/invariant'
+import { useRemixForm } from 'remix-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FoldersCreateSchema } from 'app/routes/api+/folders+/create'
+
+type FormData = z.infer<typeof FoldersCreateSchema>
+
+const resolver = zodResolver(FoldersCreateSchema)
+
+export const getFolderCacheKey = (folderId: Folder['id']) =>
+  `folder:${folderId}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { url, folderId } = params
-  const timings = makeTimings('project loader')
+  const { projectId, folderId } = params
+  invariantResponse(folderId, 'Missing folder ID in route params')
+  invariantResponse(projectId, 'Missing project ID in route params')
+
+  const timings = makeTimings('project folder loader')
   const userId = await time(getUserIdFromSession(request), {
     timings,
-    type: 'get userId from session',
+    type: 'folder get userId from session',
   })
   const folder = time(
-    prisma.folder.findFirst({
-      where: {
-        Project: {
-          url,
-          userId,
+    () => {
+      return prisma.folder.findFirst({
+        where: {
+          Project: {
+            id: projectId,
+            userId,
+          },
+          id: folderId,
         },
-        id: folderId,
-      },
-      include: {
-        files: true,
-      },
-    }),
-    { timings, type: 'get folder' }
+        include: {
+          files: true,
+        },
+      })
+    },
+    {
+      timings,
+      type: 'get folder',
+    }
   )
 
-  return data({ folder }, { headers: { 'Server-Timing': timings.toString() } })
+  return data(
+    { folder, cached: false },
+    { headers: { 'Server-Timing': timings.toString() } }
+  )
 }
 
-export const clientLoader = ({ serverLoader }: ClientLoaderFunctionArgs) => {
-  const folder = new Promise((res) =>
-    serverLoader().then((data) =>
-      res((data as SerializeFrom<typeof loader>).folder)
-    )
-  )
+let initialLoad = true
+export async function clientLoader({
+  serverLoader,
+  params,
+}: ClientLoaderFunctionArgs) {
+  if (!params.folderId) {
+    return redirect('/projects')
+  }
+
+  const key = getFolderCacheKey(params.folderId)
+  const cacheEntry = await cache.getItem(key)
+  if (cacheEntry && !initialLoad) {
+    return { folder: cacheEntry, cached: true }
+  }
+
+  initialLoad = false
+
+  const loaderData = (await serverLoader()) as SerializeFrom<typeof loader>
+  const folder = await loaderData.folder
+  await cache.setItem(key, folder)
 
   return { folder }
 }
+
+clientLoader.hydrate = true
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   return {
@@ -83,12 +125,17 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   }
 }
 
-export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
-  if (formAction) {
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  formAction,
+  currentParams,
+  defaultShouldRevalidate,
+}) => {
+  if (formAction && currentParams.folderId) {
+    cache.removeItem(getFolderCacheKey(currentParams.folderId))
     return true
   }
 
-  return false
+  return defaultShouldRevalidate
 }
 
 const ProjectHeader: React.FC<{
@@ -99,14 +146,23 @@ const ProjectHeader: React.FC<{
   const { folderId } = useParams()
   const currentFolder = project?.folders.find((e) => e.id === folderId)
   const projectTotalSize = formatBytes(Number(project?.totalSize) || 0)
-
-  const handleCreateFolder = async () => {}
+  const createFolderAction = '/api/folders/create'
+  const { register, handleSubmit } = useRemixForm<FormData>({
+    resolver,
+    submitConfig: {
+      action: createFolderAction,
+      method: 'POST',
+    },
+  })
+  const isCreatingFolder = useIsPending({
+    formAction: createFolderAction,
+  })
 
   const handleFolderClick = (folder: Folder) => {
     if (!project) return
 
     if (currentFolder?.id !== folder.id) {
-      navigate('/projects/' + project.url + '/folder/' + folder.id)
+      navigate('/projects/' + project.id + '/folder/' + folder.id)
     }
   }
 
@@ -165,15 +221,21 @@ const ProjectHeader: React.FC<{
             {project?.folders.map((folder, i) => (
               <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
             ))}
-            <IconButton
-              // disabled={isCreatingFolder}
-              // loading={isCreatingFolder}
-              variant="tertiary"
-              size="lg"
-              onClick={handleCreateFolder}
-            >
-              <Plus />
-            </IconButton>
+            <Form onSubmit={handleSubmit}>
+              <input
+                {...register('projectId', { value: project?.id })}
+                hidden
+              />
+              <IconButton
+                disabled={isCreatingFolder}
+                loading={isCreatingFolder}
+                variant="tertiary"
+                size="lg"
+                type="submit"
+              >
+                <Plus />
+              </IconButton>
+            </Form>
           </div>
           <div className={styles.project__foldersTotalSizeContainer}>
             <span className={styles.project__foldersTotalSizeCaption}>
@@ -185,20 +247,17 @@ const ProjectHeader: React.FC<{
       </div>
       <Divider />
       <Wrapper className={styles.project__folderInfo}>
-        {currentFolder?.title && (
-          <div className={styles.project__folderTitleContainer}>
-            {currentFolder?.title}
-            <IconButton
-              onClick={handleEditFolderTitle}
-              variant="tertiary-dimmed"
-            >
-              <PencilEdit />
-            </IconButton>
-          </div>
-        )}
+        <div className={styles.project__folderTitleContainer}>
+          {currentFolder?.title}
+          <IconButton onClick={handleEditFolderTitle} variant="tertiary-dimmed">
+            <PencilEdit />
+          </IconButton>
+        </div>
         {currentFolder?.description && (
           <div className={styles.project__folderDescriptionContainer}>
-            <p>{formatNewLine(currentFolder?.description)}</p>
+            <Animated asChild>
+              <p>{formatNewLine(currentFolder?.description)}</p>
+            </Animated>
             <IconButton
               onClick={handleEditFolderDescription}
               variant="tertiary-dimmed"
@@ -215,9 +274,8 @@ const ProjectHeader: React.FC<{
 const FolderComponent: React.FC<{
   folder: FolderWithFiles | null
 }> = ({ folder }) => {
-  const storeFiles = useProjectsStore((state) => state.files)
   const setFilesToStore = useProjectsStore((state) => state.setFiles)
-  const files = storeFiles || folder?.files
+  const files = folder?.files
 
   useEffect(() => {
     folder?.files && setFilesToStore(folder?.files)
@@ -249,7 +307,7 @@ const ProjectRoute = () => {
           {(project) => <ProjectHeader project={project || null} />}
         </Await>
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<h1>loading folder...</h1>}>
         <Await resolve={data.folder}>
           {(folder) => <FolderComponent folder={folder} />}
         </Await>
@@ -260,4 +318,4 @@ const ProjectRoute = () => {
 
 export const ErrorBoundary = GeneralErrorBoundary
 
-export default ProjectRoute
+export default React.memo(ProjectRoute)

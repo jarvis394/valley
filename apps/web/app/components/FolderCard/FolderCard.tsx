@@ -69,7 +69,7 @@ const MenuContent: React.FC<{
 }
 
 const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
-  const { url, folderId } = useParams()
+  const { projectId, folderId } = useParams()
   const isActive = folderId ? folderId === folder.id : folder.isDefaultFolder
   const totalSize = formatBytes(Number(folder.totalSize))
 
@@ -85,7 +85,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
         >
           <Link
             onClick={onClick?.bind(null, folder)}
-            to={'/projects/' + url + '/folder/' + folder.id}
+            to={'/projects/' + projectId + '/folder/' + folder.id}
           >
             <DropdownMenu.Root modal={false}>
               <div className={styles.folderCard__content}>

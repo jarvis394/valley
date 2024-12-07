@@ -54,5 +54,5 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     },
   })
 
-  return redirect('/projects/' + project.url)
+  return redirect('/projects/' + project.id)
 }

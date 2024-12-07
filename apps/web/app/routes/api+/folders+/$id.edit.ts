@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { Folder } from '@valley/db'
 import {
   PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
   PROJECT_FOLDER_TITLE_MAX_LENGTH,
@@ -51,14 +50,16 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
-  let folder: Folder | null = null
   try {
-    folder = await prisma.folder.update({
+    const folder = await prisma.folder.update({
       where: { id, Project: { userId: user.id } },
+      select: { projectId: true, id: true },
       data: {
         ...submissionData,
       },
     })
+
+    return redirect('/projects/' + folder.projectId + '/folder/' + folder.id)
   } catch (e) {
     return data(
       {
@@ -76,14 +77,4 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
       }
     )
   }
-
-  return data(
-    {
-      ok: true,
-      folder,
-    },
-    {
-      status: 200,
-    }
-  )
 }

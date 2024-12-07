@@ -52,4 +52,4 @@ const TabsItem = React.forwardRef<HTMLButtonElement, TabsItemProps>(
   }
 )
 
-export default TabsItem
+export default React.memo(TabsItem)

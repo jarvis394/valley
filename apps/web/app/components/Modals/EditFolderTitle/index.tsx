@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,16 +6,10 @@ import styles from './EditFolderTitle.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
-import {
-  Form,
-  useLocation,
-  useParams,
-  useRevalidator,
-  useSearchParams,
-} from '@remix-run/react'
+import { Form, useLocation, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { editFolder } from 'app/api/folders'
+import { useRemixForm } from 'remix-hook-form'
+import { useIsPending } from 'app/utils/misc'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -34,34 +28,27 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
   const modalPropsFolderId = searchParams.get('modal-folderId')
   const defaultTitle = location.state?.defaultTitle
   const folderId = modalPropsFolderId || paramsFolderId
+  const formAction = '/api/folders/' + folderId + '/edit'
   const { register, getFieldState, formState, handleSubmit } =
-    useForm<FormData>({ resolver })
-  const [isPending, setPending] = useState(false)
-  const revalidator = useRevalidator()
-
-  const onSubmit: SubmitHandler<FormData> = async (data, e) => {
-    e?.preventDefault()
-    if (!folderId || !data.title) return
-
-    setPending(true)
-    await editFolder({
-      folderId,
-      title: data.title,
+    useRemixForm<FormData>({
+      resolver,
+      submitConfig: {
+        action: formAction,
+        method: 'POST',
+      },
     })
-    setPending(false)
-    onClose()
-    revalidator.revalidate()
-  }
+  const isPending = useIsPending({
+    formMethod: 'POST',
+    formAction,
+  })
 
   return (
     <>
       <ModalHeader>Edit Folder Title</ModalHeader>
       <Form
-        onSubmit={handleSubmit(onSubmit)}
-        className={styles.editFolderTitle__form}
+        onSubmit={handleSubmit}
         id="edit-folder-title-form"
-        method="POST"
-        action={'/api/folders/' + folderId + '/edit'}
+        className={styles.editFolderTitle__form}
       >
         <div>
           <TextField

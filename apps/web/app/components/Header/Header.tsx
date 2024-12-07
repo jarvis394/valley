@@ -9,8 +9,9 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { Await, Link, useParams } from '@remix-run/react'
-import { User } from '@valley/db'
+import { Await, Link } from '@remix-run/react'
+import { Project, User } from '@valley/db'
+import { useProjectAwait } from 'app/utils/project'
 
 const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
   return (
@@ -36,8 +37,8 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
   )
 }
 
-const CurrentProject = () => {
-  const { id: _projectId } = useParams()
+const CurrentProject: React.FC<{ project: Project | null }> = ({ project }) => {
+  if (!project) return null
 
   return (
     <>
@@ -48,7 +49,7 @@ const CurrentProject = () => {
           align={'center'}
           className={styles.header__avatarAndNameContainer}
         >
-          test project
+          {project.title}
         </Stack>
       </Stack>
     </>
@@ -60,6 +61,8 @@ type HeaderProps = {
 }
 
 const Header: React.FC<HeaderProps> = ({ user }) => {
+  const project = useProjectAwait()
+
   return (
     <header
       className={styles.header}
@@ -79,7 +82,15 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
               </Await>
             </Suspense>
           )}
-          <CurrentProject />
+          {project && (
+            <Suspense fallback={<h1>loading...</h1>}>
+              <Await resolve={project.project}>
+                {(resolvedProject) => (
+                  <CurrentProject project={resolvedProject} />
+                )}
+              </Await>
+            </Suspense>
+          )}
         </Stack>
         <Stack gap={2} align={'center'}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>
@@ -91,4 +102,4 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
   )
 }
 
-export default Header
+export default React.memo(Header)
