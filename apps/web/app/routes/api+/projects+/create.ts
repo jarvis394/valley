@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { UrlService } from 'app/server/services/url.server'
@@ -26,7 +26,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
   if (errors) {
-    return Response.json(
+    return data(
       { ok: false, errors, defaultValues },
       {
         status: 400,
@@ -54,5 +54,5 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     },
   })
 
-  return redirect('/projects/' + project.url)
+  return redirect('/projects/' + project.id)
 }

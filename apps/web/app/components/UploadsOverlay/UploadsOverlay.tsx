@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useUploadsStore } from '../../hooks/useUpload'
+import { useUploadsStore } from '../../stores/uploads'
 import { Portal } from '@valley/ui/Portal'
 import styles from './UploadsOverlay.module.css'
 import Spinner from '@valley/ui/Spinner'

@@ -12,12 +12,12 @@ import {
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
 import { Link } from '@remix-run/react'
-import { Project } from '@valley/db'
 import Skeleton from '@valley/ui/Skeleton'
+import { ProjectWithFolders } from '@valley/shared'
 
 type ProjectCardProps =
   | {
-      project: Project
+      project: ProjectWithFolders
       loading?: false
     }
   | {
@@ -27,7 +27,10 @@ type ProjectCardProps =
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
   const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
-  const projectLink = `/projects/${project?.url}`
+  const defaultFolderId =
+    project?.folders.find((e) => e.isDefaultFolder)?.id ||
+    project?.folders[0]?.id
+  const projectLink = `/projects/${project?.id}/folder/${defaultFolderId}`
 
   return (
     <div className={styles.projectCard}>

@@ -1,5 +1,6 @@
 import React, {
   CSSProperties,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -81,34 +82,40 @@ const Tabs = <T extends TabValue = TabValue>({
   )
 
   const onLeaveTabs = () => {
-    setHoveredTab(null)
-    initialHoveredElementTimeoutRef.current = setTimeout(() => {
-      setIsInitialHoveredElement(true)
-    }, ANIMATION_DURATION)
+    startTransition(() => {
+      setHoveredTab(null)
+      initialHoveredElementTimeoutRef.current = setTimeout(() => {
+        setIsInitialHoveredElement(true)
+      }, ANIMATION_DURATION)
+    })
   }
 
-  const onEnterTab = useCallback((e: React.PointerEvent, value: T) => {
-    // Do not show hover indicator when on mobile (client is using touch)
-    if (e.pointerType === 'touch') return
-    if (!e.target || !(e.target instanceof HTMLElement)) return
+  const onEnterTab = useCallback((value: T, e: React.PointerEvent) => {
+    startTransition(() => {
+      // Do not show hover indicator when on mobile (client is using touch)
+      if (e.pointerType === 'touch') return
+      if (!e.target || !(e.target instanceof HTMLElement)) return
 
-    setHoveredTab((prev) => {
-      if (prev !== null && prev !== value) {
-        setIsInitialHoveredElement(false)
-      }
+      setHoveredTab((prev) => {
+        if (prev !== null && prev !== value) {
+          setIsInitialHoveredElement(false)
+        }
 
-      return value
+        return value
+      })
+
+      setHoveredElement(e.target)
     })
-
-    setHoveredElement(e.target)
   }, [])
 
   const handleItemClick = useCallback(
     (itemValue: T, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      onItemClick?.(itemValue, e)
-      setInnerValue(itemValue)
-      setSelectedElement(e.currentTarget)
-      setIsInitialSelectedAppear(false)
+      startTransition(() => {
+        onItemClick?.(itemValue, e)
+        setInnerValue(itemValue)
+        setSelectedElement(e.currentTarget)
+        setIsInitialSelectedAppear(false)
+      })
     },
     [onItemClick]
   )
@@ -135,7 +142,8 @@ const Tabs = <T extends TabValue = TabValue>({
       const childValue = (
         child.props.value === undefined ? childIndex : child.props.value
       ) as T
-      const selected = childValue === value
+      const childSelected = child.props.selected
+      const selected = childSelected || childValue === value
 
       childIndex += 1
 
@@ -144,9 +152,7 @@ const Tabs = <T extends TabValue = TabValue>({
       >(child, {
         indicator: selected && !mounted && indicator,
         selected,
-        onClick: (value, event) => {
-          handleItemClick(value as T, event)
-        },
+        onClick: handleItemClick as (value: string | number) => void,
         value: childValue,
         ref: (e) => {
           if (!e) return
@@ -155,7 +161,7 @@ const Tabs = <T extends TabValue = TabValue>({
             setSelectedElement(e)
           }
         },
-        onPointerEnter: (e) => onEnterTab(e, childValue),
+        onPointerEnter: onEnterTab.bind(null, childValue),
       })
     })
   }, [childrenProp, handleItemClick, indicator, mounted, onEnterTab, value])
@@ -190,7 +196,9 @@ const Tabs = <T extends TabValue = TabValue>({
   }
 
   useEffect(() => {
-    setMounted(true)
+    startTransition(() => {
+      setMounted(true)
+    })
 
     return () => {
       clearTimeout(initialHoveredElementTimeoutRef.current)

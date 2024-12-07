@@ -2,21 +2,45 @@
   display: flex;
 }
 
+.projects__bannerBlocks {
+  width: 100%;
+  padding-top: 16px;
+  gap: 0;
+  width: 100%;
+  overflow: auto;
+}
+
+.projects__bannerBlocks > [data-overlayscrollbars-contents] {
+  position: relative;
+  gap: 12px;
+  display: flex;
+  flex-direction: row;
+}
+
 .projects__list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+  padding: 16px 0;
   gap: 16px;
   width: 100%;
 }
 
-@media screen and (min-width: 900px) {
+.projects__searchBar {
+  padding-top: 16px;
+}
+
+.projects__searchInput {
+  max-width: 280px;
+}
+
+@media screen and (min-width: 660px) {
   .projects__list {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 960px) {
   .projects__list {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }

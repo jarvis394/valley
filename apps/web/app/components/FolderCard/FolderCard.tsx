@@ -20,6 +20,7 @@ import { Link, useParams, useSearchParams } from '@remix-run/react'
 
 type FolderCardProps = {
   folder: Folder
+  onClick?: (folder: Folder) => void
 }
 
 const MenuContent: React.FC<{
@@ -29,9 +30,14 @@ const MenuContent: React.FC<{
   const [searchParams, setSearchParams] = useSearchParams()
 
   const handleFolderRename = () => {
-    searchParams.set('modal', 'edit-folder-title')
-    searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('modal', 'edit-folder-title')
+    params.set('modal-folderId', folder.id.toString())
+    setSearchParams(params, {
+      state: {
+        defaultTitle: folder.title,
+      },
+    })
   }
 
   const handleFolderDelete = () => {
@@ -62,8 +68,8 @@ const MenuContent: React.FC<{
   )
 }
 
-const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
-  const { folderId } = useParams()
+const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
+  const { projectId, folderId } = useParams()
   const isActive = folderId ? folderId === folder.id : folder.isDefaultFolder
   const totalSize = formatBytes(Number(folder.totalSize))
 
@@ -77,7 +83,10 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
             [styles['folderCard--active']]: isActive,
           })}
         >
-          <Link to={'./folder/' + folder.id}>
+          <Link
+            onClick={onClick?.bind(null, folder)}
+            to={'/projects/' + projectId + '/folder/' + folder.id}
+          >
             <DropdownMenu.Root modal={false}>
               <div className={styles.folderCard__content}>
                 <h5 className={styles.folderCard__contentTitle}>

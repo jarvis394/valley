@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Button, { ButtonProps } from './Button'
-import { RefAttributes } from 'react'
 import { JSX } from 'react/jsx-runtime'
 import Divider from '../Divider/Divider'
 import Stack from '../Stack/Stack'
@@ -67,8 +66,7 @@ export const Default: Story = {
     before,
     after,
     ...args
-  }: JSX.IntrinsicAttributes &
-    (ButtonProps & RefAttributes<HTMLButtonElement>)) => (
+  }: JSX.IntrinsicAttributes & ButtonProps) => (
     <Stack gap={2} direction={'column'}>
       <Button
         {...args}

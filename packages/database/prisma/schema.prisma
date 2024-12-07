@@ -16,14 +16,14 @@ model User {
   email     String   @unique
   fullname  String
 
-  image          UserImage?
-  password       Password?
-  roles          Role[]
-  sessions       Session[]
-  connections    Connection[]
-  projects       Project[]
+  image       UserImage?
+  password    Password?
+  roles       Role[]
+  sessions    Session[]
+  connections Connection[]
+  projects    Project[]
   /// Contains user settings and social links
-  settings       UserSettings?
+  settings    UserSettings?
 }
 
 model UserSettings {
@@ -144,7 +144,7 @@ model Connection {
 model Project {
   id                 String              @id @default(cuid())
   title              String
-  url                String
+  url                String              @unique
   totalFiles         Int                 @default(0)
   /// Total size is in bytes, string formatted
   totalSize          String              @default("0")
@@ -195,19 +195,22 @@ model UserImage {
 }
 
 model File {
-  id           String   @id
-  bucket       String
-  key          String
-  thumbnailKey String?
-  exifMetadata Json
-  name         String
-  type         String
+  id                String   @id
+  bucket            String
+  key               String
+  thumbnailKey      String?
+  exifMetadata      Json
+  name              String
+  type              String
   /// File size in bytes, string formatted
-  size         String
-  dateCreated  DateTime @default(now())
+  size              String
+  dateCreated       DateTime @default(now())
+  /// Is marked for deletion by a cron job
+  isPendingDeletion Boolean  @default(false)
 
-  Folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId String
+  // Can be `null` because files are only being marked as deleted when folder is removed
+  Folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId String?
 }
 
 model TranslationStrings {
@@ -218,4 +221,11 @@ model TranslationStrings {
 
   Project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String  @unique
+}
+
+model UploadToken {
+  hash            String @unique
+  uploadProjectId String
+  uploadFolderId  String
+  userId          String
 }

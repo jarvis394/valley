@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   Links,
   Meta,
@@ -16,7 +17,7 @@ import {
   type LoaderFunctionArgs,
   data,
 } from '@remix-run/node'
-import { ManifestLink, loadServiceWorker } from '@remix-pwa/sw'
+import { ManifestLink } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -27,7 +28,6 @@ import { combineHeaders, getDomainUrl } from './utils/misc'
 import { makeTimings, time } from './server/timing.server'
 import { HoneypotProvider } from './components/Honeypot/Honeypot'
 import { honeypot } from './server/honeypot.server'
-import { useEffect } from 'react'
 import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
@@ -36,10 +36,11 @@ import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 import './styles/fonts.css'
 import './styles/global.css'
 import '@valley/ui/styles/theme.css'
+import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
-import '@uppy/core/dist/style.min.css?url'
-import '@uppy/progress-bar/dist/style.min.css?url'
-import 'overlayscrollbars/overlayscrollbars.css?url'
+import '@uppy/core/dist/style.min.css'
+import '@uppy/progress-bar/dist/style.min.css'
+import 'overlayscrollbars/overlayscrollbars.css'
 
 export const links: LinksFunction = () => [
   {
@@ -202,17 +203,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function App() {
+const App = () => {
   const loaderData = useLoaderData<typeof loader>()
   const theme = useTheme()
 
   useToast(loaderData.toast)
 
-  useEffect(() => {
-    // Registering SW manually because Vite remix-pwa plugin
-    // adds <script> tag without CSP nonce value
-    loadServiceWorker()
-  }, [])
+  // TODO: fix SW requests
+  // useEffect(() => {
+  //   // Registering SW manually because Vite remix-pwa plugin
+  //   // adds <script> tag without CSP nonce value
+  //   loadServiceWorker()
+  // }, [])
 
   return (
     <HoneypotProvider {...loaderData.honeypotProps}>
@@ -225,3 +227,4 @@ export default function App() {
 }
 
 export const ErrorBoundary = GeneralErrorBoundary
+export default React.memo(App)

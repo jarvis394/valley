@@ -1,9 +1,18 @@
-import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { Await, data, Link, useLoaderData } from '@remix-run/react'
+import type {
+  HeadersFunction,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from '@remix-run/node'
+import {
+  Await,
+  ClientLoaderFunctionArgs,
+  data,
+  ShouldRevalidateFunction,
+  useLoaderData,
+} from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
-import { showToast } from 'app/components/Toast/Toast'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import React, { Suspense } from 'react'
@@ -15,6 +24,10 @@ import {
   makeTimings,
   time,
 } from 'app/server/timing.server'
+import Input from '@valley/ui/Input'
+import { ChevronDown, MagnifyingGlass, SortAscending } from 'geist-ui-icons'
+import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
@@ -25,6 +38,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const projects = time(
     prisma.project.findMany({
       where: { userId },
+      orderBy: { dateCreated: 'desc' },
+      include: {
+        folders: true,
+      },
     }),
     { timings, type: 'find projects' }
   )
@@ -41,50 +58,72 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   }
 }
 
-export const shouldRevalidate = () => {
+export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
+  if (formAction) {
+    return true
+  }
+
   return false
 }
+
+export const clientLoader = ({ serverLoader }: ClientLoaderFunctionArgs) => {
+  const projects = new Promise((res) =>
+    serverLoader().then((data) =>
+      res((data as SerializeFrom<typeof loader>).projects)
+    )
+  )
+
+  return { projects }
+}
+
+const projectSkeletons = new Array(8)
+  .fill(null)
+  .map((_, i) => <ProjectCard loading key={i} />)
 
 const ProjectsRoute = () => {
   const data = useLoaderData<typeof loader>()
 
   return (
-    <Stack direction={'column'} gap={4} padding={4}>
-      <Button asChild>
-        <Link to="/account/settings">/account/settings</Link>
-      </Button>
-      <Button asChild>
-        <Link to={{ search: 'modal=create-project' }}>Create Project</Link>
-      </Button>
-      <Button
-        variant="secondary-dimmed"
-        onClick={() =>
-          showToast({
-            title: 'Test title',
-            description: 'Test description, very long',
-            type: 'info',
-            id: 'test',
-          })
-        }
-      >
-        Show toast
-      </Button>
-      <Wrapper>
-        <div className={styles.projects__list}>
-          <Suspense
-            fallback={new Array(8).fill(null).map((_, i) => (
-              <ProjectCard loading key={i} />
-            ))}
+    <Stack direction={'column'}>
+      <Wrapper asChild className={styles.projects__bannerBlocks}>
+        <OverlayScrollbarsComponent
+          defer
+          options={{
+            scrollbars: { theme: 'os-theme-light' },
+            overflow: { x: 'scroll' },
+          }}
+          style={{ gap: 12 }}
+        >
+          <CreateProjectButton />
+        </OverlayScrollbarsComponent>
+      </Wrapper>
+      <Wrapper className={styles.projects__searchBar} asChild>
+        <Stack gap={3}>
+          <Input
+            placeholder="Search projects..."
+            paperProps={{ className: styles.projects__searchInput }}
+            before={<MagnifyingGlass color="var(--text-hint)" />}
+          />
+          <Button
+            size="md"
+            variant="secondary-dimmed"
+            before={<SortAscending />}
+            after={<ChevronDown />}
           >
-            <Await resolve={data.projects}>
-              {(projects) =>
-                projects?.map((project, i) => (
-                  <ProjectCard project={project} key={i} />
-                ))
-              }
-            </Await>
-          </Suspense>
-        </div>
+            Sort by name
+          </Button>
+        </Stack>
+      </Wrapper>
+      <Wrapper className={styles.projects__list}>
+        <Suspense fallback={projectSkeletons}>
+          <Await resolve={data.projects}>
+            {(projects) =>
+              projects?.map((project, i) => (
+                <ProjectCard project={project} key={i} />
+              ))
+            }
+          </Await>
+        </Suspense>
       </Wrapper>
     </Stack>
   )

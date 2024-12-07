@@ -2,7 +2,7 @@ import { createId as cuid } from '@paralleldrive/cuid2'
 import { redirect } from '@remix-run/node'
 import { GitHubStrategy } from 'remix-auth-github'
 import { z } from 'zod'
-import { redisCache, cachified } from '../../cache'
+import { cachified, lruCache } from '../../cache'
 import { connectionSessionStorage } from '../connections.server'
 import { type Timings } from '../../timing.server'
 import { normalizeEmail, type AuthProvider } from './provider'
@@ -60,7 +60,7 @@ export class GitHubProvider implements AuthProvider {
   ) {
     const result = await cachified({
       key: `connection-data:github:${providerId}`,
-      cache: redisCache,
+      cache: lruCache,
       timings,
       ttl: 1000 * 60,
       swr: 1000 * 60 * 60 * 24 * 7,
@@ -104,8 +104,9 @@ export class GitHubProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/github/callback?${searchParams}`, {
       headers: {
-        'set-cookie':
-          await connectionSessionStorage.commitSession(connectionSession),
+        'set-cookie': await connectionSessionStorage.commitSession(
+          connectionSession
+        ),
       },
     })
   }

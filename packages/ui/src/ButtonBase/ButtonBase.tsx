@@ -47,4 +47,4 @@ const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(
   }
 )
 
-export default ButtonBase
+export default React.memo(ButtonBase)

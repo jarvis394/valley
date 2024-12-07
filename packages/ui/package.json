@@ -46,7 +46,8 @@
     "./useMediaQuery": "./src/useMediaQuery/useMediaQuery.ts",
     "./config/theme": "./src/config/theme.ts",
     "./styles/global.css": "./src/styles/global.css",
-    "./styles/theme.css": "./src/styles/theme.css"
+    "./styles/theme.css": "./src/styles/theme.css",
+    "./styles/reset.css": "./src/styles/reset.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

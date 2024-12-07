@@ -1,0 +1,7 @@
+.editFolderDescription__form {
+  padding: 24px;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
