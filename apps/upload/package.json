@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=production build/bin/server.js",
+    "start": "cross-env NODE_ENV=production node ./build/bin/server.js",
     "build": "cross-env NODE_ENV=production node ace build",
     "dev": "cross-env NODE_ENV=development node ace serve --hmr",
     "lint": "eslint . --max-warnings 0 --cache --cache-location ./node_modules/.cache/eslint",
@@ -47,7 +47,8 @@
     "pino-pretty": "^11.2.2",
     "prettier": "^3.3.3",
     "ts-node-maintained": "^10.9.4",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@types/lodash.deburr": "^4.1.9"
   },
   "dependencies": {
     "@adonisjs/auth": "^9.2.3",
@@ -73,7 +74,8 @@
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.33.5",
     "transliteration": "^2.3.5",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "cross-env": "^7.0.3"
   },
   "hotHook": {
     "boundaries": [

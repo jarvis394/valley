@@ -24,6 +24,9 @@
     "typecheck": {
       "dependsOn": ["^db:generate"]
     },
+    "start": {
+      "cache": false
+    },
     "db:migrate": {
       "cache": false
     },
@@ -33,7 +36,7 @@
     "db:generate": {
       "cache": false
     },
-    "db:push": {
+    "db:deploy": {
       "cache": false
     },
     "db:studio": {

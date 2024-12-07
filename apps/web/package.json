@@ -123,7 +123,6 @@
     "@valley/typescript-config": "*",
     "@vercel/remix": "2.15.0",
     "autoprefixer": "^10.4.19",
-    "cross-env": "^7.0.3",
     "eslint": "^8.56.11",
     "postcss": "^8.4.38",
     "react-email": "^3.0.1",

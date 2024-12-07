@@ -3,6 +3,16 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const seed = async () => {
+  const isAlreadySeeded = await prisma.role.findFirst({
+    where: {
+      name: 'user',
+    },
+  })
+
+  if (isAlreadySeeded) {
+    return console.log('💿 Database is already seeded, skipping...')
+  }
+
   console.time('🔑 Created permissions...')
   const entities = ['user', 'project']
   const actions = ['create', 'read', 'update', 'delete']
