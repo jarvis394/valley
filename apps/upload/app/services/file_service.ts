@@ -11,7 +11,7 @@ import drive from '@adonisjs/drive/services/main'
 import { errors } from 'flydrive'
 import contentDisposition from 'content-disposition'
 
-type FileData = Omit<File, 'exifMetadata' | 'thumbnailKey'> & {
+type FileData = Omit<File, 'id' | 'exifMetadata' | 'thumbnailKey'> & {
   projectId: Project['id']
 }
 
@@ -86,11 +86,11 @@ export default class FileService {
           id: data.folderId,
         },
       },
-      id: data.id,
       key: data.key,
       name: data.name,
       size: data.size,
-      type: data.type,
+      // Set default file type if not present
+      type: data.type || 'application/octet-stream',
       exifMetadata: {},
       bucket: data.bucket,
     }

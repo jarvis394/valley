@@ -68,3 +68,15 @@ yarn format
 ## Installation and running issues
 
 Ensure your machine has this packages installed: `libvips`, `libvips-tools`, `libvips-dev`
+
+## Running on WSL
+
+If some of services are inaccessible from network, run the following command to proxy it.
+
+`PORT` is your desired port to proxy from WSL to your network.
+
+`WSL_IP` can be retrieved from `hostname -I` command.
+
+```
+netsh interface portproxy add v4tov4 listenport=<PORT> listenaddress=0.0.0.0 connectport=<PORT> connectaddress=<WSL_IP>
+```

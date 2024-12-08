@@ -13,6 +13,10 @@ export default class UploadsController {
   async handleTusHook() {
     const data = this.ctx.request.body() as TusHookData
 
+    this.ctx.logger.info(
+      `handleTusHook: ${data.Type} | ${data.Event.Upload.ID}`
+    )
+
     switch (data.Type) {
       case TusHookType.PRE_CREATE:
         return await this.uploadService.handlePreCreateHook(data)

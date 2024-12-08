@@ -10,7 +10,7 @@ export enum TusHookType {
 }
 
 export type TusUploadMetadata = {
-  type: string
+  type: string | null
   filename?: string
   filetype?: string
   'normalized-name': string

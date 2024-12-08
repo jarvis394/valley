@@ -54,7 +54,7 @@ export function ErrorBoundary() {
     <Stack
       fullWidth
       fullHeight
-      gap={0}
+      gap={2}
       direction={'column'}
       align={'center'}
       justify={'center'}

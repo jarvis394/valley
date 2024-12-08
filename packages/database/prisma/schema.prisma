@@ -195,7 +195,7 @@ model UserImage {
 }
 
 model File {
-  id                String   @id
+  id                String   @id @default(cuid())
   bucket            String
   key               String
   thumbnailKey      String?

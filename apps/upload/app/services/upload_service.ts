@@ -117,6 +117,7 @@ export default class UploadService {
       Size: size,
       Storage: storage,
     } = data.Event.Upload
+    const contentType = metadata.type || 'application/octet-stream'
     const dateCreated = new Date()
     const resBuilder = new TusHookResponseBuilder<TusHookPreFinishResponse>()
       .setStatusCode(201)
@@ -130,21 +131,20 @@ export default class UploadService {
         name: deburr(metadata['normalized-name'].trim()),
         dateCreated: dateCreated.toISOString(),
         exifMetadata: {},
-        id: data.Event.Upload.ID,
+        id: '',
         uploadId: metadata['upload-id'],
         projectId: metadata['project-id'],
         isPendingDeletion: false,
-        contentType: metadata.type || 'application/octet-stream',
+        contentType,
       })
 
     try {
       const file = await this.filesService.createFileForProjectFolder({
-        id: resBuilder.body.id,
         folderId: resBuilder.body.folderId,
         key: resBuilder.body.key,
         size: resBuilder.body.size,
         name: resBuilder.body.name,
-        type: metadata.type,
+        type: contentType,
         bucket: resBuilder.body.bucket,
         projectId: metadata['project-id'],
         isPendingDeletion: false,

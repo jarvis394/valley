@@ -40,7 +40,11 @@ import { Folder } from '@valley/db'
 import { useProjectsStore } from 'app/stores/projects'
 import Animated from '@valley/ui/Animated'
 import { useProjectAwait } from 'app/utils/project'
-import { FolderWithFiles, ProjectWithFolders } from '@valley/shared'
+import {
+  FolderWithFiles,
+  PROJECT_MAX_FOLDERS,
+  ProjectWithFolders,
+} from '@valley/shared'
 import { formatNewLine } from 'app/utils/format-new-line'
 import { cache } from 'app/utils/client-cache'
 import { invariantResponse } from 'app/utils/invariant'
@@ -150,6 +154,7 @@ const ProjectHeader: React.FC<{
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     submitConfig: {
+      navigate: false,
       action: createFolderAction,
       method: 'POST',
     },
@@ -157,6 +162,8 @@ const ProjectHeader: React.FC<{
   const isCreatingFolder = useIsPending({
     formAction: createFolderAction,
   })
+  const canCreateMoreFolders =
+    (project?.folders.length || 0) < PROJECT_MAX_FOLDERS
 
   const handleFolderClick = (folder: Folder) => {
     if (!project) return
@@ -217,26 +224,28 @@ const ProjectHeader: React.FC<{
       <Divider />
       <div className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
-          <div className={cx(styles.project__foldersList)}>
+          <Animated className={cx(styles.project__foldersList)}>
             {project?.folders.map((folder, i) => (
               <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
             ))}
-            <Form onSubmit={handleSubmit}>
-              <input
-                {...register('projectId', { value: project?.id })}
-                hidden
-              />
-              <IconButton
-                disabled={isCreatingFolder}
-                loading={isCreatingFolder}
-                variant="tertiary"
-                size="lg"
-                type="submit"
-              >
-                <Plus />
-              </IconButton>
-            </Form>
-          </div>
+            {canCreateMoreFolders && (
+              <Form onSubmit={handleSubmit}>
+                <input
+                  {...register('projectId', { value: project?.id })}
+                  hidden
+                />
+                <IconButton
+                  disabled={isCreatingFolder}
+                  loading={isCreatingFolder}
+                  variant="tertiary"
+                  size="lg"
+                  type="submit"
+                >
+                  <Plus />
+                </IconButton>
+              </Form>
+            )}
+          </Animated>
           <div className={styles.project__foldersTotalSizeContainer}>
             <span className={styles.project__foldersTotalSizeCaption}>
               Total size
