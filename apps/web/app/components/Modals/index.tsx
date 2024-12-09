@@ -1,9 +1,10 @@
+import { useCallback } from 'react'
+import { useSearchParams } from '@remix-run/react'
 import Modal from '@valley/ui/Modal'
 import CreateProjectModal from './CreateProject'
-import { useSearchParams } from '@remix-run/react'
 import EditFolderTitleModal from './EditFolderTitle'
-import { useCallback } from 'react'
 import EditFolderDescriptionModal from './EditFolderDescription'
+import ConfirmFolderDeletionModal from './ConfirmFolderDeletion'
 
 export const Modals = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -44,6 +45,14 @@ export const Modals = () => {
         id="edit-folder-description"
       >
         <EditFolderDescriptionModal onClose={handleClose} />
+      </Modal>
+      <Modal
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        onDismiss={handleClose}
+        id="confirm-folder-deletion"
+      >
+        <ConfirmFolderDeletionModal onClose={handleClose} />
       </Modal>
     </>
   )

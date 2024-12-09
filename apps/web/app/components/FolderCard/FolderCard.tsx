@@ -8,13 +8,9 @@ import {
   Trash,
   Menu as MenuIcon,
 } from 'geist-ui-icons'
-import Menu, { MenuProps } from '@valley/ui/Menu'
-import MenuItem from '@valley/ui/MenuItem'
-import MenuSeparator from '@valley/ui/MenuSeparator'
+import Menu from '@valley/ui/Menu'
 import { formatBytes } from 'app/utils/misc'
 import { Folder } from '@valley/db'
-import * as DropdownMenu from '@valley/ui/DropdownMenu'
-import * as ContextMenu from '@valley/ui/ContextMenu'
 import IconButton from '@valley/ui/IconButton'
 import { Link, useParams, useSearchParams } from '@remix-run/react'
 
@@ -23,10 +19,9 @@ type FolderCardProps = {
   onClick?: (folder: Folder) => void
 }
 
-const MenuContent: React.FC<{
-  type?: MenuProps['type']
+const FolderCardMenuContent: React.FC<{
   folder: Folder
-}> = ({ type = 'dropdown', folder }) => {
+}> = ({ folder }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const handleFolderRename = () => {
@@ -47,24 +42,24 @@ const MenuContent: React.FC<{
   }
 
   return (
-    <Menu type={type}>
-      <MenuItem
+    <Menu.Content>
+      <Menu.Item
         onClick={handleFolderRename}
         before={<PencilEdit color="var(--text-secondary)" />}
       >
         Rename
-      </MenuItem>
-      <MenuItem before={<MenuIcon color="var(--text-secondary)" />}>
+      </Menu.Item>
+      <Menu.Item before={<MenuIcon color="var(--text-secondary)" />}>
         Reorder
-      </MenuItem>
-      <MenuSeparator />
-      <MenuItem
+      </Menu.Item>
+      <Menu.Separator />
+      <Menu.Item
         onClick={handleFolderDelete}
         before={<Trash color="var(--red-600)" />}
       >
         Delete
-      </MenuItem>
-    </Menu>
+      </Menu.Item>
+    </Menu.Content>
   )
 }
 
@@ -74,51 +69,44 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
   const totalSize = formatBytes(Number(folder.totalSize))
 
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger asChild>
-        <ButtonBase
-          asChild
-          variant="secondary"
-          className={cx(styles.folderCard, {
-            [styles['folderCard--active']]: isActive,
-          })}
+    <Menu.Root openOnContextMenu>
+      <ButtonBase
+        asChild
+        variant="secondary"
+        className={cx(styles.folderCard, {
+          [styles['folderCard--active']]: isActive,
+        })}
+      >
+        <Link
+          onClick={onClick?.bind(null, folder)}
+          to={'/projects/' + projectId + '/folder/' + folder.id}
         >
-          <Link
-            onClick={onClick?.bind(null, folder)}
-            to={'/projects/' + projectId + '/folder/' + folder.id}
-          >
-            <DropdownMenu.Root modal={false}>
-              <div className={styles.folderCard__content}>
-                <h5 className={styles.folderCard__contentTitle}>
-                  {folder.title}
-                </h5>
-                <div className={styles.folderCard__contentSubtitle}>
-                  <p>{folder.totalFiles} files</p>
-                  <span>•</span>
-                  <p>{totalSize}</p>
-                </div>
-              </div>
+          <div className={styles.folderCard__content}>
+            <h5 className={styles.folderCard__contentTitle}>{folder.title}</h5>
+            <div className={styles.folderCard__contentSubtitle}>
+              <p>{folder.totalFiles} files</p>
+              <span>•</span>
+              <p>{totalSize}</p>
+            </div>
+          </div>
 
-              <DropdownMenu.Trigger asChild>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                  }}
-                  size="sm"
-                  variant="tertiary"
-                >
-                  <MoreVertical />
-                </IconButton>
-              </DropdownMenu.Trigger>
+          <Menu.Trigger asChild>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+              }}
+              size="sm"
+              variant="tertiary"
+            >
+              <MoreVertical />
+            </IconButton>
+          </Menu.Trigger>
 
-              <MenuContent type={'dropdown'} folder={folder} />
-            </DropdownMenu.Root>
-          </Link>
-        </ButtonBase>
-      </ContextMenu.Trigger>
-      <MenuContent type={'context'} folder={folder} />
-    </ContextMenu.Root>
+          <FolderCardMenuContent folder={folder} />
+        </Link>
+      </ButtonBase>
+    </Menu.Root>
   )
 }
 

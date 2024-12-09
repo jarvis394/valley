@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense } from 'react'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
 import Button from '@valley/ui/Button'
@@ -37,7 +37,6 @@ import {
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
 import { Folder } from '@valley/db'
-import { useProjectsStore } from 'app/stores/projects'
 import Animated from '@valley/ui/Animated'
 import { useProjectAwait } from 'app/utils/project'
 import {
@@ -224,7 +223,7 @@ const ProjectHeader: React.FC<{
       <Divider />
       <div className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
-          <Animated className={cx(styles.project__foldersList)}>
+          <div className={cx(styles.project__foldersList)}>
             {project?.folders.map((folder, i) => (
               <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
             ))}
@@ -245,12 +244,12 @@ const ProjectHeader: React.FC<{
                 </IconButton>
               </Form>
             )}
-          </Animated>
+          </div>
           <div className={styles.project__foldersTotalSizeContainer}>
             <span className={styles.project__foldersTotalSizeCaption}>
               Total size
             </span>
-            <Animated>{projectTotalSize}</Animated>
+            {projectTotalSize}
           </div>
         </Wrapper>
       </div>
@@ -280,26 +279,16 @@ const ProjectHeader: React.FC<{
   )
 }
 
-const FolderComponent: React.FC<{
+const FolderFiles: React.FC<{
   folder: FolderWithFiles | null
 }> = ({ folder }) => {
-  const setFilesToStore = useProjectsStore((state) => state.setFiles)
-  const files = folder?.files
-
-  useEffect(() => {
-    folder?.files && setFilesToStore(folder?.files)
-  }, [folder?.files, setFilesToStore])
+  if (!folder) return null
 
   return (
     <Wrapper className={styles.project__files}>
-      {folder && (
-        <UploadButton projectId={folder.projectId} folderId={folder.id} />
-      )}
-
-      {files?.map((file, i) => (
-        // TODO: investigate `key`, somewhy `key={file.id}` throws React error of 2 duplicate keys
-        // TODO: `key={i}` is a quick fix
-        <FileCard key={i} file={file} />
+      <UploadButton projectId={folder.projectId} folderId={folder.id} />
+      {folder.files.map((file) => (
+        <FileCard key={file.id} file={file} />
       ))}
     </Wrapper>
   )
@@ -318,7 +307,7 @@ const ProjectRoute = () => {
       </Suspense>
       <Suspense fallback={<h1>loading folder...</h1>}>
         <Await resolve={data.folder}>
-          {(folder) => <FolderComponent folder={folder} />}
+          {(folder) => <FolderFiles folder={folder} />}
         </Await>
       </Suspense>
     </div>

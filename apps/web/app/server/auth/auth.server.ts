@@ -127,18 +127,6 @@ export async function requireAnonymous(request: Request) {
   }
 }
 
-export async function canPerformPasswordLogin(email: User['email']) {
-  const password = await prisma.password.findFirst({
-    where: {
-      user: {
-        email,
-      },
-    },
-  })
-
-  return !!password
-}
-
 export async function login({
   email,
   password,

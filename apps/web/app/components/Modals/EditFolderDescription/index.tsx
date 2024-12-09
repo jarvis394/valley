@@ -55,8 +55,6 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
           <TextArea
             {...register('description')}
             size="lg"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
             defaultValue={defaultDescription}
             id="folder-description-input"
             placeholder="Write here anything..."

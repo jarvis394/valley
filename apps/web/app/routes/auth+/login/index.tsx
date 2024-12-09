@@ -13,7 +13,6 @@ import {
   HeadersFunction,
 } from '@remix-run/node'
 import {
-  canPerformPasswordLogin,
   getSessionExpirationDate,
   requireAnonymous,
 } from '../../../server/auth/auth.server'
@@ -78,17 +77,16 @@ export async function action({ request }: ActionFunctionArgs) {
     ...(submissionData.redirectTo && { redirectTo: submissionData.redirectTo }),
   })
   const user = await prisma.user.findUnique({
-    where: {
-      email: submissionData.email,
-    },
+    where: { email: submissionData.email },
+    include: { password: true },
   })
   // Redirect to password login if no user to not to give any additional info to spambots
   if (!user) {
     return redirect('/auth/login/email?' + searchParams.toString())
   }
 
-  const userHasPassword = await canPerformPasswordLogin(submissionData.email)
-  if (userHasPassword) {
+  // Redirect to password login if user has password
+  if (user.password) {
     return redirect('/auth/login/email?' + searchParams.toString())
   }
 

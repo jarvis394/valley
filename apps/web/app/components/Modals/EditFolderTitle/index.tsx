@@ -49,6 +49,8 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
         onSubmit={handleSubmit}
         id="edit-folder-title-form"
         className={styles.editFolderTitle__form}
+        action={formAction}
+        method="POST"
       >
         <div>
           <TextField
@@ -59,8 +61,6 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
             label="Title"
             required
             size="lg"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
             defaultValue={defaultTitle}
             id="folder-title-input"
             placeholder="Folder"
