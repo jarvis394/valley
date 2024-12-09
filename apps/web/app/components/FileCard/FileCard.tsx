@@ -19,16 +19,12 @@ import { useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 
 type FileCardMenuContentProps = {
-  type?: Menu.MenuProps['type']
   file: File
 }
 
-const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({
-  type = 'dropdown',
-  file,
-}) => {
+const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
   return (
-    <Menu.Content type={type}>
+    <Menu.Content>
       <Stack
         gap={0.5}
         className={styles.fileCard__menuHeader}
@@ -107,8 +103,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
           </Menu.Trigger>
         </Stack>
 
-        <FileCardMenuContent type="dropdown" file={file} />
-        <FileCardMenuContent type="context" file={file} />
+        <FileCardMenuContent file={file} />
       </div>
     </Menu.Root>
   )

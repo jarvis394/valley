@@ -36,6 +36,8 @@ export default defineConfig({
     () => import('#providers/prisma_provider'),
     () => import('@adonisjs/drive/drive_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
+    () => import('@adonisjs/lock/lock_provider'),
+    () => import('@adonisjs/redis/redis_provider'),
   ],
 
   /*

@@ -48,4 +48,15 @@ export default await Env.create(APP_ROOT, {
   UPLOAD_BUCKET: Env.schema.string.optional(),
   GCS_KEY: Env.schema.string.optional(),
   GCS_BUCKET: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the lock package
+  |----------------------------------------------------------
+  */
+  LOCK_STORE: Env.schema.enum(['redis', 'memory'] as const),
+
+  REDIS_HOST: Env.schema.string({ format: 'host' }),
+  REDIS_PORT: Env.schema.number(),
+  REDIS_PASSWORD: Env.schema.string.optional(),
 })

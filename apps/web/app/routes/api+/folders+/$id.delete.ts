@@ -15,27 +15,51 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   try {
     const folder = await prisma.folder.findFirst({
       where: { id, Project: { userId: user.id } },
-      select: { projectId: true, id: true, isDefaultFolder: true },
+      select: {
+        projectId: true,
+        totalFiles: true,
+        totalSize: true,
+        Project: { select: { totalFiles: true, totalSize: true } },
+        id: true,
+        isDefaultFolder: true,
+      },
     })
 
     invariantResponse(folder, 'Folder not found', { status: 404 })
-    invariantResponse(folder.isDefaultFolder, 'Cannot delete default folder', {
+    invariantResponse(!folder.isDefaultFolder, 'Cannot delete default folder', {
       status: 403,
     })
 
     await prisma.$transaction(async (tx) => {
+      const newTotalFiles = folder.Project.totalFiles - folder.totalFiles
+      const newTotalSize =
+        Number(folder.Project.totalSize) - Number(folder.totalSize)
+
       await tx.file.updateMany({
         where: { folderId: folder.id },
         data: { isPendingDeletion: true, folderId: null },
       })
       await tx.folder.delete({ where: { id: folder.id } })
+      await tx.project.update({
+        where: {
+          id: folder.projectId,
+        },
+        data: {
+          totalFiles: newTotalFiles,
+          totalSize: newTotalSize.toString(),
+        },
+      })
     })
 
     return redirect(
       redirectTo || '/projects/' + folder.projectId + '/folder/' + folder.id
     )
   } catch (e) {
-    console.error(e)
+    if (e instanceof Response) {
+      throw e
+    }
+
+    console.log(e)
     throw new Response('Unknown error occurred', {
       status: 500,
     })

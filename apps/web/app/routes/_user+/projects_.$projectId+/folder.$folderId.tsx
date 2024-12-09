@@ -80,7 +80,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
           id: folderId,
         },
         include: {
-          files: true,
+          files: {
+            where: {
+              isPendingDeletion: false,
+            },
+          },
         },
       })
     },
