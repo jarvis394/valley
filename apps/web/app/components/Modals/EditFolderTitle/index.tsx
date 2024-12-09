@@ -2,7 +2,7 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from './EditFolderTitle.module.css'
+import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
@@ -48,7 +48,7 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
       <Form
         onSubmit={handleSubmit}
         id="edit-folder-title-form"
-        className={styles.editFolderTitle__form}
+        className={styles.modal__content}
         action={formAction}
         method="POST"
       >

@@ -4,20 +4,15 @@ import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import styles from './ConfirmFolderDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
-import z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
 import Note from '@valley/ui/Note'
 import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
-import { ProjectsCreateSchema } from 'app/routes/api+/projects+/create'
 import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
 import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
-
-type FormData = z.infer<typeof ProjectsCreateSchema>
-
-const resolver = zodResolver(ProjectsCreateSchema)
+import { redirectToKey } from 'app/routes/auth+/verify+'
+import ErrorModalContent from '../ErrorModalContent'
 
 type ConfirmFolderDeletionProps = {
   onClose: () => void
@@ -27,14 +22,20 @@ const ModalContent: React.FC<
   { project?: ProjectWithFolders | null } & ConfirmFolderDeletionProps
 > = ({ project, onClose }) => {
   const [searchParams] = useSearchParams()
-  const { folderId: paramsFolderId } = useParams()
+  const { folderId: paramsFolderId, projectId } = useParams()
   const modalPropsFolderId = searchParams.get('modal-folderId')
   const folderId = useRef(modalPropsFolderId || paramsFolderId)
+  const defaultFolder = project?.folders.find((e) => e.isDefaultFolder)
   const folder = project?.folders.find((e) => e.id === folderId.current)
-  const formAction = `/api/folders/${folder?.id}/delete`
+  const redirectToFolderId =
+    paramsFolderId === folderId.current ? defaultFolder?.id : paramsFolderId
+  const redirectTo = `/projects/${projectId}${
+    redirectToFolderId ? `/folder/${redirectToFolderId}` : ''
+  }`
+  const formAction = `/api/folders/${folder?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
-    resolver,
     submitConfig: {
+      navigate: true,
       viewTransition: true,
       action: formAction,
       method: 'POST',
@@ -46,6 +47,23 @@ const ModalContent: React.FC<
   })
   const folderTitlePattern = `\\s*${folder?.title}\\s*`
   const deleteConfirmPattern = '\\s*delete my folder\\s*'
+
+  if (!folder) {
+    return (
+      <ErrorModalContent onClose={onClose} title={'Delete Folder'}>
+        Folder &quot;{folderId.current}&quot; was not found.
+      </ErrorModalContent>
+    )
+  }
+
+  if (folder.isDefaultFolder) {
+    return (
+      <ErrorModalContent onClose={onClose} title={'Delete Folder'}>
+        Cannot delete folder &quot;{folderId.current}&quot; as it is a default
+        folder.
+      </ErrorModalContent>
+    )
+  }
 
   return (
     <>

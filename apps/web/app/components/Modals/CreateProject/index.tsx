@@ -3,7 +3,7 @@ import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import * as Dialog from '@valley/ui/Modal'
-import styles from './CreateProject.module.css'
+import styles from '../Modals.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -42,7 +42,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = () => {
       <ModalHeader>Create Project</ModalHeader>
       <Form
         onSubmit={handleSubmit}
-        className={styles.createProjectModal__form}
+        className={styles.modal__content}
         id="create-project-form"
         method="POST"
         action="/api/projects/create"

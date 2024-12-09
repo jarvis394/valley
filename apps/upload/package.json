@@ -39,6 +39,7 @@
     "@adonisjs/tsconfig": "^1.4.0",
     "@swc/core": "1.7.26",
     "@types/content-disposition": "^0.5.8",
+    "@types/lodash.deburr": "^4.1.9",
     "@types/node": "^22.7.5",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
@@ -47,8 +48,7 @@
     "pino-pretty": "^11.2.2",
     "prettier": "^3.3.3",
     "ts-node-maintained": "^10.9.4",
-    "typescript": "^5.7.2",
-    "@types/lodash.deburr": "^4.1.9"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@adonisjs/auth": "^9.2.3",
@@ -67,15 +67,16 @@
     "@prisma/client": "^6.0.1",
     "@valley/db": "*",
     "@valley/shared": "*",
+    "@verful/scheduler": "^1.6.0",
     "@vinejs/vine": "^3.0.0",
     "content-disposition": "^0.5.4",
+    "cross-env": "^7.0.3",
     "lodash.deburr": "^4.1.0",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "sharp": "^0.33.5",
     "transliteration": "^2.3.5",
-    "uuid": "^11.0.3",
-    "cross-env": "^7.0.3"
+    "uuid": "^11.0.3"
   },
   "hotHook": {
     "boundaries": [

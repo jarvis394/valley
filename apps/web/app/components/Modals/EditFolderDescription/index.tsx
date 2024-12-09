@@ -2,7 +2,7 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from './EditFolderDescription.module.css'
+import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextArea from '@valley/ui/TextArea'
@@ -46,7 +46,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
       <ModalHeader>Edit Folder Description</ModalHeader>
       <Form
         onSubmit={handleSubmit}
-        className={styles.editFolderDescription__form}
+        className={styles.modal__content}
         id="edit-folder-description-form"
         method="POST"
         action={formAction}

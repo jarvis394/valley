@@ -53,12 +53,15 @@ const FolderCardMenuContent: React.FC<{
         Reorder
       </Menu.Item>
       <Menu.Separator />
-      <Menu.Item
-        onClick={handleFolderDelete}
-        before={<Trash color="var(--red-600)" />}
-      >
-        Delete
-      </Menu.Item>
+      {folder.isDefaultFolder && <Menu.Item disabled>Default folder</Menu.Item>}
+      {!folder.isDefaultFolder && (
+        <Menu.Item
+          onClick={handleFolderDelete}
+          before={<Trash color="var(--red-600)" />}
+        >
+          Delete
+        </Menu.Item>
+      )}
     </Menu.Content>
   )
 }
