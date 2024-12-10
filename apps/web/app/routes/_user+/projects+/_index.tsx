@@ -2,7 +2,7 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
   SerializeFrom,
-} from '@remix-run/node'
+} from '@remix-run/cloudflare'
 import {
   Await,
   ClientLoaderFunctionArgs,

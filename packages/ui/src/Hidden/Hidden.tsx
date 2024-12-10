@@ -1,3 +1,4 @@
+// TODO: adapt https://github.com/mui/material-ui/blob/master/packages/mui-material/src/Hidden/HiddenCss.js
 import React from 'react'
 import styles from './Hidden.module.css'
 import cx from 'classnames'
@@ -10,13 +11,13 @@ export type HiddenOwnProps = Partial<
     style: React.CSSProperties
     className: string
   }> &
-    Partial<Record<ViewportSize, boolean>>
+    Partial<Record<Exclude<ViewportSize, 'xs'>, boolean>>
 >
 export type HiddenProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &
   HiddenOwnProps
 
 const Hidden = React.forwardRef<HTMLDivElement, HiddenProps>(function Hidden(
-  { lg, md, sm, xl, xs, asChild, className, style, ...other },
+  { lg, md, sm, xl, asChild, className, style, ...other },
   ref
 ) {
   const Root = asChild ? Slot : 'div'
@@ -26,7 +27,6 @@ const Hidden = React.forwardRef<HTMLDivElement, HiddenProps>(function Hidden(
       {...other}
       ref={ref}
       className={cx('Hidden', className, styles.hidden, {
-        [styles['hidden--xs']]: xs,
         [styles['hidden--sm']]: sm,
         [styles['hidden--md']]: md,
         [styles['hidden--lg']]: lg,

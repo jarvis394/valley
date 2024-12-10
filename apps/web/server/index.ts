@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
+import { type ServerBuild } from '@remix-run/cloudflare'
 import Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'

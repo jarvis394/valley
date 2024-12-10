@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/cloudflare'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 

@@ -7,7 +7,7 @@ import {
   redirect,
   data,
   HeadersFunction,
-} from '@remix-run/node'
+} from '@remix-run/cloudflare'
 import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'

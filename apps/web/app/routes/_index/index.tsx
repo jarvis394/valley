@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunction } from '@remix-run/node'
+import { redirect, type LoaderFunction } from '@remix-run/cloudflare'
 import { isLoggedIn } from 'app/server/auth/auth.server'
 
 export const loader: LoaderFunction = async ({ request }) => {

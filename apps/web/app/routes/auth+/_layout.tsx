@@ -14,7 +14,7 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
+import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 
 const covers = [
   '/assets/cover-1.webp',
@@ -102,7 +102,7 @@ const AuthGroupLayout = () => {
         <Outlet />
         {linkButton}
       </div>
-      <Hidden xs sm md asChild>
+      <Hidden sm md asChild>
         <div className={styles.auth__section}>
           <div className={styles.auth__illustration}>
             {covers.map((cover, i) => (

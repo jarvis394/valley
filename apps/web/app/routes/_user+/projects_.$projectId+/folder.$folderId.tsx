@@ -2,11 +2,12 @@ import React, { Suspense } from 'react'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
 import Button from '@valley/ui/Button'
-import { PencilEdit, Plus, Share } from 'geist-ui-icons'
+import { MoreHorizontal, PencilEdit, Plus, Share } from 'geist-ui-icons'
 import Divider from '@valley/ui/Divider'
 import Wrapper from '@valley/ui/Wrapper'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import IconButton from '@valley/ui/IconButton'
+import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes, useIsPending } from 'app/utils/misc'
@@ -15,7 +16,7 @@ import {
   HeadersFunction,
   LoaderFunctionArgs,
   SerializeFrom,
-} from '@remix-run/node'
+} from '@remix-run/cloudflare'
 import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
@@ -51,6 +52,9 @@ import { useRemixForm } from 'remix-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FoldersCreateSchema } from 'app/routes/api+/folders+/create'
+import Hidden from '@valley/ui/Hidden'
+import Stack from '@valley/ui/Stack'
+import Spinner from '@valley/ui/Spinner'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -204,22 +208,43 @@ const ProjectHeader: React.FC<{
     <>
       <PageHeader
         before={
-          <>
+          <Menu.Root>
+            <Hidden md lg xl asChild>
+              <Menu.Trigger asChild>
+                <IconButton variant="secondary" size="lg">
+                  <MoreHorizontal />
+                </IconButton>
+              </Menu.Trigger>
+            </Hidden>
             <Button size="lg" variant="secondary" before={<Share />}>
-              Share project
+              Share{' '}
+              <Hidden sm asChild>
+                <span>project</span>
+              </Hidden>
             </Button>
-            <Button
-              onClick={handleEditFolderDescription}
-              size="lg"
-              variant="secondary"
-              before={<PencilEdit />}
-            >
-              Edit description
-            </Button>
+            <Hidden asChild sm>
+              <Button
+                onClick={handleEditFolderDescription}
+                size="lg"
+                variant="secondary"
+                before={<PencilEdit />}
+              >
+                Edit description
+              </Button>
+            </Hidden>
             <Button size="lg" variant="primary">
               Preview
             </Button>
-          </>
+            <Menu.Content>
+              <Menu.Item before={<Share />}>Share project</Menu.Item>
+              <Menu.Item
+                onClick={handleEditFolderDescription}
+                before={<PencilEdit />}
+              >
+                Edit description
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Root>
         }
       >
         {project?.title}
@@ -289,12 +314,31 @@ const FolderFiles: React.FC<{
   if (!folder) return null
 
   return (
-    <Wrapper className={styles.project__files}>
-      <UploadButton projectId={folder.projectId} folderId={folder.id} />
-      {folder.files.map((file) => (
-        <FileCard key={file.id} file={file} />
-      ))}
-    </Wrapper>
+    <Stack direction={'column'} gap={{ sm: 4, md: 8 }}>
+      <Hidden asChild md lg xl>
+        <Stack asChild align={'center'} justify={'center'}>
+          <Wrapper>
+            <UploadButton
+              projectId={folder.projectId}
+              folderId={folder.id}
+              variant="compact"
+            />
+          </Wrapper>
+        </Stack>
+      </Hidden>
+      <Wrapper className={styles.project__files}>
+        <Hidden sm>
+          <UploadButton
+            projectId={folder.projectId}
+            folderId={folder.id}
+            variant="square"
+          />
+        </Hidden>
+        {folder.files.map((file) => (
+          <FileCard key={file.id} file={file} />
+        ))}
+      </Wrapper>
+    </Stack>
   )
 }
 
@@ -304,12 +348,24 @@ const ProjectRoute = () => {
 
   return (
     <div className={styles.project}>
-      <Suspense fallback={<h1>loading project...</h1>}>
+      <Suspense
+        fallback={
+          <Stack direction={'row'} padding={6} justify={'center'}>
+            <Spinner />
+          </Stack>
+        }
+      >
         <Await resolve={projectData?.project}>
           {(project) => <ProjectHeader project={project || null} />}
         </Await>
       </Suspense>
-      <Suspense fallback={<h1>loading folder...</h1>}>
+      <Suspense
+        fallback={
+          <Stack direction={'row'} padding={6} justify={'center'}>
+            <Spinner />
+          </Stack>
+        }
+      >
         <Await resolve={data.folder}>
           {(folder) => <FolderFiles folder={folder} />}
         </Await>

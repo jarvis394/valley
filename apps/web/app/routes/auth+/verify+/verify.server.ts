@@ -23,7 +23,7 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
 } from '../../_user+/account+/settings.authentication'
-import { data } from '@remix-run/node'
+import { data } from '@remix-run/cloudflare'
 
 export type VerifyFunctionArgs = {
   request: Request

@@ -16,7 +16,7 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@remix-run/node'
+} from '@remix-run/cloudflare'
 import { ManifestLink } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'

@@ -12,12 +12,14 @@
 }
 
 .header__nav {
+  --gap: 8px;
+  --logo-offset: calc(32px + var(--gap));
   /** Logo width + gap + visual padding */
-  padding-left: calc(32px + 8px + 4px);
+  padding-left: calc(var(--logo-offset) + 4px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--gap);
   width: 100%;
 }
 
@@ -46,4 +48,17 @@
 
 .header__avatarAndNameContainer:active {
   scale: 0.98;
+}
+
+.header__username {
+  margin: 0;
+}
+
+@media screen and (width < 600px) {
+  .header__nav {
+    --logo-offset: 0;
+  }
+  .header__username[data-should-hide] {
+    display: none;
+  }
 }

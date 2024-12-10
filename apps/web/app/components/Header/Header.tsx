@@ -9,14 +9,19 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { Await, Link } from '@remix-run/react'
+import { Await, Link, useParams } from '@remix-run/react'
 import { Project, User } from '@valley/db'
 import { useProjectAwait } from 'app/utils/project'
+import Hidden from '@valley/ui/Hidden'
 
 const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
+  const { projectId } = useParams()
+
   return (
     <>
-      <Slash className="fade" data-fade-in={!!user} />
+      <Hidden asChild sm>
+        <Slash className="fade" data-fade-in={!!user} />
+      </Hidden>
       <Stack gap={4} align={'center'} className="fade" data-fade-in={!!user}>
         <Stack
           asChild
@@ -26,7 +31,9 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
         >
           <Link to={'/projects'}>
             <Avatar />
-            {user?.fullname}
+            <p data-should-hide={projectId} className={styles.header__username}>
+              {user?.fullname}
+            </p>
           </Link>
         </Stack>
         <IconButton size="sm" variant="secondary-dimmed">
@@ -70,9 +77,11 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
         ['--header-height' as string]: HEADER_HEIGHT + 'px',
       }}
     >
-      <Link to="/">
-        <Logo withScrollAnimation className={styles.header__logo} />
-      </Link>
+      <Hidden asChild sm>
+        <Link to="/">
+          <Logo withScrollAnimation className={styles.header__logo} />
+        </Link>
+      </Hidden>
       <nav className={styles.header__nav}>
         <Stack gap={2} align={'center'}>
           {user && (

@@ -11,7 +11,7 @@ import {
   type ActionFunctionArgs,
   redirect,
   HeadersFunction,
-} from '@remix-run/node'
+} from '@remix-run/cloudflare'
 import {
   getSessionExpirationDate,
   requireAnonymous,

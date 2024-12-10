@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node'
+import { createCookieSessionStorage } from '@remix-run/cloudflare'
 
 export const verifySessionStorage = createCookieSessionStorage<{
   unverifiedSessionId: string

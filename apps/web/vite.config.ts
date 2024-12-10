@@ -1,5 +1,7 @@
-import { vitePlugin as remix } from '@remix-run/dev'
-import { remixPWA } from '@remix-pwa/dev'
+import {
+  vitePlugin as remix,
+  cloudflareDevProxyVitePlugin as remixCloudflareDevProxy,
+} from '@remix-run/dev'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
@@ -45,6 +47,7 @@ export default defineConfig(() => ({
   plugins: [
     envOnlyMacros(),
     tsconfigPaths(),
+    remixCloudflareDevProxy(),
     remix({
       ...(isVercel && { presets: [vercelPreset()] }),
       ssr: true,
@@ -70,9 +73,9 @@ export default defineConfig(() => ({
         v3_singleFetch: true,
       },
     }),
-    remixPWA({
-      // Registering SW manually because Vite plugin adds <script> tag without CSP nonce
-      registerSW: null,
-    }),
+    // remixPWA({
+    //   // Registering SW manually because Vite plugin adds <script> tag without CSP nonce
+    //   registerSW: null,
+    // }),
   ],
 }))

@@ -86,15 +86,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
       <div className={styles.projectCard__bottomBar}>
         <div className={styles.projectCard__statistics}>
           <div className={styles.projectCard__statisticsItem}>
-            <LineChart />
-            128
+            <LineChart />0
           </div>
           <div className={styles.projectCard__statisticsItem}>
-            <Download />
-            11
+            <Download />0
           </div>
           <div className={styles.projectCard__statisticsItem}>
-            <Heart />1
+            <Heart />0
           </div>
         </div>
         <div className={styles.projectCard__shareButton}>
