@@ -197,6 +197,8 @@ export const Root = ({
       direction="bottom"
       open={shouldShowDrawer && dropdownMenuOpen}
       onOpenChange={handleDrawerOpenChange}
+      disablePreventScroll
+      repositionInputs
     >
       <DropdownMenu.Root
         modal={false}

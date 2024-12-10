@@ -68,6 +68,8 @@ const Modal: React.FC<ModalProps> = ({
         direction="bottom"
         open={open}
         onOpenChange={handleDrawerOpenChange}
+        disablePreventScroll
+        repositionInputs
       >
         <Drawer.Portal>
           <Drawer.Content className={styles.modal__drawer}>
