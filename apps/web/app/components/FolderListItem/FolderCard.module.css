@@ -6,11 +6,22 @@
   border-radius: 16px;
   width: 100%;
   position: relative;
+  transition-property: background-color, box-shadow, border, color;
 }
 
 .folderCard--active {
   --themed-border: var(--alpha-transparent-07);
   background-color: var(--alpha-transparent-03);
+}
+
+.folderCard--overlay {
+  z-index: 2000;
+  --themed-background: var(--alpha-solid-03);
+  --themed-background-hover: var(--alpha-solid-03);
+  --themed-background-focus: var(--alpha-solid-03);
+  --themed-border: var(--alpha-transparent-07);
+  padding-left: 8px;
+  gap: 8px;
 }
 
 .folderCard--editing {
@@ -22,11 +33,11 @@
   gap: 8px;
 }
 
-.folderCard--editingActive {
-  z-index: 10;
+.folderCard--dragging {
+  opacity: 0;
 }
 
-.folderCard--editingActive .folderCard__handle {
+.folderCard--dragging .folderCard__handle {
   cursor: grabbing;
 }
 

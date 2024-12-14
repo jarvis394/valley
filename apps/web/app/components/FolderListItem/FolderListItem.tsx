@@ -21,6 +21,7 @@ type FolderListItemMode = 'edit' | 'default'
 type FolderListItemProps = {
   folder: Folder
   mode?: FolderListItemMode
+  isOverlay?: boolean
   onClick?: (folder: Folder) => void
   onFolderRename?: (folder: Folder) => void
   onFolderDelete?: (folder: Folder) => void
@@ -29,6 +30,7 @@ type FolderListItemProps = {
 const FolderListItem: React.FC<FolderListItemProps> = ({
   folder,
   mode = 'default',
+  isOverlay,
   onClick,
   onFolderDelete,
   onFolderRename,
@@ -94,18 +96,19 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
       onClick={handleClick}
       className={cx(styles.folderCard, {
         [styles['folderCard--active']]: isActive,
+        [styles['folderCard--dragging']]: isDragging,
+        [styles['folderCard--overlay']]: isOverlay,
         [styles['folderCard--editing']]: mode === 'edit',
-        [styles['folderCard--editingActive']]: mode === 'edit' && isDragging,
       })}
     >
       <li>
         {mode === 'edit' && (
           <IconButton
+            {...attributes}
+            {...listeners}
             variant="tertiary-dimmed"
             className={styles.folderCard__handle}
             size="md"
-            {...attributes}
-            {...listeners}
           >
             <DragIndicator width={24} height={24} />
           </IconButton>

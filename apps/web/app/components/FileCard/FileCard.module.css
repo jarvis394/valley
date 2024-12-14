@@ -19,6 +19,20 @@
   position: relative;
 }
 
+.fileCard--dragging {
+  opacity: 0;
+}
+
+.fileCard--overlay {
+  z-index: 2000;
+  background-color: var(--blue-100);
+  box-shadow: 0 0 0 1px inset var(--blue-600);
+}
+
+.fileCard--overlay .fileCard__toolbar {
+  opacity: 0 !important;
+}
+
 .fileCard__name {
   white-space: nowrap;
   text-overflow: ellipsis;

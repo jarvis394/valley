@@ -15,14 +15,29 @@ import {
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData, useSearchParams } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
+import {
+  AnimateLayoutChanges,
+  defaultAnimateLayoutChanges,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import cx from 'classnames'
 
 type FileCardMenuContentProps = {
   file: File
 }
 
 const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const handleFileDelete = () => {
+    searchParams.set('modal', 'confirm-file-deletion')
+    searchParams.set('modal-fileId', file.id.toString())
+    setSearchParams(searchParams)
+  }
+
   return (
     <Menu.Content>
       <Stack
@@ -51,31 +66,65 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
         Info
       </Menu.Item>
       <Menu.Separator />
-      <Menu.Item before={<Trash color="var(--red-600)" />}>Delete</Menu.Item>
+      <Menu.Item
+        onClick={handleFileDelete}
+        before={<Trash color="var(--red-600)" />}
+      >
+        Delete
+      </Menu.Item>
     </Menu.Content>
   )
 }
 
 type FileCardProps = {
   file: File
+  isOverlay?: boolean
 }
 
-const FileCard: React.FC<FileCardProps> = ({ file }) => {
+const FileCard: React.FC<FileCardProps> = ({ file, isOverlay, ...props }) => {
   const data = useRouteLoaderData<typeof rootLoader>('root')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
-  const handleDropdownOpenChange = (isOpen: boolean) => {
-    setDropdownOpen(isOpen)
-  }
+  const animateLayoutChanges: AnimateLayoutChanges = (args) =>
+    defaultAnimateLayoutChanges({ ...args, wasDragging: true })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: file.id,
+    animateLayoutChanges,
+  })
   const fileThumbnailUrl =
     file.thumbnailKey &&
     data?.ENV.UPLOAD_SERVICE_URL + '/api/files/' + file.thumbnailKey
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const handleDropdownOpenChange = (isOpen: boolean) => {
+    setDropdownOpen(isOpen)
+  }
 
   return (
     <Menu.Root
       openOnContextMenu
       dropdownMenuProps={{ onOpenChange: handleDropdownOpenChange }}
     >
-      <div className={styles.fileCard}>
+      <li
+        {...props}
+        {...attributes}
+        {...listeners}
+        ref={setNodeRef}
+        className={cx(styles.fileCard, {
+          [styles['fileCard--dragging']]: isDragging,
+          [styles['fileCard--overlay']]: isOverlay,
+        })}
+        style={style}
+      >
         <div className={styles.fileCard__imageContainer}>
           {fileThumbnailUrl && (
             <img
@@ -104,7 +153,7 @@ const FileCard: React.FC<FileCardProps> = ({ file }) => {
         </Stack>
 
         <FileCardMenuContent file={file} />
-      </div>
+      </li>
     </Menu.Root>
   )
 }

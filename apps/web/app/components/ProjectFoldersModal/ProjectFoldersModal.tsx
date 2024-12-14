@@ -7,8 +7,9 @@ import {
   DndContext,
   closestCenter,
   MouseSensor,
+  DragOverlay,
+  DragStartEvent,
 } from '@dnd-kit/core'
-import { restrictToFirstScrollableAncestor } from '@dnd-kit/modifiers'
 import {
   sortableKeyboardCoordinates,
   arrayMove,
@@ -25,9 +26,11 @@ import ModalFooter from '@valley/ui/ModalFooter'
 import ModalHeader from '@valley/ui/ModalHeader'
 import FolderListItem from 'app/components/FolderListItem/FolderListItem'
 import { Plus, Pencil } from 'geist-ui-icons'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useId, startTransition } from 'react'
 import cx from 'classnames'
 import styles from './ProjectFoldersModal.module.css'
+import { createPortal } from 'react-dom'
+import { ClientOnly } from 'remix-utils/client-only'
 
 const ProjectFoldersModal: React.FC<{
   project: ProjectWithFolders | null
@@ -35,8 +38,13 @@ const ProjectFoldersModal: React.FC<{
   isOpen?: boolean
   onDismiss?: () => void
 }> = ({ project, isOpen, createFolderFetcher, onDismiss }) => {
+  const id = useId()
   const navigate = useNavigate()
   const [folders, setFolders] = useState(project?.folders || [])
+  const [activeFolderId, setActiveFolderId] = useState<Folder['id'] | null>(
+    null
+  )
+  const activeFolder = folders.find((e) => e.id === activeFolderId)
   const [isEditing, setIsEditing] = useState(false)
   const isCreatingFolder = createFolderFetcher.state !== 'idle'
   const canCreateMoreFolders = (folders.length || 0) < PROJECT_MAX_FOLDERS
@@ -57,12 +65,20 @@ const ProjectFoldersModal: React.FC<{
   }
 
   const handleEdit = () => {
-    setIsEditing((prev) => !prev)
+    startTransition(() => {
+      setIsEditing((prev) => !prev)
+    })
   }
 
   const handleDismiss = () => {
-    setIsEditing(false)
-    onDismiss?.()
+    startTransition(() => {
+      setIsEditing(false)
+      onDismiss?.()
+    })
+  }
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveFolderId(event.active.id.toString())
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -120,7 +136,7 @@ const ProjectFoldersModal: React.FC<{
       </ModalHeader>
       <Stack
         className={styles.project__foldersModalStack}
-        gap={isEditing ? 1 : 0}
+        gap={1}
         direction={'column'}
         padding={2}
         fullWidth
@@ -128,10 +144,11 @@ const ProjectFoldersModal: React.FC<{
       >
         <ul>
           <DndContext
+            id={id}
             sensors={sensors}
-            modifiers={[restrictToFirstScrollableAncestor]}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
           >
             <SortableContext
               disabled={!isEditing}
@@ -148,6 +165,23 @@ const ProjectFoldersModal: React.FC<{
                   folder={folder}
                 />
               ))}
+              <ClientOnly>
+                {() =>
+                  createPortal(
+                    <DragOverlay zIndex={2000}>
+                      {activeFolderId && activeFolder && (
+                        <FolderListItem
+                          mode="edit"
+                          isOverlay
+                          key={activeFolderId}
+                          folder={activeFolder}
+                        />
+                      )}
+                    </DragOverlay>,
+                    document.body
+                  )
+                }
+              </ClientOnly>
             </SortableContext>
           </DndContext>
         </ul>

@@ -5,6 +5,7 @@ import CreateProjectModal from './CreateProject'
 import EditFolderTitleModal from './EditFolderTitle'
 import EditFolderDescriptionModal from './EditFolderDescription'
 import ConfirmFolderDeletionModal from './ConfirmFolderDeletion'
+import ConfirmFileDeletionModal from './ConfirmFileDeletion'
 
 export const Modals = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -33,6 +34,9 @@ export const Modals = () => {
       </Modal>
       <Modal onDismiss={handleClose} id="confirm-folder-deletion">
         <ConfirmFolderDeletionModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="confirm-file-deletion">
+        <ConfirmFileDeletionModal onClose={handleClose} />
       </Modal>
     </>
   )

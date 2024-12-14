@@ -30,6 +30,7 @@ const ErrorModalContent: React.FC<ErrorModalContentProps> = ({
         </Note>
       </Stack>
       <ModalFooter
+        before={<></>}
         after={
           <Button onClick={onClose} variant="primary" size="md">
             Continue

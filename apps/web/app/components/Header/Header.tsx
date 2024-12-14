@@ -4,7 +4,6 @@ import Logo from '../Logo/Logo'
 import Slash from '../Slash/Slash'
 import Avatar from '@valley/ui/Avatar'
 import IconButton from '@valley/ui/IconButton'
-import MenuIcon from '../svg/MenuIcon'
 import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
@@ -13,6 +12,7 @@ import { Await, Link, useParams } from '@remix-run/react'
 import { Project, User } from '@valley/db'
 import { useProjectAwait } from 'app/utils/project'
 import Hidden from '@valley/ui/Hidden'
+import MenuExpand from '../svg/MenuExpand'
 
 const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
   const { projectId } = useParams()
@@ -22,7 +22,7 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
       <Hidden asChild sm>
         <Slash className="fade" data-fade-in={!!user} />
       </Hidden>
-      <Stack gap={4} align={'center'} className="fade" data-fade-in={!!user}>
+      <Stack gap={1} align={'center'} className="fade" data-fade-in={!!user}>
         <Stack
           asChild
           gap={3}
@@ -31,14 +31,11 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
         >
           <Link to={'/projects'}>
             <Avatar />
-            <p data-should-hide={projectId} className={styles.header__username}>
+            <p data-should-hide={projectId} className={styles.header__title}>
               {user?.fullname}
             </p>
           </Link>
         </Stack>
-        <IconButton size="sm" variant="secondary-dimmed">
-          <MenuIcon />
-        </IconButton>
       </Stack>
     </>
   )
@@ -50,14 +47,22 @@ const CurrentProject: React.FC<{ project: Project | null }> = ({ project }) => {
   return (
     <>
       <Slash className="fade" data-fade-in={true} />
-      <Stack className="fade" data-fade-in={true} gap={4} align={'center'}>
+      <Stack className="fade" data-fade-in={true} gap={1} align={'center'}>
         <Stack
           gap={3}
           align={'center'}
           className={styles.header__avatarAndNameContainer}
         >
-          {project.title}
+          <Avatar />
+          <p className={styles.header__title}>{project.title}</p>
         </Stack>
+        <IconButton
+          className={styles.header__menuIcon}
+          size="sm"
+          variant="tertiary"
+        >
+          <MenuExpand />
+        </IconButton>
       </Stack>
     </>
   )

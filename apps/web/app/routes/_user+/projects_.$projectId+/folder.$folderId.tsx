@@ -1,4 +1,5 @@
-import React, { Suspense, useState } from 'react'
+import React, { Suspense, useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
 import Button from '@valley/ui/Button'
@@ -38,8 +39,7 @@ import {
 } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
-import { Folder } from '@valley/db'
-import Animated from '@valley/ui/Animated'
+import { File, Folder } from '@valley/db'
 import { useProjectAwait } from 'app/utils/project'
 import {
   FolderWithFiles,
@@ -59,6 +59,25 @@ import Spinner from '@valley/ui/Spinner'
 import ButtonBase from '@valley/ui/ButtonBase'
 import MenuExpand from 'app/components/svg/MenuExpand'
 import ProjectFoldersModal from 'app/components/ProjectFoldersModal/ProjectFoldersModal'
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { ClientOnly } from 'remix-utils/client-only'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -350,9 +369,7 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
       </div>
       {currentFolder?.description && (
         <div className={styles.project__folderDescriptionContainer}>
-          <Animated asChild>
-            <p>{formatNewLine(currentFolder?.description)}</p>
-          </Animated>
+          <p>{formatNewLine(currentFolder?.description)}</p>
           <IconButton
             onClick={handleEditFolderDescription}
             variant="tertiary-dimmed"
@@ -385,6 +402,45 @@ const ProjectBlock: React.FC<{
 const FolderFiles: React.FC<{
   folder: FolderWithFiles | null
 }> = ({ folder }) => {
+  const id = useId()
+  const [files, setFiles] = useState(folder?.files || [])
+  const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
+  const activeFile = files.find((e) => e.id === activeFileId)
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        distance: Infinity,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveFileId(event.active.id.toString())
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (active.id !== over?.id) {
+      setFiles((prevFiles) => {
+        const oldIndex = prevFiles.findIndex((e) => e.id === active.id)
+        const newIndex = prevFiles.findIndex((e) => e.id === over?.id)
+
+        return arrayMove(prevFiles, oldIndex, newIndex)
+      })
+      setActiveFileId(null)
+    }
+  }
+
+  useEffect(() => {
+    setFiles(folder?.files || [])
+  }, [folder?.files])
+
   if (!folder) return null
 
   return (
@@ -400,21 +456,60 @@ const FolderFiles: React.FC<{
           </Wrapper>
         </Stack>
       </Hidden>
-      <Wrapper className={styles.project__files}>
-        <Hidden sm>
-          <UploadButton
-            projectId={folder.projectId}
-            folderId={folder.id}
-            variant="square"
-          />
-        </Hidden>
-        {folder.files.map((file) => (
-          <FileCard key={file.id} file={file} />
-        ))}
+      <Wrapper className={styles.project__files} asChild>
+        <ul>
+          <DndContext
+            id={id}
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            autoScroll
+          >
+            <SortableContext
+              disabled
+              items={files}
+              strategy={rectSortingStrategy}
+            >
+              <Hidden sm>
+                <UploadButton
+                  projectId={folder.projectId}
+                  folderId={folder.id}
+                  variant="square"
+                />
+              </Hidden>
+              {files.map((file) => (
+                <FileCard key={file.id} file={file} />
+              ))}
+              <ClientOnly>
+                {() =>
+                  createPortal(
+                    <DragOverlay zIndex={2000}>
+                      {activeFileId && activeFile && (
+                        <FileCard
+                          isOverlay
+                          key={activeFileId}
+                          file={activeFile}
+                        />
+                      )}
+                    </DragOverlay>,
+                    document.body
+                  )
+                }
+              </ClientOnly>
+            </SortableContext>
+          </DndContext>
+        </ul>
       </Wrapper>
     </Stack>
   )
 }
+
+const Fallback = () => (
+  <Stack direction={'row'} padding={6} justify={'center'}>
+    <Spinner />
+  </Stack>
+)
 
 const ProjectRoute = () => {
   const projectData = useProjectAwait()
@@ -422,24 +517,12 @@ const ProjectRoute = () => {
 
   return (
     <div className={styles.project}>
-      <Suspense
-        fallback={
-          <Stack direction={'row'} padding={6} justify={'center'}>
-            <Spinner />
-          </Stack>
-        }
-      >
+      <Suspense fallback={<Fallback />}>
         <Await resolve={projectData?.project}>
           {(project) => <ProjectBlock project={project || null} />}
         </Await>
       </Suspense>
-      <Suspense
-        fallback={
-          <Stack direction={'row'} padding={6} justify={'center'}>
-            <Spinner />
-          </Stack>
-        }
-      >
+      <Suspense fallback={<Fallback />}>
         <Await resolve={data.folder}>
           {(folder) => <FolderFiles folder={folder} />}
         </Await>
