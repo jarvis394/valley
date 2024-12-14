@@ -14,7 +14,7 @@
   transition-duration: 0.15s;
   transition-timing-function: ease;
   /** IMPORTANT: DO NOT CHANGE TO "all", ADD PROPERTY INSTEAD
-   *  Somehow it breaks Menu component's `onBlur` event and menus don't close
+   *  Somehow it breaks  @mui/base Menu component's `onBlur` event and menus don't close
    */
   transition-property: background-color, filter, background, box-shadow, border,
     color, opacity;
@@ -143,4 +143,24 @@
     --themed-background-focus,
     var(--themed-background-hover, var(--themed-background))
   );
+}
+
+@media (hover: none) {
+  .buttonBase:hover {
+    color: var(--themed-color) !important;
+    background-color: var(--themed-background) !important;
+  }
+
+  .buttonBase:not(:disabled):not(:has(button:active)).buttonBase:active {
+    transition-duration: 50ms;
+    --themed-border: none;
+    color: var(
+      --themed-color-focus,
+      var(--themed-color-hover, var(--themed-color))
+    ) !important;
+    background-color: var(
+      --themed-background-focus,
+      var(--themed-background-hover, var(--themed-background))
+    ) !important;
+  }
 }

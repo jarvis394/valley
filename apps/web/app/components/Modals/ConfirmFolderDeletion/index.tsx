@@ -1,4 +1,4 @@
-import React, { Suspense, useRef } from 'react'
+import React, { Suspense, useState } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,7 +6,7 @@ import styles from './ConfirmFolderDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import TextField from '@valley/ui/TextField'
 import Note from '@valley/ui/Note'
-import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
+import { Await, Form, useParams } from '@remix-run/react'
 import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
 import { useProjectAwait } from 'app/utils/project'
@@ -21,14 +21,13 @@ type ConfirmFolderDeletionProps = {
 const ModalContent: React.FC<
   { project?: ProjectWithFolders | null } & ConfirmFolderDeletionProps
 > = ({ project, onClose }) => {
-  const [searchParams] = useSearchParams()
+  const searchParams = new URLSearchParams(window.location.search)
   const { folderId: paramsFolderId, projectId } = useParams()
-  const modalPropsFolderId = searchParams.get('modal-folderId')
-  const folderId = useRef(modalPropsFolderId || paramsFolderId)
+  const [folderId] = useState(searchParams.get('modal-folderId'))
   const defaultFolder = project?.folders.find((e) => e.isDefaultFolder)
-  const folder = project?.folders.find((e) => e.id === folderId.current)
+  const folder = project?.folders.find((e) => e.id === folderId)
   const redirectToFolderId =
-    paramsFolderId === folderId.current ? defaultFolder?.id : paramsFolderId
+    paramsFolderId === folderId ? defaultFolder?.id : paramsFolderId
   const redirectTo = `/projects/${projectId}${
     redirectToFolderId ? `/folder/${redirectToFolderId}` : ''
   }`
@@ -51,7 +50,7 @@ const ModalContent: React.FC<
   if (!folder) {
     return (
       <ErrorModalContent onClose={onClose} title={'Delete Folder'}>
-        Folder &quot;{folderId.current}&quot; was not found.
+        Folder &quot;{folderId}&quot; was not found.
       </ErrorModalContent>
     )
   }
@@ -59,8 +58,7 @@ const ModalContent: React.FC<
   if (folder.isDefaultFolder) {
     return (
       <ErrorModalContent onClose={onClose} title={'Delete Folder'}>
-        Cannot delete folder &quot;{folderId.current}&quot; as it is a default
-        folder.
+        Cannot delete folder &quot;{folderId}&quot; as it is a default folder.
       </ErrorModalContent>
     )
   }

@@ -1,7 +1,4 @@
-import {
-  vitePlugin as remix,
-  cloudflareDevProxyVitePlugin as remixCloudflareDevProxy,
-} from '@remix-run/dev'
+import { vitePlugin as remix } from '@remix-run/dev'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
@@ -47,7 +44,6 @@ export default defineConfig(() => ({
   plugins: [
     envOnlyMacros(),
     tsconfigPaths(),
-    remixCloudflareDevProxy(),
     remix({
       ...(isVercel && { presets: [vercelPreset()] }),
       ssr: true,
@@ -71,6 +67,7 @@ export default defineConfig(() => ({
         v3_throwAbortReason: true,
         v3_lazyRouteDiscovery: true,
         v3_singleFetch: true,
+        unstable_optimizeDeps: true,
       },
     }),
     // remixPWA({

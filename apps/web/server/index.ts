@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/cloudflare'
+import { type ServerBuild } from '@remix-run/node'
 import Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
@@ -105,7 +105,7 @@ app.use(
 )
 
 app.use((_, res, next) => {
-  res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
+  res.locals.cspNonce = crypto.randomUUID()
   next()
 })
 

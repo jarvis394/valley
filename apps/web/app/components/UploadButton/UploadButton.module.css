@@ -1,5 +1,6 @@
 .uploadButton {
   background-color: var(--alpha-solid-07);
+  --themed-background-focus: var(--button-secondary-focused-bg);
   display: flex;
   color: var(--text-primary);
   flex-direction: column;

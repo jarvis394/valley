@@ -1,0 +1,16 @@
+.project__foldersModalStack {
+  overflow: hidden auto;
+  transition: all 150ms ease;
+}
+
+.project__foldersModalFooter {
+  display: grid;
+  grid-template-areas: 'before stack after';
+}
+
+.project__foldersModalFooterText {
+  width: 100%;
+  text-align: center;
+  color: var(--text-secondary);
+  grid-area: stack;
+}

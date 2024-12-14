@@ -106,4 +106,4 @@ const TextField = React.forwardRef(function TextField(
   )
 })
 
-export default TextField
+export default React.memo(TextField)

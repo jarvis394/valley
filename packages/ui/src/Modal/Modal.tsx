@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import type { SetURLSearchParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import styles from './Modal.module.css'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
-import { Drawer } from 'vaul'
+import { Drawer, DialogProps } from 'vaul'
 import * as Dialog from '@radix-ui/react-dialog'
 
 export const modalKey = 'modal'
@@ -11,27 +10,24 @@ export const modalKey = 'modal'
 export type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
-  searchParams: URLSearchParams
-  setSearchParams: SetURLSearchParams
   onDismiss?: () => void
-}>
+}> &
+  DialogProps
 
 const Modal: React.FC<ModalProps> = ({
   isOpen: propsIsOpen,
   children,
   id,
   onDismiss,
-  searchParams,
-  setSearchParams,
+  ...props
 }) => {
   const shouldShowDrawer = useMediaQuery(
     `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
   const [open, setOpen] = useState(propsIsOpen || false)
-  const currentModal = useMemo(
-    () => searchParams?.get(modalKey),
-    [searchParams]
-  )
+  const currentModal = new URLSearchParams(
+    typeof window !== 'undefined' ? window.location.search : ''
+  )?.get(modalKey)
 
   const handleClose = () => {
     // Use only user-provided function if it is present
@@ -39,11 +35,7 @@ const Modal: React.FC<ModalProps> = ({
       return onDismiss()
     }
 
-    // TODO: navigate back and handle empty history
-    setSearchParams((prev) => {
-      prev.delete(modalKey)
-      return prev
-    })
+    setOpen(false)
   }
 
   useEffect(() => {
@@ -66,13 +58,16 @@ const Modal: React.FC<ModalProps> = ({
     return (
       <Drawer.Root
         direction="bottom"
-        open={open}
-        onOpenChange={handleDrawerOpenChange}
         disablePreventScroll
         repositionInputs
+        {...props}
+        handleOnly
+        open={open}
+        onOpenChange={handleDrawerOpenChange}
       >
         <Drawer.Portal>
           <Drawer.Content className={styles.modal__drawer}>
+            <Drawer.Handle className={styles.modal__drawerHandle} />
             <Drawer.Title style={{ display: 'none' }}>
               {currentModal}
             </Drawer.Title>
@@ -88,13 +83,16 @@ const Modal: React.FC<ModalProps> = ({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={handleDrawerOpenChange}>
+    <Dialog.Root {...props} open={open} onOpenChange={handleDrawerOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.modal__dialogOverlay} />
         <Dialog.Content className={styles.modal__dialog}>
-          <Drawer.Description style={{ display: 'none' }}>
+          <Drawer.Title style={{ display: 'none' }}>
             {currentModal}
-          </Drawer.Description>
+          </Drawer.Title>
+          <Dialog.Description style={{ display: 'none' }}>
+            {currentModal}
+          </Dialog.Description>
           {children}
         </Dialog.Content>
       </Dialog.Portal>
@@ -105,3 +103,4 @@ const Modal: React.FC<ModalProps> = ({
 export default Modal
 
 export * from '@radix-ui/react-dialog'
+export * as Drawer from 'vaul'

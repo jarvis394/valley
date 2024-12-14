@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
 import Button from '@valley/ui/Button'
@@ -10,7 +10,7 @@ import IconButton from '@valley/ui/IconButton'
 import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
-import { formatBytes, useIsPending } from 'app/utils/misc'
+import { formatBytes } from 'app/utils/misc'
 import {
   data,
   HeadersFunction,
@@ -30,6 +30,7 @@ import {
   Form,
   redirect,
   ShouldRevalidateFunction,
+  useFetcher,
   useLoaderData,
   useNavigate,
   useParams,
@@ -55,6 +56,9 @@ import { FoldersCreateSchema } from 'app/routes/api+/folders+/create'
 import Hidden from '@valley/ui/Hidden'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
+import ButtonBase from '@valley/ui/ButtonBase'
+import MenuExpand from 'app/components/svg/MenuExpand'
+import ProjectFoldersModal from 'app/components/ProjectFoldersModal/ProjectFoldersModal'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -151,34 +155,166 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 const ProjectHeader: React.FC<{
   project: ProjectWithFolders | null
-}> = ({ project }) => {
-  const navigate = useNavigate()
+  currentFolder?: Folder
+}> = ({ project, currentFolder }) => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { folderId } = useParams()
-  const currentFolder = project?.folders.find((e) => e.id === folderId)
-  const projectTotalSize = formatBytes(Number(project?.totalSize) || 0)
+
+  const handleEditFolderDescription = () => {
+    if (!currentFolder) return
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('modal', 'edit-folder-description')
+    params.set('modal-folderId', currentFolder.id.toString())
+    setSearchParams(params, {
+      state: {
+        defaultDescription: currentFolder.description,
+      },
+    })
+  }
+
+  return (
+    <PageHeader
+      before={
+        <Menu.Root>
+          <Hidden md lg xl asChild>
+            <Menu.Trigger asChild>
+              <IconButton variant="secondary" size="lg">
+                <MoreHorizontal />
+              </IconButton>
+            </Menu.Trigger>
+          </Hidden>
+          <Button size="lg" variant="secondary" before={<Share />}>
+            Share{' '}
+            <Hidden sm asChild>
+              <span>project</span>
+            </Hidden>
+          </Button>
+          <Hidden asChild sm>
+            <Button
+              onClick={handleEditFolderDescription}
+              size="lg"
+              variant="secondary"
+              before={<PencilEdit />}
+            >
+              Edit description
+            </Button>
+          </Hidden>
+          <Button size="lg" variant="primary">
+            Preview
+          </Button>
+          <Menu.Content>
+            <Menu.Item before={<Share />}>Share project</Menu.Item>
+            <Menu.Item
+              onClick={handleEditFolderDescription}
+              before={<PencilEdit />}
+            >
+              Edit description
+            </Menu.Item>
+          </Menu.Content>
+        </Menu.Root>
+      }
+    >
+      {project?.title}
+    </PageHeader>
+  )
+}
+
+const ProjectFolders: React.FC<{
+  project: ProjectWithFolders | null
+  currentFolder?: Folder
+}> = ({ project, currentFolder }) => {
+  const navigate = useNavigate()
+  const [isFoldersModalOpen, setFoldersModalOpen] = useState(false)
   const createFolderAction = '/api/folders/create'
+  const projectTotalSize = formatBytes(Number(project?.totalSize) || 0)
+  const createFolderFetcher = useFetcher()
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
+    fetcher: createFolderFetcher,
     submitConfig: {
       navigate: false,
       action: createFolderAction,
       method: 'POST',
+      flushSync: true,
     },
   })
-  const isCreatingFolder = useIsPending({
-    formAction: createFolderAction,
-  })
+  const isCreatingFolder = createFolderFetcher.state !== 'idle'
   const canCreateMoreFolders =
     (project?.folders.length || 0) < PROJECT_MAX_FOLDERS
 
   const handleFolderClick = (folder: Folder) => {
+    setFoldersModalOpen(false)
+
     if (!project) return
 
     if (currentFolder?.id !== folder.id) {
       navigate('/projects/' + project.id + '/folder/' + folder.id)
     }
   }
+
+  return (
+    <Form id={'create-project-folder'} onSubmit={handleSubmit}>
+      <input {...register('projectId', { value: project?.id })} hidden />
+      <Hidden asChild lg xl>
+        <ButtonBase
+          variant="secondary"
+          className={styles.project__foldersButton}
+          onClick={() => setFoldersModalOpen(true)}
+          type="button"
+        >
+          <div className={styles.project__foldersListFolderContainer}>
+            <h5 className={styles.project__foldersListFolderTitle}>
+              {currentFolder?.title}
+            </h5>
+            <div className={styles.project__foldersListFolderSubtitle}>
+              <p>{currentFolder?.totalFiles} files</p>
+              <span>•</span>
+              <p>{formatBytes(Number(currentFolder?.totalSize))}</p>
+            </div>
+          </div>
+          <MenuExpand />
+        </ButtonBase>
+      </Hidden>
+      <Hidden sm md className={styles.project__foldersContainer}>
+        <Wrapper className={styles.project__folders}>
+          <div className={cx(styles.project__foldersList)}>
+            {project?.folders.map((folder, i) => (
+              <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
+            ))}
+            {canCreateMoreFolders && (
+              <IconButton
+                disabled={isCreatingFolder}
+                loading={isCreatingFolder}
+                variant="tertiary"
+                size="lg"
+                type="submit"
+                form="create-project-folder"
+              >
+                <Plus />
+              </IconButton>
+            )}
+          </div>
+          <div className={styles.project__foldersTotalSizeContainer}>
+            <span className={styles.project__foldersTotalSizeCaption}>
+              Total size
+            </span>
+            {projectTotalSize}
+          </div>
+        </Wrapper>
+      </Hidden>
+      <ProjectFoldersModal
+        project={project}
+        createFolderFetcher={createFolderFetcher}
+        isOpen={isFoldersModalOpen}
+        onDismiss={() => setFoldersModalOpen(false)}
+      />
+    </Form>
+  )
+}
+
+const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
+  currentFolder,
+}) => {
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const handleEditFolderTitle = () => {
     if (!currentFolder) return
@@ -205,105 +341,43 @@ const ProjectHeader: React.FC<{
   }
 
   return (
-    <>
-      <PageHeader
-        before={
-          <Menu.Root>
-            <Hidden md lg xl asChild>
-              <Menu.Trigger asChild>
-                <IconButton variant="secondary" size="lg">
-                  <MoreHorizontal />
-                </IconButton>
-              </Menu.Trigger>
-            </Hidden>
-            <Button size="lg" variant="secondary" before={<Share />}>
-              Share{' '}
-              <Hidden sm asChild>
-                <span>project</span>
-              </Hidden>
-            </Button>
-            <Hidden asChild sm>
-              <Button
-                onClick={handleEditFolderDescription}
-                size="lg"
-                variant="secondary"
-                before={<PencilEdit />}
-              >
-                Edit description
-              </Button>
-            </Hidden>
-            <Button size="lg" variant="primary">
-              Preview
-            </Button>
-            <Menu.Content>
-              <Menu.Item before={<Share />}>Share project</Menu.Item>
-              <Menu.Item
-                onClick={handleEditFolderDescription}
-                before={<PencilEdit />}
-              >
-                Edit description
-              </Menu.Item>
-            </Menu.Content>
-          </Menu.Root>
-        }
-      >
-        {project?.title}
-      </PageHeader>
-      <Divider />
-      <div className={styles.project__foldersContainer}>
-        <Wrapper className={styles.project__folders}>
-          <div className={cx(styles.project__foldersList)}>
-            {project?.folders.map((folder, i) => (
-              <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
-            ))}
-            {canCreateMoreFolders && (
-              <Form onSubmit={handleSubmit}>
-                <input
-                  {...register('projectId', { value: project?.id })}
-                  hidden
-                />
-                <IconButton
-                  disabled={isCreatingFolder}
-                  loading={isCreatingFolder}
-                  variant="tertiary"
-                  size="lg"
-                  type="submit"
-                >
-                  <Plus />
-                </IconButton>
-              </Form>
-            )}
-          </div>
-          <div className={styles.project__foldersTotalSizeContainer}>
-            <span className={styles.project__foldersTotalSizeCaption}>
-              Total size
-            </span>
-            {projectTotalSize}
-          </div>
-        </Wrapper>
+    <Wrapper className={styles.project__folderInfo}>
+      <div className={styles.project__folderTitleContainer}>
+        {currentFolder?.title}
+        <IconButton onClick={handleEditFolderTitle} variant="tertiary-dimmed">
+          <PencilEdit />
+        </IconButton>
       </div>
-      <Divider />
-      <Wrapper className={styles.project__folderInfo}>
-        <div className={styles.project__folderTitleContainer}>
-          {currentFolder?.title}
-          <IconButton onClick={handleEditFolderTitle} variant="tertiary-dimmed">
+      {currentFolder?.description && (
+        <div className={styles.project__folderDescriptionContainer}>
+          <Animated asChild>
+            <p>{formatNewLine(currentFolder?.description)}</p>
+          </Animated>
+          <IconButton
+            onClick={handleEditFolderDescription}
+            variant="tertiary-dimmed"
+          >
             <PencilEdit />
           </IconButton>
         </div>
-        {currentFolder?.description && (
-          <div className={styles.project__folderDescriptionContainer}>
-            <Animated asChild>
-              <p>{formatNewLine(currentFolder?.description)}</p>
-            </Animated>
-            <IconButton
-              onClick={handleEditFolderDescription}
-              variant="tertiary-dimmed"
-            >
-              <PencilEdit />
-            </IconButton>
-          </div>
-        )}
-      </Wrapper>
+      )}
+    </Wrapper>
+  )
+}
+
+const ProjectBlock: React.FC<{
+  project: ProjectWithFolders | null
+}> = ({ project }) => {
+  const { folderId } = useParams()
+  const currentFolder = project?.folders.find((e) => e.id === folderId)
+
+  return (
+    <>
+      <ProjectHeader project={project} currentFolder={currentFolder} />
+      <Divider />
+      <ProjectFolders project={project} currentFolder={currentFolder} />
+      <Divider />
+      <FolderInfo currentFolder={currentFolder} />
     </>
   )
 }
@@ -356,7 +430,7 @@ const ProjectRoute = () => {
         }
       >
         <Await resolve={projectData?.project}>
-          {(project) => <ProjectHeader project={project || null} />}
+          {(project) => <ProjectBlock project={project || null} />}
         </Await>
       </Suspense>
       <Suspense

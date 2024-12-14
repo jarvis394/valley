@@ -53,7 +53,9 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
       >
         <div>
           <TextArea
-            {...register('description')}
+            {...register('description', {
+              value: defaultDescription,
+            })}
             size="lg"
             defaultValue={defaultDescription}
             id="folder-description-input"

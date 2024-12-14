@@ -9,32 +9,33 @@ type ModalFooterProps = React.PropsWithChildren<{
 }> &
   PropsWithoutRef<React.HTMLAttributes<HTMLDivElement>>
 
-const ModalFooter: React.FC<ModalFooterProps> = ({
-  before,
-  after,
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <Stack
-      {...props}
-      gap={2}
-      direction="row"
-      justify="space-between"
-      align="center"
-      padding={4}
-      className={cx(styles.modalFooter, className)}
-    >
-      <Stack align="center" gap={2}>
-        {before}
+const ModalFooter = React.forwardRef<HTMLDivElement, ModalFooterProps>(
+  function ModalFooter({ before, after, children, className, ...props }, ref) {
+    return (
+      <Stack
+        {...props}
+        ref={ref}
+        gap={2}
+        direction="row"
+        justify="space-between"
+        align="center"
+        padding={4}
+        className={cx(styles.modalFooter, className)}
+      >
+        {before && (
+          <Stack align="center" gap={2}>
+            {before}
+          </Stack>
+        )}
+        {children}
+        {after && (
+          <Stack align="center" gap={2}>
+            {after}
+          </Stack>
+        )}
       </Stack>
-      {children}
-      <Stack align="center" gap={2}>
-        {after}
-      </Stack>
-    </Stack>
-  )
-}
+    )
+  }
+)
 
 export default ModalFooter

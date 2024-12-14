@@ -17,6 +17,7 @@
 .modal__dialog {
   z-index: 1300;
   max-width: 480px;
+  max-height: calc(100% - 32px);
   width: calc(100% - 32px);
   background: var(--background-default);
   padding: 0px;
@@ -70,6 +71,17 @@
     0px 1px 1px rgba(0, 0, 0, 0.02),
     0px 4px 8px -4px rgba(0, 0, 0, 0.04),
     0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+}
+
+.modal__drawerHandle {
+  margin-top: 16px;
+  position: unset !important;
+}
+
+.modal__drawerHandle > [data-vaul-handle-hitarea] {
+  width: 100%;
+  height: calc(32px + 5px);
+  top: 16px !important;
 }
 
 @keyframes fadeIn {

@@ -205,7 +205,8 @@ export default function OnboardingDetailsRoute() {
             render={({ field, fieldState }) => (
               <PhoneInput
                 smartCaret
-                inputComponent={TextField}
+                // Shit typings that cannot accept React.memo
+                inputComponent={TextField as unknown as () => JSX.Element}
                 onChange={field.onChange}
                 value={field.value}
                 fieldState={fieldState}

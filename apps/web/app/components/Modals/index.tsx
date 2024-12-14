@@ -22,36 +22,16 @@ export const Modals = () => {
 
   return (
     <>
-      <Modal
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
-        onDismiss={handleClose}
-        id="create-project"
-      >
+      <Modal onDismiss={handleClose} id="create-project">
         <CreateProjectModal onClose={handleClose} />
       </Modal>
-      <Modal
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
-        onDismiss={handleClose}
-        id="edit-folder-title"
-      >
+      <Modal onDismiss={handleClose} id="edit-folder-title">
         <EditFolderTitleModal onClose={handleClose} />
       </Modal>
-      <Modal
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
-        onDismiss={handleClose}
-        id="edit-folder-description"
-      >
+      <Modal onDismiss={handleClose} id="edit-folder-description">
         <EditFolderDescriptionModal onClose={handleClose} />
       </Modal>
-      <Modal
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
-        onDismiss={handleClose}
-        id="confirm-folder-deletion"
-      >
+      <Modal onDismiss={handleClose} id="confirm-folder-deletion">
         <ConfirmFolderDeletionModal onClose={handleClose} />
       </Modal>
     </>
