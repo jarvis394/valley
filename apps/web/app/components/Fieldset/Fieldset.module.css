@@ -1,0 +1,43 @@
+.fieldset {
+  border-radius: 16px;
+  background-color: var(--background-paper);
+  border: 1px solid var(--alpha-solid-07);
+  overflow: hidden;
+}
+
+.fieldset--danger {
+  border: 1px solid var(--red-400);
+}
+
+.fieldset--danger .fieldset__divider {
+  border-color: var(--red-400);
+}
+
+.fieldset--danger .fieldset__footer {
+  background-color: var(--red-100);
+}
+
+.fieldset h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.fieldset p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.fieldset__footerBefore {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+@media screen and (width < 600px) {
+  .fieldset__footerBefore {
+    text-align: center;
+  }
+}

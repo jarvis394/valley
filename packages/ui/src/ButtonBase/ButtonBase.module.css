@@ -17,7 +17,7 @@
    *  Somehow it breaks  @mui/base Menu component's `onBlur` event and menus don't close
    */
   transition-property: background-color, filter, background, box-shadow, border,
-    color, opacity;
+    color, opacity, font-weight;
   font-size: var(--font-size);
   line-height: var(--line-height);
   cursor: pointer;

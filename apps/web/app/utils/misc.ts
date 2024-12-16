@@ -1,4 +1,5 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
+import { HTMLFormMethod } from '@remix-run/router'
 import prettyBytes from 'pretty-bytes'
 import * as z from 'zod'
 
@@ -119,7 +120,7 @@ export function useIsPending({
   state = 'non-idle',
 }: {
   formAction?: string
-  formMethod?: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE'
+  formMethod?: HTMLFormMethod
   state?: 'submitting' | 'loading' | 'non-idle'
 } = {}) {
   const contextualFormAction = useFormAction()

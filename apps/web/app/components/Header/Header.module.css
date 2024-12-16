@@ -65,10 +65,15 @@
 }
 
 @media screen and (width < 600px) {
+  .header {
+    padding: 16px;
+  }
+
   .header__nav {
     --logo-offset: 0;
   }
-  .header__username[data-should-hide] {
+
+  .header__title[data-should-hide] {
     display: none;
   }
 }

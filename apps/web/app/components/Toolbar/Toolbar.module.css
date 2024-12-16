@@ -12,3 +12,10 @@
   padding-left: 16px;
   padding-right: 16px;
 }
+
+@media screen and (width < 600px) {
+  .toolbar > div {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}

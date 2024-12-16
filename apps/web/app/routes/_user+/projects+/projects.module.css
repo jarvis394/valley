@@ -8,6 +8,7 @@
   gap: 0;
   width: 100%;
   overflow: auto;
+  flex-shrink: 0;
 }
 
 .projects__bannerBlocks > [data-overlayscrollbars-contents] {
@@ -31,6 +32,39 @@
 
 .projects__searchInput {
   max-width: 280px;
+}
+
+.projects__placeholder {
+  position: relative;
+  isolation: isolate;
+}
+
+.projects__placeholder h1 {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  margin: 0;
+}
+
+.projects__placeholder p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  margin: 0;
+}
+
+.projects__placeholderIllustration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  opacity: 0.63;
+  z-index: -10;
+  pointer-events: none;
+  user-select: none;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 }
 
 @media screen and (min-width: 660px) {

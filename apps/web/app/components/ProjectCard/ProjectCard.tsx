@@ -86,28 +86,53 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
       <div className={styles.projectCard__bottomBar}>
         <div className={styles.projectCard__statistics}>
           <div className={styles.projectCard__statisticsItem}>
-            <LineChart />0
+            {loading && (
+              <Skeleton variant="rectangular" width={40} height={16} />
+            )}
+            {!loading && (
+              <>
+                <LineChart />0
+              </>
+            )}
           </div>
           <div className={styles.projectCard__statisticsItem}>
-            <Download />0
+            {loading && (
+              <Skeleton variant="rectangular" width={40} height={16} />
+            )}
+            {!loading && (
+              <>
+                <Download />0
+              </>
+            )}
           </div>
           <div className={styles.projectCard__statisticsItem}>
-            <Heart />0
+            {loading && (
+              <Skeleton variant="rectangular" width={40} height={16} />
+            )}
+            {!loading && (
+              <>
+                <Heart />0
+              </>
+            )}
           </div>
         </div>
-        <div className={styles.projectCard__shareButton}>
-          <IconButton size="sm" variant="secondary-dimmed">
-            <Share />
-          </IconButton>
-        </div>
+        {!loading && (
+          <div className={styles.projectCard__shareButton}>
+            <IconButton size="sm" variant="secondary-dimmed">
+              <Share />
+            </IconButton>
+          </div>
+        )}
       </div>
-      <IconButton
-        className={styles.projectCard__menu}
-        size="sm"
-        variant="secondary-dimmed"
-      >
-        <MoreHorizontal />
-      </IconButton>
+      {!loading && (
+        <IconButton
+          className={styles.projectCard__menu}
+          size="sm"
+          variant="secondary-dimmed"
+        >
+          <MoreHorizontal />
+        </IconButton>
+      )}
     </div>
   )
 }

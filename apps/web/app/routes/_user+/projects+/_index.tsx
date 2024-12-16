@@ -7,6 +7,7 @@ import {
   Await,
   ClientLoaderFunctionArgs,
   data,
+  Link,
   ShouldRevalidateFunction,
   useLoaderData,
 } from '@remix-run/react'
@@ -25,9 +26,15 @@ import {
   time,
 } from 'app/server/timing.server'
 import Input from '@valley/ui/Input'
-import { ChevronDown, MagnifyingGlass, SortAscending } from 'geist-ui-icons'
+import {
+  ChevronDown,
+  MagnifyingGlass,
+  Plus,
+  SortAscending,
+} from 'geist-ui-icons'
 import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
+import { ProjectWithFolders } from '@valley/shared'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
@@ -76,15 +83,54 @@ export const clientLoader = ({ serverLoader }: ClientLoaderFunctionArgs) => {
   return { projects }
 }
 
-const projectSkeletons = new Array(8)
-  .fill(null)
-  .map((_, i) => <ProjectCard loading key={i} />)
+const projectSkeletons = (
+  <Wrapper className={styles.projects__list}>
+    {new Array(8).fill(null).map((_, i) => (
+      <ProjectCard loading key={i} />
+    ))}
+  </Wrapper>
+)
+
+const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
+  projects,
+}) => {
+  if (projects.length === 0) {
+    return (
+      <Stack
+        fullHeight
+        fullWidth
+        direction={'column'}
+        gap={6}
+        align={'center'}
+        justify={'center'}
+        className={styles.projects__placeholder}
+      >
+        <Stack direction={'column'} gap={4} align={'center'} justify={'center'}>
+          <h1>This page seems empty</h1>
+          <p>Upload some photos to make it happier</p>
+        </Stack>
+        <Button asChild variant="primary" size="lg" before={<Plus />}>
+          <Link to={{ search: 'modal=create-project' }}>Create project</Link>
+        </Button>
+        <div className={styles.projects__placeholderIllustration}>
+          {projectSkeletons}
+        </div>
+      </Stack>
+    )
+  }
+
+  return (
+    <Wrapper className={styles.projects__list}>
+      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
+    </Wrapper>
+  )
+}
 
 const ProjectsRoute = () => {
   const data = useLoaderData<typeof loader>()
 
   return (
-    <Stack direction={'column'}>
+    <Stack direction={'column'} fullHeight fullWidth>
       <Wrapper asChild className={styles.projects__bannerBlocks}>
         <OverlayScrollbarsComponent
           defer
@@ -114,17 +160,11 @@ const ProjectsRoute = () => {
           </Button>
         </Stack>
       </Wrapper>
-      <Wrapper className={styles.projects__list}>
-        <Suspense fallback={projectSkeletons}>
-          <Await resolve={data.projects}>
-            {(projects) =>
-              projects?.map((project, i) => (
-                <ProjectCard project={project} key={i} />
-              ))
-            }
-          </Await>
-        </Suspense>
-      </Wrapper>
+      <Suspense fallback={projectSkeletons}>
+        <Await resolve={data.projects}>
+          {(projects) => <ProjectsList projects={projects} />}
+        </Await>
+      </Suspense>
     </Stack>
   )
 }

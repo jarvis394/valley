@@ -31,7 +31,7 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
         >
           <Link to={'/projects'}>
             <Avatar />
-            <p data-should-hide={projectId} className={styles.header__title}>
+            <p data-should-hide={!!projectId} className={styles.header__title}>
               {user?.fullname}
             </p>
           </Link>

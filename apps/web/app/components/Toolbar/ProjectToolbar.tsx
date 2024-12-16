@@ -79,6 +79,11 @@ const ProjectsToolbar = () => {
     if (folderId && location.pathname.startsWith(projectBaseUrl + '/folder/')) {
       return projectBaseUrl
     }
+
+    if (location.pathname.startsWith(projectBaseUrl + '/settings')) {
+      return projectBaseUrl + '/settings'
+    }
+
     return location.pathname
   }, [folderId, location.pathname, projectBaseUrl])
 

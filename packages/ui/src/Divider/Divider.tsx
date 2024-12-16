@@ -19,7 +19,12 @@ const Divider: React.FC<DividerProps> = ({
     return (
       <div
         {...props}
-        className={cx(styles.divider, styles['divider--withText'], className)}
+        className={cx(
+          'Divider',
+          styles.divider,
+          styles['divider--withText'],
+          className
+        )}
       >
         <span className={cx(styles.divider, styles['divider--horizontal'])} />
         {children}
