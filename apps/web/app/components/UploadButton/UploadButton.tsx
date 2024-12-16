@@ -4,11 +4,12 @@ import styles from './UploadButton.module.css'
 import { CloudUpload } from 'geist-ui-icons'
 import { useUpload } from '../../hooks/useUpload'
 import cx from 'classnames'
+import Button from '@valley/ui/Button'
 
 type UploadButtonProps = {
   projectId: string
   folderId: string
-  variant?: 'compact' | 'square'
+  variant?: 'button' | 'compact' | 'square'
 }
 
 const UploadButton: React.FC<UploadButtonProps> = ({
@@ -19,6 +20,19 @@ const UploadButton: React.FC<UploadButtonProps> = ({
 }) => {
   const { register } = useUpload({ projectId, folderId })
   const iconSize = variant === 'compact' ? 24 : 48
+
+  if (variant === 'button') {
+    return (
+      <Button
+        {...register<HTMLButtonElement>()}
+        variant="primary"
+        size="lg"
+        before={<CloudUpload />}
+      >
+        Upload files
+      </Button>
+    )
+  }
 
   return (
     <ButtonBase

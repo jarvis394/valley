@@ -443,6 +443,31 @@ const FolderFiles: React.FC<{
 
   if (!folder) return null
 
+  if (folder.files.length === 0) {
+    return (
+      <Stack
+        fullHeight
+        fullWidth
+        direction={'column'}
+        gap={6}
+        align={'center'}
+        justify={'center'}
+        className={styles.project__placeholder}
+        padding={8}
+      >
+        <Stack direction={'column'} gap={4} align={'center'} justify={'center'}>
+          <h1>This folder does not contain any files</h1>
+          <p>Upload some photos to make it happier</p>
+        </Stack>
+        <UploadButton
+          projectId={folder.projectId}
+          folderId={folder.id}
+          variant="button"
+        />
+      </Stack>
+    )
+  }
+
   return (
     <Stack direction={'column'} gap={{ sm: 4, md: 8 }}>
       <Hidden asChild md lg xl>

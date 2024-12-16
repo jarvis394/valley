@@ -104,6 +104,7 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
         align={'center'}
         justify={'center'}
         className={styles.projects__placeholder}
+        padding={8}
       >
         <Stack direction={'column'} gap={4} align={'center'} justify={'center'}>
           <h1>This page seems empty</h1>

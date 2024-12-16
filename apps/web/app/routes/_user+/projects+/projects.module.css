@@ -44,6 +44,7 @@
   font-size: 24px;
   line-height: 30px;
   margin: 0;
+  text-align: center;
 }
 
 .projects__placeholder p {
@@ -51,6 +52,7 @@
   font-size: 16px;
   line-height: 20px;
   margin: 0;
+  text-align: center;
 }
 
 .projects__placeholderIllustration {
@@ -60,7 +62,6 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  opacity: 0.63;
   z-index: -10;
   pointer-events: none;
   user-select: none;

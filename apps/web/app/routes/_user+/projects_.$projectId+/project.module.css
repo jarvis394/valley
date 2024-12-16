@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0px;
+  height: 100%;
 }
 
 .project__foldersContainer {
@@ -81,6 +82,22 @@
 .project__folderDescriptionContainer > p {
   margin: 0;
   margin-top: 4px;
+}
+
+.project__placeholder h1 {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  margin: 0;
+  text-align: center;
+}
+
+.project__placeholder p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  margin: 0;
+  text-align: center;
 }
 
 .project__files {
