@@ -17,7 +17,6 @@ import {
   type LoaderFunctionArgs,
   data,
 } from '@remix-run/cloudflare'
-import { ManifestLink } from '@remix-pwa/sw'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -171,7 +170,7 @@ export function Document({
           href="/apple-touch-icon.png"
           sizes="180x180"
         />
-        <ManifestLink />
+        <link rel="manifest" href="/manifest.webmanifest" />
         <Meta />
         <Links />
       </head>
@@ -210,7 +209,7 @@ const App = () => {
   useToast(loaderData.toast)
 
   // TODO: fix SW requests
-  // useEffect(() => {
+  // React.useEffect(() => {
   //   // Registering SW manually because Vite remix-pwa plugin
   //   // adds <script> tag without CSP nonce value
   //   loadServiceWorker()
