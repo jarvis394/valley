@@ -76,8 +76,7 @@ export async function clientLoader({
   initialLoad = false
 
   const loaderData = (await serverLoader()) as SerializeFrom<typeof loader>
-  const project = await loaderData.project
-  await cache.setItem(key, project)
+  const project = loaderData.project
 
   return { project }
 }

@@ -36,7 +36,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
     <div className={styles.projectCard}>
       {loading && <div className={styles.projectCard__cover} />}
       {!loading && (
-        <Link to={projectLink} className={styles.projectCard__cover}>
+        <Link
+          prefetch="intent"
+          to={projectLink}
+          className={styles.projectCard__cover}
+        >
           {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
         </Link>
       )}
@@ -53,7 +57,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
         </div>
       )}
       {!loading && (
-        <Link to={projectLink} className={styles.projectCard__header}>
+        <Link
+          prefetch="intent"
+          to={projectLink}
+          className={styles.projectCard__header}
+        >
           <h3 className={styles.projectCard__contentTitle}>{project?.title}</h3>
           <p className={styles.projectCard__contentSubtitle}>
             {project?.totalFiles} photos
@@ -137,4 +145,4 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
   )
 }
 
-export default ProjectCard
+export default React.memo(ProjectCard)

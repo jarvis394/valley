@@ -78,6 +78,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
+import { getProjectCacheKey } from './_layout'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -145,8 +146,7 @@ export async function clientLoader({
   initialLoad = false
 
   const loaderData = (await serverLoader()) as SerializeFrom<typeof loader>
-  const folder = await loaderData.folder
-  await cache.setItem(key, folder)
+  const folder = loaderData.folder
 
   return { folder }
 }
@@ -388,6 +388,13 @@ const ProjectBlock: React.FC<{
   const { folderId } = useParams()
   const currentFolder = project?.folders.find((e) => e.id === folderId)
 
+  useEffect(() => {
+    if (!project) return
+    const key = getProjectCacheKey(project.id)
+    const putProjectDataToCache = async () => await cache.setItem(key, project)
+    putProjectDataToCache()
+  }, [project])
+
   return (
     <>
       <ProjectHeader project={project} currentFolder={currentFolder} />
@@ -440,6 +447,13 @@ const FolderFiles: React.FC<{
   useEffect(() => {
     setFiles(folder?.files || [])
   }, [folder?.files])
+
+  useEffect(() => {
+    if (!folder) return
+    const key = getFolderCacheKey(folder.id)
+    const putFolderDataToCache = async () => await cache.setItem(key, folder)
+    putFolderDataToCache()
+  }, [folder])
 
   if (!folder) return null
 
