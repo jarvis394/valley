@@ -2,6 +2,9 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
 } from '@remix-run/cloudflare'
+import handleRequestNode from './entry.server.node'
+import handleRequestEdge from './entry.server.edge'
+import handleRequestVercel from './entry.server.vercel'
 import * as Sentry from '@sentry/remix'
 import ansis from 'ansis'
 
@@ -18,14 +21,11 @@ const runtime =
 let handleRequest: unknown
 
 if (isVercel) {
-  console.log('Using Vercel entry.server.ts')
-  handleRequest = (await import('./entry.server.vercel')).default
+  handleRequest = handleRequestVercel
 } else if (runtime === 'edge') {
-  console.log('Using Edge runtime entry.server.ts')
-  handleRequest = (await import('./entry.server.edge')).default
+  handleRequest = handleRequestEdge
 } else {
-  console.log('Using NodeJS runtime entry.server.ts')
-  handleRequest = (await import('./entry.server.node')).default
+  handleRequest = handleRequestNode
 }
 
 export default handleRequest
