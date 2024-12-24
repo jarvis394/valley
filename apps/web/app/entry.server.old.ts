@@ -4,7 +4,7 @@ import type {
 } from '@remix-run/cloudflare'
 import handleRequestNode from './entry.server.node'
 import handleRequestEdge from './entry.server.edge'
-import handleRequestVercel from './entry.server.vercel'
+import handleRequestVercel from './entry.server'
 import * as Sentry from '@sentry/remix'
 import ansis from 'ansis'
 
