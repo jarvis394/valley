@@ -12,6 +12,8 @@ import Button from '@valley/ui/Button'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
+export const runtime = 'edge'
+
 export const themeFetcherKey = 'theme-switch-fetcher'
 
 type ThemeStoreState = {

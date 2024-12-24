@@ -1,9 +1,7 @@
 import { PassThrough } from 'node:stream'
 import type {
-  ActionFunctionArgs,
   EntryContext,
   HandleDocumentRequestFunction,
-  LoaderFunctionArgs,
 } from '@remix-run/node'
 import { createReadableStreamFromReadable } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
@@ -12,8 +10,6 @@ import { renderToPipeableStream } from 'react-dom/server'
 import { NonceProvider } from './components/NonceProvider/NonceProvider'
 import { init as envInit } from './server/env.server'
 import { makeTimings } from './server/timing.server'
-import ansis from 'ansis'
-import * as Sentry from '@sentry/remix'
 
 const ABORT_DELAY = 5_000
 export const STREAMING_TIMEOUT = 5_000
@@ -68,30 +64,6 @@ const handleRequest: HandleDocumentRequestFunction = (
 
     setTimeout(abort, STREAMING_TIMEOUT + ABORT_DELAY)
   })
-}
-
-export function handleError(
-  error: unknown,
-  { request }: LoaderFunctionArgs | ActionFunctionArgs
-): void {
-  // Skip capturing if the request is aborted as Remix docs suggest
-  // Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
-  if (request.signal.aborted) {
-    return
-  }
-
-  if (error instanceof Error) {
-    console.error(ansis.red(error.stack || error.message))
-    void Sentry.captureRemixServerException(
-      error,
-      'remix.server',
-      request,
-      true
-    )
-  } else {
-    console.error(error)
-    Sentry.captureException(error)
-  }
 }
 
 export default handleRequest

@@ -36,6 +36,9 @@
     "db:generate": {
       "cache": false
     },
+    "db:generate-prod": {
+      "cache": false
+    },
     "db:deploy": {
       "cache": false
     },
