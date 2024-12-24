@@ -9,6 +9,7 @@ declare global {
   export const EdgeRuntime: string | undefined
 }
 
+const isVercel = process.env.VERCEL === '1'
 const runtime =
   typeof WebSocketPair !== 'undefined' || typeof EdgeRuntime === 'string'
     ? 'edge'
@@ -16,11 +17,14 @@ const runtime =
 
 let handleRequest: unknown
 
-if (process.env.VERCEL) {
+if (isVercel) {
+  console.log('Using Vercel entry.server.ts')
   handleRequest = (await import('./entry.server.vercel')).default
 } else if (runtime === 'edge') {
+  console.log('Using Edge runtime entry.server.ts')
   handleRequest = (await import('./entry.server.edge')).default
 } else {
+  console.log('Using NodeJS runtime entry.server.ts')
   handleRequest = (await import('./entry.server.node')).default
 }
 
