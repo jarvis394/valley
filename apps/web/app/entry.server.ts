@@ -16,7 +16,9 @@ const runtime =
 
 let handleRequest: unknown
 
-if (runtime === 'edge') {
+if (process.env.VERCEL) {
+  handleRequest = (await import('./entry.server.vercel')).default
+} else if (runtime === 'edge') {
   handleRequest = (await import('./entry.server.edge')).default
 } else {
   handleRequest = (await import('./entry.server.node')).default
