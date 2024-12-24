@@ -21,7 +21,7 @@ if (process.env.VERCEL) {
 } else if (runtime === 'edge') {
   handleRequest = (await import('./entry.server.edge')).default
 } else {
-  // handleRequest = (await import('./entry.server.node')).default
+  handleRequest = (await import('./entry.server.node')).default
 }
 
 export default handleRequest

@@ -6,8 +6,6 @@ import { Link, useNavigation, useRouteLoaderData } from '@remix-run/react'
 import { ThemeSwitch } from '../resources+/theme-switch'
 import { loader as rootLoader } from '../../root'
 
-export const config = { runtime: 'edge' }
-
 export const meta: MetaFunction = () => {
   return [
     { title: 'Valley' },
