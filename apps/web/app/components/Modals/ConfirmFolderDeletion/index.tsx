@@ -13,6 +13,7 @@ import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/routes/auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
+import Modal from '@valley/ui/Modal'
 
 type ConfirmFolderDeletionProps = {
   onClose: () => void
@@ -171,13 +172,15 @@ const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionProps> = ({
   const data = useProjectAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ModalContent onClose={onClose} project={resolvedProject} />
-        )}
-      </Await>
-    </Suspense>
+    <Modal onDismiss={onClose} id="confirm-folder-deletion">
+      <Suspense>
+        <Await resolve={data?.project}>
+          {(resolvedProject) => (
+            <ModalContent onClose={onClose} project={resolvedProject} />
+          )}
+        </Await>
+      </Suspense>
+    </Modal>
   )
 }
 

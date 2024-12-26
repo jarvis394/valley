@@ -13,6 +13,7 @@ import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/routes/auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
+import Modal from '@valley/ui/Modal'
 
 type ConfirmFolderClearProps = {
   onClose: () => void
@@ -158,13 +159,15 @@ const ConfirmFolderClearModal: React.FC<ConfirmFolderClearProps> = ({
   const data = useProjectAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ModalContent onClose={onClose} project={resolvedProject} />
-        )}
-      </Await>
-    </Suspense>
+    <Modal onDismiss={onClose} id="confirm-folder-clear">
+      <Suspense>
+        <Await resolve={data?.project}>
+          {(resolvedProject) => (
+            <ModalContent onClose={onClose} project={resolvedProject} />
+          )}
+        </Await>
+      </Suspense>
+    </Modal>
   )
 }
 

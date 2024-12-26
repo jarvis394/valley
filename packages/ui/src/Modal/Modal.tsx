@@ -60,8 +60,8 @@ const Modal: React.FC<ModalProps> = ({
         direction="bottom"
         disablePreventScroll
         repositionInputs
-        {...props}
         handleOnly
+        {...props}
         open={open}
         onOpenChange={handleDrawerOpenChange}
       >
@@ -87,9 +87,9 @@ const Modal: React.FC<ModalProps> = ({
       <Dialog.Portal>
         <Dialog.Overlay className={styles.modal__dialogOverlay} />
         <Dialog.Content className={styles.modal__dialog}>
-          <Drawer.Title style={{ display: 'none' }}>
+          <Dialog.Title style={{ display: 'none' }}>
             {currentModal}
-          </Drawer.Title>
+          </Dialog.Title>
           <Dialog.Description style={{ display: 'none' }}>
             {currentModal}
           </Dialog.Description>

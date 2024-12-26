@@ -10,6 +10,7 @@ import { Form, useLocation, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
+import Modal from '@valley/ui/Modal'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -42,7 +43,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
   })
 
   return (
-    <>
+    <Modal onDismiss={onClose} id="edit-folder-description">
       <ModalHeader>Edit Folder Description</ModalHeader>
       <Form
         onSubmit={handleSubmit}
@@ -87,7 +88,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
           </Button>
         }
       />
-    </>
+    </Modal>
   )
 }
 

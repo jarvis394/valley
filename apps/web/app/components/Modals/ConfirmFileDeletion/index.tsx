@@ -12,6 +12,7 @@ import { FolderWithFiles } from '@valley/shared'
 import { redirectToKey } from 'app/routes/auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
 import { useFolderAwait } from 'app/utils/folder'
+import Modal from '@valley/ui/Modal'
 
 type ConfirmFileDeletionProps = {
   onClose: () => void
@@ -105,13 +106,15 @@ const ConfirmFileDeletionModal: React.FC<ConfirmFileDeletionProps> = ({
   const data = useFolderAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.folder}>
-        {(resolvedFolder) => (
-          <ModalContent onClose={onClose} folder={resolvedFolder} />
-        )}
-      </Await>
-    </Suspense>
+    <Modal handleOnly={false} onDismiss={onClose} id="confirm-file-deletion">
+      <Suspense>
+        <Await resolve={data?.folder}>
+          {(resolvedFolder) => (
+            <ModalContent onClose={onClose} folder={resolvedFolder} />
+          )}
+        </Await>
+      </Suspense>
+    </Modal>
   )
 }
 
