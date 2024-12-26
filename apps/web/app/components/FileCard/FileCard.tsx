@@ -35,7 +35,9 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
   const handleFileDelete = () => {
     searchParams.set('modal', 'confirm-file-deletion')
     searchParams.set('modal-fileId', file.id.toString())
-    setSearchParams(searchParams)
+    setSearchParams(searchParams, {
+      preventScrollReset: true,
+    })
   }
 
   return (

@@ -8,9 +8,10 @@ export default class FolderService {
     files: File[]
   ): Promise<SerializedFolder | null> {
     return await prisma.$transaction(async (tx) => {
-      const folder = await tx.folder.findFirst({
-        where: { id: folderId },
-      })
+      const query = await tx.$queryRaw<
+        Folder[]
+      >`SELECT * FROM "Folder" WHERE id=${folderId} FOR UPDATE`
+      const folder = query[0]
 
       if (!folder) {
         return null
@@ -43,17 +44,19 @@ export default class FolderService {
     files: File[]
   ): Promise<SerializedFolder | null> {
     return await prisma.$transaction(async (tx) => {
-      const folder = await tx.folder.findFirst({
-        where: { id: folderId },
-      })
-      let allFilesSize = 0
-      files.forEach((file) => {
-        allFilesSize += Number(file.size)
-      })
+      const query = await tx.$queryRaw<
+        Folder[]
+      >`SELECT * FROM "Folder" WHERE id=${folderId} FOR UPDATE`
+      const folder = query[0]
 
       if (!folder) {
         return null
       }
+
+      let allFilesSize = 0
+      files.forEach((file) => {
+        allFilesSize += Number(file.size)
+      })
 
       const newFolderTotalSize = Number(folder.totalSize) - allFilesSize
       const newFolderData = await tx.folder.update({

@@ -1,0 +1,23 @@
+.confirmFolderClear__content {
+  padding-top: 0;
+}
+
+.confirmFolderClear__content > p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.confirmFolderClear__form {
+  border-top: 1px solid var(--alpha-transparent-07);
+  background-color: var(--background-paper);
+}
+
+.confirmFolderClear__footer {
+  background-color: var(--background-default);
+}
+
+.confirmFolderClear__formLabel {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+}

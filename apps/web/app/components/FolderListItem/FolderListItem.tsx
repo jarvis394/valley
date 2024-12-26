@@ -76,6 +76,7 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
       state: {
         defaultTitle: folder.title,
       },
+      preventScrollReset: true,
     })
   }
 
@@ -83,7 +84,9 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
     onFolderDelete?.(folder)
     searchParams.set('modal', 'confirm-folder-deletion')
     searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams)
+    setSearchParams(searchParams, {
+      preventScrollReset: true,
+    })
   }
 
   return (

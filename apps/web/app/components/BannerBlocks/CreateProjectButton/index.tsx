@@ -14,7 +14,7 @@ const CreateProjectButton = () => {
       className={styles.createProjectButton}
       variant="primary"
     >
-      <Link to={{ search: 'modal=create-project' }}>
+      <Link preventScrollReset to={{ search: 'modal=create-project' }}>
         <h3>
           Create new
           <br />

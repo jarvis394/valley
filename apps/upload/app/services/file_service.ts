@@ -25,7 +25,7 @@ export default class FileService {
     'image/jpg',
     'image/jpeg',
   ])
-  static readonly THUMBNAIL_PREFIX = 'thumb_'
+  static readonly THUMBNAIL_SUFFIX = '_thumbnail'
   static readonly PROJECT_PATH_PREFIX = 'project-'
   static readonly FOLDER_PATH_PREFIX = 'folder-'
 
@@ -116,13 +116,17 @@ export default class FileService {
 
   async streamFile(key: string, res: Response) {
     const parts = FileService.getFilePathnameParts(key)
+    const isThumbnail = FileService.isThumbnail(parts.filename)
     if (!parts.filename || !parts.projectId || !parts.folderId) {
       return res.badRequest('File path parts are missing')
     }
 
     let filename = parts.filename
-    if (FileService.isThumbnail(filename)) {
-      filename = parts.filename.slice(FileService.THUMBNAIL_PREFIX.length)
+    if (isThumbnail) {
+      filename = parts.filename.slice(
+        0,
+        parts.filename.length - FileService.THUMBNAIL_SUFFIX.length
+      )
     }
 
     const parsedKey = FileService.makeUploadPath({
@@ -153,7 +157,7 @@ export default class FileService {
 
       res.header(
         'Content-Disposition',
-        contentDisposition(databaseFile.name || key, {
+        contentDisposition(databaseFile.name, {
           type: 'inline',
         })
       )
@@ -170,6 +174,17 @@ export default class FileService {
       }
 
       return res.internalServerError(e)
+    }
+  }
+
+  async deleteFileFromStorage(key: string) {
+    const disk = drive.use()
+
+    try {
+      await disk.delete(key)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, message: (e as Error).message }
     }
   }
 
@@ -196,9 +211,13 @@ export default class FileService {
     return { path, filename, projectId, folderId }
   }
 
+  static makeThumbnailFilename(name: string) {
+    return name + FileService.THUMBNAIL_SUFFIX
+  }
+
   static makeThumbnailUploadPath(filePath: string) {
     const { filename, path } = FileService.getFilePathnameParts(filePath)
-    return path + '/' + FileService.THUMBNAIL_PREFIX + filename
+    return path + '/' + FileService.makeThumbnailFilename(filename)
   }
 
   static getUploadProjectName(projectId: Project['id']) {
@@ -224,6 +243,6 @@ export default class FileService {
   }
 
   static isThumbnail(fileKey: string) {
-    return fileKey.startsWith(FileService.THUMBNAIL_PREFIX)
+    return fileKey.endsWith(FileService.THUMBNAIL_SUFFIX)
   }
 }

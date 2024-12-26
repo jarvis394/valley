@@ -32,13 +32,24 @@ const FolderCardMenuContent: React.FC<{
       state: {
         defaultTitle: folder.title,
       },
+      preventScrollReset: true,
     })
   }
 
   const handleFolderDelete = () => {
     searchParams.set('modal', 'confirm-folder-deletion')
     searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams)
+    setSearchParams(searchParams, {
+      preventScrollReset: true,
+    })
+  }
+
+  const handleFolderClear = () => {
+    searchParams.set('modal', 'confirm-folder-clear')
+    searchParams.set('modal-folderId', folder.id.toString())
+    setSearchParams(searchParams, {
+      preventScrollReset: true,
+    })
   }
 
   return (
@@ -53,7 +64,16 @@ const FolderCardMenuContent: React.FC<{
         Reorder
       </Menu.Item>
       <Menu.Separator />
-      {folder.isDefaultFolder && <Menu.Item disabled>Default folder</Menu.Item>}
+      {folder.isDefaultFolder && (
+        <>
+          <Menu.Item
+            onClick={handleFolderClear}
+            before={<Trash color="var(--red-600)" />}
+          >
+            Delete all files
+          </Menu.Item>
+        </>
+      )}
       {!folder.isDefaultFolder && (
         <Menu.Item
           onClick={handleFolderDelete}

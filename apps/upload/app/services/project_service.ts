@@ -8,9 +8,10 @@ export default class ProjectService {
     files: File[]
   ): Promise<SerializedProject | null> {
     return await prisma.$transaction(async (tx) => {
-      const project = await tx.project.findFirst({
-        where: { id: projectId },
-      })
+      const query = await tx.$queryRaw<
+        Project[]
+      >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`
+      const project = query[0]
 
       if (!project) {
         return null
@@ -43,9 +44,10 @@ export default class ProjectService {
     files: File[]
   ): Promise<SerializedProject | null> {
     return await prisma.$transaction(async (tx) => {
-      const project = await tx.project.findFirst({
-        where: { id: projectId },
-      })
+      const query = await tx.$queryRaw<
+        Project[]
+      >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`
+      const project = query[0]
 
       if (!project) {
         return null

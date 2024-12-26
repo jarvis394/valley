@@ -5,7 +5,7 @@ const scheduler = new SchedulerService()
 
 scheduler.addJob({
   key: 'delete_pending_files',
-  cronExpression: '*/2 * * * *',
+  cronExpression: '*/1 * * * *',
   job: new DeletePendingFilesJob(),
 })
 

@@ -187,6 +187,7 @@ const ProjectHeader: React.FC<{
       state: {
         defaultDescription: currentFolder.description,
       },
+      preventScrollReset: true,
     })
   }
 
@@ -344,6 +345,7 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
       state: {
         defaultTitle: currentFolder.title,
       },
+      preventScrollReset: true,
     })
   }
 
@@ -356,6 +358,7 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
       state: {
         defaultDescription: currentFolder.description,
       },
+      preventScrollReset: true,
     })
   }
 

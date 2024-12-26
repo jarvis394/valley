@@ -12,7 +12,10 @@ export default defineConfig({
   | will be scanned automatically from the "./commands" directory.
   |
   */
-  commands: [() => import('@adonisjs/core/commands')],
+  commands: [
+    () => import('@adonisjs/core/commands'),
+    () => import('@rlanz/bull-queue/commands'),
+  ],
 
   /*
   |--------------------------------------------------------------------------
@@ -38,6 +41,7 @@ export default defineConfig({
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('@adonisjs/lock/lock_provider'),
     () => import('@adonisjs/redis/redis_provider'),
+    () => import('@rlanz/bull-queue/queue_provider'),
   ],
 
   /*

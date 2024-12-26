@@ -111,7 +111,9 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
           <p>Upload some photos to make it happier</p>
         </Stack>
         <Button asChild variant="primary" size="lg" before={<Plus />}>
-          <Link to={{ search: 'modal=create-project' }}>Create project</Link>
+          <Link preventScrollReset to={{ search: 'modal=create-project' }}>
+            Create project
+          </Link>
         </Button>
         <div className={styles.projects__placeholderIllustration}>
           {projectSkeletons}
@@ -122,7 +124,9 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
 
   return (
     <Wrapper className={styles.projects__list}>
-      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
+      {projects?.map((project, i) => (
+        <ProjectCard project={project} key={i} />
+      ))}
     </Wrapper>
   )
 }

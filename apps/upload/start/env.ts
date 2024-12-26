@@ -55,7 +55,6 @@ export default await Env.create(APP_ROOT, {
   |----------------------------------------------------------
   */
   LOCK_STORE: Env.schema.enum(['redis', 'memory'] as const),
-
   REDIS_HOST: Env.schema.string({ format: 'host' }),
   REDIS_PORT: Env.schema.number(),
   REDIS_PASSWORD: Env.schema.string.optional(),
