@@ -33,6 +33,8 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
 import { cache } from 'app/utils/client-cache'
 
+export const getProjectsCacheKey = () => 'projects'
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
   const userId = await time(getUserIdFromSession(request), {
@@ -64,6 +66,7 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   if (formAction) {
+    cache.removeItem(getProjectsCacheKey())
     return true
   }
 
@@ -74,7 +77,7 @@ let initialLoad = true
 export const clientLoader = async ({
   serverLoader,
 }: ClientLoaderFunctionArgs) => {
-  const key = 'projects'
+  const key = getProjectsCacheKey()
   const cacheEntry = await cache.getItem(key)
   if (cacheEntry && !initialLoad) {
     return { projects: cacheEntry, cached: true }
