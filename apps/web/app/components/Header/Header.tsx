@@ -29,7 +29,7 @@ const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
           align={'center'}
           className={styles.header__avatarAndNameContainer}
         >
-          <Link to={'/projects'}>
+          <Link viewTransition to={'/projects'}>
             <Avatar />
             <p data-should-hide={!!projectId} className={styles.header__title}>
               {user?.fullname}
@@ -83,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
       }}
     >
       <Hidden asChild sm>
-        <Link to="/">
+        <Link viewTransition to="/">
           <Logo withScrollAnimation className={styles.header__logo} />
         </Link>
       </Hidden>

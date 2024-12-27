@@ -1,4 +1,5 @@
 import localforage from 'localforage'
+import { useEffect } from 'react'
 import { decode, encode } from 'turbo-stream'
 
 function promiseToReadableStream(
@@ -48,3 +49,16 @@ export class LocalForageAdapter {
 }
 
 export const cache = new LocalForageAdapter()
+
+type UseClientCacheProps<T> = {
+  data: T
+  key: string
+}
+
+export const useClientCache = <T>({ data, key }: UseClientCacheProps<T>) => {
+  useEffect(() => {
+    if (!data) return
+    const putDataToCache = async () => await cache.setItem(key, data)
+    putDataToCache()
+  }, [data, key])
+}

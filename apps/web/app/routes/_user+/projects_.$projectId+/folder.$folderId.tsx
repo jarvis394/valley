@@ -16,7 +16,6 @@ import {
   data,
   HeadersFunction,
   LoaderFunctionArgs,
-  SerializeFrom,
 } from '@remix-run/cloudflare'
 import { prisma } from 'app/server/db.server'
 import {
@@ -47,7 +46,7 @@ import {
   ProjectWithFolders,
 } from '@valley/shared'
 import { formatNewLine } from 'app/utils/format-new-line'
-import { cache } from 'app/utils/client-cache'
+import { cache, useClientCache } from 'app/utils/client-cache'
 import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
 import { z } from 'zod'
@@ -84,7 +83,7 @@ type FormData = z.infer<typeof FoldersCreateSchema>
 
 const resolver = zodResolver(FoldersCreateSchema)
 
-export const getFolderCacheKey = (folderId: Folder['id']) =>
+export const getFolderCacheKey = (folderId?: Folder['id']) =>
   `folder:${folderId}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -145,10 +144,7 @@ export async function clientLoader({
 
   initialLoad = false
 
-  const loaderData = (await serverLoader()) as SerializeFrom<typeof loader>
-  const folder = loaderData.folder
-
-  return { folder }
+  return await serverLoader()
 }
 
 clientLoader.hydrate = true
@@ -245,7 +241,7 @@ const ProjectFolders: React.FC<{
   const navigate = useNavigate()
   const [isFoldersModalOpen, setFoldersModalOpen] = useState(false)
   const createFolderAction = '/api/folders/create'
-  const projectTotalSize = formatBytes(Number(project?.totalSize) || 0)
+  const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
   const createFolderFetcher = useFetcher()
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
@@ -288,7 +284,7 @@ const ProjectFolders: React.FC<{
             <div className={styles.project__foldersListFolderSubtitle}>
               <p>{currentFolder?.totalFiles} files</p>
               <span>•</span>
-              <p>{formatBytes(Number(currentFolder?.totalSize))}</p>
+              <p>{formatBytes(Number(currentFolder?.totalSize || '0'))}</p>
             </div>
           </div>
           <MenuExpand />
@@ -391,12 +387,7 @@ const ProjectBlock: React.FC<{
   const { folderId } = useParams()
   const currentFolder = project?.folders.find((e) => e.id === folderId)
 
-  useEffect(() => {
-    if (!project) return
-    const key = getProjectCacheKey(project.id)
-    const putProjectDataToCache = async () => await cache.setItem(key, project)
-    putProjectDataToCache()
-  }, [project])
+  useClientCache({ data: project, key: getProjectCacheKey(project?.id) })
 
   return (
     <>
@@ -417,10 +408,17 @@ const FolderFiles: React.FC<{
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         delay: 200,
+        tolerance: 5,
+        distance: Infinity,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 5,
         distance: Infinity,
       },
     }),
@@ -436,7 +434,7 @@ const FolderFiles: React.FC<{
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id !== over?.id) {
+    if (over && active.id !== over?.id) {
       setFiles((prevFiles) => {
         const oldIndex = prevFiles.findIndex((e) => e.id === active.id)
         const newIndex = prevFiles.findIndex((e) => e.id === over?.id)
@@ -451,12 +449,7 @@ const FolderFiles: React.FC<{
     setFiles(folder?.files || [])
   }, [folder?.files])
 
-  useEffect(() => {
-    if (!folder) return
-    const key = getFolderCacheKey(folder.id)
-    const putFolderDataToCache = async () => await cache.setItem(key, folder)
-    putFolderDataToCache()
-  }, [folder])
+  useClientCache({ data: folder, key: getFolderCacheKey(folder?.id) })
 
   if (!folder) return null
 
@@ -509,7 +502,7 @@ const FolderFiles: React.FC<{
             autoScroll
           >
             <SortableContext
-              disabled
+              // disabled
               items={files}
               strategy={rectSortingStrategy}
             >

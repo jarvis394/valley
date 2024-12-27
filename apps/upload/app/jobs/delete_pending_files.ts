@@ -10,6 +10,8 @@ export default class DeletePendingFilesJob extends BaseJob {
       where: { isPendingDeletion: true },
     })
 
+    if (files.length === 0) return
+
     logger.info(`Cleaning up ${files.length} files pending deletion`)
 
     files.forEach(async (file) => {

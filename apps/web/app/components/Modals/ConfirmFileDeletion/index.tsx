@@ -30,7 +30,6 @@ const ModalContent: React.FC<
   const { handleSubmit } = useRemixForm<FormData>({
     submitConfig: {
       navigate: true,
-      viewTransition: true,
       action: formAction,
       method: 'POST',
     },

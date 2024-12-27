@@ -1,8 +1,4 @@
-import type {
-  HeadersFunction,
-  LoaderFunctionArgs,
-  SerializeFrom,
-} from '@remix-run/cloudflare'
+import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
 import {
   Await,
   ClientLoaderFunctionArgs,
@@ -35,6 +31,7 @@ import {
 import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
+import { cache } from 'app/utils/client-cache'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const timings = makeTimings('projects loader')
@@ -73,15 +70,22 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const clientLoader = ({ serverLoader }: ClientLoaderFunctionArgs) => {
-  const projects = new Promise((res) =>
-    serverLoader().then((data) =>
-      res((data as SerializeFrom<typeof loader>).projects)
-    )
-  )
+let initialLoad = true
+export const clientLoader = async ({
+  serverLoader,
+}: ClientLoaderFunctionArgs) => {
+  const key = 'projects'
+  const cacheEntry = await cache.getItem(key)
+  if (cacheEntry && !initialLoad) {
+    return { projects: cacheEntry, cached: true }
+  }
 
-  return { projects }
+  initialLoad = false
+
+  return await serverLoader()
 }
+
+clientLoader.hydrate = true
 
 const projectSkeletons = (
   <Wrapper className={styles.projects__list}>
@@ -124,9 +128,7 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
 
   return (
     <Wrapper className={styles.projects__list}>
-      {projects?.map((project, i) => (
-        <ProjectCard project={project} key={i} />
-      ))}
+      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
     </Wrapper>
   )
 }

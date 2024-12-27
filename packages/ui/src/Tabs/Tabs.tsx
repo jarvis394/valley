@@ -11,6 +11,7 @@ import { isFragment } from 'react-is'
 import styles from './Tabs.module.css'
 import { TabsItemProps } from '../TabsItem/TabsItem'
 import { useScrollProgress } from '../useScrollProgress/useScrollProgress'
+import cx from 'classnames'
 
 const HOVER_CONTAINER_PADDING = 8
 const ANIMATION_DURATION = 150
@@ -32,6 +33,7 @@ type BaseTabsProps<T extends TabValue> = {
   children:
     | React.ReactElement<TabsItemProps>
     | Array<React.ReactElement<TabsItemProps>>
+  className?: string
   scrollProgressOffset?: number
   scrollProgressTransitionStyles?: (progress: number) => CSSProperties
 }
@@ -55,6 +57,7 @@ const Tabs = <T extends TabValue = TabValue>({
   value: propsValue,
   defaultValue,
   indicator,
+  className,
   ...props
 }: TabsProps<T>): JSX.Element => {
   const [innerValue, setInnerValue] = useState(defaultValue)
@@ -213,7 +216,7 @@ const Tabs = <T extends TabValue = TabValue>({
     <div
       onPointerLeave={onLeaveTabs}
       ref={$root}
-      className={styles.tabs}
+      className={cx(styles.tabs, className)}
       style={scrollProgressTransitionStyles}
     >
       {children}

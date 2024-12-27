@@ -40,6 +40,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           prefetch="intent"
           to={projectLink}
           className={styles.projectCard__cover}
+          viewTransition
         >
           {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
         </Link>
@@ -61,6 +62,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           prefetch="intent"
           to={projectLink}
           className={styles.projectCard__header}
+          viewTransition
         >
           <h3 className={styles.projectCard__contentTitle}>{project?.title}</h3>
           <p className={styles.projectCard__contentSubtitle}>

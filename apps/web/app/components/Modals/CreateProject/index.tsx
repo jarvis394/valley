@@ -2,7 +2,7 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import Modal, * as Dialog from '@valley/ui/Modal'
+import Modal from '@valley/ui/Modal'
 import styles from '../Modals.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
@@ -29,7 +29,6 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     submitConfig: {
-      viewTransition: true,
       action: '/api/projects/create',
       method: 'POST',
     },
@@ -82,11 +81,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
       </Form>
       <ModalFooter
         before={
-          <Dialog.Close asChild>
-            <Button disabled={isPending} variant="secondary-dimmed" size="md">
-              Cancel
-            </Button>
-          </Dialog.Close>
+          <Button
+            onClick={onClose}
+            disabled={isPending}
+            variant="secondary-dimmed"
+            size="md"
+          >
+            Cancel
+          </Button>
         }
         after={
           <Button

@@ -6,6 +6,7 @@
   box-shadow: inset 0 -1px var(--alpha-transparent-12);
   z-index: var(--toolbar-zIndex);
   display: flex;
+  view-transition-name: tabs !important;
 }
 
 .toolbar > div {
@@ -17,5 +18,35 @@
   .toolbar > div {
     padding-left: 8px;
     padding-right: 8px;
+  }
+}
+/* 
+::view-transition-old(tabs) {
+  animation: tabsGrowOut 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+::view-transition-new(tabs) {
+  animation: tabsGrowIn 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
+} */
+
+@keyframes tabsGrowIn {
+  from {
+    transform: translateX(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes tabsGrowOut {
+  from {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-8px);
+    opacity: 0;
   }
 }

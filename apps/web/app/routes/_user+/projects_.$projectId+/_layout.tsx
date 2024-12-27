@@ -8,11 +8,7 @@ import {
 } from '@remix-run/react'
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
-import {
-  HeadersFunction,
-  LoaderFunctionArgs,
-  SerializeFrom,
-} from '@remix-run/cloudflare'
+import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import {
@@ -24,7 +20,7 @@ import { cache } from 'app/utils/client-cache'
 import { Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 
-export const getProjectCacheKey = (id: Project['id']) => `project:${id}`
+export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { projectId } = params
@@ -70,15 +66,12 @@ export async function clientLoader({
   const key = getProjectCacheKey(params.projectId)
   const cacheEntry = await cache.getItem(key)
   if (cacheEntry && !initialLoad) {
-    return { project: cacheEntry }
+    return { project: cacheEntry, cached: true }
   }
 
   initialLoad = false
 
-  const loaderData = (await serverLoader()) as SerializeFrom<typeof loader>
-  const project = loaderData.project
-
-  return { project }
+  return await serverLoader()
 }
 
 clientLoader.hydrate = true

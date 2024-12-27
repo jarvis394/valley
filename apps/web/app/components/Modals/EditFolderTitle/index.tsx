@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,11 +6,13 @@ import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
-import { Form, useLocation, useParams, useSearchParams } from '@remix-run/react'
+import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import Modal from '@valley/ui/Modal'
+import { useProjectAwait } from 'app/utils/project'
+import { ProjectWithFolders } from '@valley/shared'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -20,15 +22,17 @@ type EditFolderTitleModalProps = {
   onClose: () => void
 }
 
-const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
-  onClose,
-}) => {
-  const location = useLocation()
+const ModalContent: React.FC<
+  EditFolderTitleModalProps & {
+    project?: ProjectWithFolders | null
+  }
+> = ({ onClose, project }) => {
   const { folderId: paramsFolderId } = useParams()
   const [searchParams] = useSearchParams()
   const modalPropsFolderId = searchParams.get('modal-folderId')
-  const defaultTitle = location.state?.defaultTitle
   const folderId = modalPropsFolderId || paramsFolderId
+  const currentFolder = project?.folders.find((f) => f.id === folderId)
+  const defaultTitle = currentFolder?.title
   const formAction = '/api/folders/' + folderId + '/edit'
   const { register, getFieldState, formState, handleSubmit } =
     useRemixForm<FormData>({
@@ -57,12 +61,12 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
           <TextField
             {...register('title', {
               required: true,
+              value: defaultTitle,
             })}
             fieldState={getFieldState('title', formState)}
             label="Title"
             required
             size="lg"
-            defaultValue={defaultTitle}
             id="folder-title-input"
             placeholder="Folder"
           />
@@ -93,6 +97,22 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
         }
       />
     </Modal>
+  )
+}
+
+const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
+  onClose,
+}) => {
+  const data = useProjectAwait()
+
+  return (
+    <Suspense>
+      <Await resolve={data?.project}>
+        {(resolvedProject) => (
+          <ModalContent onClose={onClose} project={resolvedProject} />
+        )}
+      </Await>
+    </Suspense>
   )
 }
 

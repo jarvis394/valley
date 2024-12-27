@@ -111,7 +111,14 @@ const LoginViaEmailPage: React.FC = () => {
         >
           <HoneypotInputs />
           {redirectTo && <input {...register('redirectTo')} hidden />}
-          {target && <input {...register('email')} type="email" hidden />}
+          {target && (
+            <input
+              {...register('email')}
+              autoComplete="email"
+              type="email"
+              hidden
+            />
+          )}
           <PasswordField
             {...register('password')}
             // This should be always auto focused, as we are transitioning within the same form

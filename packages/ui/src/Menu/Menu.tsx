@@ -10,7 +10,7 @@ import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { Drawer } from 'vaul'
 import { exhaustivnessCheck } from '@valley/shared'
-import { DialogClose } from '@radix-ui/react-dialog'
+import ButtonBase from '../ButtonBase/ButtonBase'
 
 export type MenuProps = React.PropsWithChildren<
   {
@@ -21,6 +21,12 @@ export type MenuProps = React.PropsWithChildren<
 export const MenuTypeContext = React.createContext<MenuProps['type']>(undefined)
 export const MenuTypeProvider = MenuTypeContext.Provider
 export const useMenuType = () => React.useContext(MenuTypeContext)
+
+export const MenuActionsContext = React.createContext<{
+  close: () => void
+}>({ close: () => {} })
+export const MenuActionsProvider = MenuActionsContext.Provider
+export const useMenuActions = () => React.useContext(MenuActionsContext)
 
 export type MenuItemProps = ButtonProps & {
   label?: string
@@ -33,12 +39,13 @@ export const Item = React.memo(
     { children, className, onClick: propsOnClick, ...props },
     ref
   ) {
+    const { close } = useMenuActions()
     const menuType = useMenuType()
     const MenuItem = useMemo(() => {
       switch (menuType) {
         case undefined:
         case 'drawer':
-          return DialogClose
+          return ButtonBase
         case 'dropdown':
           return DropdownMenu.Item
         case 'context':
@@ -52,6 +59,7 @@ export const Item = React.memo(
     ) => {
       e.stopPropagation()
       propsOnClick?.(e)
+      close()
     }
 
     return (
@@ -193,27 +201,29 @@ export const Root = ({
   }
 
   return (
-    <Drawer.Root
-      direction="bottom"
-      open={shouldShowDrawer && dropdownMenuOpen}
-      onOpenChange={handleDrawerOpenChange}
-      disablePreventScroll
-      repositionInputs
-    >
-      <DropdownMenu.Root
-        modal={false}
-        open={shouldShowMenu && dropdownMenuOpen}
-        onOpenChange={handleOpenChange}
-        {...restDropdownMenuProps}
+    <MenuActionsProvider value={{ close: () => setDropdownMenuOpen(false) }}>
+      <Drawer.Root
+        direction="bottom"
+        open={shouldShowDrawer && dropdownMenuOpen}
+        onOpenChange={handleDrawerOpenChange}
+        disablePreventScroll
+        repositionInputs
       >
-        <ContextMenu.Root {...contextMenuProps}>
-          <ContextMenuTrigger enabled={shouldEnableContextMenu}>
-            {children}
-          </ContextMenuTrigger>
-          <Slot />
-        </ContextMenu.Root>
-      </DropdownMenu.Root>
-    </Drawer.Root>
+        <DropdownMenu.Root
+          modal={false}
+          open={shouldShowMenu && dropdownMenuOpen}
+          onOpenChange={handleOpenChange}
+          {...restDropdownMenuProps}
+        >
+          <ContextMenu.Root {...contextMenuProps}>
+            <ContextMenuTrigger enabled={shouldEnableContextMenu}>
+              {children}
+            </ContextMenuTrigger>
+            <Slot />
+          </ContextMenu.Root>
+        </DropdownMenu.Root>
+      </Drawer.Root>
+    </MenuActionsProvider>
   )
 }
 
