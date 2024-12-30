@@ -1,5 +1,5 @@
-import Stack from '@valley/ui/Stack'
 import React from 'react'
+import Stack from '@valley/ui/Stack'
 import Logo from '../Logo/Logo'
 import styles from './Footer.module.css'
 import Wrapper from '@valley/ui/Wrapper'
@@ -10,7 +10,7 @@ import {
   GITHUB_REPOSITORY_URL,
   TELEGRAM_PHOTOS_URL,
 } from '../../config/constants'
-import Link from 'next/link'
+import { Link } from '@remix-run/react'
 
 const TelegramIcon = () => (
   <svg
@@ -38,17 +38,17 @@ const Footer: React.FC = () => {
         gap={2}
       >
         <Wrapper>
-          <Link href="/">
+          <Link to="/">
             <Logo className={styles.Footer__logo} withBrandName />
           </Link>
           <Stack gap={0} align={'center'}>
             <IconButton asChild variant="tertiary-dimmed" size="md">
-              <a href={GITHUB_REPOSITORY_URL} target="_blank">
+              <a href={GITHUB_REPOSITORY_URL} target="_blank" rel="noreferrer">
                 <LogoGithub />
               </a>
             </IconButton>
             <IconButton asChild variant="tertiary-dimmed" size="md">
-              <a href={TELEGRAM_PHOTOS_URL} target="_blank">
+              <a href={TELEGRAM_PHOTOS_URL} target="_blank" rel="noreferrer">
                 <TelegramIcon />
               </a>
             </IconButton>

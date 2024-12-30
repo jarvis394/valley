@@ -5,11 +5,12 @@ import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize'
 import styles from './TextArea.module.css'
+import { FormControlState, useFormControl } from '../FormControl'
 
 type TextAreaProps = {
   before?: React.ReactNode
   after?: React.ReactNode
-  state?: 'default' | 'error' | 'valid'
+  state?: FormControlState
   size?: 'md' | 'lg'
   paperProps?: Omit<PaperProps, 'asChild'>
 } & Omit<TextareaAutosizeProps, 'size'>
@@ -21,12 +22,15 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
       before,
       after,
       paperProps,
-      state = 'default',
+      state: propsState,
       size = 'md',
       ...props
     },
     ref
   ) {
+    const formControl = useFormControl()
+    const state = propsState || formControl?.state
+
     return (
       <Paper
         {...paperProps}

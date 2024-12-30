@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import cx from 'classnames'
 import styles from './Paper.module.css'
 import { Slot } from '@radix-ui/react-slot'
@@ -15,6 +15,7 @@ export type PaperOwnProps = React.PropsWithChildren<
       | 'danger'
     button: boolean
     className: string
+    style: CSSProperties
   }>
 >
 export type PaperProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &

@@ -1,98 +1,78 @@
-'use client'
-import React, { useState } from 'react'
+import React, { Suspense } from 'react'
 import Button from '@valley/ui/Button'
-import TextArea from '@valley/ui/TextArea'
-import InputLabel from '@valley/ui/InputLabel'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from './EditFolderDescription.module.css'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { editFolder } from '../../../api/folders'
-import { useParams, useSearchParams } from 'next/navigation'
-import useSWR from 'swr'
-import {
-  PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
-  ProjectGetReq,
-  ProjectGetRes,
-} from '@valley/shared'
-import { api } from '../../../api'
+import styles from '../Modals.module.css'
+import z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import TextArea from '@valley/ui/TextArea'
+import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
+import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
+import { useRemixForm } from 'remix-hook-form'
+import { useIsPending } from 'app/utils/misc'
+import Modal from '@valley/ui/Modal'
+import { ProjectWithFolders } from '@valley/shared'
+import { useProjectAwait } from 'app/utils/project'
+
+type FormData = z.infer<typeof FoldersEditSchema>
+
+const resolver = zodResolver(FoldersEditSchema)
 
 type EditFolderDescriptionModalProps = {
   onClose: () => void
 }
 
-type FieldValues = {
-  folderDescription: string
-}
-
-const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
-  onClose,
-}) => {
-  const [isLoading, setIsLoading] = useState(false)
-  const { id: projectId } = useParams()
-  const { data, mutate } = useSWR<ProjectGetRes, ProjectGetReq>(
-    '/projects/' + projectId,
-    api({ isAccessTokenRequired: true })
-  )
-  const searchParams = useSearchParams()
-  const modalPropsFolderId = searchParams.get('modal-folderId')
-  const searchParamsFolderId = searchParams.get('folder')
-  const folderId = Number(modalPropsFolderId || searchParamsFolderId)
-  const parsedProjectId = Number(projectId)
-  const defaultDescription =
-    data?.folders.find((e) => e.id === folderId)?.description || ''
-  const { register, handleSubmit } = useForm<FieldValues>()
-
-  const onSubmit: SubmitHandler<FieldValues> = async (values, e) => {
-    e?.preventDefault()
-    if (isNaN(parsedProjectId) || isNaN(folderId) || !data) return
-
-    setIsLoading(true)
-    const res = await editFolder(
-      {
-        description: values.folderDescription,
-        id: folderId,
-      },
-      parsedProjectId
-    )
-
-    onClose()
-    await mutate({
-      ...data,
-      folders: data.folders.map((e) =>
-        e.id === res.folder.id ? res.folder : e
-      ),
-    })
+const ModalContent: React.FC<
+  EditFolderDescriptionModalProps & {
+    project?: ProjectWithFolders | null
   }
+> = ({ onClose, project }) => {
+  const { folderId: paramsFolderId } = useParams()
+  const [searchParams] = useSearchParams()
+  const modalPropsFolderId = searchParams.get('modal-folderId')
+  const folderId = modalPropsFolderId || paramsFolderId
+  const currentFolder = project?.folders.find((f) => f.id === folderId)
+  const defaultDescription = currentFolder?.description || ''
+  const formAction = '/api/folders/' + folderId + '/edit'
+  const { register, handleSubmit } = useRemixForm<FormData>({
+    resolver,
+    submitConfig: {
+      action: formAction,
+      method: 'POST',
+    },
+  })
+  const isPending = useIsPending({
+    formMethod: 'POST',
+    formAction,
+  })
 
   return (
-    <>
+    <Modal onDismiss={onClose} id="edit-folder-description">
       <ModalHeader>Edit Folder Description</ModalHeader>
-      <form
+      <Form
+        onSubmit={handleSubmit}
+        className={styles.modal__content}
         id="edit-folder-description-form"
-        className={styles.editFolderDescription__form}
-        onSubmit={handleSubmit(onSubmit)}
+        method="POST"
+        action={formAction}
       >
         <div>
-          <InputLabel htmlFor="folder-description-input">
-            Description
-          </InputLabel>
           <TextArea
-            {...register('folderDescription', {
-              maxLength: PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
+            {...register('description', {
+              value: defaultDescription,
             })}
-            autoFocus
+            size="lg"
             defaultValue={defaultDescription}
             id="folder-description-input"
             placeholder="Write here anything..."
           />
         </div>
-      </form>
+      </Form>
       <ModalFooter
         before={
           <Button
             onClick={onClose}
-            disabled={isLoading}
+            disabled={isPending}
             variant="secondary-dimmed"
             size="md"
           >
@@ -105,14 +85,30 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
             variant="primary"
             size="md"
             type="submit"
-            disabled={isLoading}
-            loading={isLoading}
+            disabled={isPending}
+            loading={isPending}
           >
             Save
           </Button>
         }
       />
-    </>
+    </Modal>
+  )
+}
+
+const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
+  onClose,
+}) => {
+  const data = useProjectAwait()
+
+  return (
+    <Suspense>
+      <Await resolve={data?.project}>
+        {(resolvedProject) => (
+          <ModalContent onClose={onClose} project={resolvedProject} />
+        )}
+      </Await>
+    </Suspense>
   )
 }
 

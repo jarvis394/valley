@@ -1,0 +1,106 @@
+.folderCard {
+  padding: 12px 16px;
+  gap: 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 16px;
+  width: 100%;
+  position: relative;
+  transition-property: background-color, box-shadow, border, color;
+}
+
+.folderCard--active {
+  --themed-border: var(--alpha-transparent-07);
+  background-color: var(--alpha-transparent-03);
+}
+
+.folderCard--overlay {
+  z-index: 2000;
+  --themed-background: var(--alpha-solid-03);
+  --themed-background-hover: var(--alpha-solid-03);
+  --themed-background-focus: var(--alpha-solid-03);
+  --themed-border: var(--alpha-transparent-07);
+  padding-left: 8px;
+  gap: 8px;
+}
+
+.folderCard--editing {
+  --themed-background: var(--alpha-solid-03);
+  --themed-background-hover: var(--alpha-solid-03);
+  --themed-background-focus: var(--alpha-solid-03);
+  --themed-border: var(--alpha-transparent-07);
+  padding-left: 8px;
+  gap: 8px;
+}
+
+.folderCard--dragging {
+  opacity: 0;
+}
+
+.folderCard--dragging .folderCard__handle {
+  cursor: grabbing;
+}
+
+.folderCard__handle {
+  touch-action: manipulation;
+  cursor: grab;
+  --x-padding: 0 !important;
+  padding: 0 !important;
+  width: 40px;
+  height: 40px;
+}
+
+.folderCard__handle > span {
+  height: 24px;
+  width: 24px;
+}
+
+.folderCard__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  flex-grow: 1;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.folderCard__contentTitle {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: initial;
+}
+
+.folderCard__contentSubtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+}
+
+.folderCard__contentSubtitle > p {
+  margin: 0;
+}
+
+.folderCard__contentSubtitle > span {
+  color: var(--text-hint);
+}
+
+.folderCard__activeIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--blue-600);
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+}

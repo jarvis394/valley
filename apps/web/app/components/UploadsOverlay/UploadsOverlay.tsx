@@ -1,10 +1,9 @@
-'use client'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useUploadsStore } from '../../hooks/useUpload'
-import { Portal } from '@mui/base/Portal'
+import { useUploadsStore } from '../../stores/uploads'
+import { Portal } from '@valley/ui/Portal'
 import styles from './UploadsOverlay.module.css'
 import Spinner from '@valley/ui/Spinner'
-import { formatBytes } from '../../utils/formatBytes'
+import { formatBytes } from '../../utils/misc'
 import IconButton from '@valley/ui/IconButton'
 import { CheckCircleFill, ChevronUp, Cross } from 'geist-ui-icons'
 import cx from 'classnames'
@@ -13,6 +12,7 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import Gauge from '@valley/ui/Gauge'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { ClientOnly } from 'remix-utils/client-only'
 
 dayjs.extend(relativeTime)
 
@@ -41,7 +41,7 @@ const UploadsOverlayHeader: React.FC<UploadsOverlayHeaderProps> = ({
       }
     }
     return res
-  }, [])
+  }, [uploads])
 
   return (
     <div className={styles.uploadsOverlay__header}>
@@ -100,60 +100,63 @@ const UploadsOverlay: React.FC = () => {
   }, [isUploading])
 
   return (
-    <Portal container={() => document.body}>
-      <div className="fade" data-fade-in={shouldShowUploadsOverlay}>
-        <div
-          className={cx(styles.uploadsOverlay, {
-            [styles['uploadsOverlay--expanded']]: isExpanded,
-          })}
-        >
-          <UploadsOverlayHeader
-            isExpanded={isExpanded}
-            setExpanded={setExpanded}
-            setHidden={setHidden}
-          />
-
-          {isUploading && (
-            <div className={styles.uploadsOverlay__separator}>
-              {formatBytes(uploadSpeed)}
-              <ButtonBase
-                onClick={() => {}}
-                className={styles.uploadsOverlay__cancelButton}
-              >
-                Cancel
-              </ButtonBase>
-            </div>
-          )}
-
-          <OverlayScrollbarsComponent
-            defer
-            options={{ scrollbars: { theme: 'os-theme-light' } }}
-            className={styles.uploadsOverlay__files}
+    <ClientOnly>
+      {() => (
+        <Portal asChild container={document.body}>
+          <div
+            data-fade-in={shouldShowUploadsOverlay}
+            className={cx(styles.uploadsOverlay, 'fade', {
+              [styles['uploadsOverlay--expanded']]: isExpanded,
+            })}
           >
-            {Object.values(uploads).map((e) => (
-              <div
-                className={styles.uploadsOverlay__file}
-                key={'upload_' + e.id}
-              >
-                <p>{e.normalizedName}</p>
-                <div className={styles.uploadsOverlay__fileProgress}>
-                  <div data-hidden={!e.isUploading}>
-                    <Gauge size="xs" value={e.progress * 100} />
-                  </div>
-                  <div data-hidden={!e.isUploaded}>
-                    <CheckCircleFill
-                      color="var(--green-700)"
-                      width={24}
-                      height={24}
-                    />
+            <UploadsOverlayHeader
+              isExpanded={isExpanded}
+              setExpanded={setExpanded}
+              setHidden={setHidden}
+            />
+
+            {isUploading && (
+              <div className={styles.uploadsOverlay__separator}>
+                {formatBytes(uploadSpeed)}
+                <ButtonBase
+                  onClick={() => {}}
+                  className={styles.uploadsOverlay__cancelButton}
+                >
+                  Cancel
+                </ButtonBase>
+              </div>
+            )}
+
+            <OverlayScrollbarsComponent
+              defer
+              options={{ scrollbars: { theme: 'os-theme-light' } }}
+              className={styles.uploadsOverlay__files}
+            >
+              {Object.values(uploads).map((e) => (
+                <div
+                  className={styles.uploadsOverlay__file}
+                  key={'upload_' + e.id}
+                >
+                  <p>{e.normalizedName}</p>
+                  <div className={styles.uploadsOverlay__fileProgress}>
+                    <div data-hidden={!e.isUploading}>
+                      <Gauge size="xs" value={e.progress * 100} />
+                    </div>
+                    <div data-hidden={!e.isUploaded}>
+                      <CheckCircleFill
+                        color="var(--green-700)"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </OverlayScrollbarsComponent>
-        </div>
-      </div>
-    </Portal>
+              ))}
+            </OverlayScrollbarsComponent>
+          </div>
+        </Portal>
+      )}
+    </ClientOnly>
   )
 }
 

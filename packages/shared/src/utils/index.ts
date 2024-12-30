@@ -1,1 +1,1 @@
-export * from './exhaustivnessCheck'
+export * from './exhaustivnessCheck.js'

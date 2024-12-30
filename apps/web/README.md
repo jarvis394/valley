@@ -1,36 +1,40 @@
-# With-NestJs | Web
+# Welcome to Remix!
 
-## Getting Started
+- 📖 [Remix docs](https://remix.run/docs)
 
-> 🏁 This app depends on the [apps/api](../api/README.md) server. make sure your server is running at the port `3000`
+## Development
 
-Run the development server:
+Run the dev server:
 
-```bash
-pnpm run dev
+```shellscript
+npm run dev
 ```
 
-Open [localhost:3001](http://localhost:3001) with your browser to see the result.
+## Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+First, build your app for production:
 
-To create [API routes](https://nextjs.org/docs/app/building-your-application/routing/router-handlers) add an `api/` directory to the `app/` directory with a `route.ts` file. For individual endpoints, create a subfolder in the `api` directory, as `api/hello/route.ts` would map to [http://localhost:3000/api/hello](http://localhost:3000/api/hello).
+```sh
+npm run build
+```
 
-### ⚠️ Note about build
+Then run the app in production mode:
 
-If you plan to only build this app. Please make sure you've built the packages first.
+```sh
+npm start
+```
 
-## Learn More
+Now you'll need to pick a host to deploy it to.
 
-To learn more about Next.js, take a look at the following resources:
+### DIY
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn/foundations/about-nextjs) - an interactive Next.js tutorial.
+If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Make sure to deploy the output of `npm run build`
 
-## Deploy on Vercel
+- `build/server`
+- `build/client`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_source=github.com&utm_medium=referral&utm_campaign=turborepo-readme) from the creators of Next.js.
+## Styling
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.

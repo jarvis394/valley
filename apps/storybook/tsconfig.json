@@ -1,18 +1,13 @@
 {
-  "extends": "@valley/typescript-config/nextjs.json",
+  "extends": "@valley/typescript-config/remix.json",
   "compilerOptions": {
     "plugins": [
-      {
-        "name": "next"
-      },
       {
         "name": "typescript-plugin-css-modules"
       }
     ]
   },
   "include": [
-    "next-env.d.ts",
-    "next.config.js",
     "**/*.ts",
     "**/*.tsx",
     "**/*.module.css",

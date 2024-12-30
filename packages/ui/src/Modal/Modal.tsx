@@ -1,34 +1,33 @@
-'use client'
-import React, { useEffect, useMemo, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { Modal as BaseModal } from '@mui/base/Modal'
+import React, { useEffect, useState } from 'react'
 import styles from './Modal.module.css'
-import Grow from '../Grow/Grow'
-import cx from 'classnames'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
-import { MIDDLE_VIEWPORT_WIDTH } from '../config/theme'
-import { Drawer } from 'vaul'
+import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
+import { Drawer, DialogProps } from 'vaul'
+import * as Dialog from '@radix-ui/react-dialog'
 
-type ModalProps = React.PropsWithChildren<{
+export const modalKey = 'modal'
+
+export type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
   onDismiss?: () => void
-}>
+}> &
+  DialogProps
 
 const Modal: React.FC<ModalProps> = ({
-  onDismiss,
-  isOpen: propsIsOpen = false,
+  isOpen: propsIsOpen,
   children,
   id,
+  onDismiss,
+  ...props
 }) => {
   const shouldShowDrawer = useMediaQuery(
-    `(max-width:${MIDDLE_VIEWPORT_WIDTH}px)`
+    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
-  const [open, setOpen] = useState(propsIsOpen)
-  const router = useRouter()
-  const pathname = usePathname()
-  const query = useSearchParams()
-  const currentModal = useMemo(() => query.get('modal'), [query])
+  const [open, setOpen] = useState(propsIsOpen || false)
+  const currentModal = new URLSearchParams(
+    typeof window !== 'undefined' ? window.location.search : ''
+  )?.get(modalKey)
 
   const handleClose = () => {
     // Use only user-provided function if it is present
@@ -36,15 +35,18 @@ const Modal: React.FC<ModalProps> = ({
       return onDismiss()
     }
 
-    const newQuery = new URLSearchParams(query.toString())
-    newQuery.delete('modal')
-
-    router.push(pathname + '?' + newQuery.toString())
+    setOpen(false)
   }
 
   useEffect(() => {
+    if (propsIsOpen === undefined) return
+    setOpen(propsIsOpen)
+  }, [propsIsOpen])
+
+  useEffect(() => {
+    if (propsIsOpen !== undefined) return
     setOpen(currentModal === id)
-  }, [currentModal, id])
+  }, [currentModal, id, propsIsOpen])
 
   const handleDrawerOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -56,11 +58,16 @@ const Modal: React.FC<ModalProps> = ({
     return (
       <Drawer.Root
         direction="bottom"
+        disablePreventScroll
+        repositionInputs
+        handleOnly
+        {...props}
         open={open}
         onOpenChange={handleDrawerOpenChange}
       >
         <Drawer.Portal>
           <Drawer.Content className={styles.modal__drawer}>
+            <Drawer.Handle className={styles.modal__drawerHandle} />
             <Drawer.Title style={{ display: 'none' }}>
               {currentModal}
             </Drawer.Title>
@@ -69,55 +76,31 @@ const Modal: React.FC<ModalProps> = ({
             </Drawer.Description>
             {children}
           </Drawer.Content>
-          <Drawer.Overlay className={styles.modal__drawerOverlay} />
+          <Drawer.Overlay className={styles.modal__dialogOverlay} />
         </Drawer.Portal>
       </Drawer.Root>
     )
   }
 
   return (
-    <BaseModal
-      open={open}
-      onClose={handleClose}
-      className={styles.modal}
-      closeAfterTransition
-      slots={{
-        backdrop: Backdrop,
-      }}
-    >
-      <Grow
-        in={open}
-        transformTemplate={(e) => `translate(-50%, -50%) scale(${e.scale})`}
-        transition={{ duration: 0.32, ease: 'circInOut' }}
-        className={styles.modal__dialog}
-      >
-        {children}
-      </Grow>
-    </BaseModal>
+    <Dialog.Root {...props} open={open} onOpenChange={handleDrawerOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className={styles.modal__dialogOverlay} />
+        <Dialog.Content className={styles.modal__dialog}>
+          <Dialog.Title style={{ display: 'none' }}>
+            {currentModal}
+          </Dialog.Title>
+          <Dialog.Description style={{ display: 'none' }}>
+            {currentModal}
+          </Dialog.Description>
+          {children}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
-const Backdrop = React.forwardRef<
-  HTMLDivElement,
-  { children: React.ReactElement; open: boolean; ownerState: never }
->(function Backdrop(props, ref) {
-  const { open: propsIsOpen, ownerState: _, ...other } = props
-  const [open, setOpen] = useState(false)
-
-  // To make fade animation work, first value in DOM for `data-fade-in` should be `false`
-  // After initial render, we can catch up to the latest props `open` value
-  useEffect(() => {
-    setOpen(propsIsOpen)
-  }, [propsIsOpen])
-
-  return (
-    <div
-      {...other}
-      ref={ref}
-      data-fade-in={open}
-      className={cx(styles.modal__dialogBackdrop, 'fade')}
-    />
-  )
-})
-
 export default Modal
+
+export * from '@radix-ui/react-dialog'
+export * as Drawer from 'vaul'

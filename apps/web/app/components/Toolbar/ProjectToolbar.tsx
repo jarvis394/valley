@@ -1,46 +1,105 @@
-'use client'
-import React from 'react'
+import React, { Suspense, useMemo } from 'react'
 import styles from './Toolbar.module.css'
-import TabsItem from '@valley/ui/TabsItem'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
-import { useParams, usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { ToolbarItem } from './ToolbarItem'
+import { Await, useLocation, useParams } from '@remix-run/react'
+import { useProjectAwait } from 'app/utils/project'
+import LinkTabItem from './LinkTabItem'
 
-const PROJECT_TOOLBAR_ITEMS: ToolbarItem[] = [
-  {
-    label: 'Overview',
-    value: '/',
-  },
-  {
-    label: 'Settings',
-    value: '/settings',
-  },
-  {
-    label: 'Design',
-    value: '/design',
-  },
-]
+const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
+  HTMLButtonElement,
+  ToolbarItem
+>(function ProjectsToolbarTabItem({ value, label, ...props }, ref) {
+  const { projectId, folderId } = useParams()
+  const projectBaseUrl = `/projects/${projectId}`
+  const projectData = useProjectAwait()
+  const fallbackProjectOverviewUrl = useMemo(() => {
+    if (folderId) return projectBaseUrl + '/folder/' + folderId
+    else return projectBaseUrl
+  }, [folderId, projectBaseUrl])
 
-const ProjectToolbar = () => {
-  const { id: projectId } = useParams()
-  const pathname = usePathname()
-  const baseURL = `/projects/${projectId}`
-  const defaultValue = pathname.slice(baseURL.length) || '/'
+  if (value === projectBaseUrl) {
+    return (
+      <Suspense
+        fallback={
+          <LinkTabItem
+            {...props}
+            ref={ref}
+            to={fallbackProjectOverviewUrl}
+            value={value}
+            label={label}
+          />
+        }
+      >
+        <Await resolve={projectData?.project}>
+          {(project) => {
+            const defaultFolder =
+              project?.folders.find((e) => e.isDefaultFolder)?.id || folderId
+            return (
+              <LinkTabItem
+                {...props}
+                ref={ref}
+                value={value}
+                label={label}
+                to={projectBaseUrl + '/folder/' + defaultFolder}
+              />
+            )
+          }}
+        </Await>
+      </Suspense>
+    )
+  }
+
+  return <LinkTabItem {...props} ref={ref} value={value} label={label} />
+})
+const ProjectsToolbarTabItem = React.memo(ProjectsToolbarTabItemUnmemoized)
+
+const ProjectsToolbar = () => {
+  const { projectId, folderId } = useParams()
+  const location = useLocation()
+  const projectBaseUrl = `/projects/${projectId}`
+  const projectToolbarItems: ToolbarItem[] = useMemo(
+    () => [
+      {
+        label: 'Overview',
+        value: projectBaseUrl,
+      },
+      {
+        label: 'Settings',
+        value: projectBaseUrl + '/settings',
+      },
+      {
+        label: 'Design',
+        value: projectBaseUrl + '/design',
+      },
+    ],
+    [projectBaseUrl]
+  )
+  const defaultValue = useMemo(() => {
+    if (folderId && location.pathname.startsWith(projectBaseUrl + '/folder/')) {
+      return projectBaseUrl
+    }
+
+    if (location.pathname.startsWith(projectBaseUrl + '/settings')) {
+      return projectBaseUrl + '/settings'
+    }
+
+    return location.pathname
+  }, [folderId, location.pathname, projectBaseUrl])
 
   return (
     <div className={styles.toolbar}>
       <AnimatedTabs defaultValue={defaultValue}>
-        {PROJECT_TOOLBAR_ITEMS.map((tab) => (
-          <TabsItem asChild key={tab.value} value={tab.value}>
-            <Link prefetch href={baseURL + tab.value}>
-              {tab.label}
-            </Link>
-          </TabsItem>
+        {projectToolbarItems.map((tab) => (
+          <ProjectsToolbarTabItem
+            key={tab.value}
+            value={tab.value}
+            label={tab.label}
+          />
         ))}
       </AnimatedTabs>
     </div>
   )
 }
 
-export default ProjectToolbar
+export default React.memo(ProjectsToolbar)

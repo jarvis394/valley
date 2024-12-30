@@ -1,0 +1,38 @@
+@media screen and (width < 960px) {
+  .projectSettings__wrapper {
+    --page-margin: 0px;
+  }
+}
+
+.projectSettings__wrapper {
+  position: relative;
+}
+
+.projectSettings__tabs {
+  width: 240px;
+  position: sticky;
+  top: 68px;
+  height: min-content;
+  flex-shrink: 0;
+}
+
+.projectSettings__tab {
+  font-weight: 400 !important;
+  opacity: 0.63;
+}
+
+.projectSettings__tab--active {
+  font-weight: 600 !important;
+  opacity: 1;
+}
+
+.projectSettings__buttonTab {
+  padding: 24px 16px;
+  gap: 16px;
+  font-size: 16px;
+  font-weight: 400;
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 0;
+  border-bottom: 1px solid var(--alpha-transparent-07);
+}

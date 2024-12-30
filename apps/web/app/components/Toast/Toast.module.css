@@ -1,0 +1,74 @@
+.toast {
+  --toast-themed-background: var(--toast-default-bg);
+  --toast-themed-color: var(--toast-default-fg);
+  --toast-themed-border: var(--toast-default-border);
+
+  font-family: var(--font-geist-sans);
+  color: var(--toast-themed-color);
+  background: var(--toast-themed-background);
+  border: 1px solid var(--toast-themed-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  width: var(--width);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+@media screen and (width <= 600px) {
+  .toast {
+    width: 100%;
+  }
+}
+
+.toast--success {
+  --toast-themed-background: var(--toast-success-bg);
+  --toast-themed-color: var(--toast-success-fg);
+  --toast-themed-border: var(--toast-success-border);
+}
+
+.toast--info {
+  --toast-themed-background: var(--toast-info-bg);
+  --toast-themed-color: var(--toast-info-fg);
+  --toast-themed-border: var(--toast-info-border);
+}
+
+.toast--warning {
+  --toast-themed-background: var(--toast-warning-bg);
+  --toast-themed-color: var(--toast-warning-fg);
+  --toast-themed-border: var(--toast-warning-border);
+}
+
+.toast--error {
+  --toast-themed-background: var(--toast-error-bg);
+  --toast-themed-color: var(--toast-error-fg);
+  --toast-themed-border: var(--toast-error-border);
+}
+
+.toast__content > h1,
+.toast__content > p {
+  margin: 0;
+}
+
+.toast__content > h1 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.toast__content > h1 + .toast__content > p {
+  opacity: 0.63;
+}
+
+.toast__content > p {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.toast__closeButton {
+  --themed-color: var(--toast-themed-color);
+  --themed-background-hover: var(--toast-themed-border);
+  --themed-background-focus: var(--toast-themed-border);
+  --themed-color-hover: var(--toast-themed-color);
+  --themed-color-focus: var(--toast-themed-color);
+}

@@ -3,7 +3,7 @@
   "display": "Remix",
   "extends": "./base.json",
   "compilerOptions": {
-    "types": ["@remix-run/node", "vite/client"],
+    "types": ["@remix-run/cloudflare", "vite/client"],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"
@@ -11,6 +11,7 @@
     ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "skipLibCheck": true,
     "allowJs": false,
     "jsx": "preserve",
     "noEmit": true,

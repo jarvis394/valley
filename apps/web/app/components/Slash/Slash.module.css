@@ -1,3 +1,4 @@
 .slash {
   color: var(--alpha-transparent-12);
+  flex-shrink: 0;
 }

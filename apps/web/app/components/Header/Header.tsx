@@ -1,77 +1,80 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import styles from './Header.module.css'
 import Logo from '../Logo/Logo'
-import Link from 'next/link'
 import Slash from '../Slash/Slash'
 import Avatar from '@valley/ui/Avatar'
 import IconButton from '@valley/ui/IconButton'
-import MenuIcon from '../MenuIcon/MenuIcon'
 import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
-import useSWR from 'swr'
-import { api } from '../../api'
-import { ProjectGetRes, UserGetSelfRes } from '@valley/shared'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { useParams } from 'next/navigation'
+import { Await, Link, useParams } from '@remix-run/react'
+import { Project, User } from '@valley/db'
+import { useProjectAwait } from 'app/utils/project'
+import Hidden from '@valley/ui/Hidden'
+import MenuExpand from '../svg/MenuExpand'
 
-const CurrentUser = () => {
-  const me = useSWR<UserGetSelfRes>(
-    '/users/me',
-    api({ isAccessTokenRequired: true })
-  )
+const CurrentUser: React.FC<{ user: User }> = ({ user }) => {
+  const { projectId } = useParams()
 
   return (
     <>
-      <Slash className="fade" data-fade-in={!!me.data} />
-      <Stack gap={4} align={'center'} className="fade" data-fade-in={!!me.data}>
+      <Hidden asChild sm>
+        <Slash className="fade" data-fade-in={!!user} />
+      </Hidden>
+      <Stack gap={1} align={'center'} className="fade" data-fade-in={!!user}>
         <Stack
           asChild
           gap={3}
           align={'center'}
           className={styles.header__avatarAndNameContainer}
         >
-          <Link href={'/projects'}>
+          <Link viewTransition to={'/projects'}>
             <Avatar />
-            {me.data?.user?.username}
+            <p data-should-hide={!!projectId} className={styles.header__title}>
+              {user?.fullname}
+            </p>
           </Link>
         </Stack>
-        <IconButton size="sm" variant="secondary-dimmed">
-          <MenuIcon />
+      </Stack>
+    </>
+  )
+}
+
+const CurrentProject: React.FC<{ project: Project | null }> = ({ project }) => {
+  if (!project) return null
+
+  return (
+    <>
+      <Slash className="fade" data-fade-in={true} />
+      <Stack className="fade" data-fade-in={true} gap={1} align={'center'}>
+        <Stack
+          gap={3}
+          align={'center'}
+          className={styles.header__avatarAndNameContainer}
+        >
+          <Avatar />
+          <p className={styles.header__title}>{project.title}</p>
+        </Stack>
+        <IconButton
+          className={styles.header__menuIcon}
+          size="sm"
+          variant="tertiary"
+        >
+          <MenuExpand />
         </IconButton>
       </Stack>
     </>
   )
 }
 
-const CurrentProject = () => {
-  const { id: projectId } = useParams()
-  const project = useSWR<ProjectGetRes>(
-    projectId ? '/projects/' + projectId : null,
-    api({ isAccessTokenRequired: true }),
-    {
-      keepPreviousData: true,
-    }
-  )
-  const isShown = !!projectId && !!project.data
-
-  return (
-    <>
-      <Slash className="fade" data-fade-in={isShown} />
-      <Stack className="fade" data-fade-in={isShown} gap={4} align={'center'}>
-        <Stack
-          gap={3}
-          align={'center'}
-          className={styles.header__avatarAndNameContainer}
-        >
-          {project.data?.project?.title}
-        </Stack>
-      </Stack>
-    </>
-  )
+type HeaderProps = {
+  user?: Promise<User>
 }
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({ user }) => {
+  const project = useProjectAwait()
+
   return (
     <header
       className={styles.header}
@@ -79,13 +82,29 @@ const Header = () => {
         ['--header-height' as string]: HEADER_HEIGHT + 'px',
       }}
     >
-      <Link href="/">
-        <Logo withScrollAnimation className={styles.header__logo} />
-      </Link>
+      <Hidden asChild sm>
+        <Link viewTransition to="/">
+          <Logo withScrollAnimation className={styles.header__logo} />
+        </Link>
+      </Hidden>
       <nav className={styles.header__nav}>
         <Stack gap={2} align={'center'}>
-          <CurrentUser />
-          <CurrentProject />
+          {user && (
+            <Suspense fallback={<h1>loading...</h1>}>
+              <Await resolve={user}>
+                {(resolvedUser) => <CurrentUser user={resolvedUser} />}
+              </Await>
+            </Suspense>
+          )}
+          {project && (
+            <Suspense fallback={<h1>loading...</h1>}>
+              <Await resolve={project.project}>
+                {(resolvedProject) => (
+                  <CurrentProject project={resolvedProject} />
+                )}
+              </Await>
+            </Suspense>
+          )}
         </Stack>
         <Stack gap={2} align={'center'}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>
@@ -97,4 +116,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default React.memo(Header)

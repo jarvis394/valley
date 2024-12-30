@@ -1,8 +1,8 @@
 .uploadsOverlay {
-  --uploads-overlay-width: 380px;
+  --uploads-overlay-width: 356px;
   --uploads-overlay-collapsed-height: 64px;
   --uploads-overlay-expanded-height: 323px;
-  --uploads-overlay-offset: 16px;
+  --uploads-overlay-offset: 32px;
   display: flex;
   flex-direction: column;
   background-color: var(--background-paper);
@@ -19,6 +19,13 @@
   transition: all 240ms ease;
   z-index: var(--overlay-zIndex);
   overflow: hidden;
+}
+
+@media screen and (width <= 600px) {
+  .uploadsOverlay {
+    --uploads-overlay-width: 100%;
+    --uploads-overlay-offset: 16px;
+  }
 }
 
 .uploadsOverlay--expanded {

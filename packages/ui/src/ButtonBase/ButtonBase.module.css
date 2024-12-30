@@ -1,6 +1,6 @@
 .buttonBase {
   --font-size: 14px;
-  --line-height: 17px;
+  --line-height: 16px;
 }
 
 .buttonBase {
@@ -14,134 +14,153 @@
   transition-duration: 0.15s;
   transition-timing-function: ease;
   /** IMPORTANT: DO NOT CHANGE TO "all", ADD PROPERTY INSTEAD
-   *  Somehow it breaks Menu component's `onBlur` event and menus don't close
+   *  Somehow it breaks  @mui/base Menu component's `onBlur` event and menus don't close
    */
-  transition-property: background-color, background, box-shadow, border, color,
-    opacity;
+  transition-property: background-color, filter, background, box-shadow, border,
+    color, opacity, font-weight;
   font-size: var(--font-size);
   line-height: var(--line-height);
   cursor: pointer;
   user-select: none;
   transform: translateZ(0);
-  outline: none;
   border: 0;
+  color: var(--themed-color);
+  background-color: var(--themed-background);
   box-shadow: 0 0 0 1px inset var(--themed-border, transparent);
   vertical-align: middle;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 
+.buttonBase:focus-visible {
+  outline: auto;
+}
+
 .buttonBase:disabled {
-  color: var(--button-disabled-fg);
-  background: var(--button-disabled-bg);
   cursor: not-allowed;
-  --themed-border: var(--button-disabled-border);
+  --themed-color: var(--button-disabled-fg) !important;
+  --themed-background: var(--button-disabled-bg) !important;
+  --themed-border: var(--button-disabled-border) !important;
+}
+
+.buttonBase--tertiary:disabled {
+  --themed-color: var(--text-secondary) !important;
+  --themed-background: transparent !important;
+  --themed-border: none !important;
+}
+
+.buttonBase--tertiary-dimmed:disabled {
+  opacity: 0.8;
+  --themed-color: var(--text-hint) !important;
+  --themed-background: transparent !important;
+  --themed-border: none !important;
+}
+
+.buttonBase:disabled :global(.svg-own-color) path {
+  filter: grayscale(1);
 }
 
 .buttonBase--primary {
-  color: var(--button-primary-fg);
-  background: var(--button-primary-bg);
+  --themed-color: var(--button-primary-fg);
+  --themed-background: var(--button-primary-bg);
+  --themed-background-hover: var(--button-primary-hovered-bg);
+  --themed-color-hover: var(--button-primary-hovered-fg);
+  --themed-color-focus: var(--button-focused-fg-inversed);
   --themed-border: transparent;
 }
 
 .buttonBase--secondary {
-  color: var(--button-secondary-fg);
-  background: var(--button-secondary-bg);
+  --themed-color: var(--button-secondary-fg);
+  --themed-background: var(--button-secondary-bg);
+  --themed-background-hover: var(--button-secondary-hovered-bg);
+  --themed-background-focus: var(--button-secondary-focused-bg);
+  --themed-color-hover: var(--button-secondary-hovered-fg);
+  --themed-color-focus: var(--button-focused-fg);
   --themed-border: var(--button-secondary-border);
 }
 
 .buttonBase--secondary-dimmed {
-  color: var(--button-secondary-dimmed-fg);
-  background: var(--button-secondary-dimmed-bg);
+  --themed-color: var(--button-secondary-dimmed-fg);
+  --themed-background: var(--button-secondary-dimmed-bg);
+  --themed-background-hover: var(--button-secondary-dimmed-hovered-bg);
+  --themed-background-focus: var(--button-secondary-dimmed-focused-bg);
+  --themed-color-hover: var(--button-secondary-dimmed-hovered-fg);
+  --themed-color-focus: var(--button-focused-fg);
   --themed-border: var(--button-secondary-dimmed-border);
 }
 
 .buttonBase--tertiary {
-  color: var(--button-tertiary-fg);
-  background: var(--button-tertiary-bg);
+  --themed-color: var(--button-tertiary-fg);
+  --themed-background: var(--button-tertiary-bg);
+  --themed-background-hover: var(--button-tertiary-hovered-bg);
+  --themed-background-focus: var(--button-tertiary-focused-bg);
+  --themed-color-hover: var(--button-tertiary-hovered-fg);
+  --themed-color-focus: var(--button-focused-fg);
   --themed-border: transparent;
 }
 
 .buttonBase--tertiary-dimmed {
-  color: var(--button-tertiary-dimmed-fg);
-  background: var(--button-tertiary-dimmed-bg);
+  --themed-color: var(--button-tertiary-dimmed-fg);
+  --themed-background: var(--button-tertiary-dimmed-bg);
+  --themed-background-hover: var(--button-tertiary-dimmed-hovered-bg);
+  --themed-background-focus: var(--button-tertiary-dimmed-focused-bg);
+  --themed-color-hover: var(--button-tertiary-dimmed-hovered-fg);
+  --themed-color-focus: var(--button-tertiary-dimmed-focused-fg);
   --themed-border: transparent;
 }
 
 .buttonBase--warning {
-  color: var(--button-warning-fg);
-  background: var(--button-warning-bg);
+  --themed-color: var(--button-warning-fg);
+  --themed-background: var(--button-warning-bg);
+  --themed-background-hover: var(--button-warning-hovered-bg);
+  --themed-background-focus: var(--button-warning-focused-bg);
+  --themed-color-hover: var(--button-warning-hovered-fg);
+  --themed-color-focus: var(--button-warning-focused-fg);
   --themed-border: transparent;
 }
 
 .buttonBase--danger {
-  color: var(--button-danger-fg);
-  background: var(--button-danger-bg);
+  --themed-color: var(--button-danger-fg);
+  --themed-background: var(--button-danger-bg);
+  --themed-background-hover: var(--button-danger-hovered-bg);
+  --themed-background-focus: var(--button-danger-focused-bg);
+  --themed-color-hover: var(--button-danger-hovered-fg);
+  --themed-color-focus: var(--button-danger-focused-fg);
   --themed-border: transparent;
 }
 
-.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase--primary:hover {
-  background-color: var(--button-primary-hovered-bg);
-  color: var(--button-primary-hovered-fg);
-  --themed-border: transparent;
+.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase:hover {
+  color: var(--themed-color-hover, var(--themed-color));
+  background-color: var(--themed-background-hover, var(--themed-background));
 }
 
-.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase--secondary:hover {
-  background-color: var(--button-secondary-hovered-bg);
-  color: var(--button-secondary-hovered-fg);
+.buttonBase:not(:disabled):not(:has(button:active)).buttonBase:active {
+  color: var(
+    --themed-color-focus,
+    var(--themed-color-hover, var(--themed-color))
+  );
+  background-color: var(
+    --themed-background-focus,
+    var(--themed-background-hover, var(--themed-background))
+  );
 }
 
-.buttonBase:not(:disabled):not(
-    :has(button:hover)
-  ).buttonBase--secondary-dimmed:hover {
-  background-color: var(--button-secondary-dimmed-hovered-bg);
-  color: var(--button-secondary-dimmed-hovered-fg);
-}
+@media (hover: none) {
+  .buttonBase:hover {
+    color: var(--themed-color) !important;
+    background-color: var(--themed-background) !important;
+  }
 
-.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase--tertiary:hover {
-  background-color: var(--button-tertiary-hovered-bg);
-  color: var(--button-tertiary-hovered-fg);
-  --themed-border: transparent;
-}
-
-.buttonBase:not(:disabled):not(
-    :has(button:hover)
-  ).buttonBase--tertiary-dimmed:hover {
-  background-color: var(--button-tertiary-dimmed-hovered-bg);
-  color: var(--button-tertiary-dimmed-hovered-fg);
-  --themed-border: transparent;
-}
-
-.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase--warning:hover {
-  background-color: var(--button-warning-hovered-bg);
-  color: var(--button-warning-hovered-fg);
-  --themed-border: transparent;
-}
-
-.buttonBase:not(:disabled):not(:has(button:hover)).buttonBase--danger:hover {
-  background-color: var(--button-danger-hovered-bg);
-  color: var(--button-danger-hovered-fg);
-  --themed-border: transparent;
-}
-
-.buttonBase:not(:disabled):not(
-    :has(button:active)
-  ).buttonBase--secondary:active,
-.buttonBase:not(:disabled):not(
-    :has(button:active)
-  ).buttonBase--secondary-dimmed:active,
-.buttonBase:not(:disabled):not(
-    :has(button:active)
-  ).buttonBase--tertiary:active {
-  color: var(--button-focused-fg);
-}
-
-.buttonBase:not(:disabled):not(:has(button:active)).buttonBase--primary:active {
-  color: var(--button-focused-fg-inversed);
-}
-
-.buttonBase:not(:disabled):not(
-    :has(button:active)
-  ).buttonBase--tertiary-dimmed:active {
-  color: var(--button-tertiary-dimmed-focused-fg);
+  .buttonBase:not(:disabled):not(:has(button:active)).buttonBase:active {
+    transition-duration: 50ms;
+    --themed-border: none;
+    color: var(
+      --themed-color-focus,
+      var(--themed-color-hover, var(--themed-color))
+    ) !important;
+    background-color: var(
+      --themed-background-focus,
+      var(--themed-background-hover, var(--themed-background))
+    ) !important;
+  }
 }

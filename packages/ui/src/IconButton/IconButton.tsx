@@ -3,10 +3,15 @@ import cx from 'classnames'
 import styles from './IconButton.module.css'
 import Button, { ButtonProps } from '../Button/Button'
 import Spinner from '../Spinner/Spinner'
+import { AsChildProps } from '../types/AsChildProps'
 
-export type IconProps = Omit<ButtonProps, 'before' | 'after' | 'align'>
+export type IconButtonOwnProps = Omit<ButtonProps, 'before' | 'after' | 'align'>
+export type IconButtonProps = AsChildProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+> &
+  IconButtonOwnProps
 
-const IconButton = React.forwardRef<HTMLButtonElement, IconProps>(
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   function IconButton(
     { children, className, size = 'sm', loading, ...props },
     ref
@@ -29,4 +34,4 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconProps>(
   }
 )
 
-export default IconButton
+export default React.memo(IconButton)

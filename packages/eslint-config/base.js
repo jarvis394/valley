@@ -7,7 +7,7 @@ module.exports = {
     'plugin:import/typescript',
   ],
   rules: {
-    quotes: ['error', 'single'],
+    quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'never'],
     'no-unused-vars': 'off',
     'no-await-in-loop': 'error',
@@ -25,6 +25,14 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
+    '@typescript-eslint/no-unused-expressions': [
+      'warn',
+      {
+        allowShortCircuit: true,
+        allowTernary: true,
+      },
+    ],
+    '@typescript-eslint/no-empty-object-type': ['off'],
     '@typescript-eslint/array-type': [
       'error',
       {

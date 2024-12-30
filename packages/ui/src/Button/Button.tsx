@@ -5,8 +5,10 @@ import ButtonBase, { ButtonBaseProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
 import { Slot, Slottable } from '@radix-ui/react-slot'
+import { isElement } from 'react-is'
+import { AsChildProps } from '../types/AsChildProps'
 
-export type ButtonProps = Partial<
+export type ButtonOwnProps = Partial<
   React.PropsWithChildren<{
     size: Exclude<ViewportSize, 'xs' | 'xl'>
     fullWidth: boolean
@@ -17,6 +19,11 @@ export type ButtonProps = Partial<
   }> &
     ButtonBaseProps
 >
+
+export type ButtonProps = AsChildProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+> &
+  ButtonOwnProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
@@ -36,13 +43,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   ref
 ) {
   const Root = asChild ? Slot : 'button'
+
+  if (!isElement(children) && asChild) {
+    console.error('Cannot use `asChild` without a children element:', {
+      children,
+      asChild,
+    })
+    return null
+  }
+
   return (
     <ButtonBase
       ref={ref}
       asChild
       variant={variant}
       disabled={disabled}
-      className={cx(styles.button, className, {
+      className={cx('Button', styles.button, className, {
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
@@ -52,9 +68,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       })}
     >
       <Root {...other}>
-        {loading && <Spinner className={styles.button__loading} />}
+        {loading && (
+          <Spinner
+            className={cx(styles.button__loading, {
+              [styles['button__loading--noAnimation']]: !!before,
+            })}
+          />
+        )}
         {before && !loading && (
-          <div className={styles.button__before}>{before}</div>
+          <div className={cx('Button__before', styles.button__before)}>
+            {before}
+          </div>
         )}
         {
           // Ugly fix for slotting children in the right place (inside <span>)
@@ -63,7 +87,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
               {React.cloneElement(
                 children as React.ReactElement,
                 undefined,
-                <span className={styles.button__content}>
+                <span className={cx('Button__content', styles.button__content)}>
                   {(children as React.ReactElement)?.props?.children}
                 </span>
               )}
@@ -71,12 +95,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
           )
         }
         {children && !asChild && (
-          <span className={styles.button__content}>{children}</span>
+          <span className={cx('Button__content', styles.button__content)}>
+            {children}
+          </span>
         )}
-        {after && <div className={styles.button__after}>{after}</div>}
+        {after && (
+          <div className={cx('Button__after', styles.button__after)}>
+            {after}
+          </div>
+        )}
       </Root>
     </ButtonBase>
   )
 })
 
-export default Button
+export default React.memo(Button)

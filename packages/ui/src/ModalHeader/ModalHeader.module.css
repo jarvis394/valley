@@ -6,9 +6,6 @@
   align-items: flex-start;
   padding: 28px 24px;
   padding-bottom: 24px;
-}
-
-.modalHeader h2 {
   font-size: 24px;
   font-weight: 600;
   color: var(--text-primary);

@@ -5,7 +5,7 @@ import {
   useParams,
   useRouteError,
 } from '@remix-run/react'
-import { getErrorMessage } from '~/utils/misc'
+import { getErrorMessage } from '../../utils/misc'
 import styles from './ErrorBoundary.module.css'
 import Stack from '@valley/ui/Stack'
 

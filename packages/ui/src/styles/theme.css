@@ -48,14 +48,32 @@
 
   /** Button / Danger */
   --button-danger-fg: #ffffff;
-  --button-danger-bg: #d93036;
+  --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
-  --button-danger-hovered-bg: #ff585e;
+  --button-danger-hovered-bg: var(--red-900);
 
   /** Button / Disabled */
   --button-disabled-fg: rgba(237, 237, 237, 0.5);
   --button-disabled-bg: #1a1a1a;
   --button-disabled-border: var(--alpha-transparent-07);
+
+  /** Button / Github Theme */
+  --button-github-theme-fg: var(--text-primary);
+  --button-github-theme-bg: #24292e;
+  --button-github-theme-hovered-fg: var(--text-primary);
+  --button-github-theme-hovered-bg: #313941;
+
+  /** Button / Google Theme */
+  --button-google-theme-fg: var(--text-primary);
+  --button-google-theme-bg: var(--alpha-transparent-07);
+  --button-google-theme-hovered-fg: var(--text-primary);
+  --button-google-theme-hovered-bg: var(--alpha-transparent-12);
+
+  /** Button / VK Theme */
+  --button-vk-theme-fg: var(--text-primary);
+  --button-vk-theme-bg: #0067dc;
+  --button-vk-theme-hovered-fg: var(--text-primary);
+  --button-vk-theme-hovered-bg: #1375e5;
 
   /** Text */
   --text-primary: rgba(237, 237, 237, 1);
@@ -71,12 +89,34 @@
   --input-border: #2b2b2b;
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(255, 255, 255, 0.24);
+  --input-border-error: var(--red-600);
+  --input-border-error-shadow: rgba(229, 72, 77, 0.24);
 
   /** Alpha */
+  --alpha-solid-03: #121212;
   --alpha-solid-07: #1c1c1c;
+  --alpha-transparent-03: rgba(255, 255, 255, 0.03);
   --alpha-transparent-07: rgba(255, 255, 255, 0.07);
   --alpha-transparent-12: rgba(255, 255, 255, 0.12);
+  --alpha-transparent-24: rgba(255, 255, 255, 0.24);
   --alpha-transparent-32: rgba(255, 255, 255, 0.32);
+
+  /** Toast */
+  --toast-default-bg: var(--background-paper);
+  --toast-default-fg: var(--text-primary);
+  --toast-default-border: var(--alpha-transparent-07);
+  --toast-success-bg: var(--teal-100);
+  --toast-success-fg: var(--teal-1000);
+  --toast-success-border: var(--teal-300);
+  --toast-info-bg: var(--blue-700);
+  --toast-info-fg: var(--blue-1000);
+  --toast-info-border: var(--alpha-transparent-12);
+  --toast-warning-bg: var(--amber-200);
+  --toast-warning-fg: var(--amber-1000);
+  --toast-warning-border: var(--amber-400);
+  --toast-error-bg: #db262c;
+  --toast-error-fg: var(--red-1000);
+  --toast-error-border: var(--alpha-transparent-07);
 
   /** Shadow */
   --shadow-0: none;
@@ -151,7 +191,7 @@
 
   /** Button / Danger */
   --button-danger-fg: #ffffff;
-  --button-danger-bg: #d93036;
+  --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
   --button-danger-hovered-bg: #b52e33;
 
@@ -159,6 +199,27 @@
   --button-disabled-fg: rgba(23, 23, 23, 0.5);
   --button-disabled-bg: #f3f3f3;
   --button-disabled-border: var(--alpha-transparent-07);
+
+  /** Button / Github Theme */
+  --button-github-theme-fg: var(--text-primary-inversed);
+  --button-github-theme-bg: #24292e;
+  --button-github-theme-hovered-fg: var(--background-default);
+  --button-github-theme-hovered-bg: #313941;
+  --button-github-theme-focused-fg: var(--button-focused-fg-inversed);
+
+  /** Button / Google Theme */
+  --button-google-theme-fg: var(--text-primary);
+  --button-google-theme-bg: var(--alpha-transparent-07);
+  --button-google-theme-hovered-fg: var(--text-primary);
+  --button-google-theme-hovered-bg: var(--alpha-transparent-12);
+  --button-google-theme-focused-fg: var(--button-focused-fg);
+
+  /** Button / VK Theme */
+  --button-vk-theme-fg: var(--text-primary-inversed);
+  --button-vk-theme-bg: #0067dc;
+  --button-vk-theme-hovered-fg: var(--background-default);
+  --button-vk-theme-hovered-bg: #1375e5;
+  --button-vk-theme-focused-fg: var(--button-focused-fg-inversed);
 
   /** Text */
   --text-primary: rgb(23, 23, 23);
@@ -174,12 +235,34 @@
   --input-border: rgba(23, 23, 23, 0.12);
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(0, 0, 0, 0.16);
+  --input-border-error: var(--red-600);
+  --input-border-error-shadow: rgba(229, 72, 77, 0.16);
 
   /** Alpha */
-  --alpha-solid-07: rgba(23, 23, 23, 0.07);
+  --alpha-solid-03: #f2f2f2;
+  --alpha-solid-07: #e8e8e8;
+  --alpha-transparent-03: rgba(23, 23, 23, 0.03);
   --alpha-transparent-07: rgba(23, 23, 23, 0.07);
   --alpha-transparent-12: rgba(23, 23, 23, 0.12);
+  --alpha-transparent-24: rgba(23, 23, 23, 0.24);
   --alpha-transparent-32: rgba(23, 23, 23, 0.32);
+
+  /** Toast */
+  --toast-default-bg: var(--background-paper);
+  --toast-default-fg: var(--text-primary);
+  --toast-default-border: var(--alpha-transparent-07);
+  --toast-success-bg: var(--green-1000);
+  --toast-success-fg: var(--green-400);
+  --toast-success-border: var(--alpha-transparent-07);
+  --toast-info-bg: var(--blue-700);
+  --toast-info-fg: var(--blue-1000);
+  --toast-info-border: var(--alpha-transparent-07);
+  --toast-warning-bg: var(--amber-700);
+  --toast-warning-fg: var(--amber-300);
+  --toast-warning-border: var(--amber-600);
+  --toast-error-bg: #db262c;
+  --toast-error-fg: var(--red-1000);
+  --toast-error-border: var(--alpha-transparent-07);
 
   /** Shadow */
   --shadow-0: none;
@@ -218,6 +301,7 @@
   --gray-1000: #ededed;
 
   /** Colors / Blue */
+  --blue-50: #111b2c;
   --blue-100: #0f1c2e;
   --blue-200: #10233d;
   --blue-300: #0f2f57;
@@ -230,6 +314,7 @@
   --blue-1000: #ebf6ff;
 
   /** Colors / Green */
+  --green-50: #08160c;
   --green-100: #0b2212;
   --green-200: #0f2e18;
   --green-300: #12361b;

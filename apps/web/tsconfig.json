@@ -1,30 +1,16 @@
 {
-  "extends": "@valley/typescript-config/nextjs.json",
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "next"
-      },
-      {
-        "name": "typescript-plugin-css-modules"
-      }
-    ],
-  },
+  "extends": "@valley/typescript-config/remix.json",
   "include": [
-    "next-env.d.ts",
-    "next.config.js",
+    ".eslintrc.cjs",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.module.css",
-    "**/*.css",
-    ".next/types/**/*.ts",
-    ".storybook/*.ts",
-    ".storybook/preview.tsx",
-    "components/**/*.stories.ts",
-    "components/**/*.stories.js",
-    "components/**/*.stories.jsx",
-    "components/**/*.stories.tsx",
-    "components/**/*.stories.mdx"
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx",
+    "vite.config.js"
   ],
-  "exclude": ["node_modules"]
+  "compilerOptions": {
+    "baseUrl": "."
+  }
 }

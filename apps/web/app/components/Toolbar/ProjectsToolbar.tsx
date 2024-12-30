@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import styles from './Toolbar.module.css'
 import TabsItem from '@valley/ui/TabsItem'

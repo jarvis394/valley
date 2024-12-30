@@ -1,0 +1,115 @@
+.switch {
+  --switch-width: 52px;
+  --switch-handle-width: 16px;
+  --switch-handle-checked-width: 24px;
+  --switch-padding: 4px;
+  --switch-height: calc(
+    var(--switch-padding) * 2 + var(--switch-handle-checked-width)
+  );
+  --switch-handle-checked-shift-x: calc(
+    var(--switch-width) - var(--switch-handle-checked-width) -
+      var(--switch-padding) * 2
+  );
+  --switch-handle-active-width: calc(var(--switch-height) - 4px);
+
+  display: flex;
+  border-radius: 16px;
+  height: var(--switch-height);
+  width: var(--switch-width);
+  background-color: transparent;
+  border: 2px solid var(--alpha-transparent-24);
+  transition: all 250ms ease;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.switch__input {
+  height: 100%;
+  left: 0;
+  top: 0;
+  width: 100%;
+  margin: 0;
+  clip: auto;
+  clip-path: none;
+  pointer-events: none;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.switch__handle {
+  display: flex;
+  position: absolute;
+  width: var(--switch-handle-active-width);
+  height: var(--switch-handle-active-width);
+  top: 0;
+  left: 0;
+  transition: all 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.switch.switch--checked:active > .switch__handle {
+  left: var(--switch-handle-checked-shift-x);
+}
+
+.switch:active > .switch__handle::after {
+  transition-timing-function: ease;
+  width: var(--switch-handle-active-width);
+  height: var(--switch-handle-active-width);
+}
+
+.switch__handle::after {
+  content: '';
+  width: var(--switch-handle-width);
+  height: var(--switch-handle-width);
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  position: absolute;
+  background-color: var(--text-secondary);
+  transition: all 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.switch--checked {
+  background-color: var(--blue-900);
+  border: 2px solid var(--alpha-transparent-12);
+}
+
+.switch--checked > .switch__handle {
+  left: var(--switch-handle-checked-shift-x);
+}
+
+.switch--checked > .switch__handle::after {
+  background-color: var(--blue-200);
+  width: var(--switch-handle-checked-width);
+  height: var(--switch-handle-checked-width);
+}
+
+.switch__handle::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: var(--alpha-transparent-07);
+  opacity: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 100ms ease;
+  z-index: -10;
+}
+
+.switch:hover > .switch__handle::before {
+  opacity: 1;
+}
+
+.switch:active > .switch__handle::before {
+  background-color: var(--alpha-transparent-12);
+}

@@ -1,0 +1,22 @@
+.skeleton {
+  display: block;
+  background-color: var(--alpha-transparent-07);
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.skeleton--text {
+  height: auto;
+  transform-origin: 0px 55%;
+  transform: scale(1, 0.6);
+  border-radius: 4px / 6.7px;
+}
+
+.skeleton--circular {
+  border-radius: 50%;
+  height: 1.2em;
+}
+
+.skeleton--rectangular {
+  border-radius: 4px;
+}

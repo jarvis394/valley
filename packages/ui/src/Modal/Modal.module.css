@@ -1,23 +1,23 @@
-.modal {
-  position: fixed;
-  z-index: 1300;
-  inset: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal__dialogBackdrop {
-  --fade-duration: 320ms !important;
+.modal__dialogOverlay {
   background: var(--modal-backdrop);
-  z-index: -1;
+  z-index: 1200;
   position: fixed;
   inset: 0px;
   -webkit-tap-highlight-color: transparent;
 }
 
+.modal__dialogOverlay[data-state='open'] {
+  animation: fadeIn 320ms ease-in-out;
+}
+
+.modal__dialogOverlay[data-state='closed'] {
+  animation: fadeOut 320ms ease-in-out;
+}
+
 .modal__dialog {
+  z-index: 1300;
   max-width: 480px;
+  max-height: calc(100% - 32px);
   width: calc(100% - 32px);
   background: var(--background-default);
   padding: 0px;
@@ -28,19 +28,18 @@
   overflow: hidden;
   border-radius: 24px;
   border: 1px solid var(--alpha-transparent-12);
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.modal__drawerOverlay {
-  --fade-duration: 320ms !important;
-  background: var(--modal-backdrop);
-  z-index: 1200;
-  position: fixed;
-  inset: 0px;
-  -webkit-tap-highlight-color: transparent;
+.modal__dialog[data-state='open'] {
+  animation: growIn 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.modal__dialog[data-state='closed'] {
+  animation: growOut 320ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .modal__drawer {
@@ -72,4 +71,55 @@
     0px 1px 1px rgba(0, 0, 0, 0.02),
     0px 4px 8px -4px rgba(0, 0, 0, 0.04),
     0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+}
+
+.modal__drawerHandle {
+  margin-top: 16px;
+  position: unset !important;
+}
+
+.modal__drawerHandle > [data-vaul-handle-hitarea] {
+  width: 100%;
+  height: calc(32px + 5px);
+  top: 16px !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes growIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) translateY(0px);
+  }
+}
+
+@keyframes growOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) translateY(0px);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95) translateY(0px);
+  }
 }

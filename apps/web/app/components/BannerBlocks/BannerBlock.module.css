@@ -1,0 +1,12 @@
+.bannerBlock {
+  --bannerBlockMaxWidth: 208px;
+  border-radius: 24px;
+  max-width: var(--bannerBlockMaxWidth);
+  padding: 16px;
+  height: 100%;
+  display: inline-flex;
+  gap: 10px;
+  flex-direction: column;
+  flex: 1 0 100%;
+  overflow: hidden;
+}

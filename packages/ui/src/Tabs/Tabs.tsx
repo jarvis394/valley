@@ -1,6 +1,6 @@
-'use client'
 import React, {
   CSSProperties,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -11,6 +11,7 @@ import { isFragment } from 'react-is'
 import styles from './Tabs.module.css'
 import { TabsItemProps } from '../TabsItem/TabsItem'
 import { useScrollProgress } from '../useScrollProgress/useScrollProgress'
+import cx from 'classnames'
 
 const HOVER_CONTAINER_PADDING = 8
 const ANIMATION_DURATION = 150
@@ -32,6 +33,7 @@ type BaseTabsProps<T extends TabValue> = {
   children:
     | React.ReactElement<TabsItemProps>
     | Array<React.ReactElement<TabsItemProps>>
+  className?: string
   scrollProgressOffset?: number
   scrollProgressTransitionStyles?: (progress: number) => CSSProperties
 }
@@ -55,6 +57,7 @@ const Tabs = <T extends TabValue = TabValue>({
   value: propsValue,
   defaultValue,
   indicator,
+  className,
   ...props
 }: TabsProps<T>): JSX.Element => {
   const [innerValue, setInnerValue] = useState(defaultValue)
@@ -82,34 +85,40 @@ const Tabs = <T extends TabValue = TabValue>({
   )
 
   const onLeaveTabs = () => {
-    setHoveredTab(null)
-    initialHoveredElementTimeoutRef.current = setTimeout(() => {
-      setIsInitialHoveredElement(true)
-    }, ANIMATION_DURATION)
+    startTransition(() => {
+      setHoveredTab(null)
+      initialHoveredElementTimeoutRef.current = setTimeout(() => {
+        setIsInitialHoveredElement(true)
+      }, ANIMATION_DURATION)
+    })
   }
 
-  const onEnterTab = useCallback((e: React.PointerEvent, value: T) => {
-    // Do not show hover indicator when on mobile (client is using touch)
-    if (e.pointerType === 'touch') return
-    if (!e.target || !(e.target instanceof HTMLElement)) return
+  const onEnterTab = useCallback((value: T, e: React.PointerEvent) => {
+    startTransition(() => {
+      // Do not show hover indicator when on mobile (client is using touch)
+      if (e.pointerType === 'touch') return
+      if (!e.target || !(e.target instanceof HTMLElement)) return
 
-    setHoveredTab((prev) => {
-      if (prev !== null && prev !== value) {
-        setIsInitialHoveredElement(false)
-      }
+      setHoveredTab((prev) => {
+        if (prev !== null && prev !== value) {
+          setIsInitialHoveredElement(false)
+        }
 
-      return value
+        return value
+      })
+
+      setHoveredElement(e.target)
     })
-
-    setHoveredElement(e.target)
   }, [])
 
   const handleItemClick = useCallback(
     (itemValue: T, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      onItemClick?.(itemValue, e)
-      setInnerValue(itemValue)
-      setSelectedElement(e.currentTarget)
-      setIsInitialSelectedAppear(false)
+      startTransition(() => {
+        onItemClick?.(itemValue, e)
+        setInnerValue(itemValue)
+        setSelectedElement(e.currentTarget)
+        setIsInitialSelectedAppear(false)
+      })
     },
     [onItemClick]
   )
@@ -136,7 +145,8 @@ const Tabs = <T extends TabValue = TabValue>({
       const childValue = (
         child.props.value === undefined ? childIndex : child.props.value
       ) as T
-      const selected = childValue === value
+      const childSelected = child.props.selected
+      const selected = childSelected || childValue === value
 
       childIndex += 1
 
@@ -145,9 +155,7 @@ const Tabs = <T extends TabValue = TabValue>({
       >(child, {
         indicator: selected && !mounted && indicator,
         selected,
-        onClick: (value, event) => {
-          handleItemClick(value as T, event)
-        },
+        onClick: handleItemClick as (value: string | number) => void,
         value: childValue,
         ref: (e) => {
           if (!e) return
@@ -156,7 +164,7 @@ const Tabs = <T extends TabValue = TabValue>({
             setSelectedElement(e)
           }
         },
-        onPointerEnter: (e) => onEnterTab(e, childValue),
+        onPointerEnter: onEnterTab.bind(null, childValue),
       })
     })
   }, [childrenProp, handleItemClick, indicator, mounted, onEnterTab, value])
@@ -166,7 +174,9 @@ const Tabs = <T extends TabValue = TabValue>({
   if (rootBoundingRect && hoveredRect) {
     hoverStyles.transform = `translate3d(${
       hoveredRect.left - rootBoundingRect.left
-    }px,${hoveredRect.top - rootBoundingRect.top + HOVER_CONTAINER_PADDING}px,0px)`
+    }px,${
+      hoveredRect.top - rootBoundingRect.top + HOVER_CONTAINER_PADDING
+    }px,0px)`
     hoverStyles.width = hoveredRect.width
     hoverStyles.height = hoveredRect.height - HOVER_CONTAINER_PADDING * 2
     hoverStyles.opacity = hoveredTab !== null ? 1 : 0
@@ -189,7 +199,9 @@ const Tabs = <T extends TabValue = TabValue>({
   }
 
   useEffect(() => {
-    setMounted(true)
+    startTransition(() => {
+      setMounted(true)
+    })
 
     return () => {
       clearTimeout(initialHoveredElementTimeoutRef.current)
@@ -204,7 +216,7 @@ const Tabs = <T extends TabValue = TabValue>({
     <div
       onPointerLeave={onLeaveTabs}
       ref={$root}
-      className={styles.tabs}
+      className={cx(styles.tabs, className)}
       style={scrollProgressTransitionStyles}
     >
       {children}

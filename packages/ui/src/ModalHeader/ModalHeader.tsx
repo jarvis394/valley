@@ -1,11 +1,12 @@
 import React from 'react'
 import styles from './ModalHeader.module.css'
+import { DialogTitleProps } from '../Modal/Modal'
 
-const ModalHeader: React.FC<React.PropsWithChildren> = ({ children }) => {
+const ModalHeader: React.FC<DialogTitleProps> = ({ children, ...props }) => {
   return (
-    <div className={styles.modalHeader}>
-      <h2>{children}</h2>
-    </div>
+    <h2 {...props} className={styles.modalHeader}>
+      {children}
+    </h2>
   )
 }
 

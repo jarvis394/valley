@@ -1,5 +1,5 @@
 {
-  "extends": "@valley/typescript-config/nestjs.json",
+  "extends": "@valley/typescript-config/adonis.json",
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": "src",
@@ -7,6 +7,6 @@
     "incremental": false,
     "outDir": "dist"
   },
-  "include": ["src"],
+  "include": ["src", "prisma"],
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }

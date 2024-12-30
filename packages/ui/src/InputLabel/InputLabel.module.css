@@ -1,6 +1,24 @@
 .inputLabel {
   display: flex;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 420;
   color: var(--text-secondary);
   margin-bottom: 8px;
+  gap: 4px;
+  align-items: center;
+  user-select: none;
+}
+
+.inputLabel__requiredStar {
+  color: var(--red-600);
+}
+
+.inputLabel--size-md {
+  font-size: 13px;
+  font-weight: 420;
+}
+
+.inputLabel--size-lg {
+  font-size: 14px;
+  font-weight: 420;
 }

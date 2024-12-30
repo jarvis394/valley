@@ -1,15 +1,10 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local", ".env"],
-  "globalEnv": [
-    "NODE_ENV",
-    "GALLERY_PORT",
-    "NEXT_PUBLIC_API_URL",
-    "NEXT_PUBLIC_TUSD_URL"
-  ],
+  "globalEnv": ["*"],
   "tasks": {
     "dev": {
-      "dependsOn": ["^db:generate"],
+      "dependsOn": ["^db:generate", "@valley/shared#build"],
       "cache": false,
       "persistent": true
     },
@@ -20,13 +15,17 @@
         ".next/**",
         "!.next/cache/**",
         "storybook-static/**",
-        "dist/**"
+        "dist/**",
+        "build/**"
       ]
     },
     "build:storybook": {},
     "lint": {},
     "typecheck": {
       "dependsOn": ["^db:generate"]
+    },
+    "start": {
+      "cache": false
     },
     "db:migrate": {
       "cache": false
@@ -37,10 +36,16 @@
     "db:generate": {
       "cache": false
     },
-    "db:push": {
+    "db:generate-prod": {
+      "cache": false
+    },
+    "db:deploy": {
       "cache": false
     },
     "db:studio": {
+      "cache": false
+    },
+    "db:seed": {
       "cache": false
     }
   }

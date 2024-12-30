@@ -1,0 +1,229 @@
+x-defaults: &defaults
+  init: true
+  tty: true
+  networks:
+    - valley_network
+
+# Settings and configurations that are common for all containers
+x-minio-common: &minio-common
+  image: minio/minio
+  command: server --console-address ":9001" http://minio{1...4}/data{1...2}
+  expose:
+    - '9000'
+    - '9001'
+  env_file:
+    - .env
+  healthcheck:
+    test: ['CMD', 'mc', 'ready', 'local']
+    interval: 5s
+    timeout: 5s
+    retries: 5
+  init: true
+  tty: true
+  networks:
+    - valley_network
+
+name: valley
+
+services:
+  web:
+    <<: *defaults
+    container_name: valley-web
+    env_file:
+      - .env
+    ports:
+      - '${WEB_PORT}:${WEB_PORT}'
+    command: turbo run start --filter web
+    build:
+      args:
+        APP: web
+        START_COMMAND: start
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - tusd
+      - postgres
+      - redis
+    volumes:
+      - .env:/app/.env
+
+  gallery:
+    <<: *defaults
+    container_name: valley-gallery
+    env_file:
+      - .env
+    ports:
+      - '${GALLERY_PORT}:${GALLERY_PORT}'
+    command: turbo run start --filter gallery
+    build:
+      args:
+        APP: gallery
+        START_COMMAND: start
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - tusd
+      - postgres
+      - redis
+    volumes:
+      - .env:/app/.env
+
+  upload:
+    <<: *defaults
+    container_name: valley-upload
+    env_file:
+      - .env
+    ports:
+      - '${UPLOAD_SERVICE_PORT}:${UPLOAD_SERVICE_PORT}'
+    command: turbo run start --filter upload
+    build:
+      args:
+        APP: upload
+        START_COMMAND: start
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - tusd
+      - postgres
+      - redis
+    volumes:
+      - .env:/app/.env
+
+  minio1:
+    <<: *minio-common
+    hostname: minio1
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    hostname: minio2
+    volumes:
+      - data2-1:/data1
+      - data2-2:/data2
+
+  minio3:
+    <<: *minio-common
+    hostname: minio3
+    volumes:
+      - data3-1:/data1
+      - data3-2:/data2
+
+  minio4:
+    <<: *minio-common
+    hostname: minio4
+    volumes:
+      - data4-1:/data1
+      - data4-2:/data2
+
+  tusd:
+    <<: *defaults
+    container_name: valley-tusd
+    image: tusproject/tusd:latest
+    command: -port ${TUSD_PORT} -verbose -s3-bucket ${UPLOAD_BUCKET} -s3-endpoint http://nginx:9000 -hooks-http http://host.docker.internal:${UPLOAD_SERVICE_PORT}/api/uploads -hooks-enabled-events pre-create,pre-finish
+    volumes:
+      - tusd:/data
+    ports:
+      - '${TUSD_PORT}:${TUSD_PORT}'
+    env_file:
+      - .env
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
+
+  postgres:
+    <<: *defaults
+    container_name: valley-postgres
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
+    restart: always
+    healthcheck:
+      test: ['CMD', 'pg_isready -d valley -U ${DB_USER}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    <<: *defaults
+    container_name: valley-redis
+    image: redis:latest
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - '6379:6379'
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+
+  nginx:
+    <<: *defaults
+    image: nginx:1.19.2-alpine
+    hostname: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
+
+  prisma-migrate:
+    <<: *defaults
+    image: node:22-alpine3.19
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: ./packages/database/Dockerfile
+
+  # Creates minio bucket on startup if it was not created before
+  createbuckets:
+    <<: *defaults
+    image: minio/mc:latest
+    env_file:
+      - .env
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
+      - nginx
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://nginx:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb myminio/${UPLOAD_BUCKET};
+      /usr/bin/mc anonymous set private myminio/${UPLOAD_BUCKET};
+      exit 0;
+      "
+
+volumes:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+  data3-1:
+  data3-2:
+  data4-1:
+  data4-2:
+  pgdata:
+  tusd:
+networks:
+  valley_network:

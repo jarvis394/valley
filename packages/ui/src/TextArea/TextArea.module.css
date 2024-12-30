@@ -16,12 +16,18 @@
     0 0 0 3px var(--input-border-focused-shadow);
 }
 
+.textArea--error:focus-within {
+  box-shadow:
+    0 0 0 1px inset var(--input-border-error),
+    0 0 0 3px var(--input-border-error-shadow);
+}
+
 .textArea--valid {
-  box-shadow: 0 0 0 1px inset var(--alpha-transparent-07);
+  box-shadow: 0 0 0 1px inset var(--input-border);
 }
 
 .textArea--error {
-  box-shadow: 0 0 0 1px inset #ee4f4f;
+  box-shadow: 0 0 0 1px inset var(--input-border-error);
 }
 
 .textArea__textarea {
@@ -34,7 +40,8 @@
   display: flex;
   flex: 1 0;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
+  width: 100%;
   font-family: var(--font-geist-sans);
   resize: none;
 }

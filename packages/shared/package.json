@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "dev": "swc src/* --watch --out-dir dist",
     "build": "tsc -b -v",
@@ -36,9 +37,6 @@
       "require": "./dist/src/*.js"
     }
   },
-  "dependencies": {
-    "@nestjs/mapped-types": "*"
-  },
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.5",
@@ -48,6 +46,6 @@
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   }
 }

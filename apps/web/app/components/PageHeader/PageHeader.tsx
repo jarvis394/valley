@@ -33,7 +33,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         >
           {children}
         </h1>
-        <div className={styles.pageHeader__before}>{before}</div>
+        {before && (
+          <Stack
+            gap={3}
+            direction={{ sm: 'row-reverse', md: 'row-reverse', lg: 'row' }}
+            justify={{ sm: 'flex-end', md: 'flex-end', lg: 'flex-start' }}
+            align={'center'}
+            flex={0}
+          >
+            {before}
+          </Stack>
+        )}
       </Wrapper>
     </Stack>
   )

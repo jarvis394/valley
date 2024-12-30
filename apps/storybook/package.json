@@ -7,12 +7,13 @@
     "build:storybook": "storybook build"
   },
   "dependencies": {
-    "@storybook/addon-essentials": "^8.1.11",
-    "@storybook/nextjs": "^8.1.11",
-    "@storybook/react": "^8.1.11",
+    "@storybook/addon-essentials": "^8.4.2",
+    "@storybook/react": "^8.4.2",
+    "@storybook/react-vite": "^8.4.5",
     "@uppy/core": "^4.1.0",
     "@uppy/progress-bar": "^4.0.0",
-    "storybook": "^8.1.11"
+    "@valley/ui": "*",
+    "storybook": "^8.4.2"
   },
   "devDependencies": {
     "typescript-plugin-css-modules": "^5.1.0"

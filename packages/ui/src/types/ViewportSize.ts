@@ -2,7 +2,7 @@ import { CSSProperties } from 'react'
 
 type GridUnitProperties = 'gap' | 'padding'
 type GridUnitValue<T extends keyof CSSProperties> = T extends GridUnitProperties
-  ? number
+  ? number | number[]
   : CSSProperties[T]
 
 export type ViewportSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'

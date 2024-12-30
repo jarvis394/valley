@@ -3,6 +3,7 @@ html,
 body {
   height: 100%;
   margin: 0;
+  font-family: var(--font-geist-sans);
   background: var(--background-default);
 }
 
@@ -14,6 +15,44 @@ svg {
   fill: currentColor;
 }
 
-path {
+svg:not(.svg-own-color) path {
   fill: currentColor;
 }
+
+@media (prefers-reduced-motion) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+/* 
+::view-transition-old(content) {
+  animation: growOut 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+::view-transition-new(content) {
+  animation: growIn 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@keyframes growIn {
+  from {
+    transform: translateX(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes growOut {
+  from {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+} */

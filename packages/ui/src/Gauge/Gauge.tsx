@@ -1,4 +1,3 @@
-'use client'
 import React, { useMemo } from 'react'
 import styles from './Gauge.module.css'
 import { ViewportSize } from '../types/ViewportSize'
