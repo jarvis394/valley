@@ -1,8 +1,43 @@
-import { Folder, File } from '@valley/db'
+import { Folder, File, Prisma } from '@valley/db'
 import type { SerializedFolder } from '@valley/shared'
 import prisma from '#services/prisma_service'
 
 export default class FolderService {
+  async folder(args: Prisma.FolderFindFirstArgs): Promise<Folder | null> {
+    return await prisma.folder.findFirst(args)
+  }
+
+  async folders(args: Prisma.FolderFindManyArgs): Promise<Folder[]> {
+    return await prisma.folder.findMany(args)
+  }
+
+  async createFolder(data: Prisma.FolderCreateInput): Promise<Folder> {
+    return await prisma.folder.create({
+      data,
+    })
+  }
+
+  async update(params: {
+    where: Prisma.FolderWhereUniqueInput
+    data: Prisma.FolderUpdateInput
+  }): Promise<Folder> {
+    return await prisma.folder.update(params)
+  }
+
+  async delete(where: Prisma.FolderWhereUniqueInput): Promise<Folder> {
+    return await prisma.folder.delete({
+      where,
+    })
+  }
+
+  async deleteMany(
+    where: Prisma.FolderWhereInput
+  ): Promise<Prisma.BatchPayload> {
+    return await prisma.folder.deleteMany({
+      where,
+    })
+  }
+
   async addFilesToFolder(
     folderId: Folder['id'],
     files: File[]

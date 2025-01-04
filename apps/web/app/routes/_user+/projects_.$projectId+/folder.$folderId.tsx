@@ -34,7 +34,6 @@ import {
   useLoaderData,
   useNavigate,
   useParams,
-  useSearchParams,
 } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
@@ -78,6 +77,7 @@ import {
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
 import { getProjectCacheKey } from './_layout'
+import { useModal } from 'app/hooks/useModal'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -147,7 +147,7 @@ export async function clientLoader({
   return await serverLoader()
 }
 
-clientLoader.hydrate = true
+clientLoader.hydrate = false
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   return {
@@ -172,19 +172,21 @@ const ProjectHeader: React.FC<{
   project: ProjectWithFolders | null
   currentFolder?: Folder
 }> = ({ project, currentFolder }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { openModal } = useModal()
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'edit-folder-description')
-    params.set('modal-folderId', currentFolder.id.toString())
-    setSearchParams(params, {
-      state: {
-        defaultDescription: currentFolder.description,
+    openModal(
+      'edit-folder-description',
+      {
+        folderId: currentFolder.id,
       },
-      preventScrollReset: true,
-    })
+      {
+        state: {
+          defaultDescription: currentFolder.description,
+        },
+      }
+    )
   }
 
   return (
@@ -330,32 +332,36 @@ const ProjectFolders: React.FC<{
 const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
   currentFolder,
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { openModal } = useModal()
 
   const handleEditFolderTitle = () => {
     if (!currentFolder) return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'edit-folder-title')
-    params.set('modal-folderId', currentFolder.id.toString())
-    setSearchParams(params, {
-      state: {
-        defaultTitle: currentFolder.title,
+    openModal(
+      'edit-folder-title',
+      {
+        folderId: currentFolder.id,
       },
-      preventScrollReset: true,
-    })
+      {
+        state: {
+          defaultDescription: currentFolder.title,
+        },
+      }
+    )
   }
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'edit-folder-description')
-    params.set('modal-folderId', currentFolder.id.toString())
-    setSearchParams(params, {
-      state: {
-        defaultDescription: currentFolder.description,
+    openModal(
+      'edit-folder-description',
+      {
+        folderId: currentFolder.id,
       },
-      preventScrollReset: true,
-    })
+      {
+        state: {
+          defaultDescription: currentFolder.description,
+        },
+      }
+    )
   }
 
   return (
@@ -548,7 +554,7 @@ const Fallback = () => (
 
 const ProjectRoute = () => {
   const projectData = useProjectAwait()
-  const data = useLoaderData<typeof loader>()
+  const data = useLoaderData<typeof loader>() || {}
 
   return (
     <div className={styles.project}>
