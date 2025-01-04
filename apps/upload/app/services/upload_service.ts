@@ -15,7 +15,7 @@ import prisma from '#services/prisma_service'
 
 @inject()
 export default class UploadService {
-  constructor(private readonly filesService: FileService) {}
+  constructor(private readonly fileService: FileService) {}
 
   async handlePreCreateHook(data: TusHookData): Promise<TusHookResponse> {
     const fileSize = data.Event.Upload.Size
@@ -139,7 +139,7 @@ export default class UploadService {
       })
 
     try {
-      const file = await this.filesService.createFileForProjectFolder({
+      const file = await this.fileService.createFileForProjectFolder({
         folderId: resBuilder.body.folderId,
         key: resBuilder.body.key,
         size: resBuilder.body.size,

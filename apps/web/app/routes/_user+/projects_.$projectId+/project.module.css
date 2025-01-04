@@ -3,7 +3,6 @@
   flex-direction: column;
   gap: 0px;
   height: 100%;
-  view-transition-name: content;
 }
 
 .project__foldersContainer {

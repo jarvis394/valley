@@ -11,11 +11,12 @@ import {
   Link,
   Footer,
   Information,
+  File as FileIcon,
 } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import { useRouteLoaderData, useSearchParams } from '@remix-run/react'
+import { useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import {
   AnimateLayoutChanges,
@@ -24,19 +25,18 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import cx from 'classnames'
+import { useModal } from 'app/hooks/useModal'
 
 type FileCardMenuContentProps = {
   file: File
 }
 
 const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { openModal } = useModal()
 
   const handleFileDelete = () => {
-    searchParams.set('modal', 'confirm-file-deletion')
-    searchParams.set('modal-fileId', file.id.toString())
-    setSearchParams(searchParams, {
-      preventScrollReset: true,
+    openModal('confirm-file-deletion', {
+      fileId: file.id,
     })
   }
 
@@ -135,6 +135,7 @@ const FileCard: React.FC<FileCardProps> = ({ file, isOverlay, ...props }) => {
               alt={file.name}
             />
           )}
+          {!fileThumbnailUrl && <FileIcon width={32} height={32} />}
         </div>
         <p className={styles.fileCard__name}>{file.name}</p>
 

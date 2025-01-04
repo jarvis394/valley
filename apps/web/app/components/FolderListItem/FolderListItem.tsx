@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { CheckCircleFill, PencilEdit, Trash } from 'geist-ui-icons'
 import { formatBytes } from 'app/utils/misc'
 import { Folder } from '@valley/db'
-import { useParams, useSearchParams } from '@remix-run/react'
+import { useParams } from '@remix-run/react'
 import DragIndicator from '../svg/DragIndicator'
 import {
   AnimateLayoutChanges,
@@ -15,6 +15,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import IconButton from '@valley/ui/IconButton'
 import Stack from '@valley/ui/Stack'
+import { useModal } from 'app/hooks/useModal'
 
 type FolderListItemMode = 'edit' | 'default'
 
@@ -36,7 +37,7 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
   onFolderRename,
   ...props
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { openModal } = useModal()
   const { folderId } = useParams()
   const isActive = useMemo(() => {
     if (mode === 'edit') return false
@@ -69,23 +70,23 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
 
   const handleFolderRename = () => {
     onFolderRename?.(folder)
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'edit-folder-title')
-    params.set('modal-folderId', folder.id.toString())
-    setSearchParams(params, {
-      state: {
-        defaultTitle: folder.title,
+    openModal(
+      'edit-folder-title',
+      {
+        folderId: folder.id,
       },
-      preventScrollReset: true,
-    })
+      {
+        state: {
+          defaultTitle: folder.title,
+        },
+      }
+    )
   }
 
   const handleFolderDelete = () => {
     onFolderDelete?.(folder)
-    searchParams.set('modal', 'confirm-folder-deletion')
-    searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams, {
-      preventScrollReset: true,
+    openModal('confirm-folder-deletion', {
+      folderId: folder.id,
     })
   }
 

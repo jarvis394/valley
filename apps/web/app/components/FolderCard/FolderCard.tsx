@@ -12,7 +12,8 @@ import Menu from '@valley/ui/Menu'
 import { formatBytes } from 'app/utils/misc'
 import { Folder } from '@valley/db'
 import IconButton from '@valley/ui/IconButton'
-import { Link, useParams, useSearchParams } from '@remix-run/react'
+import { Link, useParams } from '@remix-run/react'
+import { useModal } from 'app/hooks/useModal'
 
 type FolderCardProps = {
   folder: Folder
@@ -22,33 +23,31 @@ type FolderCardProps = {
 const FolderCardMenuContent: React.FC<{
   folder: Folder
 }> = ({ folder }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { openModal } = useModal()
 
   const handleFolderRename = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'edit-folder-title')
-    params.set('modal-folderId', folder.id.toString())
-    setSearchParams(params, {
-      state: {
-        defaultTitle: folder.title,
+    openModal(
+      'edit-folder-title',
+      {
+        folderId: folder.id,
       },
-      preventScrollReset: true,
-    })
+      {
+        state: {
+          defaultTitle: folder.title,
+        },
+      }
+    )
   }
 
   const handleFolderDelete = () => {
-    searchParams.set('modal', 'confirm-folder-deletion')
-    searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams, {
-      preventScrollReset: true,
+    openModal('confirm-folder-deletion', {
+      folderId: folder.id,
     })
   }
 
   const handleFolderClear = () => {
-    searchParams.set('modal', 'confirm-folder-clear')
-    searchParams.set('modal-folderId', folder.id.toString())
-    setSearchParams(searchParams, {
-      preventScrollReset: true,
+    openModal('confirm-folder-clear', {
+      folderId: folder.id,
     })
   }
 

@@ -137,7 +137,7 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
 }
 
 const ProjectsRoute = () => {
-  const data = useLoaderData<typeof loader>()
+  const data = useLoaderData<typeof loader>() || {}
 
   return (
     <Stack direction={'column'} fullHeight fullWidth>
@@ -172,7 +172,7 @@ const ProjectsRoute = () => {
       </Wrapper>
       <Suspense fallback={projectSkeletons}>
         <Await resolve={data.projects}>
-          {(projects) => <ProjectsList projects={projects} />}
+          {(projects) => <ProjectsList projects={projects || []} />}
         </Await>
       </Suspense>
     </Stack>

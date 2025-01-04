@@ -74,7 +74,7 @@
     --logo-offset: 0;
   }
 
-  .header__title[data-should-hide="true"] {
+  .header__title[data-should-hide='true'] {
     display: none;
   }
 }

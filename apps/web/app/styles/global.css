@@ -26,33 +26,28 @@ svg:not(.svg-own-color) path {
     animation: none !important;
   }
 }
-/* 
-::view-transition-old(content) {
-  animation: growOut 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
+
+::view-transition-old(default) {
+  animation: fadeOut 250ms ease !important;
+}
+::view-transition-new(default) {
+  animation: fadeIn 250ms ease !important;
 }
 
-::view-transition-new(content) {
-  animation: growIn 250ms cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-
-@keyframes growIn {
+@keyframes fadeIn {
   from {
-    transform: translateX(8px);
     opacity: 0;
   }
   to {
-    transform: translateX(0px);
     opacity: 1;
   }
 }
 
-@keyframes growOut {
+@keyframes fadeOut {
   from {
-    transform: translateX(0px);
     opacity: 1;
   }
   to {
-    transform: translateX(-8px);
     opacity: 0;
   }
-} */
+}

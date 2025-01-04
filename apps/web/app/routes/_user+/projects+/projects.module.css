@@ -1,6 +1,5 @@
 .projects {
   display: flex;
-  view-transition-name: content;
 }
 
 .projects__bannerBlocks {

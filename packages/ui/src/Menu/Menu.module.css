@@ -10,6 +10,7 @@
   z-index: 1;
   transform-origin: var(--radix-dropdown-menu-content-transform-origin);
   overflow: hidden;
+  will-change: transform;
 }
 
 .menu__inner {
