@@ -99,11 +99,12 @@
     "vite-env-only": "^3.0.3",
     "web-oidc": "^0.0.19",
     "ws": "^8.18.0",
+    "utf-8-validate": "^6.0.5",
+    "bufferutil": "^4.0.9",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241127.0",
     "@csstools/postcss-media-minmax": "^2.0.1",
     "@remix-run/dev": "^2.15.2",
     "@types/bcryptjs": "^2.4.6",

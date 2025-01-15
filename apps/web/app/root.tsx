@@ -203,10 +203,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 const App = () => {
-  const loaderData = useLoaderData<typeof loader>()
+  const loaderData = useLoaderData<typeof loader | null>()
   const theme = useOptionalTheme()
 
-  useToast(loaderData.toast)
+  useToast(loaderData?.toast)
 
   // TODO: fix SW requests
   // React.useEffect(() => {
@@ -216,7 +216,7 @@ const App = () => {
   // }, [])
 
   return (
-    <HoneypotProvider {...loaderData.honeypotProps}>
+    <HoneypotProvider {...loaderData?.honeypotProps}>
       <Outlet />
       <Modals />
       <UploadsOverlay />
