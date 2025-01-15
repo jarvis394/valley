@@ -1,4 +1,4 @@
-import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
+import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   Await,
   ClientLoaderFunctionArgs,

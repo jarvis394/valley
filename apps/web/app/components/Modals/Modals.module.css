@@ -4,4 +4,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: auto;
+  line-height: 24px;
 }

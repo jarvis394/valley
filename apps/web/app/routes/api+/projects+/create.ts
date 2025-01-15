@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/cloudflare'
+import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { UrlService } from 'app/server/services/url.server'

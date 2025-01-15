@@ -1,3 +1,3 @@
-import ProjectSettingsGeneralRoute from './general'
+import ProjectSettingsGeneral from './general'
 
-export default ProjectSettingsGeneralRoute
+export default ProjectSettingsGeneral

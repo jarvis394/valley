@@ -1,5 +1,5 @@
 import { createId as cuid } from '@paralleldrive/cuid2'
-import { redirect } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/node'
 import { OIDCStrategy } from 'web-oidc/remix'
 import { connectionSessionStorage } from '../connections.server'
 import { redirectWithToast } from '../../toast.server'

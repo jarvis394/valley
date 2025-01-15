@@ -10,7 +10,6 @@ import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
-import Modal from '@valley/ui/Modal'
 import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 
@@ -48,7 +47,7 @@ const ModalContent: React.FC<
   })
 
   return (
-    <Modal onDismiss={onClose} id="edit-folder-title">
+    <>
       <ModalHeader>Edit Folder Title</ModalHeader>
       <Form
         onSubmit={handleSubmit}
@@ -61,8 +60,8 @@ const ModalContent: React.FC<
           <TextField
             {...register('title', {
               required: true,
-              value: defaultTitle,
             })}
+            defaultValue={defaultTitle}
             fieldState={getFieldState('title', formState)}
             label="Title"
             required
@@ -96,7 +95,7 @@ const ModalContent: React.FC<
           </Button>
         }
       />
-    </Modal>
+    </>
   )
 }
 

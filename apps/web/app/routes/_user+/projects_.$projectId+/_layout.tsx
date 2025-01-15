@@ -8,7 +8,7 @@ import {
 } from '@remix-run/react'
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
-import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
+import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import {
@@ -74,7 +74,7 @@ export async function clientLoader({
   return await serverLoader()
 }
 
-clientLoader.hydrate = true
+clientLoader.hydrate = false
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,

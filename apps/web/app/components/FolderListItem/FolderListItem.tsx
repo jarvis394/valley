@@ -70,22 +70,21 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
 
   const handleFolderRename = () => {
     onFolderRename?.(folder)
-    openModal(
-      'edit-folder-title',
-      {
-        folderId: folder.id,
-      },
-      {
-        state: {
-          defaultTitle: folder.title,
-        },
-      }
-    )
+    openModal('edit-folder-title', {
+      folderId: folder.id,
+    })
   }
 
   const handleFolderDelete = () => {
     onFolderDelete?.(folder)
     openModal('confirm-folder-deletion', {
+      folderId: folder.id,
+    })
+  }
+
+  const handleFolderClear = () => {
+    onFolderDelete?.(folder)
+    openModal('confirm-folder-clear', {
       folderId: folder.id,
     })
   }
@@ -139,15 +138,15 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
           <IconButton onClick={handleFolderRename} variant="tertiary" size="md">
             <PencilEdit color="var(--text-secondary)" />
           </IconButton>
-          {!folder.isDefaultFolder && (
-            <IconButton
-              onClick={handleFolderDelete}
-              variant="tertiary"
-              size="md"
-            >
-              <Trash color="var(--red-600)" />
-            </IconButton>
-          )}
+          <IconButton
+            onClick={
+              folder.isDefaultFolder ? handleFolderClear : handleFolderDelete
+            }
+            variant="tertiary"
+            size="md"
+          >
+            <Trash color="var(--red-600)" />
+          </IconButton>
         </Stack>
       </li>
     </ButtonBase>

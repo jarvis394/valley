@@ -12,11 +12,7 @@ import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes } from 'app/utils/misc'
-import {
-  data,
-  HeadersFunction,
-  LoaderFunctionArgs,
-} from '@remix-run/cloudflare'
+import { data, HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
@@ -56,7 +52,6 @@ import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
 import ButtonBase from '@valley/ui/ButtonBase'
 import MenuExpand from 'app/components/svg/MenuExpand'
-import ProjectFoldersModal from 'app/components/ProjectFoldersModal/ProjectFoldersModal'
 import {
   DndContext,
   DragEndEvent,
@@ -176,17 +171,9 @@ const ProjectHeader: React.FC<{
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    openModal(
-      'edit-folder-description',
-      {
-        folderId: currentFolder.id,
-      },
-      {
-        state: {
-          defaultDescription: currentFolder.description,
-        },
-      }
-    )
+    openModal('edit-folder-description', {
+      folderId: currentFolder.id,
+    })
   }
 
   return (
@@ -241,10 +228,12 @@ const ProjectFolders: React.FC<{
   currentFolder?: Folder
 }> = ({ project, currentFolder }) => {
   const navigate = useNavigate()
-  const [isFoldersModalOpen, setFoldersModalOpen] = useState(false)
+  const { openModal } = useModal()
   const createFolderAction = '/api/folders/create'
   const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
-  const createFolderFetcher = useFetcher()
+  const createFolderFetcher = useFetcher({
+    key: createFolderAction,
+  })
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     fetcher: createFolderFetcher,
@@ -260,8 +249,6 @@ const ProjectFolders: React.FC<{
     (project?.folders.length || 0) < PROJECT_MAX_FOLDERS
 
   const handleFolderClick = (folder: Folder) => {
-    setFoldersModalOpen(false)
-
     if (!project) return
 
     if (currentFolder?.id !== folder.id) {
@@ -276,7 +263,7 @@ const ProjectFolders: React.FC<{
         <ButtonBase
           variant="secondary"
           className={styles.project__foldersButton}
-          onClick={() => setFoldersModalOpen(true)}
+          onClick={() => openModal('project-folders')}
           type="button"
         >
           <div className={styles.project__foldersListFolderContainer}>
@@ -319,12 +306,6 @@ const ProjectFolders: React.FC<{
           </div>
         </Wrapper>
       </Hidden>
-      <ProjectFoldersModal
-        project={project}
-        createFolderFetcher={createFolderFetcher}
-        isOpen={isFoldersModalOpen}
-        onDismiss={() => setFoldersModalOpen(false)}
-      />
     </Form>
   )
 }
@@ -336,32 +317,16 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
 
   const handleEditFolderTitle = () => {
     if (!currentFolder) return
-    openModal(
-      'edit-folder-title',
-      {
-        folderId: currentFolder.id,
-      },
-      {
-        state: {
-          defaultDescription: currentFolder.title,
-        },
-      }
-    )
+    openModal('edit-folder-title', {
+      folderId: currentFolder.id,
+    })
   }
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    openModal(
-      'edit-folder-description',
-      {
-        folderId: currentFolder.id,
-      },
-      {
-        state: {
-          defaultDescription: currentFolder.description,
-        },
-      }
-    )
+    openModal('edit-folder-description', {
+      folderId: currentFolder.id,
+    })
   }
 
   return (

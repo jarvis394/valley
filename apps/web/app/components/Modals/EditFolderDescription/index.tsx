@@ -10,7 +10,6 @@ import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
-import Modal from '@valley/ui/Modal'
 import { ProjectWithFolders } from '@valley/shared'
 import { useProjectAwait } from 'app/utils/project'
 
@@ -47,7 +46,7 @@ const ModalContent: React.FC<
   })
 
   return (
-    <Modal onDismiss={onClose} id="edit-folder-description">
+    <>
       <ModalHeader>Edit Folder Description</ModalHeader>
       <Form
         onSubmit={handleSubmit}
@@ -92,7 +91,7 @@ const ModalContent: React.FC<
           </Button>
         }
       />
-    </Modal>
+    </>
   )
 }
 

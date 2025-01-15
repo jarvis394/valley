@@ -16,11 +16,11 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@remix-run/cloudflare'
+} from '@remix-run/node'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
-import { useOptionalTheme, useTheme } from './routes/resources+/theme-switch'
+import { useOptionalTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { combineHeaders, getDomainUrl } from './utils/misc'
@@ -204,7 +204,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 const App = () => {
   const loaderData = useLoaderData<typeof loader>()
-  const theme = useTheme()
+  const theme = useOptionalTheme()
 
   useToast(loaderData.toast)
 

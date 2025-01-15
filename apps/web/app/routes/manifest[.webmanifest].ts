@@ -1,4 +1,4 @@
-import { data } from '@remix-run/cloudflare'
+import { data } from '@remix-run/node'
 import { ShouldRevalidateFunction } from '@remix-run/react'
 
 export const loader = () => {

@@ -1,9 +1,12 @@
+import { Await } from '@remix-run/react'
 import { Project } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'
-import React from 'react'
+import { useProjectAwait } from 'app/utils/project'
+import React, { Suspense } from 'react'
 import { z } from 'zod'
+import { ProjectWithFolders } from '@valley/shared'
 
 const ProjectEditSchema: z.ZodType<Project> = z.object({
   id: z.string(),
@@ -22,7 +25,9 @@ const ProjectEditSchema: z.ZodType<Project> = z.object({
   translationStringsId: z.number().or(z.null()),
 })
 
-const ProjectSettingsGeneralRoute = () => {
+const ProjectSettingsGeneral: React.FC<{
+  project?: ProjectWithFolders | null
+}> = ({ project }) => {
   return (
     <Stack direction={'column'} gap={4} fullWidth>
       <Fieldset
@@ -35,6 +40,7 @@ const ProjectSettingsGeneralRoute = () => {
           <TextField
             {...register('title')}
             fieldState={getFieldState('title', formState)}
+            defaultValue={project?.title}
             size="lg"
             placeholder="my-project"
           />
@@ -53,6 +59,7 @@ const ProjectSettingsGeneralRoute = () => {
           <TextField
             {...register('url')}
             fieldState={getFieldState('url', formState)}
+            defaultValue={project?.url}
             size="lg"
             placeholder="Unique project URL"
           />
@@ -87,6 +94,20 @@ const ProjectSettingsGeneralRoute = () => {
         id="project-delete-form"
       />
     </Stack>
+  )
+}
+
+const ProjectSettingsGeneralRoute = () => {
+  const data = useProjectAwait()
+
+  return (
+    <Suspense>
+      <Await resolve={data?.project}>
+        {(resolvedProject) => (
+          <ProjectSettingsGeneral project={resolvedProject} />
+        )}
+      </Await>
+    </Suspense>
   )
 }
 

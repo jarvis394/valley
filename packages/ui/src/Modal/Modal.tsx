@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import styles from './Modal.module.css'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
@@ -11,6 +11,11 @@ export type ModalProps = React.PropsWithChildren<{
   id: string
   isOpen?: boolean
   onDismiss?: () => void
+  /**
+   * Use Drawer from "vaul" on mobile devices
+   * @default true
+   */
+  useDrawer?: boolean
 }> &
   DialogProps
 
@@ -19,36 +24,29 @@ const Modal: React.FC<ModalProps> = ({
   children,
   id,
   onDismiss,
+  onOpenChange,
+  useDrawer = true,
   ...props
 }) => {
-  const shouldShowDrawer = useMediaQuery(
-    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
-  )
-  const [open, setOpen] = useState(propsIsOpen || false)
+  const shouldShowDrawer =
+    useMediaQuery(`(max-width:${SMALL_VIEWPORT_WIDTH}px)`) && useDrawer
+  // const [open, setOpen] = useState(propsIsOpen || false)
   const currentModal = new URLSearchParams(
     typeof window !== 'undefined' ? window.location.search : ''
   )?.get(modalKey)
+  const openState =
+    propsIsOpen !== undefined ? propsIsOpen : currentModal === id
 
   const handleClose = () => {
     // Use only user-provided function if it is present
     if (onDismiss) {
       return onDismiss()
     }
-
-    setOpen(false)
   }
 
-  useEffect(() => {
-    if (propsIsOpen === undefined) return
-    setOpen(propsIsOpen)
-  }, [propsIsOpen])
+  const handleOpenChange = (isOpen: boolean) => {
+    onOpenChange?.(isOpen)
 
-  useEffect(() => {
-    if (propsIsOpen !== undefined) return
-    setOpen(currentModal === id)
-  }, [currentModal, id, propsIsOpen])
-
-  const handleDrawerOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       return handleClose()
     }
@@ -58,12 +56,14 @@ const Modal: React.FC<ModalProps> = ({
     return (
       <Drawer.Root
         direction="bottom"
-        disablePreventScroll
         repositionInputs
+        disablePreventScroll
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
         handleOnly
         {...props}
-        open={open}
-        onOpenChange={handleDrawerOpenChange}
+        open={openState}
+        onOpenChange={handleOpenChange}
       >
         <Drawer.Portal>
           <Drawer.Content className={styles.modal__drawer}>
@@ -83,7 +83,7 @@ const Modal: React.FC<ModalProps> = ({
   }
 
   return (
-    <Dialog.Root {...props} open={open} onOpenChange={handleDrawerOpenChange}>
+    <Dialog.Root {...props} open={openState} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.modal__dialogOverlay} />
         <Dialog.Content className={styles.modal__dialog}>

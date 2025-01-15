@@ -1,5 +1,5 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
-import { HTMLFormMethod } from '@remix-run/router'
+import type { HTMLFormMethod } from '@remix-run/router'
 import prettyBytes from 'pretty-bytes'
 import * as z from 'zod'
 

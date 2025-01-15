@@ -1,11 +1,13 @@
 import { useCallback } from 'react'
 import { useNavigate, useSearchParams } from '@remix-run/react'
+import Modal from '@valley/ui/Modal'
 import CreateProjectModal from './CreateProject'
 import EditFolderTitleModal from './EditFolderTitle'
 import EditFolderDescriptionModal from './EditFolderDescription'
 import ConfirmFolderDeletionModal from './ConfirmFolderDeletion'
 import ConfirmFileDeletionModal from './ConfirmFileDeletion'
 import ConfirmFolderClearModal from './ConfirmFolderClear'
+import ProjectFoldersModal from './ProjectFoldersModal'
 
 export type ModalId =
   | 'create-project'
@@ -14,6 +16,7 @@ export type ModalId =
   | 'confirm-folder-deletion'
   | 'confirm-file-deletion'
   | 'confirm-folder-clear'
+  | 'project-folders'
 
 export const Modals = () => {
   const navigate = useNavigate()
@@ -40,12 +43,27 @@ export const Modals = () => {
 
   return (
     <>
-      <CreateProjectModal onClose={handleClose} />
-      <EditFolderTitleModal onClose={handleClose} />
-      <EditFolderDescriptionModal onClose={handleClose} />
-      <ConfirmFolderDeletionModal onClose={handleClose} />
-      <ConfirmFolderClearModal onClose={handleClose} />
-      <ConfirmFileDeletionModal onClose={handleClose} />
+      <Modal onDismiss={handleClose} id="create-project">
+        <CreateProjectModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="edit-folder-title">
+        <EditFolderTitleModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="edit-folder-description">
+        <EditFolderDescriptionModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="confirm-folder-deletion">
+        <ConfirmFolderDeletionModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="confirm-folder-clear">
+        <ConfirmFolderClearModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="confirm-file-deletion">
+        <ConfirmFileDeletionModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="project-folders">
+        <ProjectFoldersModal onClose={handleClose} />
+      </Modal>
     </>
   )
 }

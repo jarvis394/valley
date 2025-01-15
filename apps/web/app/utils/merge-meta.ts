@@ -1,4 +1,4 @@
-import type { MetaDescriptor, MetaFunction } from '@remix-run/cloudflare'
+import type { MetaDescriptor, MetaFunction } from '@remix-run/node'
 
 export const mergeMeta = (
   overrideFn: MetaFunction,

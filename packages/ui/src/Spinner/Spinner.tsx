@@ -1,12 +1,18 @@
 import React from 'react'
 import styles from './Spinner.module.css'
 import cx from 'classnames'
+import { AsChildProps } from '../types/AsChildProps'
+import { Slot } from '@radix-ui/react-slot'
 
-const Spinner: React.FC<
-  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
-> = ({ className, ...props }) => {
+type SpinnerProps = AsChildProps<React.HTMLAttributes<HTMLDivElement>> & {
+  className?: string
+}
+
+const Spinner: React.FC<SpinnerProps> = ({ className, asChild, ...props }) => {
+  const Root = asChild ? Slot : 'div'
+
   return (
-    <div {...props} className={cx(styles.spinner, className)}>
+    <Root {...props} className={cx(styles.spinner, className)}>
       <div className={styles.spinner__inner}>
         <div className={styles.spinner__bar} />
         <div className={styles.spinner__bar} />
@@ -21,7 +27,7 @@ const Spinner: React.FC<
         <div className={styles.spinner__bar} />
         <div className={styles.spinner__bar} />
       </div>
-    </div>
+    </Root>
   )
 }
 

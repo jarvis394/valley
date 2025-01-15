@@ -2,7 +2,6 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import Modal from '@valley/ui/Modal'
 import styles from '../Modals.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
@@ -37,7 +36,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
   const isPending = fetcher.state !== 'idle'
 
   return (
-    <Modal onDismiss={onClose} id="create-project">
+    <>
       <ModalHeader>Create Project</ModalHeader>
       <Form
         onSubmit={handleSubmit}
@@ -103,7 +102,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
           </Button>
         }
       />
-    </Modal>
+    </>
   )
 }
 

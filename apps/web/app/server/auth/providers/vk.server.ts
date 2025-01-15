@@ -1,5 +1,5 @@
 import { createId as cuid } from '@paralleldrive/cuid2'
-import { redirect } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/node'
 import { VKStrategy } from 'remix-auth-vk'
 import { connectionSessionStorage } from '../connections.server'
 import { type AuthProvider } from './provider'

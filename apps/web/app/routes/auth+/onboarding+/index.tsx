@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from '@remix-run/cloudflare'
+import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireOnboardingData } from './onboarding.server'
 
 /** Redirect user to the current onboarding step */

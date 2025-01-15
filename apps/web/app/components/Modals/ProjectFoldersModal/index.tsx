@@ -16,28 +16,38 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { FetcherWithComponents, useNavigate } from '@remix-run/react'
+import {
+  Await,
+  FetcherWithComponents,
+  useFetcher,
+  useNavigate,
+} from '@remix-run/react'
 import { Folder } from '@valley/db'
 import { ProjectWithFolders, PROJECT_MAX_FOLDERS } from '@valley/shared'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-import Modal from '@valley/ui/Modal'
 import ModalFooter from '@valley/ui/ModalFooter'
 import ModalHeader from '@valley/ui/ModalHeader'
 import FolderListItem from 'app/components/FolderListItem/FolderListItem'
 import { Plus, Pencil } from 'geist-ui-icons'
-import React, { useState, useEffect, useId, startTransition } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useId,
+  startTransition,
+  Suspense,
+} from 'react'
 import cx from 'classnames'
 import styles from './ProjectFoldersModal.module.css'
 import { createPortal } from 'react-dom'
 import { ClientOnly } from 'remix-utils/client-only'
+import { useProjectAwait } from 'app/utils/project'
 
-const ProjectFoldersModal: React.FC<{
-  project: ProjectWithFolders | null
+const ModalContent: React.FC<{
+  project?: ProjectWithFolders | null
   createFolderFetcher: FetcherWithComponents<unknown>
-  isOpen?: boolean
-  onDismiss?: () => void
-}> = ({ project, isOpen, createFolderFetcher, onDismiss }) => {
+  onClose?: () => void
+}> = ({ project, createFolderFetcher, onClose }) => {
   const id = useId()
   const navigate = useNavigate()
   const [folders, setFolders] = useState(project?.folders || [])
@@ -59,21 +69,16 @@ const ProjectFoldersModal: React.FC<{
   const handleFolderClick = (folder: Folder) => {
     if (!project) return
 
-    onDismiss?.()
-    navigate('/projects/' + project.id + '/folder/' + folder.id)
-    setIsEditing(false)
+    startTransition(() => {
+      onClose?.()
+      navigate('/projects/' + project.id + '/folder/' + folder.id)
+      setIsEditing(false)
+    })
   }
 
   const handleEdit = () => {
     startTransition(() => {
       setIsEditing((prev) => !prev)
-    })
-  }
-
-  const handleDismiss = () => {
-    startTransition(() => {
-      setIsEditing(false)
-      onDismiss?.()
     })
   }
 
@@ -99,12 +104,7 @@ const ProjectFoldersModal: React.FC<{
   }, [project?.folders])
 
   return (
-    <Modal
-      id="project-folders-list"
-      onDismiss={handleDismiss}
-      isOpen={isOpen}
-      handleOnly
-    >
+    <>
       <ModalHeader style={{ paddingTop: 24, paddingBottom: 12 }}>
         <Stack fullWidth align={'center'} justify={'space-between'}>
           Folders
@@ -160,8 +160,6 @@ const ProjectFoldersModal: React.FC<{
                   mode={isEditing ? 'edit' : 'default'}
                   key={folder.id}
                   onClick={handleFolderClick}
-                  onFolderRename={handleDismiss}
-                  onFolderDelete={handleDismiss}
                   folder={folder}
                 />
               ))}
@@ -200,7 +198,31 @@ const ProjectFoldersModal: React.FC<{
           You can edit folders by clicking &quot;Edit&quot; button
         </p>
       </ModalFooter>
-    </Modal>
+    </>
+  )
+}
+
+const ProjectFoldersModal: React.FC<{ onClose?: () => void }> = ({
+  onClose,
+}) => {
+  const data = useProjectAwait()
+  const createFolderAction = '/api/folders/create'
+  const createFolderFetcher = useFetcher({
+    key: createFolderAction,
+  })
+
+  return (
+    <Suspense>
+      <Await resolve={data?.project}>
+        {(resolvedProject) => (
+          <ModalContent
+            createFolderFetcher={createFolderFetcher}
+            onClose={onClose}
+            project={resolvedProject}
+          />
+        )}
+      </Await>
+    </Suspense>
   )
 }
 

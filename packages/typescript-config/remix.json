@@ -3,7 +3,7 @@
   "display": "Remix",
   "extends": "./base.json",
   "compilerOptions": {
-    "types": ["@remix-run/cloudflare", "vite/client"],
+    "types": ["@remix-run/node", "vite/client"],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"

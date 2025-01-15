@@ -157,6 +157,7 @@ model Project {
   protected          Boolean             @default(false)
   password           String?
   folders            Folder[]
+  coverImage         Cover?
   translationStrings TranslationStrings?
 
   User                 User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -211,6 +212,19 @@ model File {
   // Can be `null` because files are only being marked as deleted when folder is removed
   Folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   folderId String?
+
+  Cover Cover[]
+}
+
+model Cover {
+  id String @id @default(cuid())
+  x  Float  @default(0.5)
+  y  Float  @default(0.5)
+
+  Project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  File      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId    String
+  projectId String  @unique
 }
 
 model TranslationStrings {
