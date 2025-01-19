@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useId, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
@@ -21,13 +21,11 @@ import {
 } from 'app/server/timing.server'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import {
-  Await,
-  ClientLoaderFunctionArgs,
+  ClientLoaderFunction,
   Form,
   redirect,
   ShouldRevalidateFunction,
   useFetcher,
-  useLoaderData,
   useNavigate,
   useParams,
 } from '@remix-run/react'
@@ -41,7 +39,12 @@ import {
   ProjectWithFolders,
 } from '@valley/shared'
 import { formatNewLine } from 'app/utils/format-new-line'
-import { cache, useClientCache } from 'app/utils/client-cache'
+import {
+  cacheClientLoader,
+  invalidateCache,
+  useCachedLoaderData,
+  useSwrData,
+} from 'app/utils/client-cache'
 import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
 import { z } from 'zod'
@@ -49,7 +52,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { FoldersCreateSchema } from 'app/routes/api+/folders+/create'
 import Hidden from '@valley/ui/Hidden'
 import Stack from '@valley/ui/Stack'
-import Spinner from '@valley/ui/Spinner'
 import ButtonBase from '@valley/ui/ButtonBase'
 import MenuExpand from 'app/components/svg/MenuExpand'
 import {
@@ -71,7 +73,6 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
-import { getProjectCacheKey } from './_layout'
 import { useModal } from 'app/hooks/useModal'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
@@ -91,7 +92,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     timings,
     type: 'folder get userId from session',
   })
-  const folder = time(
+  const folder = await time(
     () => {
       return prisma.folder.findFirst({
         where: {
@@ -122,21 +123,17 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   )
 }
 
-export async function clientLoader({
-  serverLoader,
-  params,
-}: ClientLoaderFunctionArgs) {
+export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
   if (!params.folderId) {
     return redirect('/projects')
   }
 
-  const key = getFolderCacheKey(params.folderId)
-  const cacheEntry = await cache.getItem(key)
-  if (cacheEntry) {
-    return { folder: cacheEntry, cached: true }
-  }
-
-  return await serverLoader()
+  return cacheClientLoader(
+    { params, ...props },
+    {
+      key: getFolderCacheKey(params.folderId),
+    }
+  )
 }
 
 clientLoader.hydrate = true
@@ -153,7 +150,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   defaultShouldRevalidate,
 }) => {
   if (formAction && currentParams.folderId) {
-    cache.removeItem(getFolderCacheKey(currentParams.folderId))
+    invalidateCache(getFolderCacheKey(currentParams.folderId))
     return true
   }
 
@@ -236,9 +233,9 @@ const ProjectFolders: React.FC<{
     fetcher: createFolderFetcher,
     submitConfig: {
       navigate: false,
+      replace: true,
       action: createFolderAction,
       method: 'POST',
-      flushSync: true,
     },
   })
   const isCreatingFolder = createFolderFetcher.state !== 'idle'
@@ -351,14 +348,9 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
 
 const ProjectBlock: React.FC<{
   project?: ProjectWithFolders | null
-}> = ({ project }) => {
+}> = React.memo(function ProjectBlock({ project }) {
   const { folderId } = useParams()
   const currentFolder = project?.folders?.find((e) => e.id === folderId)
-
-  useClientCache({
-    data: project,
-    key: getProjectCacheKey(project?.id),
-  })
 
   return (
     <>
@@ -369,7 +361,7 @@ const ProjectBlock: React.FC<{
       <FolderInfo currentFolder={currentFolder} />
     </>
   )
-}
+})
 
 const FolderFiles: React.FC<{
   folder: FolderWithFiles | null
@@ -419,8 +411,6 @@ const FolderFiles: React.FC<{
   useEffect(() => {
     setFiles(folder?.files || [])
   }, [folder?.files])
-
-  useClientCache({ data: folder, key: getFolderCacheKey(folder?.id) })
 
   if (!folder) return null
 
@@ -511,28 +501,21 @@ const FolderFiles: React.FC<{
   )
 }
 
-const Fallback = () => (
-  <Stack direction={'row'} padding={6} justify={'center'}>
-    <Spinner />
-  </Stack>
-)
-
 const ProjectRoute = () => {
-  const projectData = useProjectAwait()
-  const data = useLoaderData<typeof loader>() || {}
+  const { ProjectAwait } = useProjectAwait()
+  const data = useCachedLoaderData<typeof loader>()
+  const FolderAwait = useSwrData<typeof loader>(data)
 
   return (
     <div className={styles.project}>
-      <Suspense fallback={<Fallback />}>
-        <Await resolve={projectData?.project}>
-          {(project) => <ProjectBlock project={project} />}
-        </Await>
-      </Suspense>
-      <Suspense fallback={<Fallback />}>
-        <Await resolve={data.folder}>
-          {(folder) => <FolderFiles folder={folder} />}
-        </Await>
-      </Suspense>
+      <ProjectAwait
+        fallback={(data) => <ProjectBlock project={data.project} />}
+      >
+        {(data) => <ProjectBlock project={data.project} />}
+      </ProjectAwait>
+      <FolderAwait fallback={(data) => <FolderFiles folder={data.folder} />}>
+        {(data) => <FolderFiles folder={data.folder} />}
+      </FolderAwait>
     </div>
   )
 }

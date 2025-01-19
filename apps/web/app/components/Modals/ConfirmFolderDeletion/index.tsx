@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react'
+import React, { useState } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,13 +6,14 @@ import styles from './ConfirmFolderDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import TextField from '@valley/ui/TextField'
 import Note from '@valley/ui/Note'
-import { Await, Form, useParams } from '@remix-run/react'
+import { Form, useParams } from '@remix-run/react'
 import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
 import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/routes/auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
+import Spinner from '@valley/ui/Spinner'
 
 type ConfirmFolderDeletionProps = {
   onClose: () => void
@@ -167,16 +168,21 @@ const ModalContent: React.FC<
 const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const { ProjectAwait } = useProjectAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ModalContent onClose={onClose} project={resolvedProject} />
-        )}
-      </Await>
-    </Suspense>
+    <ProjectAwait
+      fallback={() => (
+        <>
+          <ModalHeader>Delete Folder</ModalHeader>
+          <Stack padding={[4, 4, 8, 4]} align={'center'} justify={'center'}>
+            <Spinner />
+          </Stack>
+        </>
+      )}
+    >
+      {(data) => <ModalContent onClose={onClose} project={data.project} />}
+    </ProjectAwait>
   )
 }
 

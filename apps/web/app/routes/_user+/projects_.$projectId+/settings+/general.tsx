@@ -1,10 +1,9 @@
-import { Await } from '@remix-run/react'
 import type { Project } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'
 import { useProjectAwait } from 'app/utils/project'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { z } from 'zod'
 import { ProjectWithFolders } from '@valley/shared'
 
@@ -98,16 +97,12 @@ const ProjectSettingsGeneral: React.FC<{
 }
 
 const ProjectSettingsGeneralRoute = () => {
-  const data = useProjectAwait()
+  const { ProjectAwait } = useProjectAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ProjectSettingsGeneral project={resolvedProject} />
-        )}
-      </Await>
-    </Suspense>
+    <ProjectAwait>
+      {(data) => <ProjectSettingsGeneral project={data.project} />}
+    </ProjectAwait>
   )
 }
 

@@ -17,7 +17,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import {
-  Await,
   FetcherWithComponents,
   useFetcher,
   useNavigate,
@@ -30,13 +29,7 @@ import ModalFooter from '@valley/ui/ModalFooter'
 import ModalHeader from '@valley/ui/ModalHeader'
 import FolderListItem from 'app/components/FolderListItem/FolderListItem'
 import { Plus, Pencil } from 'geist-ui-icons'
-import React, {
-  useState,
-  useEffect,
-  useId,
-  startTransition,
-  Suspense,
-} from 'react'
+import React, { useState, useEffect, useId, startTransition } from 'react'
 import cx from 'classnames'
 import styles from './ProjectFoldersModal.module.css'
 import { createPortal } from 'react-dom'
@@ -47,7 +40,7 @@ const ModalContent: React.FC<{
   project?: ProjectWithFolders | null
   createFolderFetcher: FetcherWithComponents<unknown>
   onClose?: () => void
-}> = ({ project, createFolderFetcher, onClose }) => {
+}> = ({ project, createFolderFetcher }) => {
   const id = useId()
   const navigate = useNavigate()
   const [folders, setFolders] = useState(project?.folders || [])
@@ -69,11 +62,7 @@ const ModalContent: React.FC<{
   const handleFolderClick = (folder: Folder) => {
     if (!project) return
 
-    startTransition(() => {
-      onClose?.()
-      navigate('/projects/' + project.id + '/folder/' + folder.id)
-      setIsEditing(false)
-    })
+    navigate('/projects/' + project.id + '/folder/' + folder.id)
   }
 
   const handleEdit = () => {
@@ -205,24 +194,22 @@ const ModalContent: React.FC<{
 const ProjectFoldersModal: React.FC<{ onClose?: () => void }> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const { ProjectAwait } = useProjectAwait()
   const createFolderAction = '/api/folders/create'
   const createFolderFetcher = useFetcher({
     key: createFolderAction,
   })
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ModalContent
-            createFolderFetcher={createFolderFetcher}
-            onClose={onClose}
-            project={resolvedProject}
-          />
-        )}
-      </Await>
-    </Suspense>
+    <ProjectAwait>
+      {(data) => (
+        <ModalContent
+          createFolderFetcher={createFolderFetcher}
+          onClose={onClose}
+          project={data.project}
+        />
+      )}
+    </ProjectAwait>
   )
 }
 

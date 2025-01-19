@@ -1,11 +1,9 @@
 import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
-  Await,
-  ClientLoaderFunctionArgs,
+  ClientLoaderFunction,
   data,
   Link,
   ShouldRevalidateFunction,
-  useLoaderData,
 } from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
@@ -15,7 +13,7 @@ import {
   requireLoggedIn,
 } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
-import React, { Suspense } from 'react'
+import React from 'react'
 import styles from './projects.module.css'
 import ProjectCard from 'app/components/ProjectCard/ProjectCard'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
@@ -34,7 +32,12 @@ import {
 import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
-import { cache } from 'app/utils/client-cache'
+import {
+  cache,
+  cacheClientLoader,
+  useCachedLoaderData,
+  useSwrData,
+} from 'app/utils/client-cache'
 
 export const getProjectsCacheKey = () => 'projects'
 
@@ -46,7 +49,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     timings,
     type: 'get userId from session',
   })
-  const projects = time(
+  const projects = await time(
     prisma.project.findMany({
       where: { userId },
       orderBy: { dateCreated: 'desc' },
@@ -78,17 +81,10 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const clientLoader = async ({
-  serverLoader,
-}: ClientLoaderFunctionArgs) => {
-  const key = getProjectsCacheKey()
-  const cacheEntry = await cache.getItem(key)
-  if (cacheEntry) {
-    return { projects: cacheEntry, cached: true }
-  }
-
-  return await serverLoader()
-}
+export const clientLoader: ClientLoaderFunction = (args) =>
+  cacheClientLoader(args, {
+    key: getProjectsCacheKey(),
+  })
 
 clientLoader.hydrate = true
 
@@ -100,10 +96,10 @@ const projectSkeletons = (
   </Wrapper>
 )
 
-const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
+const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
   projects,
 }) => {
-  if (projects.length === 0) {
+  if (projects?.length === 0) {
     return (
       <Stack
         fullHeight
@@ -139,7 +135,8 @@ const ProjectsList: React.FC<{ projects: ProjectWithFolders[] }> = ({
 }
 
 const ProjectsRoute = () => {
-  const data = useLoaderData<typeof loader>() || {}
+  const data = useCachedLoaderData<typeof loader>()
+  const ProjectsAwait = useSwrData<typeof loader>(data)
 
   return (
     <Stack direction={'column'} fullHeight fullWidth>
@@ -172,11 +169,9 @@ const ProjectsRoute = () => {
           </Button>
         </Stack>
       </Wrapper>
-      <Suspense fallback={projectSkeletons}>
-        <Await resolve={data.projects}>
-          {(projects) => <ProjectsList projects={projects || []} />}
-        </Await>
-      </Suspense>
+      <ProjectsAwait fallback={() => projectSkeletons}>
+        {(data) => <ProjectsList projects={data.projects} />}
+      </ProjectsAwait>
     </Stack>
   )
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  ClientLoaderFunctionArgs,
+  ClientLoaderFunction,
   data,
   Outlet,
   redirect,
@@ -19,7 +19,12 @@ import {
   makeTimings,
   time,
 } from 'app/server/timing.server'
-import { cache } from 'app/utils/client-cache'
+import {
+  cacheClientLoader,
+  decacheClientLoader,
+  invalidateCache,
+  useCachedLoaderData,
+} from 'app/utils/client-cache'
 import type { Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 
@@ -37,9 +42,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     type: 'project get userId from session',
   })
 
-  const project = time(
-    async () => {
-      return await prisma.project.findFirst({
+  const project = await time(
+    () => {
+      return prisma.project.findFirst({
         where: { id: projectId, userId },
         include: {
           folders: {
@@ -59,36 +64,42 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
-export async function clientLoader({
-  serverLoader,
-  params,
-}: ClientLoaderFunctionArgs) {
+export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
   if (!params.projectId) {
     return redirect('/projects')
   }
 
-  const key = getProjectCacheKey(params.projectId)
-  const cacheEntry = await cache.getItem(key)
-  if (cacheEntry) {
-    return { project: cacheEntry, cached: true }
-  }
-
-  return await serverLoader()
+  return cacheClientLoader(
+    { params, ...props },
+    {
+      key: getProjectCacheKey(params.projectId),
+    }
+  )
 }
 
 clientLoader.hydrate = true
 
+export const clientAction = decacheClientLoader
+
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
   currentParams,
-  defaultShouldRevalidate,
+  currentUrl,
+  nextUrl,
 }) => {
   if (formAction && currentParams.projectId) {
-    cache.removeItem(getProjectCacheKey(currentParams.projectId))
+    invalidateCache(getProjectCacheKey(currentParams.projectId))
     return true
   }
 
-  return defaultShouldRevalidate
+  if (
+    !currentUrl.searchParams.has('upload') &&
+    nextUrl.searchParams.has('upload')
+  ) {
+    return true
+  }
+
+  return false
 }
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
@@ -98,6 +109,8 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 }
 
 const ProjectLayout: React.FC = () => {
+  useCachedLoaderData()
+
   return (
     <>
       <ProjectToolbar />
