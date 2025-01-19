@@ -31,6 +31,7 @@ import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
+// import { loadServiceWorker, useSWEffect } from '@remix-pwa/sw'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -214,6 +215,8 @@ const App = () => {
   //   // adds <script> tag without CSP nonce value
   //   loadServiceWorker()
   // }, [])
+
+  // useSWEffect()
 
   return (
     <HoneypotProvider {...loaderData?.honeypotProps}>

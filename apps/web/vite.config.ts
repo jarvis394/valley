@@ -4,6 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
 import { flatRoutes } from 'remix-flat-routes'
 import { vercelPreset } from '@vercel/remix/vite'
+// import { remixPWA } from '@remix-pwa/dev'
 
 declare module '@remix-run/server-runtime' {
   interface Future {

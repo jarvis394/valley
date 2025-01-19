@@ -1,7 +1,8 @@
+import { data } from '@remix-run/node'
 import { ShouldRevalidateFunction } from '@remix-run/react'
 
 export const loader = () => {
-  return Response.json(
+  return data(
     {
       name: 'Valley',
       short_name: 'Valley',
