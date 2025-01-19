@@ -4,7 +4,7 @@ import styles from './FolderCard.module.css'
 import cx from 'classnames'
 import { CheckCircleFill, PencilEdit, Trash } from 'geist-ui-icons'
 import { formatBytes } from 'app/utils/misc'
-import { Folder } from '@valley/db'
+import type { Folder } from '@valley/db'
 import { useParams } from '@remix-run/react'
 import DragIndicator from '../svg/DragIndicator'
 import {

@@ -1,4 +1,4 @@
-import { Folder, Project } from '@valley/db'
+import type { Folder, Project } from '@valley/db'
 
 export type ProjectWithFolders = Project & {
   folders: Folder[]

@@ -12,7 +12,7 @@ import {
 import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
-import { Folder, Project } from '@valley/db'
+import type { Folder, Project } from '@valley/db'
 import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
@@ -31,7 +31,7 @@ type UseUploadProps = {
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const inputId = useId()
   const rootContext = useRouteLoaderData<typeof rootLoader>('root')
-  const $root = useRef(null)
+  const $root = useRef<HTMLElement>(null)
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null
   )
@@ -163,7 +163,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     onClick: () => void
   } => {
     return {
-      ref: $root,
+      ref: $root as React.RefObject<T>,
       onClick: openFilePicker,
     }
   }
@@ -218,9 +218,9 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         e as unknown as React.ChangeEvent<HTMLInputElement>
       )
 
-    if (!$input.current) return
+    if (!$input.current || !$root.current) return
 
-    isClientSide && document.body.appendChild($input.current)
+    isClientSide && $root.current.appendChild($input.current)
     $input.current.multiple = true
     $input.current.hidden = true
     $input.current.type = 'file'

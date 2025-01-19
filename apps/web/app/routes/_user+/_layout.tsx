@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Outlet, useLoaderData, useSubmit } from '@remix-run/react'
+import { Outlet, useSubmit } from '@remix-run/react'
 import styles from './styles.module.css'
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
@@ -19,11 +19,9 @@ export const shouldRevalidate = () => {
 }
 
 const UserGroupLayout: React.FC = () => {
-  const data = useLoaderData<typeof loader>()
-
   return (
     <div className={styles.main}>
-      <Header user={data.user} />
+      <Header />
       <main className={styles.main__wrapper}>
         <Outlet />
       </main>

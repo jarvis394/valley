@@ -10,7 +10,10 @@ import {
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
-import { getUserIdFromSession } from 'app/server/auth/auth.server'
+import {
+  getUserIdFromSession,
+  requireLoggedIn,
+} from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import React, { Suspense } from 'react'
 import styles from './projects.module.css'
@@ -36,6 +39,8 @@ import { cache } from 'app/utils/client-cache'
 export const getProjectsCacheKey = () => 'projects'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  await requireLoggedIn(request)
+
   const timings = makeTimings('projects loader')
   const userId = await time(getUserIdFromSession(request), {
     timings,
@@ -73,17 +78,14 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-let initialLoad = true
 export const clientLoader = async ({
   serverLoader,
 }: ClientLoaderFunctionArgs) => {
   const key = getProjectsCacheKey()
   const cacheEntry = await cache.getItem(key)
-  if (cacheEntry && !initialLoad) {
+  if (cacheEntry) {
     return { projects: cacheEntry, cached: true }
   }
-
-  initialLoad = false
 
   return await serverLoader()
 }

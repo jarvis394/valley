@@ -11,9 +11,10 @@ import {
 } from 'geist-ui-icons'
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
-import { Link } from '@remix-run/react'
+import { Link, useNavigation } from '@remix-run/react'
 import Skeleton from '@valley/ui/Skeleton'
 import { ProjectWithFolders } from '@valley/shared'
+import Spinner from '@valley/ui/Spinner'
 
 type ProjectCardProps =
   | {
@@ -31,6 +32,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
     project?.folders.find((e) => e.isDefaultFolder)?.id ||
     project?.folders[0]?.id
   const projectLink = `/projects/${project?.id}/folder/${defaultFolderId}`
+  const navigation = useNavigation()
 
   return (
     <div className={styles.projectCard}>
@@ -40,8 +42,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           prefetch="intent"
           to={projectLink}
           className={styles.projectCard__cover}
-          viewTransition
         >
+          {navigation.state === 'loading' && <Spinner />}
           {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
         </Link>
       )}
@@ -62,7 +64,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           prefetch="intent"
           to={projectLink}
           className={styles.projectCard__header}
-          viewTransition
         >
           <h3 className={styles.projectCard__contentTitle}>{project?.title}</h3>
           <p className={styles.projectCard__contentSubtitle}>

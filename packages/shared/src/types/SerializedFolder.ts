@@ -1,4 +1,4 @@
-import { Folder } from '@valley/db'
+import type { Folder } from '@valley/db'
 
 export type SerializedFolder = Omit<Folder, 'totalSize'> & {
   totalSize: number

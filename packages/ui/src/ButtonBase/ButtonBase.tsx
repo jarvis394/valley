@@ -31,7 +31,7 @@ const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(
       <Root
         {...other}
         ref={ref}
-        className={cx(className, styles.buttonBase, {
+        className={cx(className, 'ButtonBase', styles.buttonBase, {
           [styles['buttonBase--primary']]: variant === 'primary',
           [styles['buttonBase--secondary']]: variant === 'secondary',
           [styles['buttonBase--secondary-dimmed']]:

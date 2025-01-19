@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styles from './FileCard.module.css'
-import { File } from '@valley/db'
+import type { File } from '@valley/db'
 import * as Menu from '@valley/ui/Menu'
 import {
   Download,

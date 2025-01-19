@@ -58,7 +58,6 @@ type UseClientCacheProps<T> = {
 export const useClientCache = <T>({ data, key }: UseClientCacheProps<T>) => {
   useEffect(() => {
     if (!data) return
-    const putDataToCache = async () => await cache.setItem(key, data)
-    putDataToCache()
+    cache.setItem(key, data)
   }, [data, key])
 }

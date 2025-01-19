@@ -15,6 +15,7 @@
 .skeleton--circular {
   border-radius: 50%;
   height: 1.2em;
+  flex-shrink: 0;
 }
 
 .skeleton--rectangular {

@@ -33,7 +33,7 @@ import {
 } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
-import { File, Folder } from '@valley/db'
+import type { File, Folder } from '@valley/db'
 import { useProjectAwait } from 'app/utils/project'
 import {
   FolderWithFiles,
@@ -122,7 +122,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   )
 }
 
-let initialLoad = true
 export async function clientLoader({
   serverLoader,
   params,
@@ -133,16 +132,14 @@ export async function clientLoader({
 
   const key = getFolderCacheKey(params.folderId)
   const cacheEntry = await cache.getItem(key)
-  if (cacheEntry && !initialLoad) {
+  if (cacheEntry) {
     return { folder: cacheEntry, cached: true }
   }
-
-  initialLoad = false
 
   return await serverLoader()
 }
 
-clientLoader.hydrate = false
+clientLoader.hydrate = true
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   return {
@@ -164,7 +161,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 }
 
 const ProjectHeader: React.FC<{
-  project: ProjectWithFolders | null
+  project?: ProjectWithFolders | null
   currentFolder?: Folder
 }> = ({ project, currentFolder }) => {
   const { openModal } = useModal()
@@ -224,7 +221,7 @@ const ProjectHeader: React.FC<{
 }
 
 const ProjectFolders: React.FC<{
-  project: ProjectWithFolders | null
+  project?: ProjectWithFolders | null
   currentFolder?: Folder
 }> = ({ project, currentFolder }) => {
   const navigate = useNavigate()
@@ -246,7 +243,7 @@ const ProjectFolders: React.FC<{
   })
   const isCreatingFolder = createFolderFetcher.state !== 'idle'
   const canCreateMoreFolders =
-    (project?.folders.length || 0) < PROJECT_MAX_FOLDERS
+    (project?.folders?.length || 0) < PROJECT_MAX_FOLDERS
 
   const handleFolderClick = (folder: Folder) => {
     if (!project) return
@@ -282,7 +279,7 @@ const ProjectFolders: React.FC<{
       <Hidden sm md className={styles.project__foldersContainer}>
         <Wrapper className={styles.project__folders}>
           <div className={cx(styles.project__foldersList)}>
-            {project?.folders.map((folder, i) => (
+            {project?.folders?.map((folder, i) => (
               <FolderCard onClick={handleFolderClick} key={i} folder={folder} />
             ))}
             {canCreateMoreFolders && (
@@ -353,12 +350,15 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
 }
 
 const ProjectBlock: React.FC<{
-  project: ProjectWithFolders | null
+  project?: ProjectWithFolders | null
 }> = ({ project }) => {
   const { folderId } = useParams()
-  const currentFolder = project?.folders.find((e) => e.id === folderId)
+  const currentFolder = project?.folders?.find((e) => e.id === folderId)
 
-  useClientCache({ data: project, key: getProjectCacheKey(project?.id) })
+  useClientCache({
+    data: project,
+    key: getProjectCacheKey(project?.id),
+  })
 
   return (
     <>
@@ -525,7 +525,7 @@ const ProjectRoute = () => {
     <div className={styles.project}>
       <Suspense fallback={<Fallback />}>
         <Await resolve={projectData?.project}>
-          {(project) => <ProjectBlock project={project || null} />}
+          {(project) => <ProjectBlock project={project} />}
         </Await>
       </Suspense>
       <Suspense fallback={<Fallback />}>

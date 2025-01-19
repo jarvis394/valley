@@ -10,7 +10,7 @@ import {
 } from 'geist-ui-icons'
 import Menu from '@valley/ui/Menu'
 import { formatBytes } from 'app/utils/misc'
-import { Folder } from '@valley/db'
+import type { Folder } from '@valley/db'
 import IconButton from '@valley/ui/IconButton'
 import { Link, useParams } from '@remix-run/react'
 import { useModal } from 'app/hooks/useModal'
@@ -101,6 +101,8 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
       >
         <Link
           onClick={onClick?.bind(null, folder)}
+          replace
+          discover="render"
           to={'/projects/' + projectId + '/folder/' + folder.id}
         >
           <div className={styles.folderCard__content}>

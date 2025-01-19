@@ -1,4 +1,4 @@
-import { File } from '@valley/db'
+import type { File } from '@valley/db'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 

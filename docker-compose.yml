@@ -1,6 +1,11 @@
 x-defaults: &defaults
   init: true
   tty: true
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '20m'
+      max-file: '3'
   networks:
     - valley_network
 
@@ -18,6 +23,11 @@ x-minio-common: &minio-common
     interval: 5s
     timeout: 5s
     retries: 5
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '20m'
+      max-file: '3'
   init: true
   tty: true
   networks:

@@ -1,16 +1,23 @@
 import React from 'react'
 import styles from './Skeleton.module.css'
 import cx from 'classnames'
+import { AsChildProps } from '../types/AsChildProps'
+import { Slot } from '@radix-ui/react-slot'
 
-export type SkeletonProps = React.PropsWithChildren<{
+export type SkeletonOwnProps = React.PropsWithChildren<{
   variant?: 'text' | 'rectangular' | 'circular'
   width?: string | number
   height?: string | number
-}> &
+  className?: string
+}>
+
+export type SkeletonProps = AsChildProps<
   React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLSpanElement>,
     HTMLSpanElement
   >
+> &
+  SkeletonOwnProps
 
 const Skeleton: React.FC<SkeletonProps> = ({
   children,
@@ -18,10 +25,13 @@ const Skeleton: React.FC<SkeletonProps> = ({
   className,
   width,
   height,
+  asChild,
   ...props
 }) => {
+  const Root = asChild ? Slot : 'span'
+
   return (
-    <span
+    <Root
       style={{ width, height }}
       className={cx(styles.skeleton, className, {
         [styles['skeleton--text']]: variant === 'text',
@@ -31,7 +41,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
       {...props}
     >
       {children}
-    </span>
+    </Root>
   )
 }
 

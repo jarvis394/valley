@@ -7,7 +7,7 @@ const LinkTabItem = React.forwardRef<HTMLButtonElement, ToolbarItem>(
   function LinkTabItem({ label, value, to, ...props }, ref) {
     return (
       <TabsItem {...props} ref={ref} asChild key={value} value={value}>
-        <Link prefetch="intent" to={to || value}>
+        <Link prefetch="intent" discover="render" to={to || value}>
           {label}
         </Link>
       </TabsItem>

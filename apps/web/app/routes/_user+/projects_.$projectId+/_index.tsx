@@ -1,9 +1,17 @@
 import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { getUserIdFromSession } from 'app/server/auth/auth.server'
+import {
+  getUserIdFromSession,
+  requireLoggedIn,
+} from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
+import { invariantResponse } from 'app/utils/invariant'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  await requireLoggedIn(request)
+
   const { projectId } = params
+  invariantResponse(projectId, 'Missing project ID in route params')
+
   const userId = await getUserIdFromSession(request)
   const project = await prisma.project.findFirst({
     where: { id: projectId, userId },

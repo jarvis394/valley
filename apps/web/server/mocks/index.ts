@@ -5,14 +5,15 @@ import { handlers as githubHandlers } from './github.js'
 
 export const server = setupServer(...resendHandlers, ...githubHandlers)
 
-server.listen({
-  onUnhandledRequest(request, print) {
-    if (request.url.includes('.sentry.io')) return
-    print.warning()
-  },
-})
-
 if (process.env.NODE_ENV !== 'test') {
+  server.listen({
+    onUnhandledRequest(request, print) {
+      if (request.url.includes('.sentry.io')) return
+      if (request.url.includes('neon.tech')) return
+      print.warning()
+    },
+  })
+
   console.info('🔶 Mock server installed')
 
   closeWithGrace(() => {

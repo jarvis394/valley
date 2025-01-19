@@ -1,4 +1,4 @@
-import { Folder, Project } from '@valley/db'
+import type { Folder, Project } from '@valley/db'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 

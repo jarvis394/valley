@@ -1,4 +1,4 @@
-import { File } from '@valley/db'
+import type { File } from '@valley/db'
 
 export type FileGetAllInFolderReq = unknown
 export type FileGetAllInFolderRes = {

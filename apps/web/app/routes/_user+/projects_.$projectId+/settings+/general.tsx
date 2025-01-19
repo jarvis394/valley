@@ -1,5 +1,5 @@
 import { Await } from '@remix-run/react'
-import { Project } from '@valley/db'
+import type { Project } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'

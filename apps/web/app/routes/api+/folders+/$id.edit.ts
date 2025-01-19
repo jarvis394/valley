@@ -63,7 +63,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   } catch (e) {
     return data(
       {
-        ok: true,
+        ok: false,
         errors: {
           title: {
             type: 'validate',

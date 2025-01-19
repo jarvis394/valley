@@ -1,4 +1,4 @@
-import { User } from '@valley/db'
+import type { User } from '@valley/db'
 import { SerializedUser } from '../SerializedUser.js'
 
 export type UserGetSelfReq = unknown

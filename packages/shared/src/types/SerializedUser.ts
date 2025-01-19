@@ -1,3 +1,3 @@
-import { User } from '@valley/db'
+import type { User } from '@valley/db'
 
 export type SerializedUser = Omit<User, 'password' | 'refreshToken'>

@@ -34,7 +34,7 @@ const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
         <Await resolve={projectData?.project}>
           {(project) => {
             const defaultFolder =
-              project?.folders.find((e) => e.isDefaultFolder)?.id || folderId
+              project?.folders?.find((e) => e.isDefaultFolder)?.id || folderId
             return (
               <LinkTabItem
                 {...props}
@@ -75,7 +75,7 @@ const ProjectsToolbar = () => {
     ],
     [projectBaseUrl]
   )
-  const defaultValue = useMemo(() => {
+  const value = useMemo(() => {
     if (folderId && location.pathname.startsWith(projectBaseUrl + '/folder/')) {
       return projectBaseUrl
     }
@@ -89,7 +89,7 @@ const ProjectsToolbar = () => {
 
   return (
     <div className={styles.toolbar}>
-      <AnimatedTabs defaultValue={defaultValue}>
+      <AnimatedTabs value={value}>
         {projectToolbarItems.map((tab) => (
           <ProjectsToolbarTabItem
             key={tab.value}

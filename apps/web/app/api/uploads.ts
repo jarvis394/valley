@@ -1,4 +1,4 @@
-import { Folder, Project, UploadToken } from '@valley/db'
+import type { Folder, Project, UploadToken } from '@valley/db'
 import axios from 'axios'
 
 type CreateUploadTokenProps = {

@@ -1,4 +1,4 @@
-import { File, Folder, Project } from '@valley/db'
+import type { File, Folder, Project } from '@valley/db'
 
 export enum TusHookType {
   PRE_CREATE = 'pre-create',

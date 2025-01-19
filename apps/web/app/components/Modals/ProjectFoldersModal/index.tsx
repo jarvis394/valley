@@ -22,7 +22,7 @@ import {
   useFetcher,
   useNavigate,
 } from '@remix-run/react'
-import { Folder } from '@valley/db'
+import type { Folder } from '@valley/db'
 import { ProjectWithFolders, PROJECT_MAX_FOLDERS } from '@valley/shared'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'

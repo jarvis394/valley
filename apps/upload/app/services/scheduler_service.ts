@@ -28,6 +28,7 @@ export default class SchedulerService {
         logger.error(
           `[Scheduler] - An error occurred during the execution of job ${jobConfig.key}`
         )
+        e instanceof Error && logger.error(`[Scheduler] - ${e.message}`)
       } finally {
         if (acquired) {
           await lock.release()

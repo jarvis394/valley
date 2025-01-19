@@ -1,4 +1,4 @@
-import type { User, Password, Connection } from '@valley/db'
+import type { User, Password, Connection, UserSettings } from '@valley/db'
 import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
@@ -8,7 +8,6 @@ import { prisma } from '../db.server'
 import { combineHeaders } from '../../utils/misc'
 import { normalizeEmail, type ProviderUser } from './providers/provider'
 import { authSessionStorage } from './session.server'
-import { UserSettings } from '@valley/db'
 import { invariantResponse } from '../../utils/invariant'
 
 // TODO: think about refreshing sessions

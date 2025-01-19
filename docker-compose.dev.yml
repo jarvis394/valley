@@ -1,13 +1,18 @@
 x-defaults: &defaults
   init: true
   tty: true
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '20m'
+      max-file: '3'
   networks:
     - valley_network
 
 # Settings and configurations that are common for all containers
 x-minio-common: &minio-common
   image: minio/minio
-  command: server --console-address ":9001" http://minio{1...4}/data{1...2}
+  command: server --console-address ":9001" /data/minio
   expose:
     - '9000'
     - '9001'
@@ -18,6 +23,11 @@ x-minio-common: &minio-common
     interval: 5s
     timeout: 5s
     retries: 5
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '20m'
+      max-file: '3'
   init: true
   tty: true
   networks:
@@ -26,33 +36,11 @@ x-minio-common: &minio-common
 name: valley
 
 services:
-  minio1:
+  minio:
     <<: *minio-common
-    hostname: minio1
+    hostname: minio
     volumes:
-      - data1-1:/data1
-      - data1-2:/data2
-
-  minio2:
-    <<: *minio-common
-    hostname: minio2
-    volumes:
-      - data2-1:/data1
-      - data2-2:/data2
-
-  minio3:
-    <<: *minio-common
-    hostname: minio3
-    volumes:
-      - data3-1:/data1
-      - data3-2:/data2
-
-  minio4:
-    <<: *minio-common
-    hostname: minio4
-    volumes:
-      - data4-1:/data1
-      - data4-2:/data2
+      - data:/data
 
   tusd:
     <<: *defaults
@@ -66,10 +54,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - minio1
-      - minio2
-      - minio3
-      - minio4
+      - minio
 
   postgres:
     <<: *defaults
@@ -81,7 +66,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
       - ./postgres:/docker-entrypoint-initdb.d
     ports:
       - '5432:5432'
@@ -101,6 +86,8 @@ services:
     restart: always
     ports:
       - '6379:6379'
+    volumes:
+      - redis-data:/data
     environment:
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
@@ -110,15 +97,12 @@ services:
     image: nginx:1.19.2-alpine
     hostname: nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro
     ports:
       - '9000:9000'
       - '9001:9001'
     depends_on:
-      - minio1
-      - minio2
-      - minio3
-      - minio4
+      - minio
 
   # Creates minio bucket on startup if it was not created before
   createbuckets:
@@ -127,10 +111,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - minio1
-      - minio2
-      - minio3
-      - minio4
+      - minio
       - nginx
     entrypoint: >
       /bin/sh -c "
@@ -141,15 +122,9 @@ services:
       "
 
 volumes:
-  data1-1:
-  data1-2:
-  data2-1:
-  data2-2:
-  data3-1:
-  data3-2:
-  data4-1:
-  data4-2:
-  pgdata:
+  data:
+  redis-data:
+  postgres-data:
   tusd:
 networks:
   valley_network:

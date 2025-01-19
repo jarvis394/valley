@@ -9,7 +9,10 @@ import {
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { getUserIdFromSession } from 'app/server/auth/auth.server'
+import {
+  getUserIdFromSession,
+  requireLoggedIn,
+} from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
@@ -17,12 +20,14 @@ import {
   time,
 } from 'app/server/timing.server'
 import { cache } from 'app/utils/client-cache'
-import { Project } from '@valley/db'
+import type { Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  await requireLoggedIn(request)
+
   const { projectId } = params
   invariantResponse(projectId, 'Missing project ID in route params')
 
@@ -33,8 +38,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   })
 
   const project = time(
-    () => {
-      return prisma.project.findFirst({
+    async () => {
+      return await prisma.project.findFirst({
         where: { id: projectId, userId },
         include: {
           folders: {
@@ -54,7 +59,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
-let initialLoad = true
 export async function clientLoader({
   serverLoader,
   params,
@@ -65,16 +69,14 @@ export async function clientLoader({
 
   const key = getProjectCacheKey(params.projectId)
   const cacheEntry = await cache.getItem(key)
-  if (cacheEntry && !initialLoad) {
+  if (cacheEntry) {
     return { project: cacheEntry, cached: true }
   }
-
-  initialLoad = false
 
   return await serverLoader()
 }
 
-clientLoader.hydrate = false
+clientLoader.hydrate = true
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
