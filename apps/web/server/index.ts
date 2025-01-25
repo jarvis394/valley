@@ -178,8 +178,9 @@ app.use((req, res, next) => {
     '/admin',
     '/reset-password',
     '/settings/profile',
-    '/resources/login',
-    '/resources/verify',
+    '/auth/login',
+    '/auth/verify',
+    '/auth/register',
   ]
 
   if (req.method !== 'GET' && req.method !== 'HEAD') {

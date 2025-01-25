@@ -1,5 +1,5 @@
 import { loader as projectLayoutLoader } from 'app/routes/_user+/projects_.$projectId+/_layout'
-import { useCachedLoaderData, useSwrData } from './client-cache'
+import { useCachedLoaderData, useSwrData } from './cache'
 import { useRouteLoaderData } from '@remix-run/react'
 
 export function useProjectAwait() {

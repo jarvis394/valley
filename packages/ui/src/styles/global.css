@@ -48,3 +48,39 @@
   translate: 0 8px;
   visibility: hidden;
 }
+
+.shimmer {
+  position: relative;
+  mask-image: -webkit-radial-gradient(center, white, black);
+  overflow: hidden;
+  opacity: 0.75;
+  user-select: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+.shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--alpha-transparent-07),
+    transparent
+  );
+  content: '';
+  position: absolute;
+  transform: translateX(-100%);
+  inset: 0px;
+  animation: 2s linear 0s infinite normal none running animation-shimmer;
+}
+
+@keyframes animation-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

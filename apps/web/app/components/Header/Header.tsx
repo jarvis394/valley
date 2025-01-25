@@ -138,7 +138,9 @@ const Header: React.FC = () => {
               {(resolvedUser) => <CurrentUser user={resolvedUser} />}
             </Await>
           </Suspense>
-          <ProjectAwait fallback={() => <PathPartSkeleton />}>
+          <ProjectAwait
+            fallback={(data) => <CurrentProject project={data.project} />}
+          >
             {(data) => <CurrentProject project={data.project} />}
           </ProjectAwait>
         </Stack>

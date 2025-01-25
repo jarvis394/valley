@@ -137,7 +137,7 @@ const UploadsOverlay: React.FC = () => {
                   className={styles.uploadsOverlay__file}
                   key={'upload_' + e.id}
                 >
-                  <p>{e.normalizedName}</p>
+                  <p>{e.name}</p>
                   <div className={styles.uploadsOverlay__fileProgress}>
                     <div data-hidden={!e.isUploading}>
                       <Gauge size="xs" value={e.progress * 100} />

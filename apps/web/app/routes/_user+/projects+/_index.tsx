@@ -1,10 +1,6 @@
 import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import {
-  ClientLoaderFunction,
-  data,
-  Link,
-  ShouldRevalidateFunction,
-} from '@remix-run/react'
+import { redirect } from '@remix-run/node'
+import { data, Link, ShouldRevalidateFunction } from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
@@ -12,7 +8,6 @@ import {
   getUserIdFromSession,
   requireLoggedIn,
 } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import React from 'react'
 import styles from './projects.module.css'
 import ProjectCard from 'app/components/ProjectCard/ProjectCard'
@@ -28,16 +23,19 @@ import {
   MagnifyingGlass,
   Plus,
   SortAscending,
+  SortDescending,
 } from 'geist-ui-icons'
 import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
 import {
   cache,
-  cacheClientLoader,
+  createClientLoaderCache,
   useCachedLoaderData,
   useSwrData,
-} from 'app/utils/client-cache'
+} from 'app/utils/cache'
+import Menu from '@valley/ui/Menu'
+import { getUserProjects } from 'app/server/project/project.server'
 
 export const getProjectsCacheKey = () => 'projects'
 
@@ -49,16 +47,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     timings,
     type: 'get userId from session',
   })
-  const projects = await time(
-    prisma.project.findMany({
-      where: { userId },
-      orderBy: { dateCreated: 'desc' },
-      include: {
-        folders: true,
-      },
-    }),
-    { timings, type: 'find projects' }
-  )
+
+  if (!userId) {
+    throw redirect('/auth/login')
+  }
+
+  const projects = await time(getUserProjects({ userId }), {
+    timings,
+    type: 'find projects',
+  })
 
   return data(
     { projects },
@@ -81,12 +78,10 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const clientLoader: ClientLoaderFunction = (args) =>
-  cacheClientLoader(args, {
-    key: getProjectsCacheKey(),
-  })
-
-clientLoader.hydrate = true
+export const clientLoader = createClientLoaderCache({
+  key: getProjectsCacheKey(),
+  type: 'swr',
+})
 
 const projectSkeletons = (
   <Wrapper className={styles.projects__list}>
@@ -129,7 +124,9 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
 
   return (
     <Wrapper className={styles.projects__list}>
-      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
+      {projects?.map((project, i) => (
+        <ProjectCard project={project} key={i} />
+      ))}
     </Wrapper>
   )
 }
@@ -159,14 +156,50 @@ const ProjectsRoute = () => {
             paperProps={{ className: styles.projects__searchInput }}
             before={<MagnifyingGlass color="var(--text-hint)" />}
           />
-          <Button
-            size="md"
-            variant="secondary-dimmed"
-            before={<SortAscending />}
-            after={<ChevronDown />}
-          >
-            Sort by name
-          </Button>
+          <Menu.Root>
+            <Menu.Trigger asChild>
+              <Button
+                size="md"
+                variant="secondary-dimmed"
+                before={<SortAscending />}
+                after={<ChevronDown />}
+              >
+                Sort by name
+              </Button>
+            </Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item
+                after={<SortAscending color="var(--text-secondary)" />}
+              >
+                Sort by name
+              </Menu.Item>
+              <Menu.Item
+                after={<SortDescending color="var(--text-secondary)" />}
+              >
+                Sort by name
+              </Menu.Item>
+              <Menu.Item
+                after={<SortAscending color="var(--text-secondary)" />}
+              >
+                Sort by date updated
+              </Menu.Item>
+              <Menu.Item
+                after={<SortDescending color="var(--text-secondary)" />}
+              >
+                Sort by date updated
+              </Menu.Item>
+              <Menu.Item
+                after={<SortAscending color="var(--text-secondary)" />}
+              >
+                Sort by date shot
+              </Menu.Item>
+              <Menu.Item
+                after={<SortDescending color="var(--text-secondary)" />}
+              >
+                Sort by date shot
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Root>
         </Stack>
       </Wrapper>
       <ProjectsAwait fallback={() => projectSkeletons}>

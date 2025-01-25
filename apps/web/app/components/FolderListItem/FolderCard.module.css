@@ -9,12 +9,12 @@
   transition-property: background-color, box-shadow, border, color;
 }
 
-.folderCard--active {
+.folderCard--active:global(.ButtonBase) {
   --themed-border: var(--alpha-transparent-07);
   background-color: var(--alpha-transparent-03);
 }
 
-.folderCard--overlay {
+.folderCard--overlay:global(.ButtonBase) {
   z-index: 2000;
   --themed-background: var(--alpha-solid-03);
   --themed-background-hover: var(--alpha-solid-03);
@@ -24,7 +24,7 @@
   gap: 8px;
 }
 
-.folderCard--editing {
+.folderCard--editing:global(.ButtonBase) {
   --themed-background: var(--alpha-solid-03);
   --themed-background-hover: var(--alpha-solid-03);
   --themed-background-focus: var(--alpha-solid-03);

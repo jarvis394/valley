@@ -3,9 +3,9 @@ import app from '@adonisjs/core/services/app'
 import { defineConfig, services } from '@adonisjs/drive'
 import { S3Client } from '@aws-sdk/client-s3'
 
-const AWS_ACCESS_KEY_ID = env.get('AWS_ACCESS_KEY_ID')
-const AWS_SECRET_ACCESS_KEY = env.get('AWS_SECRET_ACCESS_KEY')
-const UPLOAD_BUCKET = env.get('UPLOAD_BUCKET')
+export const AWS_ACCESS_KEY_ID = env.get('AWS_ACCESS_KEY_ID')
+export const AWS_SECRET_ACCESS_KEY = env.get('AWS_SECRET_ACCESS_KEY')
+export const UPLOAD_BUCKET = env.get('UPLOAD_BUCKET')
 
 export const s3Client = new S3Client({
   endpoint: env.get('AWS_ENDPOINT'),
@@ -17,12 +17,14 @@ export const s3Client = new S3Client({
   },
 })
 
-const GCS_KEY = env.get('GCS_KEY')
-const GCS_BUCKET = env.get('GCS_BUCKET')
+export const GCS_KEY_FILENAME = env.get('GCS_KEY_FILENAME')
+export const GCS_BUCKET = env.get('GCS_BUCKET')
+export const GCS_PROJECT_ID = env.get('GCS_PROJECT_ID')
 
-const S3_SERVICE_ENABLED =
+export const S3_SERVICE_ENABLED =
   !!AWS_ACCESS_KEY_ID && !!AWS_SECRET_ACCESS_KEY && !!UPLOAD_BUCKET
-const GCS_SERVICE_ENABLED = !!GCS_KEY && !!GCS_BUCKET
+export const GCS_SERVICE_ENABLED =
+  !!GCS_KEY_FILENAME && !!GCS_BUCKET && !!GCS_PROJECT_ID
 
 const driveConfig = defineConfig({
   default: env.get('DRIVE_DISK'),
@@ -44,7 +46,7 @@ const driveConfig = defineConfig({
     ...(S3_SERVICE_ENABLED && {
       s3: services.s3({
         client: s3Client,
-        bucket: UPLOAD_BUCKET,
+        bucket: UPLOAD_BUCKET!,
         visibility: 'private',
       }),
     }),
@@ -54,10 +56,11 @@ const driveConfig = defineConfig({
      */
     ...(GCS_SERVICE_ENABLED && {
       gcs: services.gcs({
-        bucket: GCS_BUCKET,
+        bucket: GCS_BUCKET!,
         visibility: 'private',
         usingUniformAcl: true,
-        keyFilename: GCS_KEY,
+        keyFilename: GCS_KEY_FILENAME,
+        projectId: GCS_PROJECT_ID,
       }),
     }),
   },

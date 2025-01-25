@@ -13,7 +13,6 @@ import {
   getUserIdFromSession,
   requireLoggedIn,
 } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
   makeTimings,
@@ -24,9 +23,10 @@ import {
   decacheClientLoader,
   invalidateCache,
   useCachedLoaderData,
-} from 'app/utils/client-cache'
+} from 'app/utils/cache'
 import type { Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
+import { getUserProject } from 'app/server/project/project.server'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
@@ -42,24 +42,14 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     type: 'project get userId from session',
   })
 
-  const project = await time(
-    () => {
-      return prisma.project.findFirst({
-        where: { id: projectId, userId },
-        include: {
-          folders: {
-            orderBy: {
-              dateCreated: 'asc',
-            },
-          },
-        },
-      })
-    },
-    {
-      timings,
-      type: 'get project',
-    }
-  )
+  if (!userId) {
+    throw redirect('/auth/login')
+  }
+
+  const project = await time(getUserProject({ userId, projectId }), {
+    timings,
+    type: 'get project',
+  })
 
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
@@ -72,6 +62,7 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
   return cacheClientLoader(
     { params, ...props },
     {
+      type: 'swr',
       key: getProjectCacheKey(params.projectId),
     }
   )

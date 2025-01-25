@@ -11,14 +11,11 @@ export enum TusHookType {
 
 export type TusUploadMetadata = {
   type: string | null
+  name: string
   filename?: string
   filetype?: string
-  'normalized-name': string
-  'user-id': string
-  'upload-id': string
   'project-id': string
   'folder-id': string
-  'upload-token': string
 }
 
 export type TusHookData = {
@@ -48,15 +45,9 @@ export type TusHookData = {
 }
 
 export type TusHookResponse = {
-  RejectUpload?: boolean
-  HTTPResponse: {
-    StatusCode: number
-    Body?: string
-    Header?: Record<string, string>
-  }
-  ChangeFileInfo?: {
-    ID?: string
-  }
+  status_code: number
+  body?: string
+  headers?: Record<string, string>
 }
 
 export type BaseTusHookResponseBody = {
@@ -65,7 +56,7 @@ export type BaseTusHookResponseBody = {
 }
 
 export type BaseTusHookResponseErrorBody = {
-  type: TusHookType
+  type?: TusHookType
   ok: false
   statusCode: number
   message: string
@@ -86,7 +77,6 @@ export type TusHookPreFinishResponse = BaseTusHookResponseBody & {
   /** File date created in ISO format */
   dateCreated: string
   thumbnailKey?: string
-  uploadId: string
   projectId: Project['id']
   folderId: Folder['id']
   contentType: string

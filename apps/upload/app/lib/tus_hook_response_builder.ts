@@ -1,7 +1,7 @@
 import type { BaseTusHookResponseBody, TusHookResponse } from '@valley/shared'
 
 export class TusHookResponseBuilder<
-  ResBody extends Record<string, any> = BaseTusHookResponseBody,
+  ResBody extends Record<string, any> = BaseTusHookResponseBody
 > {
   private readonly data: TusHookResponse
   #body: ResBody = { ok: true } as unknown as ResBody
@@ -12,23 +12,21 @@ export class TusHookResponseBuilder<
 
   constructor() {
     this.data = {
-      HTTPResponse: {
-        StatusCode: 200,
-        Body: JSON.stringify(this.body),
-        Header: {
-          'Content-Type': 'application/json',
-        },
+      status_code: 200,
+      body: JSON.stringify(this.body),
+      headers: {
+        'Content-Type': 'application/json',
       },
     }
   }
 
   private stringifyBody() {
-    this.data.HTTPResponse.Body = JSON.stringify(this.#body)
+    this.data.body = JSON.stringify(this.#body)
     return this
   }
 
   setStatusCode(code: number) {
-    this.data.HTTPResponse.StatusCode = code
+    this.data.status_code = code
     return this
   }
 
@@ -41,18 +39,6 @@ export class TusHookResponseBuilder<
   setBodyRecord(key: keyof ResBody, value: ResBody[keyof ResBody]) {
     this.#body[key] = value
     this.stringifyBody()
-    return this
-  }
-
-  setRejectUpload(state: boolean) {
-    this.data.RejectUpload = state
-    return this
-  }
-
-  setUploadPath(path: string) {
-    this.data.ChangeFileInfo = {
-      ID: path,
-    }
     return this
   }
 

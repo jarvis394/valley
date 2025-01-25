@@ -42,20 +42,6 @@ services:
     volumes:
       - data:/data
 
-  tusd:
-    <<: *defaults
-    container_name: valley-tusd
-    image: tusproject/tusd:latest
-    command: -port ${TUSD_PORT} -verbose -s3-bucket ${UPLOAD_BUCKET} -s3-endpoint http://nginx:9000 -hooks-http http://host.docker.internal:${UPLOAD_SERVICE_PORT}/api/uploads -hooks-enabled-events pre-create,pre-finish
-    volumes:
-      - tusd:/data
-    ports:
-      - '${TUSD_PORT}:${TUSD_PORT}'
-    env_file:
-      - .env
-    depends_on:
-      - minio
-
   postgres:
     <<: *defaults
     container_name: valley-postgres

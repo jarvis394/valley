@@ -1,7 +1,5 @@
-import localforage from 'localforage'
-import React, { useCallback, useEffect, useState } from 'react'
-import { decode, encode } from 'turbo-stream'
 import type { SerializeFrom } from '@remix-run/server-runtime'
+import React, { startTransition, useCallback, useEffect, useState } from 'react'
 import {
   Await,
   type ClientActionFunctionArgs,
@@ -9,66 +7,7 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react'
-
-function promiseToReadableStream(
-  promise: Promise<Uint8Array | null>
-): ReadableStream<Uint8Array> {
-  return new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        const chunk = await promise
-        if (chunk !== null) {
-          controller.enqueue(chunk)
-        }
-        controller.close()
-      } catch (error) {
-        controller.error(error)
-      }
-    },
-  })
-}
-
-export class LocalForageAdapter {
-  async getItem<T>(key: string): Promise<T | null> {
-    const encoded = localforage.getItem<Uint8Array>(key)
-
-    if (!(await encoded)) return null
-
-    const stream = promiseToReadableStream(encoded)
-    const decoded = await decode(stream)
-    const data = decoded.value
-
-    await decoded.done
-    return data as T
-  }
-
-  async setItem(key: string, value: unknown) {
-    const stream = encode(value)
-    const reader = stream.getReader().read()
-    const setter = localforage.setItem(key, (await reader).value)
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    ;(await reader).done
-    return await setter
-  }
-
-  async removeItem(key: string) {
-    return localforage.removeItem(key)
-  }
-}
-
-export const cache: CacheAdapter = new LocalForageAdapter()
-
-type UseClientCacheProps<T> = {
-  data: T
-  key: string
-}
-
-export function useClientCache<T>({ data, key }: UseClientCacheProps<T>) {
-  useEffect(() => {
-    if (!data) return
-    cache.setItem(key, data)
-  }, [data, key])
-}
+import { cache } from './adapter.client'
 
 export interface CacheAdapter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,6 +16,37 @@ export interface CacheAdapter {
   setItem: (key: string, value: any) => Promise<any> | any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   removeItem: (key: string) => Promise<any> | any
+}
+
+const augmentStorageAdapter = (storage: Storage) => {
+  return {
+    getItem: async (key: string) => {
+      try {
+        const item = JSON.parse(storage.getItem(key) || '')
+
+        return item
+      } catch (e) {
+        return storage.getItem(key)
+      }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setItem: async (key: string, val: any) =>
+      storage.setItem(key, JSON.stringify(val)),
+    removeItem: async (key: string) => storage.removeItem(key),
+  }
+}
+
+export const createCacheAdapter = (adapter: () => CacheAdapter) => {
+  if (typeof document === 'undefined') return { adapter: undefined }
+  const adapterInstance = adapter()
+  if (adapterInstance instanceof Storage) {
+    return {
+      adapter: augmentStorageAdapter(adapterInstance),
+    }
+  }
+  return {
+    adapter: adapter(),
+  }
 }
 
 export const decacheClientLoader = async <T,>(
@@ -91,13 +61,19 @@ export const decacheClientLoader = async <T,>(
   return data
 }
 
+type CacheClientLoaderArgs = {
+  type?: 'swr' | 'normal'
+  key?: string
+  adapter?: CacheAdapter
+}
+
 export const cacheClientLoader = async <T,>(
   { request, serverLoader }: ClientLoaderFunctionArgs,
   {
     type = 'swr',
     key = constructKey(request),
     adapter = cache,
-  }: { type?: 'swr' | 'normal'; key?: string; adapter?: CacheAdapter } = {
+  }: CacheClientLoaderArgs = {
     type: 'swr',
     key: constructKey(request),
     adapter: cache,
@@ -131,12 +107,19 @@ export const cacheClientLoader = async <T,>(
   }
 }
 
+export const createClientLoaderCache = (props?: CacheClientLoaderArgs) => {
+  const clientLoader = (args: ClientLoaderFunctionArgs) =>
+    cacheClientLoader(args, props)
+  clientLoader.hydrate = true
+  return clientLoader
+}
+
 export function useCachedLoaderData<T>(
   {
     adapter = cache,
     data: propsData,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }: { adapter?: CacheAdapter; data?: any } = {
+  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { adapter?: CacheAdapter; data?: any } = {
     adapter: cache,
   }
 ) {
@@ -157,12 +140,13 @@ export function useCachedLoaderData<T>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((newData: any) => {
           if (isMounted) {
-            adapter.setItem(data.key, newData)
-            setFreshData(newData)
+            startTransition(() => {
+              adapter.setItem(data.key, newData)
+              setFreshData(newData)
+            })
           }
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((e: any) => {
+        .catch((e: Error) => {
           const res = e instanceof Response ? e : undefined
           if (res && res.status === 302) {
             const to = res.headers.get('Location')
@@ -175,7 +159,8 @@ export function useCachedLoaderData<T>(
     return () => {
       isMounted = false
     }
-  }, [adapter, data, navigate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
 
   // Update the cache if the data changes
   useEffect(() => {
@@ -183,9 +168,12 @@ export function useCachedLoaderData<T>(
       data.serverData &&
       JSON.stringify(data.serverData) !== JSON.stringify(freshData)
     ) {
-      setFreshData(data.serverData)
+      startTransition(() => {
+        setFreshData(data.serverData)
+      })
     }
-  }, [freshData, data.serverData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.serverData])
 
   return {
     ...data,
@@ -220,8 +208,8 @@ export function useSwrData<T>({
   serverData,
   deferredServerData,
   ...args
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}: any) {
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+any) {
   const memoized = useCallback(
     ({
       children,
@@ -230,15 +218,17 @@ export function useSwrData<T>({
       children: (data: SerializeFrom<T>) => React.ReactElement
       fallback?: (data: SerializeFrom<T>) => React.ReactElement
     }) => {
-      if (deferredServerData) {
-        return (
-          <React.Suspense fallback={fallback?.(serverData)}>
-            <Await resolve={deferredServerData}>{children as never}</Await>
-          </React.Suspense>
-        )
-      }
-
-      return children(serverData ?? (args as T))
+      return (
+        <>
+          {deferredServerData ? (
+            <React.Suspense fallback={fallback?.(serverData)}>
+              <Await resolve={deferredServerData}>{children as never}</Await>
+            </React.Suspense>
+          ) : (
+            children(serverData ?? (args as T))
+          )}
+        </>
+      )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [deferredServerData, serverData]

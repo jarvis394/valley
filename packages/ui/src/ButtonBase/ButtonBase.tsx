@@ -15,6 +15,7 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
     | 'danger'
   disabled?: boolean
   onClick?: React.MouseEventHandler
+  shimmer?: boolean
   className?: string
   style?: CSSProperties
 }>
@@ -24,13 +25,17 @@ export type ButtonBaseProps = AsChildProps<
   ButtonBaseOwnProps
 
 const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(
-  function ButtonBaseWithRef({ variant, className, asChild, ...other }, ref) {
+  function ButtonBaseWithRef(
+    { variant, className, disabled, asChild, shimmer, ...other },
+    ref
+  ) {
     const Root = asChild ? Slot : 'button'
 
     return (
       <Root
         {...other}
         ref={ref}
+        disabled={disabled || shimmer}
         className={cx(className, 'ButtonBase', styles.buttonBase, {
           [styles['buttonBase--primary']]: variant === 'primary',
           [styles['buttonBase--secondary']]: variant === 'secondary',
@@ -41,6 +46,8 @@ const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(
             variant === 'tertiary-dimmed',
           [styles['buttonBase--warning']]: variant === 'warning',
           [styles['buttonBase--danger']]: variant === 'danger',
+          [styles['buttonBase--shimmer']]: shimmer,
+          shimmer: shimmer,
         })}
       />
     )

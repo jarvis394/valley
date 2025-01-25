@@ -13,7 +13,6 @@ import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes } from 'app/utils/misc'
 import { data, HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
   makeTimings,
@@ -44,7 +43,7 @@ import {
   invalidateCache,
   useCachedLoaderData,
   useSwrData,
-} from 'app/utils/client-cache'
+} from 'app/utils/cache'
 import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
 import { z } from 'zod'
@@ -74,6 +73,7 @@ import {
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
+import { getProjectFolder } from 'app/server/folder/folder.server'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -92,35 +92,17 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     timings,
     type: 'folder get userId from session',
   })
-  const folder = await time(
-    () => {
-      return prisma.folder.findFirst({
-        where: {
-          Project: {
-            id: projectId,
-            userId,
-          },
-          id: folderId,
-        },
-        include: {
-          files: {
-            where: {
-              isPendingDeletion: false,
-            },
-          },
-        },
-      })
-    },
-    {
-      timings,
-      type: 'get folder',
-    }
-  )
 
-  return data(
-    { folder, cached: false },
-    { headers: { 'Server-Timing': timings.toString() } }
-  )
+  if (!userId) {
+    throw redirect('/auth/login')
+  }
+
+  const folder = await time(getProjectFolder({ userId, projectId, folderId }), {
+    timings,
+    type: 'get folder',
+  })
+
+  return data({ folder }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
 export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
@@ -131,6 +113,7 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
   return cacheClientLoader(
     { params, ...props },
     {
+      type: 'swr',
       key: getFolderCacheKey(params.folderId),
     }
   )
@@ -147,14 +130,30 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
   currentParams,
-  defaultShouldRevalidate,
+  currentUrl,
+  nextUrl,
+  nextParams,
 }) => {
   if (formAction && currentParams.folderId) {
     invalidateCache(getFolderCacheKey(currentParams.folderId))
     return true
   }
 
-  return defaultShouldRevalidate
+  if (
+    !currentUrl.searchParams.has('upload') &&
+    nextUrl.searchParams.has('upload')
+  ) {
+    return true
+  }
+
+  if (
+    currentParams.folderId &&
+    currentParams.folderId !== nextParams.folderId
+  ) {
+    return true
+  }
+
+  return false
 }
 
 const ProjectHeader: React.FC<{

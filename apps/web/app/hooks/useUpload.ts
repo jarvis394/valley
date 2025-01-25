@@ -13,15 +13,10 @@ import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import type { Folder, Project } from '@valley/db'
-import {
-  useRevalidator,
-  useRouteLoaderData,
-  useSearchParams,
-} from '@remix-run/react'
+import { useRouteLoaderData, useSearchParams } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
-import { createUploadToken } from 'app/api/uploads'
-import { invalidateCache } from 'app/utils/client-cache'
+import { invalidateCache } from 'app/utils/cache'
 import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 
@@ -40,7 +35,6 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null
   )
-  const revalidator = useRevalidator()
   const setIsUploading = useUploadsStore((state) => state.setIsUploading)
   const setFolderId = useUploadsStore((state) => state.setFolderId)
   const setProjectId = useUploadsStore((state) => state.setProjectId)
@@ -65,12 +59,19 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     ])
 
     try {
-      setSearchParams((prev) => {
-        prev.set('upload', '1')
-        return prev
-      })
-      revalidator.revalidate()
-    } catch (e) {}
+      setSearchParams(
+        (prev) => {
+          prev.set('upload', '1')
+          return prev
+        },
+        {
+          preventScrollReset: true,
+          replace: true,
+        }
+      )
+    } catch (e) {
+      console.error('Got an error on cache update:', e)
+    }
   }
 
   const handleUploadResponse = async (_req: HttpRequest, res: HttpResponse) => {
@@ -107,17 +108,22 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       },
       // Allows duplicate files
       onBeforeFileAdded: () => true,
+      onBeforeUpload(files) {
+        console.log(files)
+        return files
+      },
     }).use(Tus, {
-      endpoint: rootContext?.ENV.TUSD_URL + '/files',
+      endpoint: rootContext?.ENV.TUSD_URL,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
       onAfterResponse: handleUploadResponse,
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      withCredentials: true,
     })
   )
 
   const uploadFiles = useCallback(
     async (fileList: FileList) => {
-      const token = await createUploadToken({ projectId, folderId })
-
       const files = [...fileList]
       const fileIDs: string[] = []
       let totalSize = 0
@@ -126,13 +132,10 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       files.forEach(async (file) => {
         const fileId = uppy.addFile(file)
         const metadata: TusUploadMetadata = {
-          'normalized-name': deburr(file.name),
-          'upload-id': fileId,
-          'user-id': token.userId,
-          'folder-id': token.uploadFolderId,
-          'project-id': token.uploadProjectId,
-          'upload-token': token.hash,
+          'folder-id': folderId,
+          'project-id': projectId,
           type: file.type,
+          name: deburr(file.name.trim()),
         }
         uppy.setFileMeta(fileId, metadata)
         fileIDs.push(fileId)
@@ -140,7 +143,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
           id: fileId,
           totalBytes: file.size,
           filetype: file.type,
-          normalizedName: metadata['normalized-name'],
+          name: metadata.name,
         })
       })
 
@@ -149,7 +152,10 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         updateUploadSpeed()
       }, 1000)
 
-      setSearchParams()
+      setSearchParams(undefined, {
+        preventScrollReset: true,
+        replace: true,
+      })
 
       const res = await uppy.upload()
 
