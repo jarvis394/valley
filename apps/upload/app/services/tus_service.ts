@@ -134,7 +134,7 @@ export default class TusService {
       cookies['valley_session'] || '',
       env.get('SESSION_SECRET')
     )
-    const invalidSessionError =
+    const errorMessage =
       new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
         .setStatusCode(401)
         .setBody({
@@ -142,23 +142,28 @@ export default class TusService {
           message: 'Invalid session',
           statusCode: 401,
         })
-        .build()
 
     if (!encodedSession) {
-      throw invalidSessionError
+      throw errorMessage.build()
     }
 
-    let session: { sessionId: string } | null = null
+    let session: { sessionId: string } | null
     try {
       session = JSON.parse(
         Buffer.from(encodedSession, 'base64').toString('ascii')
       )
     } catch (e) {
-      throw invalidSessionError
+      throw errorMessage
+        .setBody({
+          ok: false,
+          message: 'Invalid session (cannot destructure body)',
+          statusCode: 401,
+        })
+        .build()
     }
 
     if (!session) {
-      throw invalidSessionError
+      throw errorMessage.build()
     }
 
     const dbSession = await prisma.session.findFirst({
@@ -168,7 +173,13 @@ export default class TusService {
     })
 
     if (!dbSession || dbSession.expirationDate < new Date()) {
-      throw invalidSessionError
+      throw errorMessage
+        .setBody({
+          ok: false,
+          message: 'Invalid session (probably expired)',
+          statusCode: 401,
+        })
+        .build()
     }
 
     return dbSession
