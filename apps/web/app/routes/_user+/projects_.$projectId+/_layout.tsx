@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   ClientLoaderFunction,
   data,
@@ -24,9 +24,11 @@ import {
   invalidateCache,
   useCachedLoaderData,
 } from 'app/utils/cache'
-import type { Project } from '@valley/db'
+import type { Folder, Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 import { getUserProject } from 'app/server/project/project.server'
+import { useProjectsStore } from 'app/stores/projects'
+import { FolderWithFiles } from '@valley/shared'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
@@ -75,18 +77,9 @@ export const clientAction = decacheClientLoader
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
   currentParams,
-  currentUrl,
-  nextUrl,
 }) => {
   if (formAction && currentParams.projectId) {
     invalidateCache(getProjectCacheKey(currentParams.projectId))
-    return true
-  }
-
-  if (
-    !currentUrl.searchParams.has('upload') &&
-    nextUrl.searchParams.has('upload')
-  ) {
     return true
   }
 
@@ -100,7 +93,19 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 }
 
 const ProjectLayout: React.FC = () => {
-  useCachedLoaderData()
+  const setProject = useProjectsStore((state) => state.setProject)
+  const data = useCachedLoaderData<typeof loader>()
+
+  // Set the project to the cache store when the data is loaded
+  // Used for optimistic updates
+  useEffect(() => {
+    if (!data.project) return
+    const folders: Record<Folder['id'], FolderWithFiles> = {}
+    data.project.folders.forEach((folder) => {
+      folders[folder.id] = { ...folder, files: [] }
+    })
+    setProject({ ...data.project, folders })
+  }, [data.project, setProject])
 
   return (
     <>

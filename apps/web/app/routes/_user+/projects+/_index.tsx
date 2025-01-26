@@ -124,9 +124,7 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
 
   return (
     <Wrapper className={styles.projects__list}>
-      {projects?.map((project, i) => (
-        <ProjectCard project={project} key={i} />
-      ))}
+      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
     </Wrapper>
   )
 }

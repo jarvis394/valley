@@ -57,6 +57,7 @@
   user-select: none;
   pointer-events: none;
   cursor: default;
+  transition: all 150ms ease;
 }
 
 .shimmer::after {
@@ -69,6 +70,7 @@
   content: '';
   position: absolute;
   transform: translateX(-100%);
+  transition: all 150ms ease;
   inset: 0px;
   animation: 2s linear 0s infinite normal none running animation-shimmer;
 }

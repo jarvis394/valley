@@ -17,7 +17,7 @@ import { useModal } from 'app/hooks/useModal'
 
 type FolderCardProps = {
   folder: Folder
-  onClick?: (folder: Folder) => void
+  onClick?: (e: React.MouseEvent, folder: Folder) => void
 }
 
 const FolderCardMenuContent: React.FC<{
@@ -26,17 +26,9 @@ const FolderCardMenuContent: React.FC<{
   const { openModal } = useModal()
 
   const handleFolderRename = () => {
-    openModal(
-      'edit-folder-title',
-      {
-        folderId: folder.id,
-      },
-      {
-        state: {
-          defaultTitle: folder.title,
-        },
-      }
-    )
+    openModal('edit-folder-title', {
+      folderId: folder.id,
+    })
   }
 
   const handleFolderDelete = () => {
@@ -95,6 +87,11 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
     navigation.state === 'loading' &&
     navigation.location?.pathname === folderLink
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onClick?.(e, folder)
+  }
+
   const handleMenuClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -112,12 +109,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
           [styles['folderCard--active']]: isActive,
         })}
       >
-        <Link
-          onClick={onClick?.bind(null, folder)}
-          replace
-          discover="render"
-          to={folderLink}
-        >
+        <Link onClick={handleClick} replace discover="render" to={folderLink}>
           <div className={styles.folderCard__content}>
             <h5 className={styles.folderCard__contentTitle}>{folder.title}</h5>
             <div className={styles.folderCard__contentSubtitle}>

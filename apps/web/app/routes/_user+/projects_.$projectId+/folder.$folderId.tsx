@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react'
+import React, { useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
@@ -74,6 +74,7 @@ import {
 import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
 import { getProjectFolder } from 'app/server/folder/folder.server'
+import { useProjectsStore } from 'app/stores/projects'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -130,19 +131,10 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
   currentParams,
-  currentUrl,
-  nextUrl,
   nextParams,
 }) => {
   if (formAction && currentParams.folderId) {
     invalidateCache(getFolderCacheKey(currentParams.folderId))
-    return true
-  }
-
-  if (
-    !currentUrl.searchParams.has('upload') &&
-    nextUrl.searchParams.has('upload')
-  ) {
     return true
   }
 
@@ -153,7 +145,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
     return true
   }
 
-  return false
+  return true
 }
 
 const ProjectHeader: React.FC<{
@@ -219,9 +211,22 @@ const ProjectHeader: React.FC<{
 const ProjectFolders: React.FC<{
   project?: ProjectWithFolders | null
   currentFolder?: Folder
-}> = ({ project, currentFolder }) => {
+}> = ({ project: propsProject, currentFolder }) => {
   const navigate = useNavigate()
   const { openModal } = useModal()
+  const storeProject = useProjectsStore(
+    (state) => state.projects[propsProject?.id || '']
+  )
+  const parsedStoreProject = useMemo(() => {
+    const res: ProjectWithFolders = { ...storeProject, folders: [] }
+    if (!storeProject) return propsProject
+    for (const id in storeProject.folders) {
+      const folder = storeProject.folders[id]
+      folder && res.folders.push(folder)
+    }
+    return res
+  }, [propsProject, storeProject])
+  const project = parsedStoreProject || propsProject
   const createFolderAction = '/api/folders/create'
   const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
   const createFolderFetcher = useFetcher({
@@ -241,12 +246,18 @@ const ProjectFolders: React.FC<{
   const canCreateMoreFolders =
     (project?.folders?.length || 0) < PROJECT_MAX_FOLDERS
 
-  const handleFolderClick = (folder: Folder) => {
+  const handleFolderClick = (e: React.MouseEvent, folder: Folder) => {
+    e.preventDefault()
+
     if (!project) return
 
     if (currentFolder?.id !== folder.id) {
       navigate('/projects/' + project.id + '/folder/' + folder.id)
     }
+  }
+
+  const handleOpenProjectFolders = () => {
+    openModal('project-folders')
   }
 
   return (
@@ -256,7 +267,7 @@ const ProjectFolders: React.FC<{
         <ButtonBase
           variant="secondary"
           className={styles.project__foldersButton}
-          onClick={() => openModal('project-folders')}
+          onClick={handleOpenProjectFolders}
           type="button"
         >
           <div className={styles.project__foldersListFolderContainer}>
@@ -366,7 +377,13 @@ const FolderFiles: React.FC<{
   folder: FolderWithFiles | null
 }> = ({ folder }) => {
   const id = useId()
-  const [files, setFiles] = useState(folder?.files || [])
+  const folderId = folder?.id || ''
+  const projectId = folder?.projectId || ''
+  const storeFiles = useProjectsStore(
+    (state) => state.projects[projectId]?.folders[folderId]?.files
+  )
+  const files = storeFiles || folder?.files || []
+  const setFiles = useProjectsStore((state) => state.setFiles)
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
   const sensors = useSensors(
@@ -397,19 +414,23 @@ const FolderFiles: React.FC<{
     const { active, over } = event
 
     if (over && active.id !== over?.id) {
-      setFiles((prevFiles) => {
-        const oldIndex = prevFiles.findIndex((e) => e.id === active.id)
-        const newIndex = prevFiles.findIndex((e) => e.id === over?.id)
+      const oldIndex = files.findIndex((e) => e.id === active.id)
+      const newIndex = files.findIndex((e) => e.id === over?.id)
 
-        return arrayMove(prevFiles, oldIndex, newIndex)
-      })
       setActiveFileId(null)
+      setFiles({
+        projectId,
+        folderId,
+        files: arrayMove(files, oldIndex, newIndex),
+      })
     }
   }
 
+  // Set the folder's files to the cache store
+  // Used for optimistic updates
   useEffect(() => {
-    setFiles(folder?.files || [])
-  }, [folder?.files])
+    setFiles({ projectId, folderId, files: folder?.files || [] })
+  }, [folder?.files, folderId, projectId, setFiles])
 
   if (!folder) return null
 

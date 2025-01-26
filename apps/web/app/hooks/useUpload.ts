@@ -13,12 +13,13 @@ import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import type { Folder, Project } from '@valley/db'
-import { useRouteLoaderData, useSearchParams } from '@remix-run/react'
+import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
 import { invalidateCache } from 'app/utils/cache'
 import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
+import { useProjectsStore } from 'app/stores/projects'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -29,7 +30,7 @@ type UseUploadProps = {
 
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const inputId = useId()
-  const [_, setSearchParams] = useSearchParams()
+  const revalidator = useRevalidator()
   const rootContext = useRouteLoaderData<typeof rootLoader>('root')
   const $root = useRef<HTMLElement>(null)
   const $input = useRef<HTMLInputElement>(
@@ -50,6 +51,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const clearSuccessfulUploads = useUploadsStore(
     (state) => state.clearSuccessfulUploads
   )
+  const addFileToCache = useProjectsStore((state) => state.addFile)
   const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
 
   const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
@@ -59,16 +61,16 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     ])
 
     try {
-      setSearchParams(
-        (prev) => {
-          prev.set('upload', '1')
-          return prev
+      revalidator.revalidate()
+      addFileToCache({
+        projectId: file.projectId,
+        folderId: file.folderId,
+        file: {
+          ...file,
+          dateCreated: new Date(file.dateCreated),
+          thumbnailKey: file.thumbnailKey || null,
         },
-        {
-          preventScrollReset: true,
-          replace: true,
-        }
-      )
+      })
     } catch (e) {
       console.error('Got an error on cache update:', e)
     }
@@ -152,26 +154,13 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         updateUploadSpeed()
       }, 1000)
 
-      setSearchParams(undefined, {
-        preventScrollReset: true,
-        replace: true,
-      })
-
       const res = await uppy.upload()
 
       setIsUploading(false)
       clearInterval(uploadSpeedIntervalID.current)
       uppy.removeFiles(res?.successful?.map((e) => e.id) || [])
     },
-    [
-      addUpload,
-      folderId,
-      projectId,
-      setIsUploading,
-      setSearchParams,
-      updateUploadSpeed,
-      uppy,
-    ]
+    [addUpload, folderId, projectId, setIsUploading, updateUploadSpeed, uppy]
   )
 
   const handleUploadInputChange = useCallback(
