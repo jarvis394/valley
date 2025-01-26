@@ -5,26 +5,23 @@ import { Await, useLoaderData } from '@remix-run/react'
 import Stack from '@valley/ui/Stack'
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  const user = new Promise((res) => setTimeout(res, 2000)).then(() =>
-    prisma.user.findFirst({
-      where: {
+  const user = await prisma.user.findFirst({
+    where: {
+      settings: {
+        serviceDomain: params.domain,
+      },
+    },
+  })
+
+  const projects = await prisma.project.findMany({
+    where: {
+      User: {
         settings: {
-          domain: params.domain,
+          serviceDomain: params.domain,
         },
       },
-    })
-  )
-  const projects = new Promise((res) => setTimeout(res, 4000)).then(() =>
-    prisma.project.findMany({
-      where: {
-        User: {
-          settings: {
-            domain: params.domain,
-          },
-        },
-      },
-    })
-  )
+    },
+  })
 
   return { user, projects }
 }

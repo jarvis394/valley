@@ -16,10 +16,10 @@ import type { Folder, Project } from '@valley/db'
 import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
-import { createUploadToken } from 'app/api/uploads'
-import { cache } from 'app/utils/client-cache'
+import { invalidateCache } from 'app/utils/cache'
 import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
+import { useProjectsStore } from 'app/stores/projects'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -30,12 +30,12 @@ type UseUploadProps = {
 
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const inputId = useId()
+  const revalidator = useRevalidator()
   const rootContext = useRouteLoaderData<typeof rootLoader>('root')
   const $root = useRef<HTMLElement>(null)
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null
   )
-  const revalidator = useRevalidator()
   const setIsUploading = useUploadsStore((state) => state.setIsUploading)
   const setFolderId = useUploadsStore((state) => state.setFolderId)
   const setProjectId = useUploadsStore((state) => state.setProjectId)
@@ -51,17 +51,29 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const clearSuccessfulUploads = useUploadsStore(
     (state) => state.clearSuccessfulUploads
   )
+  const addFileToCache = useProjectsStore((state) => state.addFile)
   const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
 
   const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
-    await Promise.all([
-      cache.removeItem(getFolderCacheKey(file.folderId)),
-      cache.removeItem(getProjectCacheKey(file.projectId)),
+    await invalidateCache([
+      getProjectCacheKey(file.projectId),
+      getFolderCacheKey(file.folderId),
     ])
 
     try {
       revalidator.revalidate()
-    } catch (e) {}
+      addFileToCache({
+        projectId: file.projectId,
+        folderId: file.folderId,
+        file: {
+          ...file,
+          dateCreated: new Date(file.dateCreated),
+          thumbnailKey: file.thumbnailKey || null,
+        },
+      })
+    } catch (e) {
+      console.error('Got an error on cache update:', e)
+    }
   }
 
   const handleUploadResponse = async (_req: HttpRequest, res: HttpResponse) => {
@@ -98,17 +110,22 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       },
       // Allows duplicate files
       onBeforeFileAdded: () => true,
+      onBeforeUpload(files) {
+        console.log(files)
+        return files
+      },
     }).use(Tus, {
-      endpoint: rootContext?.ENV.TUSD_URL + '/files',
+      endpoint: rootContext?.ENV.TUSD_URL,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
       onAfterResponse: handleUploadResponse,
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      withCredentials: true,
     })
   )
 
   const uploadFiles = useCallback(
     async (fileList: FileList) => {
-      const token = await createUploadToken({ projectId, folderId })
-
       const files = [...fileList]
       const fileIDs: string[] = []
       let totalSize = 0
@@ -117,13 +134,10 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       files.forEach(async (file) => {
         const fileId = uppy.addFile(file)
         const metadata: TusUploadMetadata = {
-          'normalized-name': deburr(file.name),
-          'upload-id': fileId,
-          'user-id': token.userId,
-          'folder-id': token.uploadFolderId,
-          'project-id': token.uploadProjectId,
-          'upload-token': token.hash,
+          'folder-id': folderId,
+          'project-id': projectId,
           type: file.type,
+          name: deburr(file.name.trim()),
         }
         uppy.setFileMeta(fileId, metadata)
         fileIDs.push(fileId)
@@ -131,7 +145,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
           id: fileId,
           totalBytes: file.size,
           filetype: file.type,
-          normalizedName: metadata['normalized-name'],
+          name: metadata.name,
         })
       })
 

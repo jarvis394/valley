@@ -12,12 +12,12 @@ import Menu from '@valley/ui/Menu'
 import { formatBytes } from 'app/utils/misc'
 import type { Folder } from '@valley/db'
 import IconButton from '@valley/ui/IconButton'
-import { Link, useParams } from '@remix-run/react'
+import { Link, useNavigation, useParams } from '@remix-run/react'
 import { useModal } from 'app/hooks/useModal'
 
 type FolderCardProps = {
   folder: Folder
-  onClick?: (folder: Folder) => void
+  onClick?: (e: React.MouseEvent, folder: Folder) => void
 }
 
 const FolderCardMenuContent: React.FC<{
@@ -26,17 +26,9 @@ const FolderCardMenuContent: React.FC<{
   const { openModal } = useModal()
 
   const handleFolderRename = () => {
-    openModal(
-      'edit-folder-title',
-      {
-        folderId: folder.id,
-      },
-      {
-        state: {
-          defaultTitle: folder.title,
-        },
-      }
-    )
+    openModal('edit-folder-title', {
+      folderId: folder.id,
+    })
   }
 
   const handleFolderDelete = () => {
@@ -89,22 +81,35 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
   const { projectId, folderId } = useParams()
   const isActive = folderId ? folderId === folder.id : folder.isDefaultFolder
   const totalSize = formatBytes(Number(folder.totalSize))
+  const navigation = useNavigation()
+  const folderLink = '/projects/' + projectId + '/folder/' + folder.id
+  const isLoading =
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === folderLink
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onClick?.(e, folder)
+  }
+
+  const handleMenuClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
 
   return (
     <Menu.Root openOnContextMenu>
       <ButtonBase
         asChild
         variant="secondary"
+        shimmer={isLoading}
         className={cx(styles.folderCard, {
           [styles['folderCard--active']]: isActive,
         })}
       >
-        <Link
-          onClick={onClick?.bind(null, folder)}
-          replace
-          discover="render"
-          to={'/projects/' + projectId + '/folder/' + folder.id}
-        >
+        <Link onClick={handleClick} replace discover="render" to={folderLink}>
           <div className={styles.folderCard__content}>
             <h5 className={styles.folderCard__contentTitle}>{folder.title}</h5>
             <div className={styles.folderCard__contentSubtitle}>
@@ -115,14 +120,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
           </div>
 
           <Menu.Trigger asChild>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation()
-                e.preventDefault()
-              }}
-              size="sm"
-              variant="tertiary"
-            >
+            <IconButton onClick={handleMenuClick} size="sm" variant="tertiary">
               <MoreVertical />
             </IconButton>
           </Menu.Trigger>

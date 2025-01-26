@@ -43,6 +43,14 @@
   --themed-border: var(--button-disabled-border) !important;
 }
 
+.buttonBase--shimmer,
+.buttonBase--shimmer:disabled {
+  cursor: default;
+  --themed-color: var(--button-disabled-fg) !important;
+  --themed-background: var(--button-disabled-bg) !important;
+  --themed-border: var(--button-disabled-border) !important;
+}
+
 .buttonBase--tertiary:disabled {
   --themed-color: var(--text-secondary) !important;
   --themed-background: transparent !important;

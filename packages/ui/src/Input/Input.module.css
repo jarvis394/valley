@@ -10,6 +10,10 @@
   transition-timing-function: ease;
 }
 
+.input:hover {
+  box-shadow: 0 0 0 1px inset var(--input-border-hovered);
+}
+
 .input input::placeholder,
 .input input::-webkit-input-placeholder {
   user-select: none;

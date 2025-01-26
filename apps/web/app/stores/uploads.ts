@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 
 export type Upload = {
   id: string
-  normalizedName: string
+  name: string
   filetype: string
   bytesUploaded: number
   totalBytes: number
@@ -36,7 +36,7 @@ export type UploadsAction = {
   setIsUploading: (state: UploadsState['isUploading']) => void
   setFileUploadError: (id: Upload['id'], err: Upload['uploadError']) => void
   addUpload: (
-    upload: Pick<Upload, 'id' | 'totalBytes' | 'filetype' | 'normalizedName'>
+    upload: Pick<Upload, 'id' | 'totalBytes' | 'filetype' | 'name'>
   ) => void
   setFileUploadProgress: (
     id: Upload['id'],

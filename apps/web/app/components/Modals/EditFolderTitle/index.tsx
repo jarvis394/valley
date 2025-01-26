@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,12 +6,14 @@ import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
-import { Await, Form, useParams, useSearchParams } from '@remix-run/react'
+import { Form, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
+import Stack from '@valley/ui/Stack'
+import Spinner from '@valley/ui/Spinner'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -102,16 +104,21 @@ const ModalContent: React.FC<
 const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const { ProjectAwait } = useProjectAwait()
 
   return (
-    <Suspense>
-      <Await resolve={data?.project}>
-        {(resolvedProject) => (
-          <ModalContent onClose={onClose} project={resolvedProject} />
-        )}
-      </Await>
-    </Suspense>
+    <ProjectAwait
+      fallback={() => (
+        <>
+          <ModalHeader>Edit Folder Title</ModalHeader>
+          <Stack padding={[4, 4, 8, 4]} align={'center'} justify={'center'}>
+            <Spinner />
+          </Stack>
+        </>
+      )}
+    >
+      {(data) => <ModalContent onClose={onClose} project={data.project} />}
+    </ProjectAwait>
   )
 }
 

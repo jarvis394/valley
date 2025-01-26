@@ -162,6 +162,8 @@ model Project {
   User                 User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId               String?
   translationStringsId Int?
+
+  @@index([dateCreated, dateUpdated, dateShot, totalSize])
 }
 
 model Folder {
@@ -213,6 +215,8 @@ model File {
   folderId String?
 
   Cover Cover[]
+
+  @@index([dateCreated, isPendingDeletion])
 }
 
 model Cover {
@@ -234,11 +238,4 @@ model TranslationStrings {
 
   Project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String  @unique
-}
-
-model UploadToken {
-  hash            String @unique
-  uploadProjectId String
-  uploadFolderId  String
-  userId          String
 }

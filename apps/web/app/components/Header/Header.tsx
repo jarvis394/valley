@@ -8,7 +8,7 @@ import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
-import { Await, Link } from '@remix-run/react'
+import { Await, Link, useParams } from '@remix-run/react'
 import type { Project, User } from '@valley/db'
 import { useProjectAwait } from 'app/utils/project'
 import Hidden from '@valley/ui/Hidden'
@@ -51,6 +51,7 @@ const CurrentUser: React.FC<{ user?: User }> = ({ user }) => {
       align={'center'}
       gap={2}
       data-fade-in={!!user}
+      style={{ flexShrink: 0 }}
       className={cx('fade', styles.header__pathPart)}
     >
       <Hidden asChild sm>
@@ -74,6 +75,8 @@ const CurrentUser: React.FC<{ user?: User }> = ({ user }) => {
 const CurrentProject: React.FC<{ project?: Project | null }> = ({
   project,
 }) => {
+  const { projectId } = useParams()
+  const shouldShow = !!projectId
   const [lastProject, setLastProject] = React.useState(project)
 
   React.useEffect(() => {
@@ -84,7 +87,7 @@ const CurrentProject: React.FC<{ project?: Project | null }> = ({
     <Stack
       align={'center'}
       gap={2}
-      data-fade-in={!!project}
+      data-fade-in={shouldShow}
       className={cx('fade', styles.header__pathPart)}
     >
       <Slash />
@@ -114,7 +117,7 @@ const CurrentProject: React.FC<{ project?: Project | null }> = ({
 
 const Header: React.FC = () => {
   const user = useUserAwait()
-  const project = useProjectAwait()
+  const { ProjectAwait } = useProjectAwait()
 
   return (
     <header
@@ -135,13 +138,11 @@ const Header: React.FC = () => {
               {(resolvedUser) => <CurrentUser user={resolvedUser} />}
             </Await>
           </Suspense>
-          <Suspense fallback={<PathPartSkeleton />}>
-            <Await resolve={project?.project}>
-              {(resolvedProject) => (
-                <CurrentProject project={resolvedProject} />
-              )}
-            </Await>
-          </Suspense>
+          <ProjectAwait
+            fallback={(data) => <CurrentProject project={data.project} />}
+          >
+            {(data) => <CurrentProject project={data.project} />}
+          </ProjectAwait>
         </Stack>
         <Stack gap={2} align={'center'} className={styles.header__after}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>

@@ -12,6 +12,7 @@ import { errors } from 'flydrive'
 import contentDisposition from 'content-disposition'
 
 type FileData = Omit<File, 'id' | 'exifMetadata' | 'thumbnailKey'> & {
+  id?: File['id']
   projectId: Project['id']
 }
 

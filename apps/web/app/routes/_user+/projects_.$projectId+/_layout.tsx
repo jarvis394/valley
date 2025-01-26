@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
-  ClientLoaderFunctionArgs,
+  ClientLoaderFunction,
   data,
   Outlet,
   redirect,
@@ -13,15 +13,22 @@ import {
   getUserIdFromSession,
   requireLoggedIn,
 } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import {
   combineServerTimings,
   makeTimings,
   time,
 } from 'app/server/timing.server'
-import { cache } from 'app/utils/client-cache'
-import type { Project } from '@valley/db'
+import {
+  cacheClientLoader,
+  decacheClientLoader,
+  invalidateCache,
+  useCachedLoaderData,
+} from 'app/utils/cache'
+import type { Folder, Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
+import { getUserProject } from 'app/server/project/project.server'
+import { useProjectsStore } from 'app/stores/projects'
+import { FolderWithFiles } from '@valley/shared'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
@@ -37,58 +44,46 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     type: 'project get userId from session',
   })
 
-  const project = time(
-    async () => {
-      return await prisma.project.findFirst({
-        where: { id: projectId, userId },
-        include: {
-          folders: {
-            orderBy: {
-              dateCreated: 'asc',
-            },
-          },
-        },
-      })
-    },
-    {
-      timings,
-      type: 'get project',
-    }
-  )
+  if (!userId) {
+    throw redirect('/auth/login')
+  }
+
+  const project = await time(getUserProject({ userId, projectId }), {
+    timings,
+    type: 'get project',
+  })
 
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
-export async function clientLoader({
-  serverLoader,
-  params,
-}: ClientLoaderFunctionArgs) {
+export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
   if (!params.projectId) {
     return redirect('/projects')
   }
 
-  const key = getProjectCacheKey(params.projectId)
-  const cacheEntry = await cache.getItem(key)
-  if (cacheEntry) {
-    return { project: cacheEntry, cached: true }
-  }
-
-  return await serverLoader()
+  return cacheClientLoader(
+    { params, ...props },
+    {
+      type: 'swr',
+      key: getProjectCacheKey(params.projectId),
+    }
+  )
 }
 
 clientLoader.hydrate = true
 
+export const clientAction = decacheClientLoader
+
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formAction,
   currentParams,
-  defaultShouldRevalidate,
 }) => {
   if (formAction && currentParams.projectId) {
-    cache.removeItem(getProjectCacheKey(currentParams.projectId))
+    invalidateCache(getProjectCacheKey(currentParams.projectId))
     return true
   }
 
-  return defaultShouldRevalidate
+  return false
 }
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
@@ -98,6 +93,20 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
 }
 
 const ProjectLayout: React.FC = () => {
+  const setProject = useProjectsStore((state) => state.setProject)
+  const data = useCachedLoaderData<typeof loader>()
+
+  // Set the project to the cache store when the data is loaded
+  // Used for optimistic updates
+  useEffect(() => {
+    if (!data.project) return
+    const folders: Record<Folder['id'], FolderWithFiles> = {}
+    data.project.folders.forEach((folder) => {
+      folders[folder.id] = { ...folder, files: [] }
+    })
+    setProject({ ...data.project, folders })
+  }, [data.project, setProject])
+
   return (
     <>
       <ProjectToolbar />

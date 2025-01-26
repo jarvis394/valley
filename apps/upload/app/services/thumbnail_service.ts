@@ -55,7 +55,7 @@ export default class ThumbnailService {
       const upload = new Upload({
         client: s3Client,
         params: {
-          Bucket: env.get('UPLOAD_BUCKET'),
+          Bucket: env.get('AWS_BUCKET'),
           Key: thumbnailKey,
           Body: pipeline,
         },

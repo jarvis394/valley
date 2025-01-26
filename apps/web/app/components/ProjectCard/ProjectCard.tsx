@@ -14,7 +14,7 @@ import dayjs from 'dayjs'
 import { Link, useNavigation } from '@remix-run/react'
 import Skeleton from '@valley/ui/Skeleton'
 import { ProjectWithFolders } from '@valley/shared'
-import Spinner from '@valley/ui/Spinner'
+import cx from 'classnames'
 
 type ProjectCardProps =
   | {
@@ -33,9 +33,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
     project?.folders[0]?.id
   const projectLink = `/projects/${project?.id}/folder/${defaultFolderId}`
   const navigation = useNavigation()
+  const isLoading =
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === projectLink
 
   return (
-    <div className={styles.projectCard}>
+    <div
+      className={cx(styles.projectCard, {
+        shimmer: isLoading,
+      })}
+    >
       {loading && <div className={styles.projectCard__cover} />}
       {!loading && (
         <Link
@@ -43,8 +50,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           to={projectLink}
           className={styles.projectCard__cover}
         >
-          {navigation.state === 'loading' && <Spinner />}
           {/* <Image priority height={424} src={cover} alt={'Cover'} /> */}
+          <img
+            alt=""
+            src={'https://avatars.githubusercontent.com/u/37776763?v=4'}
+          />
         </Link>
       )}
       {loading && (

@@ -87,6 +87,7 @@
 
   /** Input */
   --input-border: #2b2b2b;
+  --input-border-hovered: #404040;
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(255, 255, 255, 0.24);
   --input-border-error: var(--red-600);
@@ -233,6 +234,7 @@
 
   /** Input */
   --input-border: rgba(23, 23, 23, 0.12);
+  --input-border-hovered: rgba(23, 23, 23, 0.24);
   --input-border-focused: var(--text-secondary);
   --input-border-focused-shadow: rgba(0, 0, 0, 0.16);
   --input-border-error: var(--red-600);

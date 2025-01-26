@@ -13,7 +13,11 @@ export default await Env.create(APP_ROOT, {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
   APP_KEY: Env.schema.string(),
   PORT: Env.schema.number(),
+  WEB_PORT: Env.schema.number(),
   HOST: Env.schema.string({ format: 'host' }),
+  WEB_SERVICE_URL: Env.schema.string(),
+  UPLOAD_SERVICE_URL: Env.schema.string(),
+  SESSION_SECRET: Env.schema.string(),
   LOG_LEVEL: Env.schema.enum([
     'fatal',
     'error',
@@ -45,9 +49,10 @@ export default await Env.create(APP_ROOT, {
   AWS_SECRET_ACCESS_KEY: Env.schema.string.optional(),
   AWS_REGION: Env.schema.string.optional(),
   AWS_ENDPOINT: Env.schema.string.optional(),
-  UPLOAD_BUCKET: Env.schema.string.optional(),
-  GCS_KEY: Env.schema.string.optional(),
+  AWS_BUCKET: Env.schema.string.optional(),
+  GCS_KEY_FILENAME: Env.schema.string.optional(),
   GCS_BUCKET: Env.schema.string.optional(),
+  GCS_PROJECT_ID: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------
