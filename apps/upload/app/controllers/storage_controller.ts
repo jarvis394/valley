@@ -1,13 +1,21 @@
 import { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
-import tusServer from '#services/tus_service'
+import TusService from '#services/tus_service'
+import { Server } from '@tus/server'
 
 @inject()
 export default class StorageController {
-  constructor(private ctx: HttpContext) {}
+  tusServer: Server
+
+  constructor(
+    private ctx: HttpContext,
+    tusService: TusService
+  ) {
+    this.tusServer = tusService.makeTusServer()
+  }
 
   async handleTusRequest() {
-    return await tusServer.handle(
+    return await this.tusServer.handle(
       this.ctx.request.request,
       this.ctx.response.response
     )
