@@ -28,6 +28,7 @@ import FolderService from '#services/folder_service'
 import { IncomingMessage } from 'node:http'
 import deburr from 'lodash.deburr'
 import { TusHookResponseBuilder } from '#lib/tus_hook_response_builder'
+import logger from '@adonisjs/core/services/logger'
 
 const gcsStorage = new Storage({
   keyFilename: GCS_KEY_FILENAME,
@@ -130,6 +131,7 @@ export default class TusService {
 
   async getSessionFromRequest(req: IncomingMessage) {
     const cookies = cookie.parse(req.headers.cookie || '')
+    logger.debug('tus: Reading session cookie from request', cookies)
     const encodedSession = cookieSignature.unsign(
       cookies['valley_session'] || '',
       env.get('SESSION_SECRET')
@@ -161,6 +163,8 @@ export default class TusService {
         })
         .build()
     }
+
+    logger.debug('tus: Decoded session:', encodedSession)
 
     if (!session) {
       throw errorMessage.build()

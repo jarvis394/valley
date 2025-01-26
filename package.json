@@ -19,7 +19,8 @@
     "prepare": "husky",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "docker:upload:buildx": "docker buildx build --push --platform linux/arm64/v8,linux/amd64 -f ./apps/upload/Dockerfile --tag jarvis394/valley-upload ."
   },
   "devDependencies": {
     "@caxy/dotenv-updater": "^1.0.9",
