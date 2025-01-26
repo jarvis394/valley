@@ -1,0 +1,46 @@
+x-defaults: &defaults
+  init: true
+  tty: true
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '20m'
+      max-file: '3'
+  networks:
+    - valley_network
+
+name: valley
+
+services:
+  upload:
+    <<: *defaults
+    container_name: valley-upload
+    image: jarvis394/valley-upload:latest
+    env_file:
+      - .env
+    ports:
+      - '${UPLOAD_SERVICE_PORT}:${UPLOAD_SERVICE_PORT}'
+    depends_on:
+      - redis
+    volumes:
+      - .env:/app/.env
+
+  redis:
+    <<: *defaults
+    container_name: valley-redis
+    image: redis:latest
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+
+volumes:
+  redis-data:
+networks:
+  valley_network:
