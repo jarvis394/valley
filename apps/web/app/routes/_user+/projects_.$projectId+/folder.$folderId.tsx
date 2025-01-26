@@ -95,7 +95,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   })
 
   if (!userId) {
-    throw redirect('/auth/login')
+    return redirect('/auth/login')
   }
 
   const folder = await time(getProjectFolder({ userId, projectId, folderId }), {
