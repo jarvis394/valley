@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "turbo dev --filter !storybook",
     "storybook": "turbo dev --filter storybook",
-    "docker:dev": "docker compose -f ./docker/docker-compose.dev.yml up",
-    "docker:start": "docker compose -f ./docker/docker-compose.yml up",
+    "docker:dev": "docker compose -f ./docker-compose.dev.yml up",
+    "docker:start": "docker compose -f ./docker-compose.yml up",
     "build": "NODE_ENV=production turbo build",
     "db:seed": "yarn workspace @valley/db db:seed",
     "db:studio": "yarn workspace @valley/db db:studio",
