@@ -211,22 +211,9 @@ const ProjectHeader: React.FC<{
 const ProjectFolders: React.FC<{
   project?: ProjectWithFolders | null
   currentFolder?: Folder
-}> = ({ project: propsProject, currentFolder }) => {
+}> = ({ project, currentFolder }) => {
   const navigate = useNavigate()
   const { openModal } = useModal()
-  const storeProject = useProjectsStore(
-    (state) => state.projects[propsProject?.id || '']
-  )
-  const parsedStoreProject = useMemo(() => {
-    const res: ProjectWithFolders = { ...storeProject, folders: [] }
-    if (!storeProject) return propsProject
-    for (const id in storeProject.folders) {
-      const folder = storeProject.folders[id]
-      folder && res.folders.push(folder)
-    }
-    return res
-  }, [propsProject, storeProject])
-  const project = parsedStoreProject || propsProject
   const createFolderAction = '/api/folders/create'
   const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
   const createFolderFetcher = useFetcher({
@@ -358,8 +345,21 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
 
 const ProjectBlock: React.FC<{
   project?: ProjectWithFolders | null
-}> = React.memo(function ProjectBlock({ project }) {
+}> = React.memo(function ProjectBlock({ project: propsProject }) {
   const { folderId } = useParams()
+  const storeProject = useProjectsStore(
+    (state) => state.projects[propsProject?.id || '']
+  )
+  const parsedStoreProject = useMemo(() => {
+    const res: ProjectWithFolders = { ...storeProject, folders: [] }
+    if (!storeProject) return propsProject
+    for (const id in storeProject.folders) {
+      const folder = storeProject.folders[id]
+      folder && res.folders.push(folder)
+    }
+    return res
+  }, [propsProject, storeProject])
+  const project = parsedStoreProject || propsProject
   const currentFolder = project?.folders?.find((e) => e.id === folderId)
 
   return (

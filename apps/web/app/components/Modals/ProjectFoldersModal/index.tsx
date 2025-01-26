@@ -29,21 +29,36 @@ import ModalFooter from '@valley/ui/ModalFooter'
 import ModalHeader from '@valley/ui/ModalHeader'
 import FolderListItem from 'app/components/FolderListItem/FolderListItem'
 import { Plus, Pencil } from 'geist-ui-icons'
-import React, { useState, useEffect, useId, startTransition } from 'react'
+import React, { useState, useId, startTransition, useMemo } from 'react'
 import cx from 'classnames'
 import styles from './ProjectFoldersModal.module.css'
 import { createPortal } from 'react-dom'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useProjectAwait } from 'app/utils/project'
+import { useProjectsStore } from 'app/stores/projects'
 
 const ModalContent: React.FC<{
   project?: ProjectWithFolders | null
   createFolderFetcher: FetcherWithComponents<unknown>
   onClose?: () => void
-}> = ({ project, createFolderFetcher }) => {
+}> = ({ project: propsProject, createFolderFetcher }) => {
   const id = useId()
   const navigate = useNavigate()
-  const [folders, setFolders] = useState(project?.folders || [])
+  const storeProject = useProjectsStore(
+    (state) => state.projects[propsProject?.id || '']
+  )
+  const setProjectFolders = useProjectsStore((state) => state.setProjectFolders)
+  const parsedStoreProject = useMemo(() => {
+    const res: ProjectWithFolders = { ...storeProject, folders: [] }
+    if (!storeProject) return propsProject
+    for (const id in storeProject.folders) {
+      const folder = storeProject.folders[id]
+      folder && res.folders.push(folder)
+    }
+    return res
+  }, [propsProject, storeProject])
+  const project = parsedStoreProject || propsProject
+  const folders = project?.folders || []
   const [activeFolderId, setActiveFolderId] = useState<Folder['id'] | null>(
     null
   )
@@ -76,21 +91,16 @@ const ModalContent: React.FC<{
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
+    if (!project) return
+
     const { active, over } = event
 
     if (active.id !== over?.id) {
-      setFolders((prevFolders) => {
-        const oldIndex = prevFolders.findIndex((e) => e.id === active.id)
-        const newIndex = prevFolders.findIndex((e) => e.id === over?.id)
-
-        return arrayMove(prevFolders, oldIndex, newIndex)
-      })
+      const oldIndex = folders.findIndex((e) => e.id === active.id)
+      const newIndex = folders.findIndex((e) => e.id === over?.id)
+      setProjectFolders(project?.id, arrayMove(folders, oldIndex, newIndex))
     }
   }
-
-  useEffect(() => {
-    setFolders(project?.folders || [])
-  }, [project?.folders])
 
   return (
     <>

@@ -78,8 +78,12 @@ export default class TusService {
 
   static makeS3Store() {
     return new S3Store({
+      useTags: false,
       s3ClientConfig: {
-        bucket: env.get('UPLOAD_BUCKET')!,
+        // Fix for B2 storage (disables checksum header)
+        requestChecksumCalculation: 'WHEN_REQUIRED',
+        responseChecksumValidation: 'WHEN_REQUIRED',
+        bucket: env.get('AWS_BUCKET')!,
         endpoint: env.get('AWS_ENDPOINT'),
         region: env.get('AWS_REGION'),
         forcePathStyle: true,

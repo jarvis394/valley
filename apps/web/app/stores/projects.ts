@@ -19,6 +19,10 @@ export type ProjectsState = {
 
 export type ProjectsAction = {
   setProject: (project: ProjectWithFoldersMap) => void
+  setProjectFolders: (
+    projectId: Project['id'],
+    folders: FolderWithFiles[]
+  ) => void
   setFolder: (folder: FolderWithFiles) => void
   setFiles: (props: {
     projectId: Project['id']
@@ -73,6 +77,19 @@ export const useProjectsStore = create<ProjectsState & ProjectsAction>()(
 
         state.projects[project.id] = project
       }),
+    setProjectFolders: (projectId, folders) => {
+      set((state) => {
+        if (!state.projects[projectId]) {
+          state.projects[projectId] = makeDefaultProject(projectId)
+        }
+
+        const foldersMap: ProjectWithFoldersMap['folders'] = {}
+        folders.forEach((folder) => {
+          foldersMap[folder.id] = folder
+        })
+        state.projects[projectId].folders = foldersMap
+      })
+    },
     setFolder: (folder) => {
       set((state) => {
         if (!state.projects[folder.projectId]) {

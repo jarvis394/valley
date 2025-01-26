@@ -102,8 +102,8 @@ services:
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host add myminio http://nginx:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-      /usr/bin/mc mb myminio/${UPLOAD_BUCKET};
-      /usr/bin/mc anonymous set private myminio/${UPLOAD_BUCKET};
+      /usr/bin/mc mb myminio/${AWS_BUCKET};
+      /usr/bin/mc anonymous set private myminio/${AWS_BUCKET};
       exit 0;
       "
 

@@ -5,7 +5,7 @@ import { S3Client } from '@aws-sdk/client-s3'
 
 export const AWS_ACCESS_KEY_ID = env.get('AWS_ACCESS_KEY_ID')
 export const AWS_SECRET_ACCESS_KEY = env.get('AWS_SECRET_ACCESS_KEY')
-export const UPLOAD_BUCKET = env.get('UPLOAD_BUCKET')
+export const AWS_BUCKET = env.get('AWS_BUCKET')
 
 export const s3Client = new S3Client({
   endpoint: env.get('AWS_ENDPOINT'),
@@ -22,7 +22,7 @@ export const GCS_BUCKET = env.get('GCS_BUCKET')
 export const GCS_PROJECT_ID = env.get('GCS_PROJECT_ID')
 
 export const S3_SERVICE_ENABLED =
-  !!AWS_ACCESS_KEY_ID && !!AWS_SECRET_ACCESS_KEY && !!UPLOAD_BUCKET
+  !!AWS_ACCESS_KEY_ID && !!AWS_SECRET_ACCESS_KEY && !!AWS_BUCKET
 export const GCS_SERVICE_ENABLED =
   !!GCS_KEY_FILENAME && !!GCS_BUCKET && !!GCS_PROJECT_ID
 
@@ -46,7 +46,7 @@ const driveConfig = defineConfig({
     ...(S3_SERVICE_ENABLED && {
       s3: services.s3({
         client: s3Client,
-        bucket: UPLOAD_BUCKET!,
+        bucket: AWS_BUCKET!,
         visibility: 'private',
       }),
     }),
