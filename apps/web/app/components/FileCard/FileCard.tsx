@@ -119,10 +119,7 @@ const FileCard: React.FC<FileCardProps> = ({
   }
 
   return (
-    <Menu.Root
-      openOnContextMenu
-      dropdownMenuProps={{ onOpenChange: handleDropdownOpenChange }}
-    >
+    <Menu.Root openOnContextMenu onOpenChange={handleDropdownOpenChange}>
       <li
         {...props}
         {...attributes}

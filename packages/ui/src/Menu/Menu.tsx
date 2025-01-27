@@ -172,11 +172,13 @@ export const Root = ({
   dropdownMenuProps,
   contextMenuProps,
   openOnContextMenu = false,
+  onOpenChange,
   children,
 }: React.PropsWithChildren<{
   dropdownMenuProps?: DropdownMenu.DropdownMenuProps
   contextMenuProps?: ContextMenu.ContextMenuProps
   openOnContextMenu?: boolean
+  onOpenChange?: (open: boolean) => void
 }>) => {
   const shouldShowDrawer = useMediaQuery(
     `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
@@ -186,34 +188,35 @@ export const Root = ({
   const [dropdownMenuOpen, setDropdownMenuOpen] = useState(
     dropdownMenuProps?.defaultOpen
   )
-  const { onOpenChange: propsOnOpenChange, ...restDropdownMenuProps } =
-    dropdownMenuProps || {}
+  const menuActions = useMemo(
+    () => ({
+      close: () => {
+        onOpenChange?.(false)
+        setDropdownMenuOpen(false)
+      },
+    }),
+    [onOpenChange]
+  )
 
   const handleOpenChange = (newIsOpen: boolean) => {
-    propsOnOpenChange?.(newIsOpen)
+    onOpenChange?.(newIsOpen)
     setDropdownMenuOpen(newIsOpen)
   }
 
-  const handleDrawerOpenChange = (newIsOpen: boolean) => {
-    if (!newIsOpen) {
-      return setDropdownMenuOpen(false)
-    }
-  }
-
   return (
-    <MenuActionsProvider value={{ close: () => setDropdownMenuOpen(false) }}>
+    <MenuActionsProvider value={menuActions}>
       <Drawer.Root
         direction="bottom"
         open={shouldShowDrawer && dropdownMenuOpen}
-        onOpenChange={handleDrawerOpenChange}
+        onOpenChange={handleOpenChange}
         disablePreventScroll
         repositionInputs
       >
         <DropdownMenu.Root
+          {...dropdownMenuProps}
           modal={false}
           open={shouldShowMenu && dropdownMenuOpen}
           onOpenChange={handleOpenChange}
-          {...restDropdownMenuProps}
         >
           <ContextMenu.Root {...contextMenuProps}>
             <ContextMenuTrigger enabled={shouldEnableContextMenu}>
