@@ -430,11 +430,12 @@ const FolderFiles: React.FC<{
   // Used for optimistic updates
   useEffect(() => {
     setFiles({ projectId, folderId, files: folder?.files || [] })
-  }, [folder?.files, folderId, projectId, setFiles])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [folderId, projectId])
 
   if (!folder) return null
 
-  if (folder.files.length === 0) {
+  if (files.length === 0) {
     return (
       <Stack
         fullHeight

@@ -12,7 +12,12 @@ export const getUserProjects = ({
   return prisma.project.findMany({
     orderBy,
     where: { userId },
-    include: { folders: true },
+    include: {
+      folders: true,
+      coverImage: {
+        include: { File: true },
+      },
+    },
   })
 }
 
