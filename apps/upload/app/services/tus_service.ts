@@ -131,7 +131,10 @@ export default class TusService {
 
   async getSessionFromRequest(req: IncomingMessage) {
     const cookies = cookie.parse(req.headers.cookie || '')
-    logger.debug('tus: Reading session cookie from request', cookies)
+    logger.debug(
+      'tus: Reading session cookie from request',
+      JSON.stringify(cookies)
+    )
     const encodedSession = cookieSignature.unsign(
       cookies['valley_session'] || '',
       env.get('SESSION_SECRET')

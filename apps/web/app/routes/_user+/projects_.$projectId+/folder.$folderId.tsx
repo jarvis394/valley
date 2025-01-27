@@ -145,7 +145,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
     return true
   }
 
-  return true
+  return false
 }
 
 const ProjectHeader: React.FC<{

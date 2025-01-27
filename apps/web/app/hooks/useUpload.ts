@@ -84,6 +84,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       const parsedBody = JSON.parse(body) as TusHookResponseBody
 
       if (body) {
+        if (!parsedBody.ok) return
         switch (parsedBody.type) {
           case TusHookType.PRE_CREATE:
             break
@@ -128,8 +129,6 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     async (fileList: FileList) => {
       const files = [...fileList]
       const fileIDs: string[] = []
-      let totalSize = 0
-      files.forEach((file) => (totalSize += file.size))
 
       files.forEach(async (file) => {
         const fileId = uppy.addFile(file)
