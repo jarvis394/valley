@@ -1,4 +1,4 @@
-import { Project, File, Cover } from '@valley/db'
+import { Project, File } from '@valley/db'
 import type { SerializedProject } from '@valley/shared'
 import prisma from '#services/prisma_service'
 
@@ -8,29 +8,21 @@ export default class ProjectService {
     files: File[]
   ): Promise<SerializedProject | null> {
     return await prisma.$transaction(async (tx) => {
-      const [projectsQuery, projectCoverQuery] = await Promise.all([
+      const [projectsQuery, projectCover] = await Promise.all([
         tx.$queryRaw<
           Project[]
         >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`,
-        tx.$queryRaw<
-          Cover[]
-        >`SELECT * FROM "Cover" WHERE projectId=${projectId}`,
+        tx.cover.findFirst({
+          where: {
+            projectId,
+          },
+        }),
       ])
       const project = projectsQuery[0]
-      const projectCover = projectCoverQuery[0]
+      const shouldCreateCover = !projectCover
 
       if (!project) {
         return null
-      }
-
-      let cover: Cover | null = null
-      if (!projectCover) {
-        cover = await tx.cover.create({
-          data: {
-            fileId: files[0].id,
-            projectId: project.id,
-          },
-        })
       }
 
       let allFilesSize = 0
@@ -42,10 +34,10 @@ export default class ProjectService {
       const newProjectData = await tx.project.update({
         where: { id: projectId },
         data: {
-          ...(cover && {
+          ...(shouldCreateCover && {
             coverImage: {
-              connect: {
-                id: cover.id,
+              create: {
+                fileId: files[0].id,
               },
             },
           }),
