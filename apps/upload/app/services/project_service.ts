@@ -8,17 +8,23 @@ export default class ProjectService {
     files: File[]
   ): Promise<SerializedProject | null> {
     return await prisma.$transaction(async (tx) => {
-      const query = await tx.$queryRaw<
-        Array<Project & { coverImage: string | null }>
-      >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`
-      const project = query[0]
+      const [projectsQuery, projectCoverQuery] = await Promise.all([
+        tx.$queryRaw<
+          Project[]
+        >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`,
+        tx.$queryRaw<
+          Cover[]
+        >`SELECT * FROM "Cover" WHERE projectId=${projectId}`,
+      ])
+      const project = projectsQuery[0]
+      const projectCover = projectCoverQuery[0]
 
       if (!project) {
         return null
       }
 
       let cover: Cover | null = null
-      if (!project.coverImage) {
+      if (!projectCover) {
         cover = await tx.cover.create({
           data: {
             fileId: files[0].id,
