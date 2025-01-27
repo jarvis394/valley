@@ -41,6 +41,12 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
     })
   }
 
+  const handleSetCover = () => {
+    openModal('set-project-cover', {
+      fileId: file.id,
+    })
+  }
+
   return (
     <Menu.Content>
       <Stack
@@ -53,7 +59,10 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
         <p>{file.type}</p>
       </Stack>
       <Menu.Separator />
-      <Menu.Item before={<Footer color="var(--text-secondary)" />}>
+      <Menu.Item
+        onClick={handleSetCover}
+        before={<Footer color="var(--text-secondary)" />}
+      >
         Set as folder cover
       </Menu.Item>
       <Menu.Item before={<Link color="var(--text-secondary)" />}>

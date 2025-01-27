@@ -7,7 +7,8 @@ import EditFolderDescriptionModal from './EditFolderDescription'
 import ConfirmFolderDeletionModal from './ConfirmFolderDeletion'
 import ConfirmFileDeletionModal from './ConfirmFileDeletion'
 import ConfirmFolderClearModal from './ConfirmFolderClear'
-import ProjectFoldersModal from './ProjectFoldersModal'
+import ProjectFoldersModal from './ProjectFolders'
+import SetProjectCoverModal from './SetProjectCover'
 
 export type ModalId =
   | 'create-project'
@@ -17,6 +18,7 @@ export type ModalId =
   | 'confirm-file-deletion'
   | 'confirm-folder-clear'
   | 'project-folders'
+  | 'set-project-cover'
 
 export const Modals = () => {
   const navigate = useNavigate()
@@ -63,6 +65,9 @@ export const Modals = () => {
       </Modal>
       <Modal onDismiss={handleClose} id="project-folders">
         <ProjectFoldersModal onClose={handleClose} />
+      </Modal>
+      <Modal onDismiss={handleClose} id="set-project-cover">
+        <SetProjectCoverModal onClose={handleClose} />
       </Modal>
     </>
   )

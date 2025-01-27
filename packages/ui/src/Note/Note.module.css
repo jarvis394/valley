@@ -43,6 +43,7 @@
   font-weight: 600;
   white-space: nowrap;
   display: flex;
+  flex-shrink: 0;
 }
 
 .note--secondary,
