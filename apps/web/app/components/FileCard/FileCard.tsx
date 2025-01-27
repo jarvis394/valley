@@ -26,6 +26,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import cx from 'classnames'
 import { useModal } from 'app/hooks/useModal'
+import Paper from '@valley/ui/Paper'
 
 type FileCardMenuContentProps = {
   file: File
@@ -80,10 +81,16 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
 
 type FileCardProps = {
   file: File
+  isCover?: boolean
   isOverlay?: boolean
 }
 
-const FileCard: React.FC<FileCardProps> = ({ file, isOverlay, ...props }) => {
+const FileCard: React.FC<FileCardProps> = ({
+  file,
+  isOverlay,
+  isCover,
+  ...props
+}) => {
   const data = useRouteLoaderData<typeof rootLoader>('root')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
@@ -138,6 +145,22 @@ const FileCard: React.FC<FileCardProps> = ({ file, isOverlay, ...props }) => {
           {!fileThumbnailUrl && <FileIcon width={32} height={32} />}
         </div>
         <p className={styles.fileCard__name}>{file.name}</p>
+
+        {isCover && (
+          <Stack
+            className={styles.fileCard__coverBadge}
+            gap={2}
+            direction={'row'}
+            align={'center'}
+            justify={'flex-start'}
+            asChild
+          >
+            <Paper variant="secondary">
+              <Footer color="var(--text-secondary)" />
+              Folder Cover
+            </Paper>
+          </Stack>
+        )}
 
         <Stack
           className={styles.fileCard__toolbar}

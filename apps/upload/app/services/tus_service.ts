@@ -13,7 +13,6 @@ import { Storage } from '@google-cloud/storage'
 import type { Bucket } from '@google-cloud/storage'
 import { ALLOWED_ORIGINS } from '#config/cors'
 import FileService from '#services/file_service'
-import * as cookie from 'cookie'
 import cookieSignature from 'cookie-signature'
 import prisma from '#services/prisma_service'
 import {
@@ -130,13 +129,12 @@ export default class TusService {
   }
 
   async getSessionFromRequest(req: IncomingMessage) {
-    const cookies = cookie.parse(req.headers.cookie || '')
     logger.debug(
-      'tus: Reading session cookie from request',
-      JSON.stringify(cookies)
+      'tus: Reading session cookie from request: ',
+      req.headers.authorization
     )
     const encodedSession = cookieSignature.unsign(
-      cookies['valley_session'] || '',
+      req.headers.authorization || '',
       env.get('SESSION_SECRET')
     )
     const invalidSessionError =
@@ -162,7 +160,7 @@ export default class TusService {
       throw invalidSessionError
     }
 
-    logger.debug('tus: Decoded session:', encodedSession)
+    logger.debug('tus: Decoded session:', session)
 
     if (!session) {
       throw invalidSessionError

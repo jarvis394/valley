@@ -111,6 +111,5 @@ volumes:
   data:
   redis-data:
   postgres-data:
-  tusd:
 networks:
   valley_network:

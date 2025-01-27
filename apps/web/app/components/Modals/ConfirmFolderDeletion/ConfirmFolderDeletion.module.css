@@ -1,12 +1,3 @@
-.confirmFolderDeletion__content {
-  padding-top: 0;
-}
-
-.confirmFolderDeletion__content > p {
-  margin: 0;
-  font-size: 16px;
-}
-
 .confirmFolderDeletion__form {
   border-top: 1px solid var(--alpha-transparent-07);
   background-color: var(--background-paper);

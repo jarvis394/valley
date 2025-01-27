@@ -1,5 +1,5 @@
-import type { File, Folder } from '@valley/db'
+import type { Cover, File, Folder } from '@valley/db'
 
 export type FolderWithFiles = Folder & {
-  files: File[]
+  files: Array<File & { Cover: Cover[] | null }>
 }

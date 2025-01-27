@@ -2,7 +2,6 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextField from '@valley/ui/TextField'
@@ -14,6 +13,7 @@ import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
+import ModalContent from '@valley/ui/ModalContent'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -23,7 +23,7 @@ type EditFolderTitleModalProps = {
   onClose: () => void
 }
 
-const ModalContent: React.FC<
+const ModalContents: React.FC<
   EditFolderTitleModalProps & {
     project?: ProjectWithFolders | null
   }
@@ -51,14 +51,13 @@ const ModalContent: React.FC<
   return (
     <>
       <ModalHeader>Edit Folder Title</ModalHeader>
-      <Form
-        onSubmit={handleSubmit}
-        id="edit-folder-title-form"
-        className={styles.modal__content}
-        action={formAction}
-        method="POST"
-      >
-        <div>
+      <ModalContent asChild>
+        <Form
+          onSubmit={handleSubmit}
+          id="edit-folder-title-form"
+          action={formAction}
+          method="POST"
+        >
           <TextField
             {...register('title', {
               required: true,
@@ -71,8 +70,8 @@ const ModalContent: React.FC<
             id="folder-title-input"
             placeholder="Folder"
           />
-        </div>
-      </Form>
+        </Form>
+      </ModalContent>
       <ModalFooter
         before={
           <Button
@@ -117,7 +116,7 @@ const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
         </>
       )}
     >
-      {(data) => <ModalContent onClose={onClose} project={data.project} />}
+      {(data) => <ModalContents onClose={onClose} project={data.project} />}
     </ProjectAwait>
   )
 }

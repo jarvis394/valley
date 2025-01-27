@@ -11,7 +11,8 @@ export const authSessionStorage = createCookieSessionStorage<{
     name: 'valley_session',
     path: '/',
     isSigned: true,
-    httpOnly: true,
+    // TODO: need to rethink whole architecture with different domains (JWT maybe?)
+    httpOnly: false,
     sameSite: 'none',
     secrets: process.env.SESSION_SECRET.split(','),
     secure: true,

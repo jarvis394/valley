@@ -2,11 +2,11 @@ import React, { Suspense, useState } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
+import ModalContent from '@valley/ui/ModalContent'
 import styles from './ConfirmFileDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import Note from '@valley/ui/Note'
 import { Await, Form, useParams } from '@remix-run/react'
-import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
 import { FolderWithFiles } from '@valley/shared'
 import { redirectToKey } from 'app/routes/auth+/verify+'
@@ -17,7 +17,7 @@ type ConfirmFileDeletionProps = {
   onClose: () => void
 }
 
-const ModalContent: React.FC<
+const ModalContents: React.FC<
   { folder?: FolderWithFiles | null } & ConfirmFileDeletionProps
 > = ({ folder, onClose }) => {
   const searchParams = new URLSearchParams(window.location.search)
@@ -48,17 +48,12 @@ const ModalContent: React.FC<
   return (
     <>
       <ModalHeader>Delete File</ModalHeader>
-      <Form
-        onSubmit={handleSubmit}
-        id="confirm-folder-deletion-form"
-        method="POST"
-        action={formAction}
-      >
-        <Stack
-          gap={4}
-          padding={6}
-          direction="column"
-          className={styles.confirmFileDeletion__content}
+      <ModalContent asChild>
+        <Form
+          onSubmit={handleSubmit}
+          id="confirm-folder-deletion-form"
+          method="POST"
+          action={formAction}
         >
           <p>
             File <b>&quot;{file.name}&quot;</b> will be deleted.
@@ -66,8 +61,8 @@ const ModalContent: React.FC<
           <Note variant="warning" fill>
             You can restore this file from trash later
           </Note>
-        </Stack>
-      </Form>
+        </Form>
+      </ModalContent>
       <ModalFooter
         className={styles.confirmFileDeletion__footer}
         before={
@@ -107,7 +102,7 @@ const ConfirmFileDeletionModal: React.FC<ConfirmFileDeletionProps> = ({
     <Suspense>
       <Await resolve={data?.folder}>
         {(resolvedFolder) => (
-          <ModalContent onClose={onClose} folder={resolvedFolder} />
+          <ModalContents onClose={onClose} folder={resolvedFolder} />
         )}
       </Await>
     </Suspense>

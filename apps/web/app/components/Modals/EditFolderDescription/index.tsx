@@ -2,7 +2,6 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from '../Modals.module.css'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextArea from '@valley/ui/TextArea'
@@ -14,6 +13,7 @@ import { ProjectWithFolders } from '@valley/shared'
 import { useProjectAwait } from 'app/utils/project'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
+import ModalContent from '@valley/ui/ModalContent'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
@@ -23,7 +23,7 @@ type EditFolderDescriptionModalProps = {
   onClose: () => void
 }
 
-const ModalContent: React.FC<
+const ModalContents: React.FC<
   EditFolderDescriptionModalProps & {
     project?: ProjectWithFolders | null
   }
@@ -50,25 +50,26 @@ const ModalContent: React.FC<
   return (
     <>
       <ModalHeader>Edit Folder Description</ModalHeader>
-      <Form
-        onSubmit={handleSubmit}
-        className={styles.modal__content}
-        id="edit-folder-description-form"
-        method="POST"
-        action={formAction}
-      >
-        <div>
-          <TextArea
-            {...register('description', {
-              value: defaultDescription,
-            })}
-            size="lg"
-            defaultValue={defaultDescription}
-            id="folder-description-input"
-            placeholder="Write here anything..."
-          />
-        </div>
-      </Form>
+      <ModalContent asChild>
+        <Form
+          onSubmit={handleSubmit}
+          id="edit-folder-description-form"
+          method="POST"
+          action={formAction}
+        >
+          <div>
+            <TextArea
+              {...register('description', {
+                value: defaultDescription,
+              })}
+              size="lg"
+              defaultValue={defaultDescription}
+              id="folder-description-input"
+              placeholder="Write here anything..."
+            />
+          </div>
+        </Form>
+      </ModalContent>
       <ModalFooter
         before={
           <Button
@@ -113,7 +114,7 @@ const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
         </>
       )}
     >
-      {(data) => <ModalContent onClose={onClose} project={data.project} />}
+      {(data) => <ModalContents onClose={onClose} project={data.project} />}
     </ProjectAwait>
   )
 }

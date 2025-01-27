@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./ModalContent": "./src/ModalContent/ModalContent.tsx",
     "./Skeleton": "./src/Skeleton/Skeleton.tsx",
     "./Portal": "./src/Portal/Portal.tsx",
     "./Menu": "./src/Menu/Menu.tsx",

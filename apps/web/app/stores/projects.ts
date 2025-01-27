@@ -1,11 +1,13 @@
-import type { File, Project, Folder } from '@valley/db'
+import type { File, Project, Folder, Cover } from '@valley/db'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+
+type FileWithCover = File & { Cover?: Cover[] | null }
 
 type FolderWithFiles = Omit<Folder, 'files' | 'id' | 'projectId'> & {
   id: Folder['id']
   projectId: Project['id']
-  files?: File[]
+  files?: FileWithCover[]
 }
 
 type ProjectWithFoldersMap = Omit<Project, 'folders' | 'id'> & {
@@ -27,12 +29,12 @@ export type ProjectsAction = {
   setFiles: (props: {
     projectId: Project['id']
     folderId: Folder['id']
-    files: File[]
+    files: FileWithCover[]
   }) => void
   addFile: (props: {
     projectId: Project['id']
     folderId: Folder['id']
-    file: File
+    file: FileWithCover
   }) => void
 }
 

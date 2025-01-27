@@ -27,6 +27,9 @@ export const getProjectFolder = ({
         where: {
           isPendingDeletion: false,
         },
+        include: {
+          Cover: true,
+        },
       },
     },
   })

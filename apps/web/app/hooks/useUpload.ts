@@ -20,6 +20,7 @@ import { invalidateCache } from 'app/utils/cache'
 import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 import { useProjectsStore } from 'app/stores/projects'
+import { parseCookies } from 'app/utils/misc'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -118,6 +119,11 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     }).use(Tus, {
       endpoint: rootContext?.ENV.TUSD_URL,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
+      onBeforeRequest(req) {
+        const cookies = parseCookies()
+        const session = cookies['valley_session']
+        req.setHeader('Authorization', session)
+      },
       onAfterResponse: handleUploadResponse,
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,

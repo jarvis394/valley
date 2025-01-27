@@ -2,7 +2,6 @@ import React from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
-import styles from '../Modals.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,6 +11,7 @@ import {
   ProjectsCreateSchema,
   type action as createAction,
 } from 'app/routes/api+/projects+/create'
+import ModalContent from '@valley/ui/ModalContent'
 
 type FormData = z.infer<typeof ProjectsCreateSchema>
 
@@ -38,46 +38,47 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose }) => {
   return (
     <>
       <ModalHeader>Create Project</ModalHeader>
-      <Form
-        onSubmit={handleSubmit}
-        className={styles.modal__content}
-        id="create-project-form"
-        method="POST"
-        action="/api/projects/create"
-      >
-        <TextField
-          {...register('projectName')}
-          label="Project Name"
-          required
-          size="lg"
-          id="project-name-input"
-          placeholder="my-project"
-        />
-        <TextField
-          label="Store until"
-          required
-          size="lg"
-          id="store-until-select"
-          placeholder="my-project"
-        />
-        <TextField
-          label="Visibility"
-          required
-          size="lg"
-          id="visibility-select"
-          placeholder="my-project"
-        />
-        <TextField
-          {...register('dateShot', {
-            valueAsDate: true,
-          })}
-          label="Date shot"
-          size="lg"
-          id="date-shot-input"
-          type="date"
-          placeholder="dd.mm.yyyy"
-        />
-      </Form>
+      <ModalContent asChild>
+        <Form
+          onSubmit={handleSubmit}
+          id="create-project-form"
+          method="POST"
+          action="/api/projects/create"
+        >
+          <TextField
+            {...register('projectName')}
+            label="Project Name"
+            required
+            size="lg"
+            id="project-name-input"
+            placeholder="my-project"
+          />
+          <TextField
+            label="Store until"
+            required
+            size="lg"
+            id="store-until-select"
+            placeholder="my-project"
+          />
+          <TextField
+            label="Visibility"
+            required
+            size="lg"
+            id="visibility-select"
+            placeholder="my-project"
+          />
+          <TextField
+            {...register('dateShot', {
+              valueAsDate: true,
+            })}
+            label="Date shot"
+            size="lg"
+            id="date-shot-input"
+            type="date"
+            placeholder="dd.mm.yyyy"
+          />
+        </Form>
+      </ModalContent>
       <ModalFooter
         before={
           <Button
