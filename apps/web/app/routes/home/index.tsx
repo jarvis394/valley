@@ -1,8 +1,8 @@
 import React from 'react'
-import type { MetaFunction } from '@remix-run/node'
+import type { MetaFunction } from 'react-router'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-import { Link, useNavigation, useRouteLoaderData } from '@remix-run/react'
+import { Link, useNavigation, useRouteLoaderData } from 'react-router'
 import { ThemeSwitch } from '../resources+/theme-switch'
 import { loader as rootLoader } from '../../root'
 

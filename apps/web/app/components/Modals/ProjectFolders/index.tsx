@@ -16,11 +16,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import {
-  FetcherWithComponents,
-  useFetcher,
-  useNavigate,
-} from '@remix-run/react'
+import { FetcherWithComponents, useFetcher, useNavigate } from 'react-router'
 import type { Folder } from '@valley/db'
 import { ProjectWithFolders, PROJECT_MAX_FOLDERS } from '@valley/shared'
 import Button from '@valley/ui/Button'

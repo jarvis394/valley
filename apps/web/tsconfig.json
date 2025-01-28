@@ -8,9 +8,14 @@
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx",
-    "vite.config.js"
+    "vite.config.js",
+    ".react-router/types/**/*"
   ],
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "rootDirs": [
+      ".",
+      "./.react-router/types"
+    ]
   }
 }

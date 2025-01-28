@@ -1,42 +1,41 @@
 import { createId as cuid } from '@paralleldrive/cuid2'
-import { redirect } from '@remix-run/node'
-import { OIDCStrategy } from 'web-oidc/remix'
+import { redirect } from 'react-router'
 import { connectionSessionStorage } from '../connections.server'
 import { redirectWithToast } from '../../toast.server'
 import { type AuthProvider } from './provider'
 import { getHostAdress } from '../../../server/utils/misc.server'
+import { CodeChallengeMethod, OAuth2Strategy } from 'remix-auth-oauth2'
 
 const shouldMock = process.env.GOOGLE_CLIENT_ID?.startsWith('MOCK_')
 const redirectURI = getHostAdress() + '/auth/google/callback'
 
 export class GoogleProvider implements AuthProvider {
   getAuthStrategy() {
-    return new OIDCStrategy(
+    return new OAuth2Strategy(
       {
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: redirectURI,
-        authorizationParams: {
-          scope: ['openid', 'email'],
-        },
-        issuer: 'https://accounts.google.com',
-        response_type: 'code',
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        redirectURI,
+        scopes: ['openid', 'email'],
+        authorizationEndpoint: 'https://accounts.google.com',
+        tokenEndpoint: 'https://accounts.google.com',
+        codeChallengeMethod: CodeChallengeMethod.S256,
       },
-      async ({ profile }) => {
-        if (!profile.email || !profile.email_verified) {
-          throw redirectWithToast('/login', {
-            title: 'Cannot connect Google Account',
-            description: 'Your Google Email is Unverified',
-            type: 'error',
-          })
-        }
-        return {
-          email: profile.email,
-          id: profile.sub,
-          username: profile.preferred_username,
-          name: profile.given_name,
-          imageUrl: profile.picture,
-        }
+      async ({  }) => {
+        // if (!profile.email || !profile.email_verified) {
+        //   throw redirectWithToast('/login', {
+        //     title: 'Cannot connect Google Account',
+        //     description: 'Your Google Email is Unverified',
+        //     type: 'error',
+        //   })
+        // }
+        // return {
+        //   email: profile.email,
+        //   id: profile.sub,
+        //   username: profile.preferred_username,
+        //   name: profile.given_name,
+        //   imageUrl: profile.picture,
+        // }
       }
     )
   }

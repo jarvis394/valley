@@ -5,7 +5,7 @@ import {
   ProviderName,
 } from '../../config/connections'
 import { useIsPending } from '../../utils/misc'
-import { Form } from '@remix-run/react'
+import { Form } from 'react-router'
 import Button, { ButtonProps } from '@valley/ui/Button'
 import styles from './ProviderConnectionForm.module.css'
 import cx from 'classnames'

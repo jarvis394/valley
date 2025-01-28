@@ -1,9 +1,9 @@
 import type { User, Password, Connection, UserSettings } from '@valley/db'
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { connectionSessionStorage, providers } from './connections.server'
+import { providers } from './connections.server'
 import { prisma } from '../db.server'
 import { combineHeaders } from '../../utils/misc'
 import { normalizeEmail, type ProviderUser } from './providers/provider'
@@ -15,9 +15,7 @@ export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30 // 30 days
 export const getSessionExpirationDate = () =>
   new Date(Date.now() + SESSION_EXPIRATION_TIME)
 
-export const authenticator = new Authenticator<ProviderUser>(
-  connectionSessionStorage
-)
+export const authenticator = new Authenticator<ProviderUser>()
 
 // Register auth providers
 for (const [providerName, provider] of Object.entries(providers)) {

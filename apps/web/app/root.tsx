@@ -8,7 +8,7 @@ import {
   ScrollRestoration,
   ShouldRevalidateFunction,
   useLoaderData,
-} from '@remix-run/react'
+} from 'react-router'
 import cx from 'classnames'
 import styles from './root.module.css'
 import {
@@ -16,7 +16,7 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
   data,
-} from '@remix-run/node'
+} from 'react-router'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -31,7 +31,6 @@ import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
-// import { loadServiceWorker, useSWEffect } from '@remix-pwa/sw'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -208,15 +207,6 @@ const App = () => {
   const theme = useOptionalTheme()
 
   useToast(loaderData?.toast)
-
-  // TODO: fix SW requests
-  // React.useEffect(() => {
-  //   // Registering SW manually because Vite remix-pwa plugin
-  //   // adds <script> tag without CSP nonce value
-  //   loadServiceWorker()
-  // }, [])
-
-  // useSWEffect()
 
   return (
     <HoneypotProvider {...loaderData?.honeypotProps}>

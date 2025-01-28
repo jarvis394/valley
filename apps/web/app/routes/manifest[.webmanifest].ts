@@ -1,8 +1,7 @@
-import { data } from '@remix-run/node'
-import { ShouldRevalidateFunction } from '@remix-run/react'
+import type { ShouldRevalidateFunction } from 'react-router'
 
 export const loader = () => {
-  return data(
+  return Response.json(
     {
       name: 'Valley',
       short_name: 'Valley',

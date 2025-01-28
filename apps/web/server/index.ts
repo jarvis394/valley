@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
-import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
-import Sentry from '@sentry/remix'
+import { createRequestHandler } from '@react-router/express'
+import { type ServerBuild } from 'react-router'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
@@ -21,11 +20,6 @@ dotenv.config({ path: path.join('../../.env') })
 const MODE = process.env.NODE_ENV ?? 'development'
 const MOCKS_ENABLED = process.env.MOCKS === 'true'
 const IS_PROD = MODE === 'production'
-const SENTRY_ENABLED = IS_PROD && process.env.SENTRY_DSN
-
-if (SENTRY_ENABLED) {
-  void import('./utils/monitoring.js').then(({ init }) => init())
-}
 
 if (MOCKS_ENABLED) {
   await import('./mocks/index.js')
@@ -118,7 +112,6 @@ app.use(
       directives: {
         'connect-src': [
           MODE === 'development' ? 'ws:' : null,
-          SENTRY_ENABLED ? '*.sentry.io' : null,
           process.env.TUSD_URL || null,
           process.env.UPLOAD_SERVICE_URL || null,
           "'self'",
@@ -203,7 +196,7 @@ app.use((req, res, next) => {
 async function getBuild() {
   try {
     const build = viteDevServer
-      ? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+      ? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
       : await import('../server/index.js')
 
     return { build: build as unknown as ServerBuild, error: null }
@@ -294,8 +287,5 @@ closeWithGrace(async ({ err }) => {
 
   if (err) {
     console.error(ansis.red(err.stack || err.message))
-
-    SENTRY_ENABLED && Sentry.captureException(err)
-    SENTRY_ENABLED && (await Sentry.flush(500))
   }
 })

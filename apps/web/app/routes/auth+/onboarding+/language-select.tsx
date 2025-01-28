@@ -3,8 +3,8 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
   redirect,
-} from '@remix-run/node'
-import { Form, useNavigation } from '@remix-run/react'
+} from 'react-router'
+import { Form, useNavigation } from 'react-router'
 import { useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'

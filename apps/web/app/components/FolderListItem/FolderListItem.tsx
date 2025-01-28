@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { CheckCircleFill, PencilEdit, Trash } from 'geist-ui-icons'
 import { formatBytes } from 'app/utils/misc'
 import type { Folder } from '@valley/db'
-import { useParams } from '@remix-run/react'
+import { useParams } from 'react-router'
 import DragIndicator from '../svg/DragIndicator'
 import {
   AnimateLayoutChanges,

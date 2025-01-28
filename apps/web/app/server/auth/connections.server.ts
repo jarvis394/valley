@@ -1,10 +1,10 @@
-import { createCookieSessionStorage } from '@remix-run/node'
+import { createCookieSessionStorage } from 'react-router'
 import { type ProviderName } from '../../config/connections'
 import { type AuthProvider } from './providers/provider'
 import { type Timings } from '../timing.server'
 import { GitHubProvider } from './providers/github.server'
-import { GoogleProvider } from './providers/google.server'
-import { VKProvider } from './providers/vk.server'
+// import { GoogleProvider } from './providers/google.server'
+// import { VKProvider } from './providers/vk.server'
 
 export const connectionSessionStorage = createCookieSessionStorage({
   cookie: {
@@ -20,8 +20,8 @@ export const connectionSessionStorage = createCookieSessionStorage({
 
 export const providers: Record<ProviderName, AuthProvider> = {
   github: new GitHubProvider(),
-  google: new GoogleProvider(),
-  vk: new VKProvider(),
+  // google: new GoogleProvider(),
+  // vk: new VKProvider(),
 }
 
 export function handleMockAction(providerName: ProviderName, request: Request) {

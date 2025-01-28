@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import styles from './Toolbar.module.css'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
 import { ToolbarItem } from './ToolbarItem'
-import { useLocation, useParams } from '@remix-run/react'
+import { useLocation, useParams } from 'react-router'
 import { useProjectAwait } from 'app/utils/project'
 import LinkTabItem from './LinkTabItem'
 

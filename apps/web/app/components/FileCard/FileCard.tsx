@@ -16,7 +16,7 @@ import {
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData } from 'react-router'
 import { loader as rootLoader } from 'app/root'
 import {
   AnimateLayoutChanges,

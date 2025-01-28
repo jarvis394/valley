@@ -5,6 +5,7 @@ body {
   margin: 0;
   font-family: var(--font-geist-sans);
   background: var(--background-default);
+  transition: background 150ms ease;
 }
 
 * {

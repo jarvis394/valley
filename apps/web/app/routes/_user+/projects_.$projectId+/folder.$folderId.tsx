@@ -12,7 +12,7 @@ import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes } from 'app/utils/misc'
-import { data, HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { data, HeadersFunction, LoaderFunctionArgs } from 'react-router'
 import {
   combineServerTimings,
   makeTimings,
@@ -27,7 +27,7 @@ import {
   useFetcher,
   useNavigate,
   useParams,
-} from '@remix-run/react'
+} from 'react-router'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
 import type { File, Folder } from '@valley/db'

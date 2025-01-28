@@ -1,4 +1,4 @@
-import type { SerializeFrom } from '@remix-run/server-runtime'
+import type { SerializeFrom } from 'react-router'
 import React, { startTransition, useCallback, useEffect, useState } from 'react'
 import {
   Await,
@@ -6,7 +6,7 @@ import {
   type ClientLoaderFunctionArgs,
   useLoaderData,
   useNavigate,
-} from '@remix-run/react'
+} from 'react-router'
 import { cache } from './adapter.client'
 
 export interface CacheAdapter {

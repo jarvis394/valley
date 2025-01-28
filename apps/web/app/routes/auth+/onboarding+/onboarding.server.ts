@@ -1,5 +1,5 @@
 import { invariant } from '../../../utils/invariant'
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { type VerifyFunctionArgs } from '../verify+/verify.server'
 import {
   authenticator,

@@ -5,7 +5,7 @@ import {
   Outlet,
   ShouldRevalidateFunction,
   useLocation,
-} from '@remix-run/react'
+} from 'react-router'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
 import Button from '@valley/ui/Button'
@@ -14,7 +14,7 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
+import { type LoaderFunctionArgs, MetaFunction } from 'react-router'
 
 const covers = [
   '/assets/cover-1.webp',

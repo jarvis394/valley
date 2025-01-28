@@ -88,7 +88,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
                 children as React.ReactElement,
                 undefined,
                 <span className={cx('Button__content', styles.button__content)}>
-                  {(children as React.ReactElement)?.props?.children}
+                  {
+                    (children as React.ReactElement<React.PropsWithChildren>)
+                      ?.props?.children
+                  }
                 </span>
               )}
             </Slottable>

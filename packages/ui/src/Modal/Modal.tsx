@@ -103,4 +103,3 @@ const Modal: React.FC<ModalProps> = ({
 export default Modal
 
 export * from '@radix-ui/react-dialog'
-export * as Drawer from 'vaul'

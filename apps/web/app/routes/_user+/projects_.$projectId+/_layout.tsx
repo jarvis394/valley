@@ -5,10 +5,10 @@ import {
   Outlet,
   redirect,
   ShouldRevalidateFunction,
-} from '@remix-run/react'
+} from 'react-router'
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
-import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { HeadersFunction, LoaderFunctionArgs } from 'react-router'
 import {
   getUserIdFromSession,
   requireLoggedIn,

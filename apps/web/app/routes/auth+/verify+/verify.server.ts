@@ -23,7 +23,7 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
 } from '../../_user+/account+/settings.authentication'
-import { data } from '@remix-run/node'
+import { data } from 'react-router'
 
 export type VerifyFunctionArgs = {
   request: Request

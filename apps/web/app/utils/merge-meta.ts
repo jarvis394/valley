@@ -1,4 +1,4 @@
-import type { MetaDescriptor, MetaFunction } from '@remix-run/node'
+import type { MetaDescriptor, MetaFunction } from 'react-router'
 
 export const mergeMeta = (
   overrideFn: MetaFunction,
