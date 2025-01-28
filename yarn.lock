@@ -10260,13 +10260,13 @@ gcp-metadata@^6.1.0:
     gaxios "^6.0.0"
     json-bigint "^1.0.0"
 
-geist-ui-icons@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/geist-ui-icons/-/geist-ui-icons-1.1.1.tgz#6e40d1895e2e74a734389f32741485096fd6b7fb"
-  integrity sha512-kr3TP8ZZHdNyURDbn5o7d5WI+WV3pV+EmQfOTt3SDn2GeLE0EnSWRAPhM6LncWlo7yLX5lg7dSt7/GNGZgXsdQ==
+geist-ui-icons@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/geist-ui-icons/-/geist-ui-icons-1.2.0.tgz#8126db7d2ef492586fbffd798dc2bcc5c4fca058"
+  integrity sha512-UZ2LWqWde4LeTXrbC1hn8HUFJAaEmgpqZQXg1Po5jiA7pHhwexgNPjnkjsw7ZGapB+gbYfq1owhDxZpEBoabPQ==
   dependencies:
     "@svgr/cli" "^8.1.0"
-    react "^18.3.1"
+    react "^19.0.0"
 
 generic-pool@3.9.0:
   version "3.9.0"
@@ -13803,7 +13803,7 @@ react-textarea-autosize@^8.5.7:
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
 
-"react@^16.8.0 || ^17.0.0 || ^18.0.0", react@^18.3.1:
+"react@^16.8.0 || ^17.0.0 || ^18.0.0":
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
@@ -14046,10 +14046,10 @@ remix-auth@^4.1.0:
   resolved "https://registry.yarnpkg.com/remix-auth/-/remix-auth-4.1.0.tgz#6c99c367a477a009e153912484282deadd831746"
   integrity sha512-Xdy42clt+g79GCn+Wl1+B6S/yWnvrStnk62vo1pGuRuUwHC+pjmeEE52ZRkRPuhLGqsQnoDD9TVz/wfEJAGF8g==
 
-remix-flat-routes@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/remix-flat-routes/-/remix-flat-routes-0.8.2.tgz#b25d5b2f99c8183e974daaeba15092059cf66d99"
-  integrity sha512-oNUTpQfPUOEjdnnMpIUSAwoF60f9dTf8ssvo6hEacPG7XDi7cqlGVzFyeLxI0Z43Q8kkZvgyb0LJB7NTx/Xygg==
+remix-flat-routes@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/remix-flat-routes/-/remix-flat-routes-0.8.3.tgz#717df558df062dc1bd49744e6fb8e3bdc4c24832"
+  integrity sha512-B5y18Fv6TbJd0gp+tSSiQi+p8yReEF4M4JhNxfp6hKoN8YSRXcJt1TCVcylL4FU2A7TvCiqolv8xZllCF+1tiQ==
   dependencies:
     fs-extra "^11.2.0"
     minimatch "^10.0.1"

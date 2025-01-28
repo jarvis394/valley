@@ -53,7 +53,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     (state) => state.clearSuccessfulUploads
   )
   const addFileToCache = useProjectsStore((state) => state.addFile)
-  const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
+  const uploadSpeedIntervalID = useRef<NodeJS.Timeout>(undefined)
 
   const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
     await invalidateCache([

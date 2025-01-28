@@ -16,6 +16,7 @@ export type ButtonOwnProps = Partial<
     before: React.ReactNode
     after: React.ReactNode
     align: 'start' | 'center' | 'end'
+    ref: React.Ref<HTMLButtonElement>
   }> &
     ButtonBaseProps
 >
@@ -25,23 +26,20 @@ export type ButtonProps = AsChildProps<
 > &
   ButtonOwnProps
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    children,
-    size = 'sm',
-    variant = 'primary',
-    loading,
-    className,
-    disabled,
-    before,
-    fullWidth,
-    align,
-    after,
-    asChild,
-    ...other
-  },
-  ref
-) {
+const Button = ({
+  children,
+  size = 'sm',
+  variant = 'primary',
+  loading,
+  className,
+  disabled,
+  before,
+  fullWidth,
+  align,
+  after,
+  asChild,
+  ...other
+}: ButtonProps) => {
   const Root = asChild ? Slot : 'button'
 
   if (!isElement(children) && asChild) {
@@ -54,7 +52,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 
   return (
     <ButtonBase
-      ref={ref}
       asChild
       variant={variant}
       disabled={disabled}
@@ -110,6 +107,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       </Root>
     </ButtonBase>
   )
-})
+}
 
 export default React.memo(Button)

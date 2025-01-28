@@ -1,5 +1,6 @@
 import React, {
   CSSProperties,
+  JSX,
   startTransition,
   useCallback,
   useEffect,
@@ -73,7 +74,7 @@ const Tabs = <T extends TabValue = TabValue>({
   const [mounted, setMounted] = useState(false)
   const tabsRefs = useRef(new Map<T, HTMLElement>())
   const [hoveredTab, setHoveredTab] = useState<T | null>(null)
-  const initialHoveredElementTimeoutRef = useRef<NodeJS.Timeout>()
+  const initialHoveredElementTimeoutRef = useRef<NodeJS.Timeout>(null)
   /** Removes transform animation from selected item indicator on first render */
   const [isInitialSelectedAppear, setIsInitialSelectedAppear] = useState(true)
   const $root = useRef<HTMLDivElement>(null)
@@ -204,7 +205,7 @@ const Tabs = <T extends TabValue = TabValue>({
     })
 
     return () => {
-      clearTimeout(initialHoveredElementTimeoutRef.current)
+      clearTimeout(initialHoveredElementTimeoutRef.current || undefined)
     }
   }, [])
 

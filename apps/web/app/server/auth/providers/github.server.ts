@@ -35,8 +35,34 @@ export class GitHubProvider implements AuthProvider {
         clientId: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
         redirectURI,
+        cookie: {
+          name: 'valley_connection',
+          sameSite: 'Lax',
+          path: '/',
+          httpOnly: true,
+          maxAge: 60 * 10, // 10 minutes
+          secure: true,
+        },
       },
-      async ({ profile }) => {
+      async ({ tokens }) => {
+        const response = await fetch('https://api.github.com/user', {
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${tokens.accessToken()}`,
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+        })
+
+        const profile = (await response.json()) as {
+          emails: Array<{ value: string }>
+          id: string
+          displayName: string
+          name: {
+            givenName: string
+          }
+          photos: Array<{ value: string }>
+        }
+
         const email = normalizeEmail(profile.emails[0]?.value)
         if (!email) {
           throw new Error('Email not found')

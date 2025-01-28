@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { LogoGithub, LogoGoogle } from 'geist-ui-icons'
-import LogoVK from '../components/svg/LogoVK'
+import { LogoGithub } from 'geist-ui-icons'
+// import LogoVK from '../components/svg/LogoVK'
 
 export const GITHUB_PROVIDER_NAME = 'github'
-export const GOOGLE_PROVIDER_NAME = 'google'
-export const VK_PROVIDER_NAME = 'vk'
+// export const GOOGLE_PROVIDER_NAME = 'google'
+// export const VK_PROVIDER_NAME = 'vk'
 
 export const PROVIDER_NAMES = [
   GITHUB_PROVIDER_NAME,

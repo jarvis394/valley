@@ -12,7 +12,6 @@ import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes } from 'app/utils/misc'
-import { data, HeadersFunction, LoaderFunctionArgs } from 'react-router'
 import {
   combineServerTimings,
   makeTimings,
@@ -20,13 +19,15 @@ import {
 } from 'app/server/timing.server'
 import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import {
-  ClientLoaderFunction,
   Form,
   redirect,
   ShouldRevalidateFunction,
   useFetcher,
   useNavigate,
   useParams,
+  data,
+  HeadersFunction,
+  LoaderFunctionArgs,
 } from 'react-router'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
@@ -75,6 +76,7 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
 import { getProjectFolder } from 'app/server/folder/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
+import { Route } from './+types/folder.$folderId'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -106,7 +108,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return data({ folder }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
-export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
+export const clientLoader = ({ params, ...props }: Route.ClientLoaderArgs) => {
   if (!params.folderId) {
     return redirect('/projects')
   }
@@ -527,10 +529,10 @@ const FolderFiles: React.FC<{
   )
 }
 
-const ProjectRoute = () => {
+const ProjectRoute = ({ loaderData }: Route.ComponentProps) => {
   const { ProjectAwait } = useProjectAwait()
-  const data = useCachedLoaderData<typeof loader>()
-  const FolderAwait = useSwrData<typeof loader>(data)
+  const data = useCachedLoaderData<typeof loaderData>()
+  const FolderAwait = useSwrData(data)
 
   return (
     <div className={styles.project}>

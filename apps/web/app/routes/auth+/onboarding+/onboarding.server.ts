@@ -1,10 +1,7 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from 'react-router'
 import { type VerifyFunctionArgs } from '../verify+/verify.server'
-import {
-  authenticator,
-  requireAnonymous,
-} from '../../../server/auth/auth.server'
+import { requireAnonymous } from '../../../server/auth/auth.server'
 import { z } from 'zod'
 import { connectionSessionStorage } from '../../../server/auth/connections.server'
 import { combineHeaders } from '../../../utils/misc'
@@ -72,7 +69,8 @@ export async function requireOnboardingData(request: Request) {
       request.headers.get('cookie')
     )
     const prefilledProfile = onboardingSession.get('prefilledProfile')
-    const formError = connectionSession.get(authenticator.sessionErrorKey)
+    // TODO: fix this, was authenticator.sessionErrorKey
+    const formError = connectionSession.get('error')
     const hasError = typeof formError === 'string'
 
     return {

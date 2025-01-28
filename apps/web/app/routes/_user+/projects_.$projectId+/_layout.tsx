@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react'
 import {
-  ClientLoaderFunction,
   data,
   Outlet,
   redirect,
   ShouldRevalidateFunction,
+  HeadersFunction,
+  LoaderFunctionArgs,
 } from 'react-router'
 import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
-import { HeadersFunction, LoaderFunctionArgs } from 'react-router'
 import {
   getUserIdFromSession,
   requireLoggedIn,
@@ -29,6 +29,7 @@ import { invariantResponse } from 'app/utils/invariant'
 import { getUserProject } from 'app/server/project/project.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { FolderWithFiles } from '@valley/shared'
+import { Route } from './+types/_layout'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
@@ -56,7 +57,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
-export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
+export const clientLoader = ({ params, ...props }: Route.ClientLoaderArgs) => {
   if (!params.projectId) {
     return redirect('/projects')
   }
@@ -92,9 +93,9 @@ export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
   }
 }
 
-const ProjectLayout: React.FC = () => {
+const ProjectLayout = ({ loaderData }: Route.ComponentProps) => {
   const setProject = useProjectsStore((state) => state.setProject)
-  const data = useCachedLoaderData<typeof loader>()
+  const data = useCachedLoaderData<typeof loaderData>()
 
   // Set the project to the cache store when the data is loaded
   // Used for optimistic updates

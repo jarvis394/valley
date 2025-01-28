@@ -1,5 +1,5 @@
 import { FieldValues } from 'react-hook-form'
-import { Honeypot, SpamError } from 'remix-utils/honeypot/server'
+import { Honeypot } from 'remix-utils/honeypot/server'
 
 export const honeypot = new Honeypot({
   validFromFieldName: process.env.NODE_ENV === 'test' ? null : undefined,

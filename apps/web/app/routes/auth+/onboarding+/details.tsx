@@ -25,6 +25,7 @@ import { redirectWithToast } from 'app/server/toast.server'
 import { register } from 'app/server/auth/auth.server'
 import { safeRedirect } from 'remix-utils/safe-redirect'
 import { authSessionStorage } from 'app/server/auth/session.server'
+import { JSX } from 'react'
 
 const DetailsFormSchema = z.object({
   firstName: NameSchema,

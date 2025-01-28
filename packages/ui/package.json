@@ -80,7 +80,7 @@
     "@valley/shared": "*",
     "classnames": "^2.5.1",
     "framer-motion": "^11.11.10",
-    "geist-ui-icons": "^1.1.1",
+    "geist-ui-icons": "^1.2.0",
     "input-otp": "^1.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
