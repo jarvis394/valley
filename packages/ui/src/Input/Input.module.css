@@ -10,7 +10,7 @@
   transition-timing-function: ease;
 }
 
-.input:hover {
+.input:not(.input--error):not(.input--valid):not(:focus-within):hover {
   box-shadow: 0 0 0 1px inset var(--input-border-hovered);
 }
 

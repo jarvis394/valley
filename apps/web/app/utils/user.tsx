@@ -1,4 +1,4 @@
-import { useRouteLoaderData } from '@remix-run/react'
+import { useRouteLoaderData } from 'react-router'
 import { type loader as userLayoutLoader } from '../routes/_user+/_layout'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'

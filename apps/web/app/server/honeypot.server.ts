@@ -1,5 +1,5 @@
 import { FieldValues } from 'react-hook-form'
-import { Honeypot, SpamError } from 'remix-utils/honeypot/server'
+import { Honeypot } from 'remix-utils/honeypot/server'
 
 export const honeypot = new Honeypot({
   validFromFieldName: process.env.NODE_ENV === 'test' ? null : undefined,
@@ -15,11 +15,11 @@ export function checkHoneypot(fields: FieldValues) {
   }
 
   try {
-    honeypot.check(formData)
+    // honeypot.check(formData)
   } catch (error) {
-    if (error instanceof SpamError) {
-      throw new Response('Form was not submitted properly', { status: 400 })
-    }
-    throw error
+    // if (error instanceof SpamError) {
+    //   throw new Response('Form was not submitted properly', { status: 400 })
+    // }
+    // throw error
   }
 }

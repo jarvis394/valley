@@ -1,7 +1,7 @@
 import React from 'react'
 import { ToolbarItem } from './ToolbarItem'
 import TabsItem from '@valley/ui/TabsItem'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 
 const LinkTabItem = React.forwardRef<HTMLButtonElement, ToolbarItem>(
   function LinkTabItem({ label, value, to, ...props }, ref) {

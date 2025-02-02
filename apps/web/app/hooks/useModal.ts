@@ -1,5 +1,5 @@
-import { useSearchParams } from '@remix-run/react'
-import type { RelativeRoutingType } from '@remix-run/router'
+import { useSearchParams } from 'react-router'
+import type { RelativeRoutingType } from 'react-router'
 import { ModalId } from 'app/components/Modals'
 
 interface NavigateOptions {

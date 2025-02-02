@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunction } from '@remix-run/node'
+import { redirect, type LoaderFunction } from 'react-router'
 import { isLoggedIn } from 'app/server/auth/auth.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -9,4 +9,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   } else {
     return redirect('/auth/login')
   }
+}
+
+export default function RootRoute() {
+  return null
 }

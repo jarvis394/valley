@@ -12,7 +12,7 @@ import Menu from '@valley/ui/Menu'
 import { formatBytes } from 'app/utils/misc'
 import type { Folder } from '@valley/db'
 import IconButton from '@valley/ui/IconButton'
-import { Link, useNavigation, useParams } from '@remix-run/react'
+import { Link, useNavigation, useParams } from 'react-router'
 import { useModal } from 'app/hooks/useModal'
 
 type FolderCardProps = {

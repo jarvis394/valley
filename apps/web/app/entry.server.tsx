@@ -1,27 +1,23 @@
 import { PassThrough } from 'node:stream'
-import type {
-  EntryContext,
-  HandleDocumentRequestFunction,
-} from '@remix-run/node'
-import { createReadableStreamFromReadable } from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
+import { createReadableStreamFromReadable } from '@react-router/node'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 import { NonceProvider } from './components/NonceProvider/NonceProvider'
 import { init as envInit } from './server/env.server'
 import { makeTimings } from './server/timing.server'
+import { ServerRouter, EntryContext, AppLoadContext } from 'react-router'
 
 const ABORT_DELAY = 5_000
 export const STREAMING_TIMEOUT = 5_000
 
 envInit()
 
-const handleRequest: HandleDocumentRequestFunction = (
+const handleRequest = (
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext,
-  loadContext
+  reactRouterContext: EntryContext,
+  loadContext: AppLoadContext
 ) => {
   const cspNonce = crypto.randomUUID()
   const nonce = loadContext.cspNonce?.toString() ?? cspNonce
@@ -37,7 +33,11 @@ const handleRequest: HandleDocumentRequestFunction = (
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>
-        <RemixServer nonce={nonce} context={remixContext} url={request.url} />
+        <ServerRouter
+          nonce={nonce}
+          context={reactRouterContext}
+          url={request.url}
+        />
       </NonceProvider>,
       {
         [callbackName]: () => {

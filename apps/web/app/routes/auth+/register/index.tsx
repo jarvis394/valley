@@ -1,13 +1,13 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import { Form, useSearchParams } from '@remix-run/react'
+import { Form, useSearchParams } from 'react-router'
 import {
   type ActionFunctionArgs,
   redirect,
   data,
   HeadersFunction,
-} from '@remix-run/node'
+} from 'react-router'
 import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'

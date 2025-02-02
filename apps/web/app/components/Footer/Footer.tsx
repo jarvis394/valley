@@ -10,7 +10,7 @@ import {
   GITHUB_REPOSITORY_URL,
   TELEGRAM_PHOTOS_URL,
 } from '../../config/constants'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 
 const TelegramIcon = () => (
   <svg

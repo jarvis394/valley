@@ -4,8 +4,8 @@ import {
   type MetaFunction,
   redirect,
   data,
-} from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+} from 'react-router'
+import { Form, useLoaderData } from 'react-router'
 import { looseOptional, useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'

@@ -13,7 +13,7 @@ import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import type { Folder, Project } from '@valley/db'
-import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
+import { useRevalidator, useRouteLoaderData } from 'react-router'
 import { loader as rootLoader } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
 import { invalidateCache } from 'app/utils/cache'
@@ -53,7 +53,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     (state) => state.clearSuccessfulUploads
   )
   const addFileToCache = useProjectsStore((state) => state.addFile)
-  const uploadSpeedIntervalID = useRef<NodeJS.Timeout>()
+  const uploadSpeedIntervalID = useRef<NodeJS.Timeout>(undefined)
 
   const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
     await invalidateCache([

@@ -1,9 +1,9 @@
 import type { User, Password, Connection, UserSettings } from '@valley/db'
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { connectionSessionStorage, providers } from './connections.server'
+import { providers } from './connections.server'
 import { prisma } from '../db.server'
 import { combineHeaders } from '../../utils/misc'
 import { normalizeEmail, type ProviderUser } from './providers/provider'
@@ -15,9 +15,7 @@ export const SESSION_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30 // 30 days
 export const getSessionExpirationDate = () =>
   new Date(Date.now() + SESSION_EXPIRATION_TIME)
 
-export const authenticator = new Authenticator<ProviderUser>(
-  connectionSessionStorage
-)
+export const authenticator = new Authenticator<ProviderUser>()
 
 // Register auth providers
 for (const [providerName, provider] of Object.entries(providers)) {
@@ -79,7 +77,7 @@ export async function requireUserId(
   const userId = await getUserId(request)
 
   if (!userId) {
-    throw redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
+    return redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
   }
 
   return userId
@@ -90,6 +88,9 @@ export async function requireUser(
   { redirectTo }: RedirectToProps = {}
 ) {
   const userId = await requireUserId(request, { redirectTo })
+  invariantResponse(typeof userId === 'string', 'User not found', {
+    status: 404,
+  })
   const user = await prisma.user.findUnique({
     where: { id: userId },
   })
@@ -112,7 +113,7 @@ export async function isLoggedIn(request: Request) {
 export async function requireLoggedIn(request: Request) {
   const loggedIn = await isLoggedIn(request)
   const redirectUrl = getUnauthenticatedRedirectUrl(request)
-  if (!loggedIn) throw redirect(redirectUrl)
+  if (!loggedIn) return redirect(redirectUrl)
 
   return true
 }

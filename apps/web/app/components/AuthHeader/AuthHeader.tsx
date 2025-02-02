@@ -3,7 +3,7 @@ import styles from './AuthHeader.module.css'
 import Logo from '../Logo/Logo'
 import Button from '@valley/ui/Button'
 import { LogoGithub } from 'geist-ui-icons'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 
 const AuthHeader: React.FC = () => {
   return (

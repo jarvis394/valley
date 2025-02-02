@@ -1,6 +1,5 @@
-import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
-import { data, Link, ShouldRevalidateFunction } from '@remix-run/react'
+import type { HeadersFunction, LoaderFunctionArgs } from 'react-router'
+import { redirect, data, Link, ShouldRevalidateFunction } from 'react-router'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
@@ -30,12 +29,13 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
 import {
   cache,
-  createClientLoaderCache,
+  cacheClientLoader,
   useCachedLoaderData,
   useSwrData,
 } from 'app/utils/cache'
 import Menu from '@valley/ui/Menu'
 import { getUserProjects } from 'app/server/project/project.server'
+import { Route } from './+types/_index'
 
 export const getProjectsCacheKey = () => 'projects'
 
@@ -49,7 +49,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   })
 
   if (!userId) {
-    throw redirect('/auth/login')
+    return redirect('/auth/login')
   }
 
   const projects = await time(getUserProjects({ userId }), {
@@ -78,10 +78,13 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const clientLoader = createClientLoaderCache({
-  key: getProjectsCacheKey(),
-  type: 'swr',
-})
+export const clientLoader = (args: Route.ClientLoaderArgs) =>
+  cacheClientLoader(args, {
+    key: getProjectsCacheKey(),
+    type: 'swr',
+  })
+
+clientLoader.hydrate = true
 
 const projectSkeletons = (
   <Wrapper className={styles.projects__list}>
@@ -129,9 +132,9 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
   )
 }
 
-const ProjectsRoute = () => {
-  const data = useCachedLoaderData<typeof loader>()
-  const ProjectsAwait = useSwrData<typeof loader>(data)
+const ProjectsRoute = ({ loaderData }: Route.ComponentProps) => {
+  const data = useCachedLoaderData<typeof loaderData>()
+  const ProjectsAwait = useSwrData(data)
 
   return (
     <Stack direction={'column'} fullHeight fullWidth>

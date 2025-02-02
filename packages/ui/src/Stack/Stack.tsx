@@ -25,24 +25,21 @@ export type StackOwnProps = Partial<
 export type StackProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &
   StackOwnProps
 
-const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
-  {
-    direction = 'row',
-    align = 'stretch',
-    justify = 'flex-start',
-    gap = 0,
-    padding = 0,
-    flex = 'initial',
-    fullWidth,
-    fullHeight,
-    wrap,
-    asChild,
-    className,
-    style,
-    ...other
-  },
-  ref
-) {
+const Stack = ({
+  direction = 'row',
+  align = 'stretch',
+  justify = 'flex-start',
+  gap = 0,
+  padding = 0,
+  flex = 'initial',
+  fullWidth,
+  fullHeight,
+  wrap,
+  asChild,
+  className,
+  style,
+  ...other
+}: StackProps) => {
   const { getViewportVariable } = useViewportVariable('stack')
   const Root = asChild ? Slot : 'div'
   const stackFlex = getViewportVariable(flex, 'flex')
@@ -55,7 +52,6 @@ const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
   return (
     <Root
       {...other}
-      ref={ref}
       className={cx('Stack', styles.stack, className, {
         [styles['stack--fullWidth']]: fullWidth,
         [styles['stack--fullHeight']]: fullHeight,
@@ -72,6 +68,6 @@ const Stack = React.forwardRef<HTMLDivElement, StackProps>(function Stack(
       }}
     />
   )
-})
+}
 
 export default Stack

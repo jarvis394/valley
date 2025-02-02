@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { JSX, useMemo } from 'react'
 import styles from './Note.module.css'
 import cx from 'classnames'
 import { Information, CheckCircle, Warning, Stop } from 'geist-ui-icons'

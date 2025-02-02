@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import {
   type ErrorResponse,
   isRouteErrorResponse,
   useParams,
   useRouteError,
-} from '@remix-run/react'
+} from 'react-router'
 import { getErrorMessage } from '../../utils/misc'
 import styles from './ErrorBoundary.module.css'
 import Stack from '@valley/ui/Stack'

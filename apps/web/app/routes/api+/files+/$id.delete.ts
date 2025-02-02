@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { LoaderFunctionArgs, redirect } from 'react-router'
 import { redirectToKey } from 'app/routes/auth+/verify+'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
