@@ -24,6 +24,7 @@ import {
   twoFAVerifyVerificationType,
 } from '../../_user+/account+/settings.authentication'
 import { data } from 'react-router'
+import { invariantResponse } from 'app/utils/invariant'
 
 export type VerifyFunctionArgs = {
   request: Request
@@ -60,6 +61,9 @@ export function getRedirectToUrl({
 export async function requireRecentVerification(request: Request) {
   const userId = await requireUserId(request)
   const shouldReverify = await shouldRequestTwoFA(request)
+  invariantResponse(typeof userId === 'string', 'User not found', {
+    status: 404,
+  })
 
   if (shouldReverify) {
     const reqUrl = new URL(request.url)

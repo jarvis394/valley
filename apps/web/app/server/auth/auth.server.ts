@@ -77,7 +77,7 @@ export async function requireUserId(
   const userId = await getUserId(request)
 
   if (!userId) {
-    throw redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
+    return redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
   }
 
   return userId
@@ -88,6 +88,9 @@ export async function requireUser(
   { redirectTo }: RedirectToProps = {}
 ) {
   const userId = await requireUserId(request, { redirectTo })
+  invariantResponse(typeof userId === 'string', 'User not found', {
+    status: 404,
+  })
   const user = await prisma.user.findUnique({
     where: { id: userId },
   })
@@ -110,7 +113,7 @@ export async function isLoggedIn(request: Request) {
 export async function requireLoggedIn(request: Request) {
   const loggedIn = await isLoggedIn(request)
   const redirectUrl = getUnauthenticatedRedirectUrl(request)
-  if (!loggedIn) throw redirect(redirectUrl)
+  if (!loggedIn) return redirect(redirectUrl)
 
   return true
 }
