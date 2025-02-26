@@ -177,7 +177,7 @@ const LoginPage: React.FC = () => {
             <ProviderConnectionForm
               key={providerName}
               providerName={providerName}
-              type="Connect"
+              type="Login"
               redirectTo={redirectTo}
             />
           ))}

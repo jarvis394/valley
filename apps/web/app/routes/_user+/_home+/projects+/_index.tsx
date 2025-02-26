@@ -32,10 +32,10 @@ import {
   cache,
   createClientLoaderCache,
   useCachedLoaderData,
-  useSwrData,
 } from 'app/utils/cache'
 import Menu from '@valley/ui/Menu'
 import { getUserProjects } from 'app/server/project/project.server'
+import { useHydrated } from 'remix-utils/use-hydrated'
 
 export const getProjectsCacheKey = () => 'projects'
 
@@ -84,16 +84,20 @@ export const clientLoader = createClientLoaderCache({
 })
 
 const projectSkeletons = (
-  <Wrapper className={styles.projects__list}>
-    {new Array(8).fill(null).map((_, i) => (
-      <ProjectCard loading key={i} />
-    ))}
-  </Wrapper>
+  <div className={styles.projects__placeholderIllustration}>
+    <Wrapper className={styles.projects__list}>
+      {new Array(8).fill(null).map((_, i) => (
+        <ProjectCard loading key={i} />
+      ))}
+    </Wrapper>
+  </div>
 )
 
 const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
   projects,
 }) => {
+  const isHydrated = useHydrated()
+
   if (projects?.length === 0) {
     return (
       <Stack
@@ -106,18 +110,32 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
         className={styles.projects__placeholder}
         padding={8}
       >
-        <Stack direction={'column'} gap={4} align={'center'} justify={'center'}>
-          <h1>This page seems empty</h1>
-          <p>Upload some photos to make it happier</p>
-        </Stack>
-        <Button asChild variant="primary" size="lg" before={<Plus />}>
-          <Link preventScrollReset to={{ search: 'modal=create-project' }}>
-            Create project
-          </Link>
-        </Button>
-        <div className={styles.projects__placeholderIllustration}>
-          {projectSkeletons}
-        </div>
+        {isHydrated && (
+          <Stack
+            className="fade-in"
+            direction={'column'}
+            gap={4}
+            align={'center'}
+            justify={'center'}
+          >
+            <h1>This page seems empty</h1>
+            <p>Upload some photos to make it happier</p>
+          </Stack>
+        )}
+        {isHydrated && (
+          <Button
+            asChild
+            className="fade-in"
+            variant="primary"
+            size="lg"
+            before={<Plus />}
+          >
+            <Link preventScrollReset to={{ search: 'modal=create-project' }}>
+              Create project
+            </Link>
+          </Button>
+        )}
+        {projectSkeletons}
       </Stack>
     )
   }
@@ -131,7 +149,6 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
 
 const ProjectsRoute = () => {
   const data = useCachedLoaderData<typeof loader>()
-  const ProjectsAwait = useSwrData<typeof loader>(data)
 
   return (
     <Stack direction={'column'} fullHeight fullWidth>
@@ -200,9 +217,7 @@ const ProjectsRoute = () => {
           </Menu.Root>
         </Stack>
       </Wrapper>
-      <ProjectsAwait fallback={() => projectSkeletons}>
-        {(data) => <ProjectsList projects={data.projects} />}
-      </ProjectsAwait>
+      <ProjectsList projects={data.projects} />
     </Stack>
   )
 }

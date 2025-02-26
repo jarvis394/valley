@@ -11,8 +11,6 @@ import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { ProjectWithFolders } from '@valley/shared'
 import { useProjectAwait } from 'app/utils/project'
-import Stack from '@valley/ui/Stack'
-import Spinner from '@valley/ui/Spinner'
 import ModalContent from '@valley/ui/ModalContent'
 
 type FormData = z.infer<typeof FoldersEditSchema>
@@ -101,22 +99,9 @@ const ModalContents: React.FC<
 const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
   onClose,
 }) => {
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
 
-  return (
-    <ProjectAwait
-      fallback={() => (
-        <>
-          <ModalHeader>Edit Folder Description</ModalHeader>
-          <Stack padding={[4, 4, 8, 4]} align={'center'} justify={'center'}>
-            <Spinner />
-          </Stack>
-        </>
-      )}
-    >
-      {(data) => <ModalContents onClose={onClose} project={data.project} />}
-    </ProjectAwait>
-  )
+  return <ModalContents onClose={onClose} project={data.project} />
 }
 
 export default EditFolderDescriptionModal

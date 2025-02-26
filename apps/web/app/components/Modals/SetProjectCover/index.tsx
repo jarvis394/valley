@@ -9,8 +9,6 @@ import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
-import Stack from '@valley/ui/Stack'
-import Spinner from '@valley/ui/Spinner'
 import ModalContent from '@valley/ui/ModalContent'
 import { ProjectSetCoverSchema } from 'app/routes/api+/projects+/$id.setCover'
 import ErrorModalContent from '../ErrorModalContent'
@@ -103,22 +101,9 @@ const ModalContents: React.FC<
 const SetProjectCoverModal: React.FC<SetProjectCoverModalProps> = ({
   onClose,
 }) => {
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
 
-  return (
-    <ProjectAwait
-      fallback={() => (
-        <>
-          <ModalHeader>Set Cover</ModalHeader>
-          <Stack padding={[4, 4, 8, 4]} align={'center'} justify={'center'}>
-            <Spinner />
-          </Stack>
-        </>
-      )}
-    >
-      {(data) => <ModalContents onClose={onClose} project={data.project} />}
-    </ProjectAwait>
-  )
+  return <ModalContents onClose={onClose} project={data.project} />
 }
 
 export default SetProjectCoverModal

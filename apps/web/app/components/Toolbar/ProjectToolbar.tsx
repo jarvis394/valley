@@ -12,40 +12,19 @@ const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
 >(function ProjectsToolbarTabItem({ value, label, ...props }, ref) {
   const { projectId, folderId } = useParams()
   const projectBaseUrl = `/projects/${projectId}`
-  const { ProjectAwait } = useProjectAwait()
-  const fallbackProjectOverviewUrl = useMemo(() => {
-    if (folderId) return projectBaseUrl + '/folder/' + folderId
-    else return projectBaseUrl
-  }, [folderId, projectBaseUrl])
+  const data = useProjectAwait()
 
   if (value === projectBaseUrl) {
+    const defaultFolder =
+      data.project?.folders?.find((e) => e.isDefaultFolder)?.id || folderId
     return (
-      <ProjectAwait
-        fallback={() => (
-          <LinkTabItem
-            {...props}
-            ref={ref}
-            to={fallbackProjectOverviewUrl}
-            value={value}
-            label={label}
-          />
-        )}
-      >
-        {(data) => {
-          const defaultFolder =
-            data.project?.folders?.find((e) => e.isDefaultFolder)?.id ||
-            folderId
-          return (
-            <LinkTabItem
-              {...props}
-              ref={ref}
-              value={value}
-              label={label}
-              to={projectBaseUrl + '/folder/' + defaultFolder}
-            />
-          )
-        }}
-      </ProjectAwait>
+      <LinkTabItem
+        {...props}
+        ref={ref}
+        value={value}
+        label={label}
+        to={projectBaseUrl + '/folder/' + defaultFolder}
+      />
     )
   }
 

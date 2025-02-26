@@ -117,7 +117,7 @@ const CurrentProject: React.FC<{ project?: Project | null }> = ({
 
 const Header: React.FC = () => {
   const user = useUserAwait()
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
 
   return (
     <header
@@ -138,11 +138,7 @@ const Header: React.FC = () => {
               {(resolvedUser) => <CurrentUser user={resolvedUser} />}
             </Await>
           </Suspense>
-          <ProjectAwait
-            fallback={(data) => <CurrentProject project={data.project} />}
-          >
-            {(data) => <CurrentProject project={data.project} />}
-          </ProjectAwait>
+          <CurrentProject project={data.project} />
         </Stack>
         <Stack gap={2} align={'center'} className={styles.header__after}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>

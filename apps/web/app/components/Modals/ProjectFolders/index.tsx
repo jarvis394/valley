@@ -204,22 +204,18 @@ const ModalContent: React.FC<{
 const ProjectFoldersModal: React.FC<{ onClose?: () => void }> = ({
   onClose,
 }) => {
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
   const createFolderAction = '/api/folders/create'
   const createFolderFetcher = useFetcher({
     key: createFolderAction,
   })
 
   return (
-    <ProjectAwait>
-      {(data) => (
-        <ModalContent
-          createFolderFetcher={createFolderFetcher}
-          onClose={onClose}
-          project={data.project}
-        />
-      )}
-    </ProjectAwait>
+    <ModalContent
+      createFolderFetcher={createFolderFetcher}
+      onClose={onClose}
+      project={data.project}
+    />
   )
 }
 

@@ -19,6 +19,21 @@
   visibility: hidden;
 }
 
+.fade-in {
+  --fade-duration: 250ms;
+  --fade-timing-function: ease-in-out;
+  animation: var(--fade-timing-function) var(--fade-duration) fade-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .grow {
   --grow-duration: 120ms;
   --grow-timing-function: ease-in-out;

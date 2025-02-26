@@ -97,13 +97,9 @@ const ProjectSettingsGeneral: React.FC<{
 }
 
 const ProjectSettingsGeneralRoute = () => {
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
 
-  return (
-    <ProjectAwait>
-      {(data) => <ProjectSettingsGeneral project={data.project} />}
-    </ProjectAwait>
-  )
+  return <ProjectSettingsGeneral project={data.project} />
 }
 
 export default ProjectSettingsGeneralRoute

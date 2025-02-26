@@ -13,7 +13,6 @@ import { useProjectAwait } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/routes/_.auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
-import Spinner from '@valley/ui/Spinner'
 import ModalContent from '@valley/ui/ModalContent'
 
 type ConfirmFolderDeletionProps = {
@@ -164,22 +163,9 @@ const ModalContents: React.FC<
 const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionProps> = ({
   onClose,
 }) => {
-  const { ProjectAwait } = useProjectAwait()
+  const data = useProjectAwait()
 
-  return (
-    <ProjectAwait
-      fallback={() => (
-        <>
-          <ModalHeader>Delete Folder</ModalHeader>
-          <Stack padding={[4, 4, 8, 4]} align={'center'} justify={'center'}>
-            <Spinner />
-          </Stack>
-        </>
-      )}
-    >
-      {(data) => <ModalContents onClose={onClose} project={data.project} />}
-    </ProjectAwait>
-  )
+  return <ModalContents onClose={onClose} project={data.project} />
 }
 
 export default ConfirmFolderDeletionModal

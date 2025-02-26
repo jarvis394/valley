@@ -42,7 +42,6 @@ import {
   cacheClientLoader,
   invalidateCache,
   useCachedLoaderData,
-  useSwrData,
 } from 'app/utils/cache'
 import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
@@ -528,20 +527,13 @@ const FolderFiles: React.FC<{
 }
 
 const ProjectRoute = () => {
-  const { ProjectAwait } = useProjectAwait()
+  const projectData = useProjectAwait()
   const data = useCachedLoaderData<typeof loader>()
-  const FolderAwait = useSwrData<typeof loader>(data)
 
   return (
     <div className={styles.project}>
-      <ProjectAwait
-        fallback={(data) => <ProjectBlock project={data.project} />}
-      >
-        {(data) => <ProjectBlock project={data.project} />}
-      </ProjectAwait>
-      <FolderAwait fallback={(data) => <FolderFiles folder={data.folder} />}>
-        {(data) => <FolderFiles folder={data.folder} />}
-      </FolderAwait>
+      <ProjectBlock project={projectData.project} />
+      <FolderFiles folder={data.folder} />
     </div>
   )
 }
