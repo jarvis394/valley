@@ -7,18 +7,28 @@ import Stack from '@valley/ui/Stack'
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const user = await prisma.user.findFirst({
     where: {
-      settings: {
-        serviceDomain: params.domain,
-      },
+      OR: [
+        { serviceDomain: params.domain },
+        {
+          domains: {
+            has: params.domain,
+          },
+        },
+      ],
     },
   })
 
   const projects = await prisma.project.findMany({
     where: {
       User: {
-        settings: {
-          serviceDomain: params.domain,
-        },
+        OR: [
+          { serviceDomain: params.domain },
+          {
+            domains: {
+              has: params.domain,
+            },
+          },
+        ],
       },
     },
   })

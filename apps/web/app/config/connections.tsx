@@ -25,3 +25,17 @@ export const PROVIDER_ICONS: Record<ProviderName, React.ReactNode> = {
   [GOOGLE_PROVIDER_NAME]: <LogoGoogle className="svg-own-color" />,
   [VK_PROVIDER_NAME]: <LogoVK />,
 } as const
+
+export const PROVIDER_MANAGE_LINKS: Record<ProviderName, string> = {
+  [GITHUB_PROVIDER_NAME]:
+    'https://github.com/settings/connections/applications/' +
+    import.meta.env.VITE_GITHUB_CLIENT_ID,
+  [GOOGLE_PROVIDER_NAME]: 'https://myaccount.google.com/connections',
+  [VK_PROVIDER_NAME]: 'https://id.vk.com/account/#/services',
+} as const
+
+export const PROVIDER_WEBSITES: Record<ProviderName, string> = {
+  [GITHUB_PROVIDER_NAME]: 'github.com',
+  [GOOGLE_PROVIDER_NAME]: 'myaccount.google.com',
+  [VK_PROVIDER_NAME]: 'id.vk.com',
+} as const

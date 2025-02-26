@@ -72,14 +72,14 @@
   transform: translateX(-100%);
   transition: all 150ms ease;
   inset: 0px;
-  animation: 2s linear 0s infinite normal none running animation-shimmer;
+  animation: 1s linear 0s infinite normal none running animation-shimmer;
 }
 
 @keyframes animation-shimmer {
   0% {
     transform: translateX(-100%);
   }
-  50% {
+  75% {
     transform: translateX(100%);
   }
   100% {

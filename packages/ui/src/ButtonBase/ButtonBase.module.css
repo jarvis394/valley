@@ -51,6 +51,11 @@
   --themed-border: var(--button-disabled-border) !important;
 }
 
+.buttonBase--shimmer.buttonBase--tertiary,
+.buttonBase--shimmer.buttonBase--tertiary-dimmed {
+  --themed-border: transparent !important;
+}
+
 .buttonBase--tertiary:disabled {
   --themed-color: var(--text-secondary) !important;
   --themed-background: transparent !important;

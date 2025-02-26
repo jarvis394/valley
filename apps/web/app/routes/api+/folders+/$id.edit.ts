@@ -1,14 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
-import {
-  PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH,
-  PROJECT_FOLDER_TITLE_MAX_LENGTH,
-} from '@valley/shared'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
-import { FieldErrors } from 'react-hook-form'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+
+export const PROJECT_FOLDER_TITLE_MAX_LENGTH = 64
+export const PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH = 4096
 
 export const FoldersEditSchema = z.object({
   description: z
@@ -65,11 +63,8 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
       {
         ok: false,
         errors: {
-          title: {
-            type: 'validate',
-            message: `Folder ${id} not found`,
-          },
-        } satisfies FieldErrors<FormData>,
+          title: `Folder ${id} not found`,
+        },
         defaultValues,
       },
       {

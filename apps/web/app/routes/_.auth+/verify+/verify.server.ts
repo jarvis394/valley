@@ -22,7 +22,7 @@ import {
 import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
-} from '../../_user+/account+/settings.authentication'
+} from '../../_user+/_home+/settings+/auth'
 import { data } from '@remix-run/node'
 import { invariantResponse } from 'app/utils/invariant'
 

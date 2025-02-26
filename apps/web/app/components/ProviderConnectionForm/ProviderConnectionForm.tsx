@@ -52,7 +52,12 @@ export const ProviderConnectionForm: React.FC<ProviderConnectionFormProps> = ({
         )}
         before={PROVIDER_ICONS[providerName]}
       >
-        {type} with {PROVIDER_LABELS[providerName]}
+        {type === 'Connect' && PROVIDER_LABELS[providerName]}
+        {type !== 'Connect' && (
+          <>
+            {type} with {PROVIDER_LABELS[providerName]}
+          </>
+        )}
       </Button>
     </Form>
   )

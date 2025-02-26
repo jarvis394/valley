@@ -20,6 +20,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.paper--rounded {
+  border-radius: 16px;
+}
+
 .paper--button {
   transition-duration: 0.15s;
   transition-timing-function: ease;
@@ -48,6 +52,12 @@
 .paper--secondary-dimmed {
   color: var(--button-secondary-dimmed-fg);
   background: var(--button-secondary-dimmed-bg);
+  --themed-border: var(--button-secondary-dimmed-border);
+}
+
+.paper--border {
+  color: var(--text-primary);
+  background: transparent;
   --themed-border: var(--button-secondary-dimmed-border);
 }
 

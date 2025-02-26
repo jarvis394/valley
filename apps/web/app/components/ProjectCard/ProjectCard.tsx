@@ -57,6 +57,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           prefetch="intent"
           to={projectLink}
           className={styles.projectCard__cover}
+          viewTransition
         >
           {coverImage && <img alt={project.title} src={coverImage} />}
         </Link>

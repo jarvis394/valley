@@ -1,0 +1,8 @@
+.confirmConnectionDelete__form {
+  color: var(--text-secondary);
+}
+
+.confirmConnectionDelete__label {
+  color: var(--text-primary);
+  font-weight: 500;
+}

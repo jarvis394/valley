@@ -18,6 +18,7 @@ type FieldsetProps<T extends ZodType = ZodType> = {
   after?: React.ReactNode
   title?: React.ReactNode
   subtitle?: React.ReactNode
+  content?: React.ReactNode
   variant?: 'default' | 'danger'
   id?: string
   submitLabel?: React.ReactNode
@@ -39,6 +40,7 @@ const Fieldset = <T extends ZodType>({
   id,
   title,
   subtitle,
+  content,
   variant = 'default',
   submitLabel = 'Save',
   submitProps,
@@ -101,10 +103,11 @@ const Fieldset = <T extends ZodType>({
           direction={'column'}
           gap={4}
         >
-          {(title || subtitle) && (
+          {(title || subtitle || content) && (
             <Stack direction={'column'} gap={3}>
               {title && <h2>{title}</h2>}
               {subtitle && <p>{subtitle}</p>}
+              {content}
             </Stack>
           )}
           {children?.(ctx)}

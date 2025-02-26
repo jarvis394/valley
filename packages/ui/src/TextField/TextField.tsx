@@ -7,8 +7,10 @@ import FormHelperText, {
   FormHelperTextProps,
 } from '../FormHelperText/FormHelperText'
 import { FieldError } from 'react-hook-form'
+import cx from 'classnames'
 
 export type TextFieldProps = InputProps & {
+  fullWidth?: boolean
   label?: React.ReactElement | string
   helperText?: React.ReactElement | string
   validHelperText?: React.ReactElement | string
@@ -35,6 +37,7 @@ const TextField = React.forwardRef(function TextField(
     required,
     size,
     formHelperTextProps,
+    fullWidth = true,
     ...props
   }: TextFieldProps,
   ref: React.ForwardedRef<HTMLInputElement>
@@ -75,7 +78,12 @@ const TextField = React.forwardRef(function TextField(
   }
 
   return (
-    <FormControl state={state} className={styles.textField}>
+    <FormControl
+      state={state}
+      className={cx(styles.textField, {
+        [styles['textField--fullWidth']]: fullWidth,
+      })}
+    >
       {label && (
         <InputLabel
           size={size}

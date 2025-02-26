@@ -11,6 +11,7 @@ import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { Drawer } from 'vaul'
 import { exhaustivnessCheck } from '@valley/shared'
 import ButtonBase from '../ButtonBase/ButtonBase'
+import { External } from 'geist-ui-icons'
 
 export type MenuProps = React.PropsWithChildren<
   {
@@ -32,11 +33,12 @@ export type MenuItemProps = ButtonProps & {
   label?: string
   id?: string
   onClick?: React.MouseEventHandler
+  href?: string
 }
 
 export const Item = React.memo(
   React.forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
-    { children, className, onClick: propsOnClick, ...props },
+    { children, className, href, onClick: propsOnClick, ...props },
     ref
   ) {
     const { close } = useMenuActions()
@@ -61,21 +63,38 @@ export const Item = React.memo(
       propsOnClick?.(e)
       close()
     }
+    const commonProps: ButtonProps = {
+      onClick: handleClick,
+      align: 'start',
+      size: 'sm',
+      variant: 'tertiary',
+      fullWidth: true,
+      className: cx(styles.menu__item, className, {
+        [styles['menu__item--drawer']]: menuType === 'drawer',
+      }),
+    }
+
+    if (href) {
+      return (
+        <MenuItem asChild>
+          <Button
+            {...commonProps}
+            after={<External color="var(--text-secondary)" />}
+            {...props}
+            ref={ref}
+            asChild
+          >
+            <a target="_blank" href={href} rel="noreferrer">
+              {children}
+            </a>
+          </Button>
+        </MenuItem>
+      )
+    }
 
     return (
       <MenuItem asChild>
-        <Button
-          onClick={handleClick}
-          align="start"
-          size="sm"
-          variant="tertiary"
-          fullWidth
-          className={cx(styles.menu__item, className, {
-            [styles['menu__item--drawer']]: menuType === 'drawer',
-          })}
-          ref={ref}
-          {...props}
-        >
+        <Button {...commonProps} {...props} ref={ref}>
           {children}
         </Button>
       </MenuItem>

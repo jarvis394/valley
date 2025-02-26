@@ -31,7 +31,7 @@ export class VKProvider implements AuthProvider {
   async resolveConnectionData(providerId: string) {
     // You may consider making a fetch request to Google to get the user's
     // profile or something similar here.
-    return { displayName: providerId, link: null } as const
+    return { displayName: providerId, alias: '', link: null } as const
   }
 
   async handleMockAction(request: Request) {

@@ -45,7 +45,7 @@ const PathPartSkeleton: React.FC<{
   </Stack>
 )
 
-const CurrentUser: React.FC<{ user?: User }> = ({ user }) => {
+const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
   return (
     <Stack
       align={'center'}
@@ -134,7 +134,7 @@ const Header: React.FC = () => {
       <nav className={styles.header__nav}>
         <Stack gap={2} align={'center'} className={styles.header__shrink}>
           <Suspense fallback={<PathPartSkeleton hideSlashOnSm />}>
-            <Await resolve={user}>
+            <Await resolve={user} errorElement={<h5>Error fetching user</h5>}>
               {(resolvedUser) => <CurrentUser user={resolvedUser} />}
             </Await>
           </Suspense>
