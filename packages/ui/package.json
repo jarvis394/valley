@@ -86,7 +86,6 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "react-is": "^18.3.1",
-    "react-router-dom": "^6.27.0",
     "react-textarea-autosize": "^8.5.7",
     "vaul": "^1.1.2"
   }

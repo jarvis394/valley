@@ -28,7 +28,11 @@ export const PasswordSchema = z
 export const NameSchema = z
   .string({ required_error: 'Field is required' })
   .min(3, { message: 'Value is too short' })
-  .max(40, { message: 'Value is too long' })
+  .max(16, { message: 'Value is too long' })
+export const FullnameSchema = z
+  .string({ required_error: 'Field is required' })
+  .min(6, { message: 'Value is too short' })
+  .max(32, { message: 'Value is too long' })
 export const EmailSchema = z
   .string({ required_error: 'Email is required' })
   .email({ message: 'Email is invalid' })

@@ -13,6 +13,8 @@ export type PaperOwnProps = React.PropsWithChildren<
       | 'tertiary'
       | 'warning'
       | 'danger'
+      | 'border'
+    rounded: boolean
     button: boolean
     className: string
     style: CSSProperties
@@ -22,7 +24,7 @@ export type PaperProps = AsChildProps<React.ComponentPropsWithRef<'div'>> &
   PaperOwnProps
 
 const Paper = React.forwardRef<HTMLDivElement, PaperProps>(function Paper(
-  { button, variant, className, asChild, ...other },
+  { button, variant, rounded, className, asChild, ...other },
   ref
 ) {
   const Root = asChild ? Slot : 'div'
@@ -38,7 +40,9 @@ const Paper = React.forwardRef<HTMLDivElement, PaperProps>(function Paper(
         [styles['paper--tertiary']]: variant === 'tertiary',
         [styles['paper--warning']]: variant === 'warning',
         [styles['paper--danger']]: variant === 'danger',
+        [styles['paper--border']]: variant === 'border',
         [styles['paper--button']]: button,
+        [styles['paper--rounded']]: rounded,
       })}
     />
   )

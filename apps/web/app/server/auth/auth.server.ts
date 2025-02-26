@@ -1,4 +1,10 @@
-import type { User, Password, Connection, UserSettings } from '@valley/db'
+import type {
+  User,
+  Password,
+  Connection,
+  UserSettings,
+  Prisma,
+} from '@valley/db'
 import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
@@ -79,7 +85,7 @@ export async function requireUserId(
   const userId = await getUserId(request)
 
   if (!userId) {
-    return redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
+    throw redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
   }
 
   return userId
@@ -87,15 +93,18 @@ export async function requireUserId(
 
 export async function requireUser(
   request: Request,
-  { redirectTo }: RedirectToProps = {}
+  {
+    redirectTo,
+    where,
+    ...props
+  }: RedirectToProps & Partial<Prisma.UserFindUniqueArgs> = {}
 ) {
   const userId = await requireUserId(request, { redirectTo })
-  invariantResponse(typeof userId === 'string', 'User not found', {
-    status: 404,
-  })
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { ...where, id: userId },
+    ...props,
   })
+
   invariantResponse(user, 'User not found', { status: 404 })
 
   return user
@@ -115,7 +124,7 @@ export async function isLoggedIn(request: Request) {
 export async function requireLoggedIn(request: Request) {
   const loggedIn = await isLoggedIn(request)
   const redirectUrl = getUnauthenticatedRedirectUrl(request)
-  if (!loggedIn) return redirect(redirectUrl)
+  if (!loggedIn) throw redirect(redirectUrl)
 
   return true
 }

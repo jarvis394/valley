@@ -69,7 +69,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (existingConnection && userId) {
     if (existingConnection.userId === userId) {
       return redirectWithToast(
-        '/settings/profile/connections',
+        '/settings/auth',
         {
           description: `Your "${profile.username}" ${label} account is already connected.`,
         },
@@ -77,7 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       )
     } else {
       return redirectWithToast(
-        '/settings/profile/connections',
+        '/settings/auth',
         {
           title: 'Error',
           description: `${label} account "${profile.username}" is already connected to another account.`,
@@ -98,11 +98,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     })
     return redirectWithToast(
-      '/settings/profile/connections',
+      '/settings/auth',
       {
         title: 'Connected',
         type: 'success',
-        description: `Your ${label} account "${profile.username}" account has been connected`,
+        description: `Your ${label} account "${profile.username}" has been connected`,
       },
       { headers: destroyRedirectTo }
     )
@@ -111,7 +111,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   // Connection exists already? Make a new session
   if (existingConnection) {
     return makeSession(
-      { request, userId: existingConnection.userId },
+      { request, redirectTo, userId: existingConnection.userId },
       {
         headers: await createToastHeaders({
           description: 'You are now logged in',

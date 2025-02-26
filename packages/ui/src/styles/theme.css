@@ -140,6 +140,9 @@
 
   /** Modal */
   --modal-backdrop: rgba(10, 10, 10, 0.5);
+  
+  /** Link */
+  --link-color: var(--blue-900);
 }
 
 .valley-themed[data-theme='light'] {
@@ -287,6 +290,9 @@
 
   /** Modal */
   --modal-backdrop: rgba(255, 255, 255, 0.5);
+
+  /** Link */
+  --link-color: var(--blue-900);
 }
 
 .valley-themed {

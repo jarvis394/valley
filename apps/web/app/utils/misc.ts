@@ -158,3 +158,7 @@ export const parseCookies = () => {
       {} as Record<string, string>
     )
 }
+
+export const lowerFirstLetter = (s: string) => {
+  return s[0].toLowerCase() + s.slice(1)
+}

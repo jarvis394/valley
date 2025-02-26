@@ -35,6 +35,7 @@ import { sendAuthEmail } from 'app/server/email.server'
 import { FieldErrors } from 'react-hook-form'
 import { prisma } from 'app/server/db.server'
 import { verifySessionStorage } from 'app/server/auth/verification.server'
+import { useHydrated } from 'remix-utils/use-hydrated'
 
 const EmailFormSchema = z.intersection(
   z.object({
@@ -147,6 +148,7 @@ const LoginPage: React.FC = () => {
   const isPending = useIsPending()
   const redirectTo = searchParams.get(redirectToKey)
   const target = searchParams.get(targetKey)
+  const isHydrated = useHydrated()
 
   const methods = useRemixForm<FormData>({
     mode: 'all',
@@ -217,7 +219,7 @@ const LoginPage: React.FC = () => {
               <Button
                 fullWidth
                 loading={isPending}
-                disabled={isPending}
+                disabled={isPending || !isHydrated}
                 variant="primary"
                 size="lg"
                 type="submit"

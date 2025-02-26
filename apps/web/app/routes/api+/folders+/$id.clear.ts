@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { redirectToKey } from 'app/routes/auth+/verify+'
+import { redirectToKey } from 'app/routes/_.auth+/verify+'
 import { requireUser } from 'app/server/auth/auth.server'
 import { prisma } from 'app/server/db.server'
 import { invariantResponse } from 'app/utils/invariant'

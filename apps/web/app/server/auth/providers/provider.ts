@@ -18,7 +18,8 @@ export interface AuthProvider<T = Strategy<ProviderUser, any>> {
     providerId: string,
     options?: { timings?: Timings }
   ): Promise<{
-    displayName: string
+    alias: string
+    displayName?: string
     link?: string | null
   }>
 }

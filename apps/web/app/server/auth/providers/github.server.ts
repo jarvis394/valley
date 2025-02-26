@@ -11,7 +11,7 @@ import { getHostAdress } from '../../../server/utils/misc.server'
 export const MOCK_CODE_GITHUB = 'MOCK_CODE_GITHUB_KODY'
 export const MOCK_CODE_GITHUB_HEADER = 'x-mock-code-github'
 
-const GitHubUserSchema = z.object({ login: z.string() })
+const GitHubUserSchema = z.object({ login: z.string(), name: z.string() })
 const GitHubUserParseResult = z
   .object({
     success: z.literal(true),
@@ -83,7 +83,8 @@ export class GitHubProvider implements AuthProvider {
     })
 
     return {
-      displayName: result.success ? result.data.login : '',
+      alias: result.success ? result.data.login : '',
+      displayName: result.success ? result.data.name : '',
       link: result.success ? `https://github.com/${result.data.login}` : null,
     } as const
   }

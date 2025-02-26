@@ -11,7 +11,7 @@ import {
   getRedirectToUrl,
   type VerifyFunctionArgs,
 } from '../verify+/verify.server'
-import { twoFAVerificationType } from '../../_user+/account+/settings.authentication'
+import { twoFAVerificationType } from '../../_user+/_home+/settings+/auth'
 
 export async function handleNewSession(
   {

@@ -8,7 +8,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 export const modalKey = 'modal'
 
 export type ModalProps = React.PropsWithChildren<{
-  id: string
+  id?: string
   isOpen?: boolean
   onDismiss?: () => void
   /**
@@ -17,7 +17,7 @@ export type ModalProps = React.PropsWithChildren<{
    */
   useDrawer?: boolean
 }> &
-  DialogProps
+  Omit<DialogProps, 'open'>
 
 const Modal: React.FC<ModalProps> = ({
   isOpen: propsIsOpen,
@@ -26,6 +26,8 @@ const Modal: React.FC<ModalProps> = ({
   onDismiss,
   onOpenChange,
   useDrawer = true,
+  // TODO: fixme
+  fadeFromIndex: _fadeFromIndex,
   ...props
 }) => {
   const shouldShowDrawer =

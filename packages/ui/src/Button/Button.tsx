@@ -38,6 +38,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     align,
     after,
     asChild,
+    shimmer,
     ...other
   },
   ref
@@ -58,6 +59,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       asChild
       variant={variant}
       disabled={disabled}
+      shimmer={shimmer}
       className={cx('Button', styles.button, className, {
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',

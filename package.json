@@ -28,7 +28,7 @@
     "@valley/typescript-config": "*",
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
-    "turbo": "^2.3.4",
+    "turbo": "^2.4.0",
     "typescript": "^5.7.2"
   },
   "engines": {
