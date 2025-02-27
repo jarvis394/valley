@@ -4,7 +4,6 @@ import {
   type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Await, useLoaderData } from '@remix-run/react'
-import Divider from '@valley/ui/Divider'
 import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
 import Stack from '@valley/ui/Stack'
@@ -154,17 +153,17 @@ const AccountSettingsAuthentication = () => {
   const data = useLoaderData<typeof loader>()
   return (
     <Stack gap={4} direction={'column'} fullWidth>
-      <Stack asChild gap={4} direction={'column'} padding={4}>
+      <Stack asChild gap={3} direction={'column'} padding={4}>
         <Paper variant="border" rounded>
           <h3
             style={{
               fontSize: 16,
-              fontWeight: 600,
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
             }}
           >
             Add New
           </h3>
-          <Divider />
           <Stack wrap gap={2}>
             {PROVIDER_NAMES.map((providerName) => (
               <ProviderConnectionForm
