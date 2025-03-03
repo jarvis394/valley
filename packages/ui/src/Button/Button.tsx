@@ -16,6 +16,7 @@ export type ButtonOwnProps = Partial<
     before: React.ReactNode
     after: React.ReactNode
     align: 'start' | 'center' | 'end'
+    ref: React.Ref<HTMLButtonElement>
   }> &
     ButtonBaseProps
 >
@@ -25,24 +26,21 @@ export type ButtonProps = AsChildProps<
 > &
   ButtonOwnProps
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    children,
-    size = 'sm',
-    variant = 'primary',
-    loading,
-    className,
-    disabled,
-    before,
-    fullWidth,
-    align,
-    after,
-    asChild,
-    shimmer,
-    ...other
-  },
-  ref
-) {
+const Button = ({
+  children,
+  size = 'sm',
+  variant = 'primary',
+  loading,
+  className,
+  disabled,
+  before,
+  fullWidth,
+  align,
+  after,
+  asChild,
+  shimmer,
+  ...other
+}: ButtonProps) => {
   const Root = asChild ? Slot : 'button'
 
   if (!isElement(children) && asChild) {
@@ -55,7 +53,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 
   return (
     <ButtonBase
-      ref={ref}
       asChild
       variant={variant}
       disabled={disabled}
@@ -90,7 +87,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
                 children as React.ReactElement,
                 undefined,
                 <span className={cx('Button__content', styles.button__content)}>
-                  {(children as React.ReactElement)?.props?.children}
+                  {
+                    (children as React.ReactElement<React.PropsWithChildren>)
+                      ?.props?.children
+                  }
                 </span>
               )}
             </Slottable>
@@ -109,6 +109,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       </Root>
     </ButtonBase>
   )
-})
+}
 
 export default React.memo(Button)

@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    color: var(--text-primary);
+    background: var(--background-default);
+    font-family: var(--font-geist-sans);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  svg {
+    fill: currentColor;
+  }
+
+  path {
+    fill: currentColor;
+  }
+}

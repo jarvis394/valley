@@ -1,0 +1,163 @@
+.projectCard {
+  background: var(--background-paper);
+  box-shadow: 0 0 0 1px var(--alpha-solid-07);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  transition: all 150ms ease-out;
+}
+
+.projectCard:has(.projectCard__cover:active),
+.projectCard:has(.projectCard__header:active) {
+  scale: 0.98;
+}
+
+.projectCard__cover {
+  height: 212px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: linear-gradient(to top, var(--alpha-transparent-03), transparent);
+  outline: none;
+}
+
+.projectCard__cover img {
+  height: 100%;
+  width: 100%;
+  min-width: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.projectCard__header {
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  padding: 16px;
+  user-select: none;
+}
+
+.projectCard__contentTitle {
+  margin: 0;
+  font-size: 20px;
+  line-height: 25px;
+  font-weight: 500;
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--text-primary);
+}
+
+.projectCard__contentSubtitle {
+  margin: 0;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.projectCard__bullet {
+  color: var(--text-hint);
+}
+
+.projectCard__linkContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding-left: 16px;
+  padding-top: 0;
+  padding-right: 8px;
+  padding-bottom: 8px;
+}
+
+.projectCard__link {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.projectCard__link svg {
+  flex-shrink: 0;
+  display: flex;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+
+.projectCard__link div {
+  display: block;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.projectCard__divider {
+  width: 100%;
+  border-top: 1px solid var(--alpha-solid-07);
+}
+
+.projectCard__bottomBar {
+  display: flex;
+  flex-direction: row;
+  height: 48px;
+}
+
+.projectCard__statistics {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  flex-grow: 1;
+}
+
+.projectCard__statisticsItem {
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-weight: 500;
+}
+
+.projectCard__statisticsItem svg {
+  color: var(--text-secondary);
+}
+
+.projectCard__shareButton {
+  padding: 8px;
+}
+
+.projectCard:hover .projectCard__menu,
+.projectCard:focus-visible .projectCard__menu {
+  opacity: 1;
+}
+
+.projectCard__menu {
+  z-index: 10;
+  right: 8px;
+  top: 8px;
+  position: absolute;
+  opacity: 0;
+}

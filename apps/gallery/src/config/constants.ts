@@ -1,0 +1,2 @@
+export const UPLOAD_SERVICE_URL =
+  process.env.UPLOAD_SERVICE_URL || process.env.NEXT_PUBLIC_UPLOAD_SERVICE_URL

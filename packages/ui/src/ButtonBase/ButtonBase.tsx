@@ -18,40 +18,41 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
   shimmer?: boolean
   className?: string
   style?: CSSProperties
+  ref?: React.Ref<HTMLButtonElement>
 }>
 export type ButtonBaseProps = AsChildProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>
 > &
   ButtonBaseOwnProps
 
-const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(
-  function ButtonBaseWithRef(
-    { variant, className, disabled, asChild, shimmer, ...other },
-    ref
-  ) {
-    const Root = asChild ? Slot : 'button'
+const ButtonBase = ({
+  variant,
+  className,
+  disabled,
+  asChild,
+  shimmer,
+  ...other
+}: ButtonBaseProps) => {
+  const Root = asChild ? Slot : 'button'
 
-    return (
-      <Root
-        {...other}
-        ref={ref}
-        disabled={disabled || shimmer}
-        className={cx(className, 'ButtonBase', styles.buttonBase, {
-          [styles['buttonBase--primary']]: variant === 'primary',
-          [styles['buttonBase--secondary']]: variant === 'secondary',
-          [styles['buttonBase--secondary-dimmed']]:
-            variant === 'secondary-dimmed',
-          [styles['buttonBase--tertiary']]: variant === 'tertiary',
-          [styles['buttonBase--tertiary-dimmed']]:
-            variant === 'tertiary-dimmed',
-          [styles['buttonBase--warning']]: variant === 'warning',
-          [styles['buttonBase--danger']]: variant === 'danger',
-          [styles['buttonBase--shimmer']]: shimmer,
-          shimmer: shimmer,
-        })}
-      />
-    )
-  }
-)
+  return (
+    <Root
+      {...other}
+      disabled={disabled || shimmer}
+      className={cx(className, 'ButtonBase', styles.buttonBase, {
+        [styles['buttonBase--primary']]: variant === 'primary',
+        [styles['buttonBase--secondary']]: variant === 'secondary',
+        [styles['buttonBase--secondary-dimmed']]:
+          variant === 'secondary-dimmed',
+        [styles['buttonBase--tertiary']]: variant === 'tertiary',
+        [styles['buttonBase--tertiary-dimmed']]: variant === 'tertiary-dimmed',
+        [styles['buttonBase--warning']]: variant === 'warning',
+        [styles['buttonBase--danger']]: variant === 'danger',
+        [styles['buttonBase--shimmer']]: shimmer,
+        shimmer: shimmer,
+      })}
+    />
+  )
+}
 
 export default React.memo(ButtonBase)

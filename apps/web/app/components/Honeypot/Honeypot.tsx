@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/autocomplete-valid */
-import React from 'react'
+import React, { JSX } from 'react'
 import { useRemixFormContext } from 'remix-hook-form'
 import { type HoneypotInputProps } from 'remix-utils/honeypot/server'
 
