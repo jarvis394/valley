@@ -1,27 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node'
 import { getDomainUrl } from 'app/utils/misc'
 import { getImgResponse } from 'openimg/node'
-import { promises as fs, constants } from 'node:fs'
-
-let cacheDir: string | null = null
-
-async function getCacheDir() {
-  if (cacheDir) return cacheDir
-
-  let dir = './tests/fixtures/openimg'
-  if (process.env.NODE_ENV === 'production') {
-    const isAccessible = await fs
-      .access('/data', constants.W_OK)
-      .then(() => true)
-      .catch(() => false)
-
-    if (isAccessible) {
-      dir = '/data/images'
-    }
-  }
-
-  return (cacheDir = dir)
-}
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { projectId, folderId, fileId } = params
@@ -35,7 +14,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       getDomainUrl(request),
       process.env.UPLOAD_SERVICE_URL,
     ].filter(Boolean),
-    cacheFolder: await getCacheDir(),
     getImgSource: () => {
       return {
         url:
