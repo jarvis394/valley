@@ -5,7 +5,6 @@ import ButtonBase, { ButtonBaseProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
 import { Slot, Slottable } from '@radix-ui/react-slot'
-import { isElement } from 'react-is'
 import { AsChildProps } from '../types/AsChildProps'
 
 export type ButtonOwnProps = Partial<
@@ -43,7 +42,7 @@ const Button = ({
 }: ButtonProps) => {
   const Root = asChild ? Slot : 'button'
 
-  if (!isElement(children) && asChild) {
+  if (!children && asChild) {
     console.error('Cannot use `asChild` without a children element:', {
       children,
       asChild,

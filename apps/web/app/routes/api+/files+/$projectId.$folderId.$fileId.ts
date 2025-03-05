@@ -14,6 +14,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       getDomainUrl(request),
       process.env.UPLOAD_SERVICE_URL,
     ].filter(Boolean),
+    cacheFolder: process.env.VERCEL === '1' ? 'no_cache' : undefined,
     getImgSource: () => {
       return {
         url:
