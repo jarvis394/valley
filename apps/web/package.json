@@ -34,12 +34,13 @@
     "@remix-pwa/dev": "^3.1.0",
     "@remix-pwa/sw": "^3.0.10",
     "@remix-pwa/worker-runtime": "^2.1.4",
-    "@remix-run/express": "^2.15.2",
-    "@remix-run/node": "^2.15.2",
-    "@remix-run/react": "^2.15.2",
+    "@remix-run/express": "^2.16.0",
+    "@remix-run/node": "^2.16.0",
+    "@remix-run/react": "^2.16.0",
     "@remix-run/router": "^1.21.0",
-    "@remix-run/serve": "^2.15.2",
-    "@remix-run/server-runtime": "^2.15.2",
+    "@remix-run/serve": "^2.16.0",
+    "@remix-run/server-runtime": "^2.16.0",
+    "@remix-run/dev": "^2.16.0",
     "@sentry/profiling-node": "^8.36.0",
     "@sentry/remix": "^8.36.0",
     "@uppy/core": "^4.1.0",
@@ -98,11 +99,11 @@
     "web-oidc": "^0.0.19",
     "ws": "^8.18.0",
     "zod": "^3.23.8",
-    "zustand": "^5.0.1"
+    "zustand": "^5.0.1",
+    "openimg": "^0.6.0"
   },
   "devDependencies": {
     "@csstools/postcss-media-minmax": "^2.0.1",
-    "@remix-run/dev": "^2.15.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.0",
@@ -113,7 +114,7 @@
     "@types/ws": "^8.5.13",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
-    "@vercel/remix": "2.15.0",
+    "@vercel/remix": "2.15.3",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.56.11",
     "postcss": "^8.4.38",
@@ -122,8 +123,7 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1",
-    "openimg": "^0.6.0"
+    "vite-tsconfig-paths": "^4.2.1"
   },
   "engines": {
     "node": ">=20.0.0"
