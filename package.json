@@ -8,13 +8,16 @@
   "scripts": {
     "dev": "turbo dev --filter !storybook",
     "storybook": "turbo dev --filter storybook",
+    "web:dev": "turbo dev --filter web",
+    "gallery:dev": "turbo dev --filter gallery",
+    "upload:dev": "turbo dev --filter upload",
     "docker:dev": "docker compose -f ./docker-compose.dev.yml up",
     "docker:start": "docker compose -f ./docker-compose.yml up",
-    "build": "NODE_ENV=production turbo build",
-    "db:seed": "yarn workspace @valley/db db:seed",
-    "db:studio": "yarn workspace @valley/db db:studio",
-    "db:migrate": "yarn workspace @valley/db db:migrate",
-    "db:migrate:reset": "yarn workspace @valley/db db:migrate:reset",
+    "build": "cross-env NODE_ENV=production turbo build",
+    "db:seed": "bun --filter @valley/db db:seed",
+    "db:studio": "bun --filter @valley/db db:studio",
+    "db:migrate": "bun --filter @valley/db db:migrate",
+    "db:migrate:reset": "bun --filter @valley/db db:migrate:reset",
     "upload:ace": "node ./apps/upload/ace",
     "prepare": "husky",
     "typecheck": "turbo typecheck",
@@ -24,12 +27,13 @@
   },
   "devDependencies": {
     "@caxy/dotenv-updater": "^1.0.9",
-    "@valley/eslint-config": "*",
-    "@valley/typescript-config": "*",
+    "@valley/eslint-config": "workspace:*",
+    "@valley/typescript-config": "workspace:*",
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "turbo": "^2.4.4",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "cross-env": "^7.0.3"
   },
   "engines": {
     "node": ">=22"

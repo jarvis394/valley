@@ -11,7 +11,7 @@
     "@storybook/react": "^8.4.2",
     "@storybook/react-vite": "^8.4.5",
     "@uppy/core": "^4.1.0",
-    "@valley/ui": "*",
+    "@valley/ui": "workspace:*",
     "storybook": "^8.4.2"
   },
   "devDependencies": {

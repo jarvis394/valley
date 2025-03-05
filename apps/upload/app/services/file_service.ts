@@ -14,10 +14,7 @@ import contentDisposition from 'content-disposition'
 type FileData = Omit<
   File,
   'id' | 'exifMetadata' | 'thumbnailKey' | 'width' | 'height'
-> & {
-  id?: File['id']
-  projectId: Project['id']
-}
+> & { id?: File['id']; projectId: Project['id'] }
 
 @inject()
 export default class FileService {
@@ -49,9 +46,7 @@ export default class FileService {
   }
 
   async createFile(data: Prisma.FileCreateInput): Promise<File> {
-    return await prisma.file.create({
-      data,
-    })
+    return await prisma.file.create({ data })
   }
 
   async update(params: {
@@ -62,15 +57,11 @@ export default class FileService {
   }
 
   async delete(where: Prisma.FileWhereUniqueInput): Promise<File> {
-    return await prisma.file.delete({
-      where,
-    })
+    return await prisma.file.delete({ where })
   }
 
   async deleteMany(where: Prisma.FileWhereInput): Promise<Prisma.BatchPayload> {
-    return await prisma.file.deleteMany({
-      where,
-    })
+    return await prisma.file.deleteMany({ where })
   }
 
   shouldProcessFileAsImage(data: FileData) {
@@ -85,11 +76,7 @@ export default class FileService {
     }
 
     const fileData: Prisma.FileCreateInput = {
-      Folder: {
-        connect: {
-          id: data.folderId,
-        },
-      },
+      Folder: { connect: { id: data.folderId } },
       key: data.key,
       name: data.name,
       size: data.size,
@@ -170,20 +157,22 @@ export default class FileService {
 
       res.header(
         'Content-Disposition',
-        contentDisposition(databaseFile.name, {
-          type: 'inline',
-        })
+        contentDisposition(databaseFile.name, { type: 'inline' })
       )
       res.header('Content-Length', metadata.contentLength)
       res.header(
         'Content-Type',
         metadata.contentType || 'application/octet-stream'
       )
+      res.header('Cache-Control', 'public, max-age=31536000, immutable')
       res.header('Etag', metadata.etag)
       res.stream(data)
     } catch (e) {
       if (e instanceof errors.E_CANNOT_READ_FILE) {
         return res.internalServerError('Cannot read file, try again later')
+      }
+      if (e instanceof errors.E_CANNOT_GET_METADATA) {
+        return res.notFound('File not found')
       }
 
       return res.internalServerError(e)

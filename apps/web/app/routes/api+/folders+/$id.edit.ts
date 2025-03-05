@@ -58,7 +58,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     })
 
     return redirect('/projects/' + folder.projectId + '/folder/' + folder.id)
-  } catch (e) {
+  } catch (_e) {
     return data(
       {
         ok: false,

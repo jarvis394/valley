@@ -3,7 +3,7 @@ module.exports = {
   root: true,
   extends: [
     'plugin:@typescript-eslint/recommended',
-    'turbo',
+    // 'turbo',
     'plugin:import/typescript',
   ],
   rules: {
@@ -27,18 +27,10 @@ module.exports = {
     ],
     '@typescript-eslint/no-unused-expressions': [
       'warn',
-      {
-        allowShortCircuit: true,
-        allowTernary: true,
-      },
+      { allowShortCircuit: true, allowTernary: true },
     ],
     '@typescript-eslint/no-empty-object-type': ['off'],
-    '@typescript-eslint/array-type': [
-      'error',
-      {
-        default: 'array-simple',
-      },
-    ],
+    '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/no-explicit-any': 'error',
   },
   plugins: ['@typescript-eslint/eslint-plugin', 'prettier', 'import'],
@@ -52,10 +44,5 @@ module.exports = {
     'coverage/',
     'node_modules/',
   ],
-  settings: {
-    'import/resolver': {
-      typescript: true,
-      node: true,
-    },
-  },
+  settings: { 'import/resolver': { typescript: true, node: true } },
 }

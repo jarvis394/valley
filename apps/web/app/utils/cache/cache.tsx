@@ -25,7 +25,7 @@ const augmentStorageAdapter = (storage: Storage) => {
         const item = JSON.parse(storage.getItem(key) || '')
 
         return item
-      } catch (e) {
+      } catch (_e) {
         return storage.getItem(key)
       }
     },
@@ -40,13 +40,9 @@ export const createCacheAdapter = (adapter: () => CacheAdapter) => {
   if (typeof document === 'undefined') return { adapter: undefined }
   const adapterInstance = adapter()
   if (adapterInstance instanceof Storage) {
-    return {
-      adapter: augmentStorageAdapter(adapterInstance),
-    }
+    return { adapter: augmentStorageAdapter(adapterInstance) }
   }
-  return {
-    adapter: adapter(),
-  }
+  return { adapter: adapter() }
 }
 
 export const decacheClientLoader = async <T,>(
@@ -119,9 +115,7 @@ export function useCachedLoaderData<T>(
     adapter = cache,
     data: propsData,
   }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  { adapter?: CacheAdapter; data?: any } = {
-    adapter: cache,
-  }
+  { adapter?: CacheAdapter; data?: any } = { adapter: cache }
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loaderData = useLoaderData() as any
@@ -180,10 +174,7 @@ export function useCachedLoaderData<T>(
     ...freshData,
     cacheKey: data.key,
     invalidate: () => invalidateCache(data.key),
-  } as SerializeFrom<T> & {
-    cacheKey?: string
-    invalidate: () => Promise<void>
-  }
+  } as SerializeFrom<T> & { cacheKey?: string; invalidate: () => Promise<void> }
 }
 
 const constructKey = (request: Request) => {
@@ -200,9 +191,7 @@ export const invalidateCache = async (key: string | string[]) => {
   await Promise.all(promises)
 }
 
-export const useCacheInvalidator = () => ({
-  invalidateCache,
-})
+export const useCacheInvalidator = () => ({ invalidateCache })
 
 export function useSwrData<T>({
   serverData,
