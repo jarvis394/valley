@@ -77,10 +77,15 @@ export type TusHookPreFinishResponse = BaseTusHookResponseBody & {
   /** File date created in ISO format */
   dateCreated: string
   thumbnailKey?: string
+  width?: number
+  height?: number
   projectId: Project['id']
   folderId: Folder['id']
   contentType: string
-} & Omit<File, 'dateCreated' | 'thumbnailKey' | 'type' | 'folderId'>
+} & Omit<
+    File,
+    'dateCreated' | 'thumbnailKey' | 'type' | 'folderId' | 'width' | 'height'
+  >
 
 export type TusHookResponseBody =
   | TusHookPreCreateResponse

@@ -122,7 +122,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "openimg": "^0.6.0"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -385,7 +385,7 @@ const FolderFiles: React.FC<{
   const setFiles = useProjectsStore((state) => state.setFiles)
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
-  const cover = files.find((e) => e.Cover?.find((c) => c.fileId === e.id))
+  const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {

@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./utils/getFileThumbnailQuery": "./src/utils/getFileThumbnailQuery.ts",
+    "./Image": "./src/Image/Image.tsx",
     "./ModalContent": "./src/ModalContent/ModalContent.tsx",
     "./Skeleton": "./src/Skeleton/Skeleton.tsx",
     "./Portal": "./src/Portal/Portal.tsx",

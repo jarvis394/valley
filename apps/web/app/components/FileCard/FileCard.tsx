@@ -16,8 +16,6 @@ import {
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import { useRouteLoaderData } from '@remix-run/react'
-import { loader as rootLoader } from 'app/root'
 import {
   AnimateLayoutChanges,
   defaultAnimateLayoutChanges,
@@ -27,6 +25,7 @@ import { CSS } from '@dnd-kit/utilities'
 import cx from 'classnames'
 import { useModal } from 'app/hooks/useModal'
 import Paper from '@valley/ui/Paper'
+import Image from '@valley/ui/Image'
 
 type FileCardMenuContentProps = {
   file: File
@@ -100,7 +99,6 @@ const FileCard: React.FC<FileCardProps> = ({
   isCover,
   ...props
 }) => {
-  const data = useRouteLoaderData<typeof rootLoader>('root')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true })
@@ -115,9 +113,6 @@ const FileCard: React.FC<FileCardProps> = ({
     id: file.id,
     animateLayoutChanges,
   })
-  const fileThumbnailUrl =
-    file.thumbnailKey &&
-    data?.ENV.UPLOAD_SERVICE_URL + '/api/files/' + file.thumbnailKey
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -141,14 +136,14 @@ const FileCard: React.FC<FileCardProps> = ({
         style={style}
       >
         <div className={styles.fileCard__imageContainer}>
-          {fileThumbnailUrl && (
-            <img
+          {file.thumbnailKey && (
+            <Image
               className={styles.fileCard__image}
-              src={fileThumbnailUrl}
-              alt={file.name}
+              file={file}
+              thumbnail="sm"
             />
           )}
-          {!fileThumbnailUrl && <FileIcon width={32} height={32} />}
+          {!file.thumbnailKey && <FileIcon width={32} height={32} />}
         </div>
         <p className={styles.fileCard__name}>{file.name}</p>
 

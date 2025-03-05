@@ -275,16 +275,13 @@ export default class TusService {
     const name = deburr(metadata?.['name']?.trim() || 'file')
     const size = upload.size?.toString()
 
-    if (
-      !upload ||
-      !metadata ||
-      !storage ||
-      !size ||
-      !storage.bucket ||
-      !projectId ||
-      !folderId
-    ) {
+    if (!upload || !metadata || !storage || !size || !projectId || !folderId) {
       throw { status_code: 400, message: 'Missing fields in upload object' }
+    }
+
+    // Means we are using FS store
+    if (upload.storage && !upload.storage?.bucket) {
+      upload.storage.path = upload.storage.path.replace('storage/', '')
     }
 
     const resBuilder = new TusHookResponseBuilder<TusHookPreFinishResponse>()
@@ -296,7 +293,7 @@ export default class TusService {
         projectId,
         size,
         key: storage.path,
-        bucket: storage.bucket,
+        bucket: storage.bucket || 'files',
         name,
         dateCreated: dateCreated.toISOString(),
         exifMetadata: {},
@@ -309,7 +306,7 @@ export default class TusService {
       const file = await this.fileService.createFileForProjectFolder({
         id: upload.id,
         type: contentType,
-        bucket: storage.bucket,
+        bucket: storage.bucket || 'files',
         key: storage.path,
         isPendingDeletion: false,
         projectId,
@@ -319,8 +316,12 @@ export default class TusService {
         size,
       })
 
+      // Add fields that can be returned after file creation
       resBuilder.setBodyRecord('exifMetadata', file.exifMetadata)
       resBuilder.setBodyRecord('thumbnailKey', file.thumbnailKey)
+      resBuilder.setBodyRecord('width', file.width)
+      resBuilder.setBodyRecord('height', file.height)
+
       return { res, ...resBuilder.build() }
     } catch (e) {
       throw { status_code: 500, body: (e as Error).message }

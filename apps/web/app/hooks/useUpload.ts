@@ -56,6 +56,8 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const uploadSpeedIntervalID = useRef<NodeJS.Timeout>(undefined)
 
   const addUploadedFileToCache = async (file: TusHookPreFinishResponse) => {
+    console.log('Adding file to cache:', file)
+
     await invalidateCache([
       getProjectCacheKey(file.projectId),
       getFolderCacheKey(file.folderId),
@@ -71,6 +73,8 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
           type: file.contentType,
           dateCreated: new Date(file.dateCreated),
           thumbnailKey: file.thumbnailKey || null,
+          height: file.height || null,
+          width: file.width || null,
         },
       })
     } catch (e) {

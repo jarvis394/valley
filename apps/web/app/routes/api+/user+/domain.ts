@@ -35,8 +35,31 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     )
   }
 
+  const newDomain = submissionData.domain
+  const exists = await prisma.user.findFirst({
+    where: {
+      OR: [
+        {
+          domains: {
+            has: newDomain,
+          },
+        },
+        {
+          serviceDomain: newDomain,
+        },
+      ],
+    },
+  })
+
+  if (exists && exists.id !== user.id) {
+    return redirectWithToast('/settings/general', {
+      type: 'error',
+      title: 'Domain Taken',
+      description: 'Domain "' + newDomain + '" is already taken',
+    })
+  }
+
   try {
-    const newDomain = submissionData.domain
     let newDomains: string[]
 
     // Move new domain to be the first if it is included in user domains history

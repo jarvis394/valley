@@ -201,6 +201,8 @@ model File {
   key               String
   thumbnailKey      String?
   exifMetadata      Json
+  width             Int?
+  height            Int?
   name              String
   type              String
   /// File size in bytes, string formatted

@@ -2,6 +2,7 @@
   "extends": "@valley/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": ".",
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"

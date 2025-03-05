@@ -3,6 +3,8 @@ import { defineConfig } from '@adonisjs/cors'
 
 export const ALLOWED_ORIGINS = [
   `http://localhost:${env.get('WEB_PORT')}`,
+  `http://localhost:${env.get('PORT')}`,
+  `http://localhost:${env.get('GALLERY_PORT')}`,
   env.get('HOST'),
   env.get('WEB_SERVICE_URL'),
   env.get('UPLOAD_SERVICE_URL'),

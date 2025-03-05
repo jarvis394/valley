@@ -11,11 +11,11 @@ import {
 } from 'geist-ui-icons'
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
-import { Link, useNavigation, useRouteLoaderData } from '@remix-run/react'
+import { Link, useNavigation } from '@remix-run/react'
 import Skeleton from '@valley/ui/Skeleton'
 import { ProjectWithFolders } from '@valley/shared'
 import cx from 'classnames'
-import { loader as rootLoader } from 'app/root'
+import Image from '@valley/ui/Image'
 
 type ProjectCardProps =
   | {
@@ -29,17 +29,10 @@ type ProjectCardProps =
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
   const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
-  const data = useRouteLoaderData<typeof rootLoader>('root')
   const defaultFolderId =
     project?.folders.find((e) => e.isDefaultFolder)?.id ||
     project?.folders[0]?.id
   const projectLink = `/projects/${project?.id}/folder/${defaultFolderId}`
-  const coverImage =
-    project?.coverImage?.File.thumbnailKey &&
-    data?.ENV.UPLOAD_SERVICE_URL +
-      '/api/files/' +
-      project.coverImage.File.key +
-      '?thumbnail=1'
   const navigation = useNavigation()
   const isLoading =
     navigation.state === 'loading' &&
@@ -59,7 +52,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           className={styles.projectCard__cover}
           viewTransition
         >
-          {coverImage && <img alt={project.title} src={coverImage} />}
+          {project.coverImage && (
+            <Image
+              alt={project.title}
+              file={project.coverImage.File}
+              thumbnail="md"
+            />
+          )}
         </Link>
       )}
       {loading && (

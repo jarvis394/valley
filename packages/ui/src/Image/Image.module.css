@@ -1,0 +1,23 @@
+.image {
+  position: relative;
+  display: flex;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image__spinner {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.image__image {
+  object-fit: contain;
+}

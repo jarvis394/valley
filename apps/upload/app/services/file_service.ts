@@ -11,7 +11,10 @@ import drive from '@adonisjs/drive/services/main'
 import { errors } from 'flydrive'
 import contentDisposition from 'content-disposition'
 
-type FileData = Omit<File, 'id' | 'exifMetadata' | 'thumbnailKey'> & {
+type FileData = Omit<
+  File,
+  'id' | 'exifMetadata' | 'thumbnailKey' | 'width' | 'height'
+> & {
   id?: File['id']
   projectId: Project['id']
 }
@@ -97,15 +100,24 @@ export default class FileService {
     }
 
     if (this.shouldProcessFileAsImage(data)) {
-      const exifMetadata = await this.exifService.extractExifData(data.key)
-      const thumbnailResult = await this.thumbnailService.createFileThumbnail(
-        data.key
-      )
-      fileData.exifMetadata = exifMetadata.ok ? exifMetadata.data : {}
-      fileData.thumbnailKey = thumbnailResult.ok ? thumbnailResult.key : null
+      const [exifMetadataResult, thumbnailResult] = await Promise.all([
+        this.exifService.extractExifData(data.key),
+        this.thumbnailService.createFileThumbnail(data.key),
+      ])
+
+      if (exifMetadataResult.ok) {
+        fileData.exifMetadata = exifMetadataResult.data
+      }
+
+      if (thumbnailResult.ok) {
+        fileData.thumbnailKey = thumbnailResult.key
+        fileData.width = thumbnailResult.width
+        fileData.height = thumbnailResult.height
+      }
     }
 
     const databaseFile = await this.createFile(fileData)
+    console.log(databaseFile)
 
     await Promise.all([
       this.folderService.addFilesToFolder(data.folderId, [databaseFile]),

@@ -10,11 +10,11 @@ import { MULTIPART_UPLOAD_CHUNK_SIZE } from '@valley/shared'
 const defaultDriveProvider = env.get('DRIVE_DISK')
 
 type ThumbnailCreationResult =
-  | { ok: true; key: string }
+  | { ok: true; key: string; width?: number; height?: number }
   | { ok: false; reason: string }
 
 export default class ThumbnailService {
-  static readonly THUMBNAIL_WIDTH = 320
+  static readonly THUMBNAIL_WIDTH = 340
   static readonly THUMBNAIL_QUALITY = 100
   static readonly THUMBNAIL_ALLOWED_CONTENT_TYPES = new Set([
     'image/png',
@@ -67,7 +67,14 @@ export default class ThumbnailService {
 
       await upload.done()
 
-      return { ok: true, key: thumbnailKey }
+      const imageMetadata = await pipeline.metadata()
+
+      return {
+        ok: true,
+        key: thumbnailKey,
+        width: imageMetadata.width,
+        height: imageMetadata.height,
+      }
     }
 
     const stream = disk.putStream(thumbnailKey, pipeline)
@@ -75,8 +82,14 @@ export default class ThumbnailService {
     data.pipe(pipeline)
 
     return stream
-      .then(() => {
-        return { ok: true, key: thumbnailKey } as const
+      .then(async () => {
+        const imageMetadata = await pipeline.metadata()
+        return {
+          ok: true,
+          key: thumbnailKey,
+          width: imageMetadata.width,
+          height: imageMetadata.height,
+        } satisfies ThumbnailCreationResult
       })
       .catch((e) => {
         return { ok: false, reason: e.message }
