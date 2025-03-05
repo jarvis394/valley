@@ -10,17 +10,8 @@ export default class FilesController {
   ) {}
 
   async handle() {
-    const { thumbnail = false } = this.ctx.request.qs()
-    const isThumbnail = !!thumbnail
     const { project, folder, key } = this.ctx.params
     const filePath = [project, folder, key].join('/')
-
-    if (isThumbnail) {
-      return this.fileService.streamFile(
-        FileService.makeThumbnailUploadPath(filePath),
-        this.ctx.response
-      )
-    }
 
     return this.fileService.streamFile(filePath, this.ctx.response)
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
@@ -31,7 +31,7 @@ import {
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
 import type { File, Folder } from '@valley/db'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import {
   FolderWithFiles,
   PROJECT_MAX_FOLDERS,
@@ -102,6 +102,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     type: 'get folder',
   })
 
+  if (!folder) {
+    return redirect('/projects/' + projectId)
+  }
+
   return data({ folder }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
@@ -112,19 +116,14 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
 
   return cacheClientLoader(
     { params, ...props },
-    {
-      type: 'swr',
-      key: getFolderCacheKey(params.folderId),
-    }
+    { type: 'swr', key: getFolderCacheKey(params.folderId) }
   )
 }
 
 clientLoader.hydrate = true
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
-  return {
-    'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
-  }
+  return { 'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders) }
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({
@@ -155,9 +154,7 @@ const ProjectHeader: React.FC<{
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    openModal('edit-folder-description', {
-      folderId: currentFolder.id,
-    })
+    openModal('edit-folder-description', { folderId: currentFolder.id })
   }
 
   return (
@@ -215,9 +212,7 @@ const ProjectFolders: React.FC<{
   const { openModal } = useModal()
   const createFolderAction = '/api/folders/create'
   const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
-  const createFolderFetcher = useFetcher({
-    key: createFolderAction,
-  })
+  const createFolderFetcher = useFetcher({ key: createFolderAction })
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     fetcher: createFolderFetcher,
@@ -307,16 +302,12 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
 
   const handleEditFolderTitle = () => {
     if (!currentFolder) return
-    openModal('edit-folder-title', {
-      folderId: currentFolder.id,
-    })
+    openModal('edit-folder-title', { folderId: currentFolder.id })
   }
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
-    openModal('edit-folder-description', {
-      folderId: currentFolder.id,
-    })
+    openModal('edit-folder-description', { folderId: currentFolder.id })
   }
 
   return (
@@ -342,23 +333,9 @@ const FolderInfo: React.FC<{ currentFolder?: Folder }> = ({
   )
 }
 
-const ProjectBlock: React.FC<{
-  project?: ProjectWithFolders | null
-}> = React.memo(function ProjectBlock({ project: propsProject }) {
+const ProjectBlock = React.memo(function ProjectBlock() {
   const { folderId } = useParams()
-  const storeProject = useProjectsStore(
-    (state) => state.projects[propsProject?.id || '']
-  )
-  const parsedStoreProject = useMemo(() => {
-    const res: ProjectWithFolders = { ...storeProject, folders: [] }
-    if (!storeProject) return propsProject
-    for (const id in storeProject.folders) {
-      const folder = storeProject.folders[id]
-      folder && res.folders.push(folder)
-    }
-    return res
-  }, [propsProject, storeProject])
-  const project = parsedStoreProject || propsProject
+  const project = useProject()
   const currentFolder = project?.folders?.find((e) => e.id === folderId)
 
   return (
@@ -372,9 +349,9 @@ const ProjectBlock: React.FC<{
   )
 })
 
-const FolderFiles: React.FC<{
-  folder: FolderWithFiles | null
-}> = ({ folder }) => {
+const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
+  folder,
+}) => {
   const id = useId()
   const folderId = folder?.id || ''
   const projectId = folder?.projectId || ''
@@ -388,22 +365,12 @@ const FolderFiles: React.FC<{
   const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: {
-        delay: 200,
-        tolerance: 5,
-        distance: Infinity,
-      },
+      activationConstraint: { delay: 200, tolerance: 5, distance: Infinity },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 500,
-        tolerance: 5,
-        distance: Infinity,
-      },
+      activationConstraint: { delay: 500, tolerance: 5, distance: Infinity },
     }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -527,12 +494,11 @@ const FolderFiles: React.FC<{
 }
 
 const ProjectRoute = () => {
-  const projectData = useProjectAwait()
   const data = useCachedLoaderData<typeof loader>()
 
   return (
     <div className={styles.project}>
-      <ProjectBlock project={projectData.project} />
+      <ProjectBlock />
       <FolderFiles folder={data.folder} />
     </div>
   )

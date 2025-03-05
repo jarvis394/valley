@@ -2,6 +2,7 @@ import exifr from '@laosb/exifr'
 import dec2frac from '#utils/dec2frac'
 import drive from '@adonisjs/drive/services/main'
 import { Readable } from 'node:stream'
+import sharp from 'sharp'
 
 type ExifDataKey =
   | 'Artist'
@@ -24,7 +25,7 @@ type ExifDataKey =
 
 type ExifData = Partial<Record<ExifDataKey, string | number>>
 type ExifParsedData =
-  | { ok: true; data: ExifData }
+  | { ok: true; data: ExifData; width?: number; height?: number }
   | { ok: false; reason: string }
 
 const extractFields: ExifDataKey[] = [
@@ -48,9 +49,7 @@ const extractFields: ExifDataKey[] = [
 ]
 
 export default class ExifService {
-  static readonly EXIF_PARSING_OPTIONS = {
-    pick: extractFields,
-  }
+  static readonly EXIF_PARSING_OPTIONS = { pick: extractFields }
 
   async reader(input: Readable, offset?: number, length?: number) {
     const chunks = []
@@ -75,13 +74,17 @@ export default class ExifService {
   async extractExifData(filePath: string): Promise<ExifParsedData> {
     const disk = drive.use()
     let parsedExif: ExifData | null
+    let metadata: sharp.Metadata
 
     try {
       const data = await disk.getStream(filePath)
-      parsedExif = await exifr.parse(data, {
-        ...ExifService.EXIF_PARSING_OPTIONS,
-        externalReader: this.reader.bind(this),
-      })
+      const image = sharp()
+      data.pipe(image)
+      metadata = await image.metadata()
+      parsedExif = await exifr.parse(
+        metadata.exif,
+        ExifService.EXIF_PARSING_OPTIONS
+      )
     } catch (e) {
       if (e instanceof Error) {
         return { ok: false, reason: e.message }
@@ -94,7 +97,12 @@ export default class ExifService {
       return { ok: false, reason: 'Parsed EXIF is empty' }
     }
 
-    const res: ExifParsedData = { ok: true, data: {} }
+    const res: ExifParsedData = {
+      ok: true,
+      data: {},
+      width: metadata.width,
+      height: metadata.height,
+    }
 
     for (const key of Object.keys(parsedExif)) {
       const typedKey = key as ExifDataKey

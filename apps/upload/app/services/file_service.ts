@@ -4,7 +4,6 @@ import { Folder, Prisma, Project, File } from '@valley/db'
 import { v4 as uuid } from 'uuid'
 import prisma from '#services/prisma_service'
 import ExifService from '#services/exif_service'
-import ThumbnailService from '#services/thumbnail_service'
 import FolderService from '#services/folder_service'
 import ProjectService from '#services/project_service'
 import drive from '@adonisjs/drive/services/main'
@@ -18,21 +17,17 @@ type FileData = Omit<
 
 @inject()
 export default class FileService {
-  static readonly MAX_PROCESSING_SIZE = 1024 * 1024 * 100 // 100 MB
-  static readonly THUMBNAIL_WIDTH = 320
-  static readonly THUMBNAIL_QUALITY = 100
-  static readonly THUMBNAIL_ALLOWED_CONTENT_TYPES = new Set([
+  static readonly IMAGE_ALLOWED_CONTENT_TYPES = new Set([
     'image/png',
     'image/jpg',
     'image/jpeg',
   ])
-  static readonly THUMBNAIL_SUFFIX = '_thumbnail'
+  static readonly MAX_PROCESSING_SIZE = 1024 * 1024 * 100 // 100 MB
   static readonly PROJECT_PATH_PREFIX = 'project-'
   static readonly FOLDER_PATH_PREFIX = 'folder-'
 
   constructor(
     private readonly exifService: ExifService,
-    private readonly thumbnailService: ThumbnailService,
     private readonly folderService: FolderService,
     private readonly projectService: ProjectService
   ) {}
@@ -65,9 +60,9 @@ export default class FileService {
   }
 
   shouldProcessFileAsImage(data: FileData) {
-    const thumbnailAllowed = ThumbnailService.shouldGenerateThumbnail(data.type)
+    const isImage = FileService.IMAGE_ALLOWED_CONTENT_TYPES.has(data.type)
     const sizeAllowed = Number(data.size) <= FileService.MAX_PROCESSING_SIZE
-    return thumbnailAllowed && sizeAllowed
+    return isImage && sizeAllowed
   }
 
   async createFileForProjectFolder(data: FileData): Promise<File> {
@@ -87,24 +82,18 @@ export default class FileService {
     }
 
     if (this.shouldProcessFileAsImage(data)) {
-      const [exifMetadataResult, thumbnailResult] = await Promise.all([
-        this.exifService.extractExifData(data.key),
-        this.thumbnailService.createFileThumbnail(data.key),
-      ])
+      const exifMetadataResult = await this.exifService.extractExifData(
+        data.key
+      )
 
       if (exifMetadataResult.ok) {
         fileData.exifMetadata = exifMetadataResult.data
-      }
-
-      if (thumbnailResult.ok) {
-        fileData.thumbnailKey = thumbnailResult.key
-        fileData.width = thumbnailResult.width
-        fileData.height = thumbnailResult.height
+        fileData.width = exifMetadataResult.width
+        fileData.height = exifMetadataResult.height
       }
     }
 
     const databaseFile = await this.createFile(fileData)
-    console.log(databaseFile)
 
     await Promise.all([
       this.folderService.addFilesToFolder(data.folderId, [databaseFile]),
@@ -116,23 +105,14 @@ export default class FileService {
 
   async streamFile(key: string, res: Response) {
     const parts = FileService.getFilePathnameParts(key)
-    const isThumbnail = FileService.isThumbnail(parts.filename)
     if (!parts.filename || !parts.projectId || !parts.folderId) {
       return res.badRequest('File path parts are missing')
-    }
-
-    let filename = parts.filename
-    if (isThumbnail) {
-      filename = parts.filename.slice(
-        0,
-        parts.filename.length - FileService.THUMBNAIL_SUFFIX.length
-      )
     }
 
     const parsedKey = FileService.makeUploadPath({
       projectId: parts.projectId,
       folderId: parts.folderId,
-      uploadId: filename,
+      uploadId: parts.filename,
     })
 
     const databaseFile = await this.file({
@@ -213,15 +193,6 @@ export default class FileService {
     return { path, filename, projectId, folderId }
   }
 
-  static makeThumbnailFilename(name: string) {
-    return name + FileService.THUMBNAIL_SUFFIX
-  }
-
-  static makeThumbnailUploadPath(filePath: string) {
-    const { filename, path } = FileService.getFilePathnameParts(filePath)
-    return path + '/' + FileService.makeThumbnailFilename(filename)
-  }
-
   static getUploadProjectName(projectId: Project['id']) {
     return `${FileService.PROJECT_PATH_PREFIX}${projectId}`
   }
@@ -242,9 +213,5 @@ export default class FileService {
     const projectName = FileService.getUploadProjectName(props.projectId)
     const folderName = FileService.getUploadFolderName(props.folderId)
     return `${projectName}/${folderName}/${props.uploadId}`
-  }
-
-  static isThumbnail(fileKey: string) {
-    return fileKey.endsWith(FileService.THUMBNAIL_SUFFIX)
   }
 }

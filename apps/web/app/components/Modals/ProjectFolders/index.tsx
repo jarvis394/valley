@@ -34,7 +34,7 @@ import cx from 'classnames'
 import styles from './ProjectFoldersModal.module.css'
 import { createPortal } from 'react-dom'
 import { ClientOnly } from 'remix-utils/client-only'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import { useProjectsStore } from 'app/stores/projects'
 
 const ModalContent: React.FC<{
@@ -69,9 +69,7 @@ const ModalContent: React.FC<{
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   const handleFolderClick = (folder: Folder) => {
@@ -204,17 +202,15 @@ const ModalContent: React.FC<{
 const ProjectFoldersModal: React.FC<{ onClose?: () => void }> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const project = useProject()
   const createFolderAction = '/api/folders/create'
-  const createFolderFetcher = useFetcher({
-    key: createFolderAction,
-  })
+  const createFolderFetcher = useFetcher({ key: createFolderAction })
 
   return (
     <ModalContent
       createFolderFetcher={createFolderFetcher}
       onClose={onClose}
-      project={data.project}
+      project={project}
     />
   )
 }

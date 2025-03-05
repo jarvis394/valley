@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react'
+import React, { useState } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
@@ -6,16 +6,14 @@ import ModalContent from '@valley/ui/ModalContent'
 import styles from './ConfirmFileDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import Note from '@valley/ui/Note'
-import { Await, Form, useParams } from '@remix-run/react'
+import { Form, useParams } from '@remix-run/react'
 import { useIsPending } from 'app/utils/misc'
 import { FolderWithFiles } from '@valley/shared'
 import { redirectToKey } from 'app/routes/_.auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
-import { useFolderAwait } from 'app/utils/folder'
+import { useFolder } from 'app/utils/folder'
 
-type ConfirmFileDeletionProps = {
-  onClose: () => void
-}
+type ConfirmFileDeletionProps = { onClose: () => void }
 
 const ModalContents: React.FC<
   { folder?: FolderWithFiles | null } & ConfirmFileDeletionProps
@@ -27,15 +25,9 @@ const ModalContents: React.FC<
   const redirectTo = `/projects/${projectId}/folder/${folderId}`
   const formAction = `/api/files/${file?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
-    submitConfig: {
-      navigate: true,
-      action: formAction,
-      method: 'POST',
-    },
+    submitConfig: { navigate: true, action: formAction, method: 'POST' },
   })
-  const isPending = useIsPending({
-    formAction,
-  })
+  const isPending = useIsPending({ formAction })
 
   if (!file) {
     return (
@@ -96,17 +88,9 @@ const ModalContents: React.FC<
 const ConfirmFileDeletionModal: React.FC<ConfirmFileDeletionProps> = ({
   onClose,
 }) => {
-  const data = useFolderAwait()
+  const folder = useFolder()
 
-  return (
-    <Suspense>
-      <Await resolve={data?.folder}>
-        {(resolvedFolder) => (
-          <ModalContents onClose={onClose} folder={resolvedFolder} />
-        )}
-      </Await>
-    </Suspense>
-  )
+  return <ModalContents onClose={onClose} folder={folder} />
 }
 
 export default ConfirmFileDeletionModal

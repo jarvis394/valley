@@ -10,21 +10,17 @@ import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { ProjectWithFolders } from '@valley/shared'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import ModalContent from '@valley/ui/ModalContent'
 
 type FormData = z.infer<typeof FoldersEditSchema>
 
 const resolver = zodResolver(FoldersEditSchema)
 
-type EditFolderDescriptionModalProps = {
-  onClose: () => void
-}
+type EditFolderDescriptionModalProps = { onClose: () => void }
 
 const ModalContents: React.FC<
-  EditFolderDescriptionModalProps & {
-    project?: ProjectWithFolders | null
-  }
+  EditFolderDescriptionModalProps & { project?: ProjectWithFolders | null }
 > = ({ onClose, project }) => {
   const { folderId: paramsFolderId } = useParams()
   const [searchParams] = useSearchParams()
@@ -35,15 +31,9 @@ const ModalContents: React.FC<
   const formAction = '/api/folders/' + folderId + '/edit'
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
-    submitConfig: {
-      action: formAction,
-      method: 'POST',
-    },
+    submitConfig: { action: formAction, method: 'POST' },
   })
-  const isPending = useIsPending({
-    formMethod: 'POST',
-    formAction,
-  })
+  const isPending = useIsPending({ formMethod: 'POST', formAction })
 
   return (
     <>
@@ -57,9 +47,7 @@ const ModalContents: React.FC<
         >
           <div>
             <TextArea
-              {...register('description', {
-                value: defaultDescription,
-              })}
+              {...register('description', { value: defaultDescription })}
               size="lg"
               defaultValue={defaultDescription}
               id="folder-description-input"
@@ -99,9 +87,9 @@ const ModalContents: React.FC<
 const EditFolderDescriptionModal: React.FC<EditFolderDescriptionModalProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const project = useProject()
 
-  return <ModalContents onClose={onClose} project={data.project} />
+  return <ModalContents onClose={onClose} project={project} />
 }
 
 export default EditFolderDescriptionModal

@@ -53,6 +53,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     type: 'get project',
   })
 
+  if (!project) {
+    return redirect('/projects')
+  }
+
   return data({ project }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
@@ -63,10 +67,7 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
 
   return cacheClientLoader(
     { params, ...props },
-    {
-      type: 'swr',
-      key: getProjectCacheKey(params.projectId),
-    }
+    { type: 'swr', key: getProjectCacheKey(params.projectId) }
   )
 }
 
@@ -87,9 +88,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 }
 
 export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
-  return {
-    'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
-  }
+  return { 'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders) }
 }
 
 const ProjectLayout: React.FC = () => {

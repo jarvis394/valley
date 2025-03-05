@@ -8,21 +8,13 @@ import dayjs from 'dayjs'
 import Skeleton from '@valley/ui/Skeleton'
 import { ProjectWithFolders } from '@valley/shared'
 import cx from 'classnames'
-import { UPLOAD_SERVICE_URL } from '../../config/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Image from '@valley/ui/Image'
 
 export type ProjectCardOwnProps =
-  | {
-      project: ProjectWithFolders
-      domain: string
-      loading?: false
-    }
-  | {
-      project?: never
-      domain?: never
-      loading: true
-    }
+  | { project: ProjectWithFolders; domain: string; loading?: false }
+  | { project?: never; domain?: never; loading: true }
 
 export type ProjectCardProps = ProjectCardOwnProps &
   React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
@@ -36,9 +28,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
   const projectLink = `/${domain}/gallery/${project?.url}`
-  const coverImage =
-    project?.coverImage?.File.thumbnailKey &&
-    UPLOAD_SERVICE_URL + '/api/files/' + project.coverImage.File.key
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -52,9 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   return (
     <div
       {...props}
-      className={cx(styles.projectCard, className, {
-        shimmer: isPending,
-      })}
+      className={cx(styles.projectCard, className, { shimmer: isPending })}
     >
       {loading && <div className={styles.projectCard__cover} />}
       {!loading && (
@@ -63,9 +50,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           href={projectLink}
           className={styles.projectCard__cover}
         >
-          {coverImage && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img alt={project.title} src={coverImage} />
+          {project.coverImage && (
+            <Image
+              alt={project.title}
+              file={project.coverImage.File}
+              thumbnail="md"
+            />
           )}
         </Link>
       )}

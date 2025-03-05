@@ -9,7 +9,7 @@ import { Form, useParams, useSearchParams } from '@remix-run/react'
 import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import ModalContent from '@valley/ui/ModalContent'
 
@@ -17,14 +17,10 @@ type FormData = z.infer<typeof FoldersEditSchema>
 
 const resolver = zodResolver(FoldersEditSchema)
 
-type EditFolderTitleModalProps = {
-  onClose: () => void
-}
+type EditFolderTitleModalProps = { onClose: () => void }
 
 const ModalContents: React.FC<
-  EditFolderTitleModalProps & {
-    project?: ProjectWithFolders | null
-  }
+  EditFolderTitleModalProps & { project?: ProjectWithFolders | null }
 > = ({ onClose, project }) => {
   const { folderId: paramsFolderId } = useParams()
   const [searchParams] = useSearchParams()
@@ -36,15 +32,9 @@ const ModalContents: React.FC<
   const { register, getFieldState, formState, handleSubmit } =
     useRemixForm<FormData>({
       resolver,
-      submitConfig: {
-        action: formAction,
-        method: 'POST',
-      },
+      submitConfig: { action: formAction, method: 'POST' },
     })
-  const isPending = useIsPending({
-    formMethod: 'POST',
-    formAction,
-  })
+  const isPending = useIsPending({ formMethod: 'POST', formAction })
 
   return (
     <>
@@ -57,9 +47,7 @@ const ModalContents: React.FC<
           method="POST"
         >
           <TextField
-            {...register('title', {
-              required: true,
-            })}
+            {...register('title', { required: true })}
             defaultValue={defaultTitle}
             fieldState={getFieldState('title', formState)}
             label="Title"
@@ -101,9 +89,9 @@ const ModalContents: React.FC<
 const EditFolderTitleModal: React.FC<EditFolderTitleModalProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const project = useProject()
 
-  return <ModalContents onClose={onClose} project={data.project} />
+  return <ModalContents onClose={onClose} project={project} />
 }
 
 export default EditFolderTitleModal

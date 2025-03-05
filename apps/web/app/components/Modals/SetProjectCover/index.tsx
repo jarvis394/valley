@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, useSearchParams } from '@remix-run/react'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import ModalContent from '@valley/ui/ModalContent'
 import { ProjectSetCoverSchema } from 'app/routes/api+/projects+/$id.setCover'
@@ -18,29 +18,19 @@ type FormData = z.infer<typeof ProjectSetCoverSchema>
 
 const resolver = zodResolver(ProjectSetCoverSchema)
 
-type SetProjectCoverModalProps = {
-  onClose: () => void
-}
+type SetProjectCoverModalProps = { onClose: () => void }
 
 const ModalContents: React.FC<
-  SetProjectCoverModalProps & {
-    project?: ProjectWithFolders | null
-  }
+  SetProjectCoverModalProps & { project?: ProjectWithFolders | null }
 > = ({ onClose, project }) => {
   const [searchParams] = useSearchParams()
   const fileId = searchParams.get('modal-fileId')
   const formAction = '/api/projects/' + project?.id + '/setCover'
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
-    submitConfig: {
-      action: formAction,
-      method: 'POST',
-    },
+    submitConfig: { action: formAction, method: 'POST' },
   })
-  const isPending = useIsPending({
-    formMethod: 'POST',
-    formAction,
-  })
+  const isPending = useIsPending({ formMethod: 'POST', formAction })
 
   if (!fileId) {
     return (
@@ -101,9 +91,9 @@ const ModalContents: React.FC<
 const SetProjectCoverModal: React.FC<SetProjectCoverModalProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const project = useProject()
 
-  return <ModalContents onClose={onClose} project={data.project} />
+  return <ModalContents onClose={onClose} project={project} />
 }
 
 export default SetProjectCoverModal

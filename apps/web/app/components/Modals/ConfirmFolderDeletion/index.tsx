@@ -9,15 +9,13 @@ import Note from '@valley/ui/Note'
 import { Form, useParams } from '@remix-run/react'
 import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/routes/_.auth+/verify+'
 import ErrorModalContent from '../ErrorModalContent'
 import ModalContent from '@valley/ui/ModalContent'
 
-type ConfirmFolderDeletionProps = {
-  onClose: () => void
-}
+type ConfirmFolderDeletionProps = { onClose: () => void }
 
 const ModalContents: React.FC<
   { project?: ProjectWithFolders | null } & ConfirmFolderDeletionProps
@@ -34,16 +32,10 @@ const ModalContents: React.FC<
   }`
   const formAction = `/api/folders/${folder?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
-    submitConfig: {
-      navigate: true,
-      action: formAction,
-      method: 'POST',
-    },
+    submitConfig: { navigate: true, action: formAction, method: 'POST' },
   })
   const isFolderWithFiles = folder?.totalFiles !== 0
-  const isPending = useIsPending({
-    formAction,
-  })
+  const isPending = useIsPending({ formAction })
   const folderTitlePattern = `\\s*${folder?.title}\\s*`
   const deleteConfirmPattern = '\\s*delete my folder\\s*'
 
@@ -85,51 +77,51 @@ const ModalContents: React.FC<
           <Note variant="alert" fill>
             This action is not reversible. Please be certain.
           </Note>
-          {isFolderWithFiles && (
-            <Stack
-              direction={'column'}
-              gap={6}
-              padding={6}
-              className={styles.confirmFolderDeletion__form}
-            >
-              <label htmlFor="folder-title-input">
-                <Stack gap={2} direction="column">
-                  <p className={styles.confirmFolderDeletion__formLabel}>
-                    Enter the folder title <b>{folder?.title}</b> to continue:
-                  </p>
-                  <TextField
-                    required
-                    pattern={folderTitlePattern}
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    type="text"
-                    id="folder-title-input"
-                  />
-                </Stack>
-              </label>
-              <label htmlFor="delete-confirm-input">
-                <Stack gap={2} direction="column">
-                  <p className={styles.confirmFolderDeletion__formLabel}>
-                    To verify, type <b>delete my folder</b> below:
-                  </p>
-                  <TextField
-                    required
-                    pattern={deleteConfirmPattern}
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    type="text"
-                    id="delete-confirm-input"
-                  />
-                </Stack>
-              </label>
-            </Stack>
-          )}
         </Form>
       </ModalContent>
+      {isFolderWithFiles && (
+        <Stack
+          direction={'column'}
+          gap={6}
+          padding={6}
+          className={styles.confirmFolderDeletion__form}
+        >
+          <label htmlFor="folder-title-input">
+            <Stack gap={2} direction="column">
+              <p className={styles.confirmFolderDeletion__formLabel}>
+                Enter the folder title <b>{folder?.title}</b> to continue:
+              </p>
+              <TextField
+                required
+                pattern={folderTitlePattern}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                type="text"
+                id="folder-title-input"
+              />
+            </Stack>
+          </label>
+          <label htmlFor="delete-confirm-input">
+            <Stack gap={2} direction="column">
+              <p className={styles.confirmFolderDeletion__formLabel}>
+                To verify, type <b>delete my folder</b> below:
+              </p>
+              <TextField
+                required
+                pattern={deleteConfirmPattern}
+                autoCapitalize="none"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                type="text"
+                id="delete-confirm-input"
+              />
+            </Stack>
+          </label>
+        </Stack>
+      )}
       <ModalFooter
         className={styles.confirmFolderDeletion__footer}
         before={
@@ -163,9 +155,9 @@ const ModalContents: React.FC<
 const ConfirmFolderDeletionModal: React.FC<ConfirmFolderDeletionProps> = ({
   onClose,
 }) => {
-  const data = useProjectAwait()
+  const project = useProject()
 
-  return <ModalContents onClose={onClose} project={data.project} />
+  return <ModalContents onClose={onClose} project={project} />
 }
 
 export default ConfirmFolderDeletionModal
