@@ -11,6 +11,7 @@ import cx from 'classnames'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from '@valley/ui/Image'
+import { WEB_SERVICE_URL } from '../../config/constants'
 
 export type ProjectCardOwnProps =
   | { project: ProjectWithFolders; domain: string; loading?: false }
@@ -55,6 +56,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               alt={project.title}
               file={project.coverImage.File}
               thumbnail="md"
+              imageHost={WEB_SERVICE_URL}
             />
           )}
         </Link>

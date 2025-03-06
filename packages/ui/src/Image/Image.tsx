@@ -13,11 +13,13 @@ export type ImageOwnProps =
   | {
       file: File
       thumbnail?: ThumbnailSize
+      imageHost?: string
       src?: never
     }
   | {
       file?: never
       thumbnail?: never
+      imageHost?: never
       src: string
     }
 
@@ -57,6 +59,7 @@ const Image: React.FC<ImageProps> = ({
   alt,
   className,
   containerProps = {},
+  imageHost,
   ...props
 }) => {
   const { className: containerClassName, ...otherContainerProps } =
@@ -75,11 +78,11 @@ const Image: React.FC<ImageProps> = ({
         resizeQuery = qs.toString()
       }
 
-      return '/api/files/' + file.key + '?' + resizeQuery
+      return imageHost + '/api/files/' + file.key + '?' + resizeQuery
     }
 
     return src
-  }, [file, height, src, thumbnail, width])
+  }, [file, height, imageHost, src, thumbnail, width])
 
   return (
     <div
