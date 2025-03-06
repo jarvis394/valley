@@ -318,6 +318,7 @@ export default class TusService {
 
       // Add fields that can be returned after file creation
       resBuilder.setBodyRecord('exifMetadata', file.exifMetadata)
+      resBuilder.setBodyRecord('canHaveThumbnails', file.canHaveThumbnails)
       resBuilder.setBodyRecord('width', file.width)
       resBuilder.setBodyRecord('height', file.height)
 
