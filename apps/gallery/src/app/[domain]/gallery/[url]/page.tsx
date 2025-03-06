@@ -7,7 +7,7 @@ import { RowsPhotoAlbum, type Photo } from 'react-photo-album'
 import { FolderWithFiles } from '@valley/shared'
 import { getFileThumbnailQuery } from '@valley/ui/utils/getFileThumbnailQuery'
 
-export default async function Home({
+export default async function Gallery({
   params,
 }: {
   params: Promise<{ domain: string; url: string }>
@@ -60,7 +60,7 @@ export default async function Home({
     <Wrapper className="flex flex-col gap-4 py-4">
       <h1 className="text-2xl font-medium">{project.title}</h1>
       {project.folders.map((folder) => (
-        <Button variant="tertiary" key={folder.id}>
+        <Button variant="secondary" key={folder.id}>
           {folder.title}
         </Button>
       ))}

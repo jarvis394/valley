@@ -3,7 +3,7 @@ import ProjectCard from '../../components/ProjectCard/ProjectCard'
 import { prisma } from '../../server/db'
 import { notFound } from 'next/navigation'
 
-export default async function Home({
+export default async function DomainHome({
   params,
 }: {
   params: Promise<{ domain: string }>
@@ -27,6 +27,11 @@ export default async function Home({
           coverImage: {
             include: {
               File: true,
+            },
+            where: {
+              File: {
+                isPendingDeletion: false,
+              },
             },
           },
         },
