@@ -1,63 +1,38 @@
 # syntax=docker/dockerfile:1.5.2
 # based on: https://github.com/vercel/turbo/blob/main/examples/with-docker/apps/api/Dockerfile
+# and on: https://github.com/vercel/turborepo/discussions/7456#discussioncomment-10468323
 
-FROM node:22-alpine as base
+ARG BUN_VERSION=1.2.2
 
-# adding apk deps to avoid node-gyp related errors and some other stuff. adds turborepo globally
+ARG YARN_PKG_MANAGER="this.packageManager=\"yarn@1.22.22\""
+ARG BUN_PKG_MANAGER="this.packageManager=\"bun@${BUN_VERSION}\""
+
+FROM oven/bun:${BUN_VERSION} as bun
+WORKDIR /app
+
+FROM oven/bun:${BUN_VERSION}-alpine as bun-alpine
 RUN apk add -f --update --no-cache --virtual .gyp nano bash libc6-compat openssl python3 make g++ \
-  && npm i -g turbo \
   && apk del .gyp
-
-#############################################
-FROM base AS pruned
 WORKDIR /app
 
+#############################################
+FROM bun AS pruned
+ARG YARN_PKG_MANAGER
 COPY . .
-
-# see https://turbo.build/repo/docs/reference/command-line-reference#turbo-prune---scopetarget
-RUN turbo prune --scope=upload --docker
-
-#############################################
-FROM base AS installer
-WORKDIR /app
-
-COPY --from=pruned /app/out/json/ .
-COPY --from=pruned /app/out/yarn.lock /app/yarn.lock
-
-# Forces the layer to recreate if the app's package.json changes
-COPY apps/upload/package.json /app/apps/upload/package.json
-
-# see https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#run---mounttypecache
-RUN \
-  --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-  yarn --prefer-offline --frozen-lockfile
-
-# fixing sharp dependency to be installed in our alpine image
-RUN \
-  --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-  yarn -W add sharp --ignore-engines --force
-
-COPY --from=pruned /app/out/full/ .
-COPY turbo.json turbo.json
-
-RUN turbo run build --no-cache --filter=upload
-
-# re-running yarn ensures that dependencies between workspaces are linked correctly
-RUN \
-  --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-  yarn --prefer-offline --frozen-lockfile
-
-# fixing sharp dependency to be installed in our alpine image
-RUN \
-  --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-  yarn -W add sharp --ignore-engines --force
+RUN bunx json -I -f package.json -e ${YARN_PKG_MANAGER}
+# RUN bunx turbo prune --scope="upload" --docker
 
 #############################################
-FROM base AS runner
+FROM bun as builder
+ARG BUN_PKG_MANAGER
+COPY --from=pruned /app .
+RUN bunx json -I -f package.json -e ${BUN_PKG_MANAGER}
+RUN bun install
+RUN bunx turbo build --filter="upload"
+
+#############################################
+FROM bun-alpine AS release
+USER bun
+COPY --from=builder /app .
 WORKDIR /app
-
-ENV HOST=0.0.0.0
-
-COPY --from=installer /app .
-
-ENTRYPOINT ["yarn", "workspace", "upload", "start"]
+ENTRYPOINT [ "bun", "--filter", "upload", "start"]

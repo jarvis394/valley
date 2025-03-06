@@ -41,8 +41,6 @@
     "@remix-run/serve": "^2.16.0",
     "@remix-run/server-runtime": "^2.16.0",
     "@remix-run/dev": "^2.16.0",
-    "@sentry/profiling-node": "^8.36.0",
-    "@sentry/remix": "^8.36.0",
     "@uppy/core": "^4.1.0",
     "@uppy/tus": "^4.1.4",
     "@valley/db": "*",

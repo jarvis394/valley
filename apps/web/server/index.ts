@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
-import Sentry from '@sentry/remix'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
@@ -295,7 +294,7 @@ closeWithGrace(async ({ err }) => {
   if (err) {
     console.error(ansis.red(err.stack || err.message))
 
-    SENTRY_ENABLED && Sentry.captureException(err)
-    SENTRY_ENABLED && (await Sentry.flush(500))
+    // SENTRY_ENABLED && Sentry.captureException(err)
+    // SENTRY_ENABLED && (await Sentry.flush(500))
   }
 })
