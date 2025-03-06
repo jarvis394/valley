@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs } from '@remix-run/node'
 import { getDomainUrl } from 'app/utils/misc'
 import { getImgResponse } from 'openimg/node'
+import { cors } from 'remix-utils/cors'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { projectId, folderId, fileId } = params
@@ -8,7 +9,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 
-  return getImgResponse(request, {
+  const response = await getImgResponse(request, {
     headers,
     allowlistedOrigins: [
       getDomainUrl(request),
@@ -25,5 +26,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
         type: 'fetch',
       }
     },
+  })
+
+  return await cors(request, response, {
+    origin: [
+      getDomainUrl(request),
+      process.env.UPLOAD_SERVICE_URL,
+      process.env.GALLERY_SERVICE_URL,
+    ].filter(Boolean),
   })
 }
