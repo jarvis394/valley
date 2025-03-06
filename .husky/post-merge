@@ -24,9 +24,9 @@ check_env() {
         echo ""
         echo "_________________________________________________________________"
         echo ""
-        bun dotenv-updater
+        yarn dotenv-updater
     fi
 }
 
-check_run package.json "bun i"
+check_run package.json "yarn"
 check_env

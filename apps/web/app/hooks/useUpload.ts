@@ -72,7 +72,6 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
           ...file,
           type: file.contentType,
           dateCreated: new Date(file.dateCreated),
-          thumbnailKey: file.thumbnailKey || null,
           height: file.height || null,
           width: file.width || null,
         },

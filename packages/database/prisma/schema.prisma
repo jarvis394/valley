@@ -199,7 +199,7 @@ model File {
   id                String   @id @default(cuid())
   bucket            String
   key               String
-  thumbnailKey      String?
+  canHaveThumbnails Boolean  @default(false)
   exifMetadata      Json
   width             Int?
   height            Int?

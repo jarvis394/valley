@@ -6,6 +6,7 @@ const schema = z.object({
   REDIS_URL: z.string(),
   TUSD_URL: z.string(),
   UPLOAD_SERVICE_URL: z.string(),
+  GALLERY_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
   WEB_PORT: z.string(),
@@ -51,6 +52,7 @@ export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
     UPLOAD_SERVICE_URL: process.env.UPLOAD_SERVICE_URL,
+    GALLERY_SERVICE_URL: process.env.GALLERY_SERVICE_URL,
     TUSD_URL: process.env.TUSD_URL,
   }
 }

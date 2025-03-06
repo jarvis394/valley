@@ -136,14 +136,14 @@ const FileCard: React.FC<FileCardProps> = ({
         style={style}
       >
         <div className={styles.fileCard__imageContainer}>
-          {file.thumbnailKey && (
+          {file.canHaveThumbnails && (
             <Image
               className={styles.fileCard__image}
               file={file}
               thumbnail="sm"
             />
           )}
-          {!file.thumbnailKey && <FileIcon width={32} height={32} />}
+          {!file.canHaveThumbnails && <FileIcon width={32} height={32} />}
         </div>
         <p className={styles.fileCard__name}>{file.name}</p>
 

@@ -3,17 +3,26 @@ import { Response } from '@adonisjs/http-server'
 import { Folder, Prisma, Project, File } from '@valley/db'
 import { v4 as uuid } from 'uuid'
 import prisma from '#services/prisma_service'
-import ExifService from '#services/exif_service'
+import ImageService from '#services/image_service'
 import FolderService from '#services/folder_service'
 import ProjectService from '#services/project_service'
 import drive from '@adonisjs/drive/services/main'
 import { errors } from 'flydrive'
 import contentDisposition from 'content-disposition'
+import logger from '@adonisjs/core/services/logger'
 
 type FileData = Omit<
   File,
-  'id' | 'exifMetadata' | 'thumbnailKey' | 'width' | 'height'
-> & { id?: File['id']; projectId: Project['id'] }
+  | 'id'
+  | 'canHaveThumbnails'
+  | 'isPendingDeletion'
+  | 'exifMetadata'
+  | 'width'
+  | 'height'
+> & {
+  id?: File['id']
+  projectId: Project['id']
+}
 
 @inject()
 export default class FileService {
@@ -27,7 +36,7 @@ export default class FileService {
   static readonly FOLDER_PATH_PREFIX = 'folder-'
 
   constructor(
-    private readonly exifService: ExifService,
+    private readonly imageService: ImageService,
     private readonly folderService: FolderService,
     private readonly projectService: ProjectService
   ) {}
@@ -82,14 +91,21 @@ export default class FileService {
     }
 
     if (this.shouldProcessFileAsImage(data)) {
-      const exifMetadataResult = await this.exifService.extractExifData(
-        data.key
-      )
+      const { exif, metadata } = await this.imageService.parseImage(data.key)
 
-      if (exifMetadataResult.ok) {
-        fileData.exifMetadata = exifMetadataResult.data
-        fileData.width = exifMetadataResult.width
-        fileData.height = exifMetadataResult.height
+      if (exif.ok) {
+        fileData.exifMetadata = exif.data
+      } else {
+        logger.warn('Could not parse image EXIF: ' + exif.reason)
+      }
+
+      if (metadata.ok) {
+        fileData.width = metadata.data.width
+        fileData.height = metadata.data.height
+        // API can only generate nice thumbnails when image dimensions are present
+        fileData.canHaveThumbnails = true
+      } else {
+        logger.warn('Could not parse image metadata: ' + metadata.reason)
       }
     }
 

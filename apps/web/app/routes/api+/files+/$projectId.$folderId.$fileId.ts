@@ -13,6 +13,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     allowlistedOrigins: [
       getDomainUrl(request),
       process.env.UPLOAD_SERVICE_URL,
+      process.env.GALLERY_SERVICE_URL,
     ].filter(Boolean),
     cacheFolder: process.env.VERCEL === '1' ? 'no_cache' : undefined,
     getImgSource: () => {
