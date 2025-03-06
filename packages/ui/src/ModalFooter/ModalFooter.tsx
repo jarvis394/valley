@@ -20,7 +20,7 @@ const ModalFooter = React.forwardRef<HTMLDivElement, ModalFooterProps>(
         justify="space-between"
         align="center"
         padding={4}
-        className={cx(styles.modalFooter, className)}
+        className={cx('ModalFooter', styles.modalFooter, className)}
       >
         {before && (
           <Stack align="center" gap={2}>

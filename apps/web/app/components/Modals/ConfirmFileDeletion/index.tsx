@@ -3,7 +3,6 @@ import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import ModalContent from '@valley/ui/ModalContent'
-import styles from './ConfirmFileDeletion.module.css'
 import { useRemixForm } from 'remix-hook-form'
 import Note from '@valley/ui/Note'
 import { Form, useParams } from '@remix-run/react'
@@ -56,7 +55,6 @@ const ModalContents: React.FC<
         </Form>
       </ModalContent>
       <ModalFooter
-        className={styles.confirmFileDeletion__footer}
         before={
           <Button
             tabIndex={0}

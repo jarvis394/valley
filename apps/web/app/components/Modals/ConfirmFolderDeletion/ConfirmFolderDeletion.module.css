@@ -3,7 +3,7 @@
   background-color: var(--background-paper);
 }
 
-.confirmFolderDeletion__footer {
+:global(.ModalFooter).confirmFolderDeletion__footer {
   background-color: var(--background-default);
 }
 

@@ -50,13 +50,13 @@ const ModalContents: React.FC<
   return (
     <>
       <ModalHeader>Clear Folder</ModalHeader>
-      <ModalContent asChild>
-        <Form
-          onSubmit={handleSubmit}
-          id="confirm-folder-clear-form"
-          method="POST"
-          action={formAction}
-        >
+      <Form
+        onSubmit={handleSubmit}
+        id="confirm-folder-clear-form"
+        method="POST"
+        action={formAction}
+      >
+        <ModalContent>
           <p>
             All folder <b>&quot;{folder?.title}&quot;</b> files will be deleted,
             which is <b>{folder?.totalFiles} files</b> total.
@@ -64,51 +64,51 @@ const ModalContents: React.FC<
           <Note variant="alert" fill>
             This action is not reversible. Please be certain.
           </Note>
-        </Form>
-      </ModalContent>
-      {isFolderWithFiles && (
-        <Stack
-          direction={'column'}
-          gap={6}
-          padding={6}
-          className={styles.confirmFolderClear__form}
-        >
-          <label htmlFor="folder-title-input">
-            <Stack gap={2} direction="column">
-              <p className={styles.confirmFolderClear__formLabel}>
-                Enter the folder title <b>{folder?.title}</b> to continue:
-              </p>
-              <TextField
-                required
-                pattern={folderTitlePattern}
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                type="text"
-                id="folder-title-input"
-              />
-            </Stack>
-          </label>
-          <label htmlFor="delete-confirm-input">
-            <Stack gap={2} direction="column">
-              <p className={styles.confirmFolderClear__formLabel}>
-                To verify, type <b>delete my files</b> below:
-              </p>
-              <TextField
-                required
-                pattern={deleteConfirmPattern}
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                type="text"
-                id="delete-confirm-input"
-              />
-            </Stack>
-          </label>
-        </Stack>
-      )}
+        </ModalContent>
+        {isFolderWithFiles && (
+          <Stack
+            direction={'column'}
+            gap={6}
+            padding={6}
+            className={styles.confirmFolderClear__form}
+          >
+            <label htmlFor="folder-title-input">
+              <Stack gap={2} direction="column">
+                <p className={styles.confirmFolderClear__formLabel}>
+                  Enter the folder title <b>{folder?.title}</b> to continue:
+                </p>
+                <TextField
+                  required
+                  pattern={folderTitlePattern}
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  type="text"
+                  id="folder-title-input"
+                />
+              </Stack>
+            </label>
+            <label htmlFor="delete-confirm-input">
+              <Stack gap={2} direction="column">
+                <p className={styles.confirmFolderClear__formLabel}>
+                  To verify, type <b>delete my files</b> below:
+                </p>
+                <TextField
+                  required
+                  pattern={deleteConfirmPattern}
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  type="text"
+                  id="delete-confirm-input"
+                />
+              </Stack>
+            </label>
+          </Stack>
+        )}
+      </Form>
       <ModalFooter
         className={styles.confirmFolderClear__footer}
         before={
