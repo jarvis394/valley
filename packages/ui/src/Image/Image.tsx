@@ -59,7 +59,7 @@ const Image: React.FC<ImageProps> = ({
   alt,
   className,
   containerProps = {},
-  imageHost,
+  imageHost = '',
   ...props
 }) => {
   const { className: containerClassName, ...otherContainerProps } =
