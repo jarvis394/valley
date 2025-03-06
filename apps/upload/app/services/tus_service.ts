@@ -300,6 +300,7 @@ export default class TusService {
         id: upload.id,
         contentType,
         isPendingDeletion: false,
+        canHaveThumbnails: false,
       })
 
     try {
@@ -308,7 +309,6 @@ export default class TusService {
         type: contentType,
         bucket: storage.bucket || 'files',
         key: storage.path,
-        isPendingDeletion: false,
         projectId,
         folderId,
         dateCreated,
@@ -318,7 +318,6 @@ export default class TusService {
 
       // Add fields that can be returned after file creation
       resBuilder.setBodyRecord('exifMetadata', file.exifMetadata)
-      resBuilder.setBodyRecord('thumbnailKey', file.thumbnailKey)
       resBuilder.setBodyRecord('width', file.width)
       resBuilder.setBodyRecord('height', file.height)
 

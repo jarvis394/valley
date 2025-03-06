@@ -2439,11 +2439,6 @@
   resolved "https://registry.yarnpkg.com/@jspm/core/-/core-2.1.0.tgz#ee21ff64591d68de98b79ca8e4bd6c5249fded53"
   integrity sha512-3sRl+pkyFY/kLmHl0cgHiFp2xEqErA8N3ECjMs7serSUBmoJ70lBa0PG5t0IM6WJgdZNyyI0R8YFfi5wM8+mzg==
 
-"@laosb/exifr@^7.2.1":
-  version "7.2.1"
-  resolved "https://registry.yarnpkg.com/@laosb/exifr/-/exifr-7.2.1.tgz#5bef4965efee8b89ccd5d6f2c993361b3af30e8f"
-  integrity sha512-Jv5649kE4x9bcuHus/1laexiiDE6rk3byB0c5ISWGOb8La57jIW4/E9jcArn/LafTzzaYw+zMbRgfZ9Ksg0v7g==
-
 "@lukeed/ms@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@lukeed/ms/-/ms-2.0.2.tgz#07f09e59a74c52f4d88c6db5c1054e819538e2a8"
@@ -9524,6 +9519,11 @@ executable@^4.1.0:
   dependencies:
     pify "^2.2.0"
 
+exif-reader@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/exif-reader/-/exif-reader-2.0.2.tgz#b4db3f5153911b5e499a9c381d5fd8e0ee1b3b55"
+  integrity sha512-CVFqcwdwFe2GnbbW7/Q7sUhVP5Ilaw7fuXQc6ad3AbX20uGfHhXTpkF/hQHPrtOuys9elFVgsUkvwfhfvjDa1A==
+
 exit-hook@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/exit-hook/-/exit-hook-2.2.1.tgz#007b2d92c6428eda2b76e7016a34351586934593"
@@ -10533,10 +10533,10 @@ hosted-git-info@^7.0.0:
   dependencies:
     lru-cache "^10.0.1"
 
-hot-hook@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/hot-hook/-/hot-hook-0.3.1.tgz#ae1ab363c5b1ff274ff67ba994c984d33fe34c76"
-  integrity sha512-PR40gornMhj+Xq93/EBaPXyfL7kmkgVOulUbJyl1j17MYfklJ6AQByOM8O/dlI9/AFg8LcR9uxecMB5/3Tizhw==
+hot-hook@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/hot-hook/-/hot-hook-0.4.0.tgz#b98bf6f263196641a465bc94cafb54c417a81070"
+  integrity sha512-D36jqIojBHqxfkel6r7QGfmal7HO3cFTnPKeZIpPsBtFdV3QPV7m42JTBDX3B/Ovi53RXbOix7t/uIeV2bfeRA==
   dependencies:
     chokidar "^4.0.1"
     fast-glob "^3.3.2"
@@ -13808,10 +13808,10 @@ pino-abstract-transport@^2.0.0:
   dependencies:
     split2 "^4.0.0"
 
-pino-pretty@^11.2.2:
-  version "11.3.0"
-  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-11.3.0.tgz#390b3be044cf3d2e9192c7d19d44f6b690468f2e"
-  integrity sha512-oXwn7ICywaZPHmu3epHGU2oJX4nPmKvHvB/bwrJHlGcbEWaVcotkpyVHMKLKmiVryWYByNp0jpgAcXpFJDXJzA==
+pino-pretty@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-13.0.0.tgz#21d57fe940e34f2e279905d7dba2d7e2c4f9bf17"
+  integrity sha512-cQBBIVG3YajgoUjo1FdKVRX6t9XPxwB9lcNJVD5GCnNM4Y6T12YYx8c6zEejxQsU0wrg9TwmDulcE9LR7qcJqA==
   dependencies:
     colorette "^2.0.7"
     dateformat "^4.6.3"
@@ -13823,7 +13823,6 @@ pino-pretty@^11.2.2:
     on-exit-leak-free "^2.1.0"
     pino-abstract-transport "^2.0.0"
     pump "^3.0.0"
-    readable-stream "^4.0.0"
     secure-json-parse "^2.4.0"
     sonic-boom "^4.0.1"
     strip-json-comments "^3.1.1"
@@ -14562,7 +14561,7 @@ readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.5.0, readable
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-readable-stream@^4.0.0, readable-stream@^4.7.0:
+readable-stream@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-4.7.0.tgz#cedbd8a1146c13dfff8dab14068028d58c15ac91"
   integrity sha512-oIGGmcpTLwPga8Bn6/Z75SVaH1z5dUut2ibSyAMVhmUggWpmDn2dapB0n7f8nwaSiRtepAsfJyfXIO5DCVAODg==

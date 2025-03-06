@@ -16,6 +16,7 @@ export const getUserProjects = ({
       folders: true,
       coverImage: {
         include: { File: true },
+        where: { File: { isPendingDeletion: false } },
       },
     },
   })
