@@ -65,7 +65,7 @@ const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
         className={styles.header__avatarAndNameContainer}
       >
         <Link to={'/projects'}>
-          <Avatar>{user?.fullname[0]}</Avatar>
+          <Avatar>{user?.fullname[0].toUpperCase()}</Avatar>
           <p className={styles.header__noShrink}>{user?.fullname}</p>
         </Link>
       </Stack>
@@ -79,6 +79,7 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
   const { projectId } = useParams()
   const shouldShow = !!projectId
   const [lastProject, setLastProject] = React.useState(project)
+  const coverFile = project?.coverImage?.File
 
   React.useEffect(() => {
     project && setLastProject(project)
@@ -100,7 +101,10 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
           className={styles.header__avatarAndNameContainer}
         >
           <Link to={'/projects/' + project?.id}>
-            <Avatar file={project?.coverImage?.File} />
+            {coverFile && <Avatar square file={coverFile} />}
+            {!coverFile && (
+              <Avatar square>{lastProject?.title[0].toUpperCase()}</Avatar>
+            )}
             <p>{lastProject?.title}</p>
           </Link>
         </Stack>

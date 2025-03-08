@@ -1,4 +1,4 @@
-.inputLabel {
+.label {
   display: flex;
   font-size: 14px;
   font-weight: 420;
@@ -9,16 +9,28 @@
   user-select: none;
 }
 
-.inputLabel__requiredStar {
+.label--standalone {
+  margin-bottom: 0;
+}
+
+.label--fullHeight {
+  height: 100%;
+}
+
+.label--fullWidth {
+  width: 100%;
+}
+
+.label__requiredStar {
   color: var(--red-600);
 }
 
-.inputLabel--size-md {
+.label--size-md {
   font-size: 13px;
   font-weight: 420;
 }
 
-.inputLabel--size-lg {
+.label--size-lg {
   font-size: 14px;
   font-weight: 420;
 }

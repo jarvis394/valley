@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./SelectField": "./src/SelectField/SelectField.tsx",
+    "./Select": "./src/Select/Select.tsx",
     "./utils/getFileThumbnailQuery": "./src/utils/getFileThumbnailQuery.ts",
     "./Image": "./src/Image/Image.tsx",
     "./ModalContent": "./src/ModalContent/ModalContent.tsx",
@@ -34,7 +36,7 @@
     "./ModalHeader": "./src/ModalHeader/ModalHeader.tsx",
     "./ModalFooter": "./src/ModalFooter/ModalFooter.tsx",
     "./Modal": "./src/Modal/Modal.tsx",
-    "./InputLabel": "./src/InputLabel/InputLabel.tsx",
+    "./Label": "./src/Label/Label.tsx",
     "./Spinner": "./src/Spinner/Spinner.tsx",
     "./Tabs": "./src/Tabs/Tabs.tsx",
     "./TabsItem": "./src/TabsItem/TabsItem.tsx",
@@ -56,6 +58,7 @@
     "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
+    "@emotion/is-prop-valid": "^1.3.1",
     "@turbo/gen": "^1.12.4",
     "@types/eslint": "^8.56.11",
     "@types/node": "^20.11.24",
@@ -66,10 +69,10 @@
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
     "typescript": "^5.7.2",
-    "typescript-plugin-css-modules": "^5.1.0",
-    "@emotion/is-prop-valid": "^1.3.1"
+    "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {
+    "@base-ui-components/react": "^1.0.0-alpha.6",
     "@floating-ui/react-dom": "^2.1.2",
     "@formkit/auto-animate": "^0.8.2",
     "@radix-ui/react-context-menu": "^2.2.6",

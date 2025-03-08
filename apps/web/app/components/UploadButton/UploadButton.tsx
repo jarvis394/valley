@@ -10,12 +10,14 @@ type UploadButtonProps = {
   projectId: string
   folderId: string
   variant?: 'button' | 'compact' | 'square'
+  size?: 'sm' | 'md' | 'lg'
 }
 
 const UploadButton: React.FC<UploadButtonProps> = ({
   projectId,
   folderId,
   variant = 'square',
+  size,
   ...props
 }) => {
   const { register } = useUpload({ projectId, folderId })
@@ -26,7 +28,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({
       <Button
         {...register<HTMLButtonElement>()}
         variant="primary"
-        size="lg"
+        size={size || 'lg'}
         before={<CloudUpload />}
       >
         Upload files

@@ -6,16 +6,15 @@ import styles from './AnimateChangeInHeight.module.css'
 type AnimateChangeInHeightProps = React.PropsWithChildren<{
   className?: string
   target?: HTMLElement | null
-  animate?: TargetAndTransition
-}> &
-  Omit<HTMLMotionProps<'div'>, 'animate'>
+  motionProps?: Omit<HTMLMotionProps<'div'>, 'animate'> & {
+    animate?: TargetAndTransition
+  }
+}>
 
 const AnimateChangeInHeight: React.FC<AnimateChangeInHeightProps> = ({
-  className,
   children,
   target,
-  style,
-  animate,
+  motionProps,
   ...props
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -43,13 +42,15 @@ const AnimateChangeInHeight: React.FC<AnimateChangeInHeightProps> = ({
 
   return (
     <motion.div
-      className={cx(styles.animateChangeInHeight, className)}
-      style={{ ...style, height }}
-      animate={{ ...animate, height }}
       transition={{ duration: 0.2, ease: 'circOut' }}
-      {...props}
+      {...motionProps}
+      className={cx(styles.animateChangeInHeight, motionProps?.className)}
+      style={{ ...motionProps?.style, height }}
+      animate={{ ...motionProps?.animate, height }}
     >
-      <div ref={containerRef}>{children}</div>
+      <div {...props} ref={containerRef}>
+        {children}
+      </div>
     </motion.div>
   )
 }

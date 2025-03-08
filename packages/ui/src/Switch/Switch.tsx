@@ -22,7 +22,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(function Switch(
   }
 
   useEffect(() => {
-    setChecked(propsChecked)
+    propsChecked !== undefined && setChecked(propsChecked)
   }, [propsChecked])
 
   return (
@@ -33,6 +33,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     >
       <span className={styles.switch__handle} />
       <input
+        defaultChecked={defaultChecked}
         className={styles.switch__input}
         type="checkbox"
         role="switch"

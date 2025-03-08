@@ -25,6 +25,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
           [styles['iconButton--size-sm']]: size === 'sm',
           [styles['iconButton--size-md']]: size === 'md',
           [styles['iconButton--size-lg']]: size === 'lg',
+          [styles['iconButton--size-xl']]: size === 'xl',
           [styles['iconButton--loading']]: loading,
         })}
       >

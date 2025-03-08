@@ -21,6 +21,7 @@
   transition: all 250ms ease;
   position: relative;
   cursor: pointer;
+  flex-shrink: 0;
   -webkit-user-drag: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;

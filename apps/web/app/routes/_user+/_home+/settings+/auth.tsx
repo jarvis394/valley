@@ -6,6 +6,7 @@ import {
 import { Await, useLoaderData } from '@remix-run/react'
 import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
+import Spinner from '@valley/ui/Spinner'
 import Stack from '@valley/ui/Stack'
 import ConnectionCard from 'app/components/ConnectionCard/ConnectionCard'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
@@ -142,7 +143,7 @@ const Connections: React.FC<{
     )
   } else {
     return (
-      <Note variant="default" fill>
+      <Note variant="default" fill className="fade-in">
         You don&apos;t have any connections yet.
       </Note>
     )
@@ -176,7 +177,13 @@ const AccountSettingsAuthentication = () => {
           </Stack>
         </Paper>
       </Stack>
-      <Suspense>
+      <Suspense
+        fallback={
+          <Stack fullWidth justify={'center'} padding={2}>
+            <Spinner />
+          </Stack>
+        }
+      >
         <Await resolve={data.connections}>
           {(connections) => (
             <Connections

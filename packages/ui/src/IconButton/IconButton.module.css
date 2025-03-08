@@ -18,6 +18,17 @@
   --x-padding: 16px;
 }
 
+.iconButton.iconButton--size-xl {
+  padding: 18px;
+  --x-padding: 18px;
+}
+
+.iconButton.iconButton--size-xl span,
+.iconButton.iconButton--size-xl svg {
+  width: 20px;
+  height: 20px;
+}
+
 .iconButton.iconButton--loading {
   padding: 14px;
   --x-padding: 14px;

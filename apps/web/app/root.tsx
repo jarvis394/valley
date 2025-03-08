@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
   ShouldRevalidateFunction,
   useLoaderData,
+  useRouteLoaderData,
 } from '@remix-run/react'
 import cx from 'classnames'
 import styles from './root.module.css'
@@ -31,7 +32,6 @@ import Toaster, { useToast } from './components/Toast/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
-// import { loadServiceWorker, useSWEffect } from '@remix-pwa/sw'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -208,15 +208,6 @@ const App = () => {
 
   useToast(loaderData?.toast)
 
-  // TODO: fix SW requests
-  // React.useEffect(() => {
-  //   // Registering SW manually because Vite remix-pwa plugin
-  //   // adds <script> tag without CSP nonce value
-  //   loadServiceWorker()
-  // }, [])
-
-  // useSWEffect()
-
   return (
     <HoneypotProvider {...loaderData?.honeypotProps}>
       <Outlet />
@@ -225,6 +216,11 @@ const App = () => {
       <Toaster theme={theme} />
     </HoneypotProvider>
   )
+}
+
+export const useRootLoaderData = () => {
+  const rootContext = useRouteLoaderData<typeof loader>('root')
+  return rootContext!
 }
 
 export const ErrorBoundary = GeneralErrorBoundary

@@ -9,7 +9,7 @@ import { AsChildProps } from '../types/AsChildProps'
 
 export type ButtonOwnProps = Partial<
   React.PropsWithChildren<{
-    size: Exclude<ViewportSize, 'xs' | 'xl'>
+    size: Exclude<ViewportSize, 'xs'>
     fullWidth: boolean
     loading: boolean
     before: React.ReactNode
@@ -60,6 +60,8 @@ const Button = ({
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
+        [styles['button--size-xl']]: size === 'xl',
+        [styles['button--primary']]: variant === 'primary',
         [styles['button--fullWidth']]: fullWidth,
         [styles['button--align-start']]: align === 'start',
         [styles['button--align-end']]: align === 'end',

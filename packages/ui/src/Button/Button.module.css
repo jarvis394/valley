@@ -47,6 +47,10 @@
   --line-height: 16px;
 }
 
+.button.button--size-md.button--primary {
+  font-weight: 500;
+}
+
 .button.button--size-lg {
   border-radius: 16px;
   gap: 12px;
@@ -55,6 +59,16 @@
   --height: 48px;
   --font-size: 16px;
   --line-height: 18px;
+}
+
+.button.button--size-xl {
+  border-radius: 16px;
+  gap: 12px;
+  font-weight: 600;
+  --x-padding: 18px;
+  --height: 56px;
+  --font-size: 20px;
+  --line-height: 24px;
 }
 
 .button .button__before,

@@ -131,8 +131,9 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
 
   return redirect('/auth/onboarding/' + currentOnboardingStep, {
     headers: combineHeaders({
-      'set-cookie':
-        await onboardingSessionStorage.commitSession(onboardingSession),
+      'set-cookie': await onboardingSessionStorage.commitSession(
+        onboardingSession
+      ),
     }),
   })
 }

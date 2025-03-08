@@ -2,9 +2,9 @@ import React from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-import { Link, useNavigation, useRouteLoaderData } from '@remix-run/react'
+import { Link, useNavigation } from '@remix-run/react'
 import { ThemeSwitch } from '../resources+/theme-switch'
-import { loader as rootLoader } from '../../root'
+import { useRootLoaderData } from '../../root'
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,7 +14,7 @@ export const meta: MetaFunction = () => {
 }
 
 const HomeRoute = () => {
-  const data = useRouteLoaderData<typeof rootLoader>('root')
+  const data = useRootLoaderData()
   const navigation = useNavigation()
 
   return (

@@ -3,7 +3,13 @@ import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
 import Button from '@valley/ui/Button'
-import { MoreHorizontal, PencilEdit, Plus, Share } from 'geist-ui-icons'
+import {
+  MoreHorizontal,
+  PencilEdit,
+  Plus,
+  Share,
+  SortAscending,
+} from 'geist-ui-icons'
 import Divider from '@valley/ui/Divider'
 import Wrapper from '@valley/ui/Wrapper'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
@@ -74,6 +80,8 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
 import { getProjectFolder } from 'app/server/folder/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
+import { useRootLoaderData } from 'app/root'
+import { useUserStore } from 'app/utils/user'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -150,7 +158,15 @@ const ProjectHeader: React.FC<{
   project?: ProjectWithFolders | null
   currentFolder?: Folder
 }> = ({ project, currentFolder }) => {
+  const {
+    ENV: { GALLERY_SERVICE_URL },
+  } = useRootLoaderData()
+  const user = useUserStore((state) => state.data)
   const { openModal } = useModal()
+  const galleryUrl =
+    user &&
+    project &&
+    [GALLERY_SERVICE_URL, user.domains[0], 'gallery', project.url].join('/')
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
@@ -184,8 +200,21 @@ const ProjectHeader: React.FC<{
               Edit description
             </Button>
           </Hidden>
-          <Button size="lg" variant="primary">
-            Preview
+          <Button
+            className={cx(styles.project__headerVisitButton, {
+              [styles['project__headerVisitButton--disabled']]: !galleryUrl,
+            })}
+            size="lg"
+            variant="primary"
+            asChild
+          >
+            <a
+              href={galleryUrl || '#'}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Visit
+            </a>
           </Button>
           <Menu.Content>
             <Menu.Item before={<Share />}>Share project</Menu.Item>
@@ -428,17 +457,44 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
   }
 
   return (
-    <Stack direction={'column'} gap={{ sm: 4, md: 8 }}>
+    <Stack direction={'column'} gap={{ sm: 3, md: 4 }}>
       <Hidden asChild md lg xl>
-        <Stack asChild align={'center'} justify={'center'}>
+        <Stack asChild gap={3} align={'center'} justify={'center'}>
           <Wrapper>
             <UploadButton
               projectId={folder.projectId}
               folderId={folder.id}
               variant="compact"
             />
+            <IconButton variant="secondary-dimmed" size="xl">
+              <SortAscending />
+            </IconButton>
           </Wrapper>
         </Stack>
+      </Hidden>
+      <Hidden sm asChild>
+        <Wrapper asChild>
+          <Stack gap={4} align={'center'} justify={'space-between'}>
+            <Stack gap={4} align={'center'}>
+              <UploadButton
+                projectId={folder.projectId}
+                folderId={folder.id}
+                variant="button"
+                size="md"
+              />
+              <p className={styles.project__uploadHint}>
+                You can also drop files anywhere on the page
+              </p>
+            </Stack>
+            <Button
+              variant="secondary-dimmed"
+              size="md"
+              before={<SortAscending />}
+            >
+              Sort by date shot
+            </Button>
+          </Stack>
+        </Wrapper>
       </Hidden>
       <Wrapper className={styles.project__files} asChild>
         <ul>
@@ -455,13 +511,6 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
               items={files}
               strategy={rectSortingStrategy}
             >
-              <Hidden sm>
-                <UploadButton
-                  projectId={folder.projectId}
-                  folderId={folder.id}
-                  variant="square"
-                />
-              </Hidden>
               {files.map((file) => (
                 <FileCard
                   isCover={cover?.id === file.id}

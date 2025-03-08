@@ -13,8 +13,8 @@ import Uppy, { Meta, UppyFile } from '@uppy/core'
 import Tus from '@uppy/tus'
 import { HttpRequest, HttpResponse } from 'tus-js-client'
 import type { Folder, Project } from '@valley/db'
-import { useRevalidator, useRouteLoaderData } from '@remix-run/react'
-import { loader as rootLoader } from 'app/root'
+import { useRevalidator } from '@remix-run/react'
+import { useRootLoaderData } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
 import { invalidateCache } from 'app/utils/cache'
 import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
@@ -32,7 +32,7 @@ type UseUploadProps = {
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const inputId = useId()
   const revalidator = useRevalidator()
-  const rootContext = useRouteLoaderData<typeof rootLoader>('root')
+  const rootContext = useRootLoaderData()
   const $root = useRef<HTMLElement>(null)
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null

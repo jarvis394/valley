@@ -5,6 +5,22 @@
   height: 100%;
 }
 
+:global(.Button).project__headerVisitButton {
+  --x-padding: 24px !important;
+  font-weight: 600 !important;
+}
+
+:global(.Button).project__headerVisitButton--disabled {
+  pointer-events: none;
+}
+
+.project__uploadHint {
+  color: var(--text-hint);
+  font-size: 14px;
+  font-weight: 400;
+  user-select: none;
+}
+
 .project__foldersContainer {
   background-color: var(--background-paper);
   display: flex;

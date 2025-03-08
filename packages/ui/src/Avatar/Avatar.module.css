@@ -11,3 +11,7 @@
   font-size: 12px;
   user-select: none;
 }
+
+.avatar--square {
+  border-radius: 6px;
+}

@@ -1,0 +1,56 @@
+.select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select__select {
+  display: flex;
+  padding: 0 14px;
+  height: 48px;
+  font-size: 16px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  flex-grow: 1;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+.select:not(.select--error):not(.select--valid):not(:focus-within):hover
+  .select__select {
+  box-shadow: 0 0 0 1px inset var(--input-border-hovered);
+}
+
+.select:focus-within .select__select {
+  box-shadow:
+    0 0 0 1px inset var(--input-border-focused),
+    0 0 0 3px var(--input-border-focused-shadow);
+}
+
+.select--error:focus-within .select__select {
+  box-shadow:
+    0 0 0 1px inset var(--input-border-error),
+    0 0 0 3px var(--input-border-error-shadow);
+}
+
+.select--valid .select__select {
+  box-shadow: 0 0 0 1px inset var(--input-border);
+}
+
+.select--error .select__select {
+  box-shadow: 0 0 0 1px inset var(--input-border-error);
+}
+
+.select:not(.select--error):not(.select--valid):hover .select__icon {
+  color: var(--text-primary);
+}
+
+.select__icon {
+  position: absolute;
+  right: 14px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}

@@ -105,8 +105,9 @@ export class GitHubProvider implements AuthProvider {
     const searchParams = new URLSearchParams({ code, state })
     throw redirect(`/auth/github/callback?${searchParams}`, {
       headers: {
-        'set-cookie':
-          await connectionSessionStorage.commitSession(connectionSession),
+        'set-cookie': await connectionSessionStorage.commitSession(
+          connectionSession
+        ),
       },
     })
   }

@@ -1,15 +1,15 @@
 import React, { useId, useMemo, useState } from 'react'
-import styles from './TextField.module.css'
-import Input, { InputProps } from '../Input/Input'
+import styles from './SelectField.module.css'
+import cx from 'classnames'
+import { FormControl } from '../FormControl'
+import Select, { SelectRootProps } from '../Select/Select'
 import Label from '../Label/Label'
-import FormControl from '../FormControl/FormControl'
 import FormHelperText, {
   FormHelperTextProps,
 } from '../FormHelperText/FormHelperText'
 import { FieldError } from 'react-hook-form'
-import cx from 'classnames'
 
-export type TextFieldProps = InputProps & {
+export type SelectFieldProps = SelectRootProps & {
   fullWidth?: boolean
   label?: React.ReactElement | string
   helperText?: React.ReactElement | string
@@ -24,24 +24,22 @@ export type TextFieldProps = InputProps & {
   }
 }
 
-const TextField = React.forwardRef(function TextField(
-  {
-    label,
-    helperText,
-    validHelperText,
-    onFocus: propsOnFocus,
-    onBlur: propsOnBlur,
-    state: propsState,
-    fieldState: propsFieldState,
-    id: propsId,
-    required,
-    size,
-    formHelperTextProps,
-    fullWidth = true,
-    ...props
-  }: TextFieldProps,
-  ref: React.ForwardedRef<HTMLInputElement>
-) {
+const SelectField: React.FC<SelectFieldProps> = ({
+  state: propsState,
+  fullWidth,
+  label,
+  required,
+  id: propsId,
+  formHelperTextProps,
+  fieldState: propsFieldState,
+  helperText,
+  validHelperText,
+  onFocus: propsOnFocus,
+  onBlur: propsOnBlur,
+  children,
+  ref,
+  ...props
+}) => {
   const [focused, setFocused] = useState(false)
   const innerId = useId()
   const id = useMemo(() => propsId || innerId, [innerId, propsId])
@@ -67,12 +65,12 @@ const TextField = React.forwardRef(function TextField(
   const shouldShowErrorMessage = state === 'error' && propsFieldState?.error
   const shouldShowValidMessage = state === 'valid' && validHelperText
 
-  const onFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
+  const onFocus: React.FocusEventHandler<HTMLSelectElement> = (e) => {
     setFocused(true)
     propsOnFocus?.(e)
   }
 
-  const onBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
+  const onBlur: React.FocusEventHandler<HTMLSelectElement> = (e) => {
     setFocused(false)
     propsOnBlur?.(e)
   }
@@ -80,25 +78,27 @@ const TextField = React.forwardRef(function TextField(
   return (
     <FormControl
       state={state}
-      className={cx(styles.textField, {
-        [styles['textField--fullWidth']]: fullWidth,
+      className={cx(styles.selectField, {
+        [styles['selectField--fullWidth']]: fullWidth,
       })}
     >
       {label && (
-        <Label size={size} required={required} htmlFor={id} id={id + '-label'}>
+        <Label size={'lg'} required={required} htmlFor={id} id={id + '-label'}>
           {label}
         </Label>
       )}
-      <Input
+
+      <Select.Root
         {...props}
-        size={size}
         aria-invalid={propsFieldState?.error ? 'true' : 'false'}
         ref={ref}
         id={id}
         required={required}
         onFocus={onFocus}
         onBlur={onBlur}
-      />
+      >
+        {children}
+      </Select.Root>
 
       <FormHelperText {...formHelperTextProps}>
         {shouldShowPropsHelperText && helperText}
@@ -107,6 +107,6 @@ const TextField = React.forwardRef(function TextField(
       </FormHelperText>
     </FormControl>
   )
-})
+}
 
-export default React.memo(TextField)
+export default SelectField

@@ -1,0 +1,11 @@
+.selectField {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 300px;
+}
+
+.selectField--fullWidth {
+  width: 100%;
+  max-width: unset !important;
+}
