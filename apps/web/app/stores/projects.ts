@@ -13,6 +13,7 @@ type FolderWithFiles = Omit<Folder, 'files' | 'id' | 'projectId'> & {
 type ProjectWithFoldersMap = Omit<Project, 'folders' | 'id'> & {
   id: Project['id']
   folders: Record<Folder['id'], FolderWithFiles>
+  coverImage?: (Cover & { File: File }) | null
 }
 
 export type ProjectsState = {
@@ -20,6 +21,7 @@ export type ProjectsState = {
 }
 
 export type ProjectsAction = {
+  deleteProject: (id: string) => void
   setProject: (project: ProjectWithFoldersMap) => void
   setProjectFolders: (
     projectId: Project['id'],
@@ -38,15 +40,23 @@ export type ProjectsAction = {
   }) => void
 }
 
-// We add partial project to the store as we do not use
-// the full project object in app, therefore we can cast type
-const makeDefaultProject = (id: Project['id']): ProjectWithFoldersMap =>
-  ({
-    id,
-    folders: {},
-    totalFiles: 0,
-    totalSize: '0',
-  }) as ProjectWithFoldersMap
+const makeDefaultProject = (id: Project['id']): ProjectWithFoldersMap => ({
+  id,
+  folders: {},
+  totalFiles: 0,
+  totalSize: '0',
+  dateCreated: new Date(),
+  dateShot: new Date(),
+  dateUpdated: new Date(),
+  language: 'ru',
+  password: null,
+  protected: false,
+  storedUntil: null,
+  title: '',
+  translationStringsId: null,
+  url: '',
+  userId: '',
+})
 
 const makeDefaultFolder = (
   id: Folder['id'],
@@ -67,6 +77,10 @@ const makeDefaultFolder = (
 export const useProjectsStore = create<ProjectsState & ProjectsAction>()(
   immer((set) => ({
     projects: {},
+    deleteProject: (id) =>
+      set((state) => {
+        delete state.projects[id]
+      }),
     setProject: (project) =>
       set((state) => {
         for (const id in project.folders) {

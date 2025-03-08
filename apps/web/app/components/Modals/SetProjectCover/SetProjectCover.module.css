@@ -1,0 +1,14 @@
+.image {
+  height: 212px !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: linear-gradient(to top, var(--alpha-transparent-03), transparent);
+  outline: none;
+  border: 1px solid var(--alpha-transparent-07);
+  border-radius: 16px;
+}

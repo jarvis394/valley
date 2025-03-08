@@ -8,4 +8,6 @@
   border-radius: 50%;
   overflow: hidden;
   background: var(--alpha-transparent-12);
+  font-size: 12px;
+  user-select: none;
 }

@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import '@valley/ui/styles/theme.css'
 import '@valley/ui/styles/global.css'
 import '../styles/globals.css'
-import 'react-photo-album/styles.css'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

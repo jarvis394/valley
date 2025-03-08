@@ -59,21 +59,20 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
     console.log('Adding file to cache:', file)
 
     await invalidateCache([
-      getProjectCacheKey(file.projectId),
-      getFolderCacheKey(file.folderId),
+      getProjectCacheKey(file.data.projectId!),
+      getFolderCacheKey(file.data.folderId!),
     ])
 
     try {
       revalidator.revalidate()
       addFileToCache({
-        projectId: file.projectId,
-        folderId: file.folderId,
+        projectId: file.data.projectId!,
+        folderId: file.data.folderId!,
         file: {
-          ...file,
-          type: file.contentType,
-          dateCreated: new Date(file.dateCreated),
-          height: file.height || null,
-          width: file.width || null,
+          ...file.data,
+          dateCreated: new Date(file.data.dateCreated),
+          height: file.data.height || null,
+          width: file.data.width || null,
         },
       })
     } catch (e) {

@@ -268,7 +268,7 @@ export default class TusService {
   ) => {
     const { storage } = upload
     const metadata = upload.metadata as TusUploadMetadata
-    const contentType = metadata?.type || 'application/octet-stream'
+    const type = metadata?.type || 'application/octet-stream'
     const dateCreated = new Date()
     const folderId = metadata?.['folder-id']
     const projectId = metadata?.['project-id']
@@ -289,25 +289,27 @@ export default class TusService {
       .setBody({
         ok: true,
         type: TusHookType.PRE_FINISH,
-        folderId,
-        projectId,
-        size,
-        key: storage.path,
-        bucket: storage.bucket || 'files',
-        name,
-        dateCreated: dateCreated.toISOString(),
-        exifMetadata: {},
-        id: upload.id,
-        contentType,
-        isPendingDeletion: false,
-        canHaveThumbnails: false,
+        data: {
+          folderId,
+          projectId,
+          size,
+          key: storage.path,
+          bucket: storage.bucket || '',
+          name,
+          dateCreated: dateCreated.toISOString(),
+          exifMetadata: {},
+          id: upload.id,
+          type,
+          isPendingDeletion: false,
+          canHaveThumbnails: false,
+        },
       })
 
     try {
       const file = await this.fileService.createFileForProjectFolder({
         id: upload.id,
-        type: contentType,
-        bucket: storage.bucket || 'files',
+        type,
+        bucket: storage.bucket || '',
         key: storage.path,
         projectId,
         folderId,
@@ -317,10 +319,11 @@ export default class TusService {
       })
 
       // Add fields that can be returned after file creation
-      resBuilder.setBodyRecord('exifMetadata', file.exifMetadata)
-      resBuilder.setBodyRecord('canHaveThumbnails', file.canHaveThumbnails)
-      resBuilder.setBodyRecord('width', file.width)
-      resBuilder.setBodyRecord('height', file.height)
+      resBuilder.setBodyRecord('data', {
+        ...resBuilder.body.data,
+        ...file,
+        dateCreated: dateCreated.toISOString(),
+      })
 
       return { res, ...resBuilder.build() }
     } catch (e) {

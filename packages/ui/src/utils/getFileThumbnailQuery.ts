@@ -8,13 +8,15 @@ export const THUMBNAIL_SIZES = {
 
 export type ThumbnailSize = keyof typeof THUMBNAIL_SIZES
 
+export type GetFileThumbnailQueryProps = {
+  size: ThumbnailSize
+  file: File
+}
+
 export const getFileThumbnailQuery = ({
   size,
   file,
-}: {
-  size: ThumbnailSize
-  file: File
-}) => {
+}: GetFileThumbnailQueryProps) => {
   const qs = new URLSearchParams()
   const newWidth = THUMBNAIL_SIZES[size]
   const changeRatio = file.width ? newWidth / file.width : 1

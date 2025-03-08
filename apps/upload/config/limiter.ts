@@ -1,8 +1,10 @@
+import env from '#start/env'
 import { defineConfig, stores } from '@adonisjs/limiter'
 
 const limiterConfig = defineConfig({
-  default: 'redis',
+  default: env.get('REDIS_HOST') ? 'redis' : 'memory',
   stores: {
+    memory: stores.memory({}),
     redis: stores.redis({}),
   },
 })

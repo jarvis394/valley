@@ -37,6 +37,10 @@ export const getUserProject = ({
       folders: {
         orderBy,
       },
+      coverImage: {
+        include: { File: true },
+        where: { File: { isPendingDeletion: false } },
+      },
     },
   })
 }

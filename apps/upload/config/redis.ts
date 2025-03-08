@@ -4,18 +4,7 @@ import { InferConnections } from '@adonisjs/redis/types'
 
 const redisConfig = defineConfig({
   connection: 'main',
-
   connections: {
-    /*
-    |--------------------------------------------------------------------------
-    | The default connection
-    |--------------------------------------------------------------------------
-    |
-    | The main connection you want to use to execute redis commands. The same
-    | connection will be used by the session provider, if you rely on the
-    | redis driver.
-    |
-    */
     main: {
       host: env.get('REDIS_HOST'),
       port: env.get('REDIS_PORT'),
@@ -23,7 +12,7 @@ const redisConfig = defineConfig({
       db: 0,
       keyPrefix: 'valley',
       retryStrategy(times) {
-        return times > 10 ? null : times * 50
+        return times > 3 ? null : times * 50
       },
     },
   },

@@ -398,7 +398,7 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
   useEffect(() => {
     setFiles({ projectId, folderId, files: folder?.files || [] })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [folderId, projectId])
+  }, [folderId, projectId, folder?.files])
 
   if (!folder) return null
 

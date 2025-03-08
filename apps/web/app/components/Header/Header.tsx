@@ -9,13 +9,14 @@ import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
 import { Await, Link, useParams } from '@remix-run/react'
-import type { Project, User } from '@valley/db'
-import { useProjectAwait } from 'app/utils/project'
+import type { User } from '@valley/db'
+import { useProject } from 'app/utils/project'
 import Hidden from '@valley/ui/Hidden'
 import MenuExpand from '../svg/MenuExpand'
 import cx from 'classnames'
 import Skeleton from '@valley/ui/Skeleton'
 import { useUserAwait } from 'app/utils/user'
+import type { ProjectWithFolders } from '@valley/shared'
 
 const PathPartSkeleton: React.FC<{
   hideSlashOnSm?: boolean
@@ -64,7 +65,7 @@ const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
         className={styles.header__avatarAndNameContainer}
       >
         <Link to={'/projects'}>
-          <Avatar />
+          <Avatar>{user?.fullname[0]}</Avatar>
           <p className={styles.header__noShrink}>{user?.fullname}</p>
         </Link>
       </Stack>
@@ -72,7 +73,7 @@ const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
   )
 }
 
-const CurrentProject: React.FC<{ project?: Project | null }> = ({
+const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
   project,
 }) => {
   const { projectId } = useParams()
@@ -99,7 +100,7 @@ const CurrentProject: React.FC<{ project?: Project | null }> = ({
           className={styles.header__avatarAndNameContainer}
         >
           <Link to={'/projects/' + project?.id}>
-            <Avatar />
+            <Avatar file={project?.coverImage?.File} />
             <p>{lastProject?.title}</p>
           </Link>
         </Stack>
@@ -117,7 +118,7 @@ const CurrentProject: React.FC<{ project?: Project | null }> = ({
 
 const Header: React.FC = () => {
   const user = useUserAwait()
-  const data = useProjectAwait()
+  const project = useProject()
 
   return (
     <header
@@ -138,7 +139,7 @@ const Header: React.FC = () => {
               {(resolvedUser) => <CurrentUser user={resolvedUser} />}
             </Await>
           </Suspense>
-          <CurrentProject project={data.project} />
+          <CurrentProject project={project} />
         </Stack>
         <Stack gap={2} align={'center'} className={styles.header__after}>
           <Button size="sm" variant="secondary-dimmed" before={<LogoGithub />}>

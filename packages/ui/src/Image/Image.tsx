@@ -20,7 +20,7 @@ export type ImageOwnProps =
       file?: never
       thumbnail?: never
       imageHost?: never
-      src: string
+      src?: string
     }
 
 export type ImageProps = ImageOwnProps & {
@@ -62,8 +62,11 @@ const Image: React.FC<ImageProps> = ({
   imageHost = '',
   ...props
 }) => {
-  const { className: containerClassName, ...otherContainerProps } =
-    containerProps
+  const {
+    className: containerClassName,
+    style: containerStyle,
+    ...otherContainerProps
+  } = containerProps
   const [ref, loaded, onLoad] = useImageLoaded()
   const isHydrated = useHydrated()
   const imageSrc = useMemo(() => {
@@ -87,12 +90,17 @@ const Image: React.FC<ImageProps> = ({
   return (
     <div
       {...otherContainerProps}
+      style={{
+        aspectRatio: width && height ? +width / +height : undefined,
+        ...containerStyle,
+      }}
       className={cx(styles.image, containerClassName)}
+      data-loaded={loaded}
     >
       {!loaded && <Spinner className={styles.image__spinner} />}
       <img
         {...props}
-        className={cx(styles.image__image, className, 'fade')}
+        className={cx(className, 'fade')}
         data-fade-in={isHydrated ? loaded : true}
         ref={ref}
         onLoad={onLoad}

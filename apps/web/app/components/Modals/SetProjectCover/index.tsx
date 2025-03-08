@@ -1,18 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '@valley/ui/Button'
 import ModalHeader from '@valley/ui/ModalHeader'
 import ModalFooter from '@valley/ui/ModalFooter'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, useSearchParams } from '@remix-run/react'
+import { Form } from '@remix-run/react'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { useProject } from 'app/utils/project'
-import { ProjectWithFolders } from '@valley/shared'
+import { FolderWithFiles, ProjectWithFolders } from '@valley/shared'
 import ModalContent from '@valley/ui/ModalContent'
 import { ProjectSetCoverSchema } from 'app/routes/api+/projects+/$id.setCover'
 import ErrorModalContent from '../ErrorModalContent'
-import Note from '@valley/ui/Note'
+import styles from './SetProjectCover.module.css'
+import { useFolder } from 'app/utils/folder'
+import Image from '@valley/ui/Image'
 
 type FormData = z.infer<typeof ProjectSetCoverSchema>
 
@@ -21,21 +23,30 @@ const resolver = zodResolver(ProjectSetCoverSchema)
 type SetProjectCoverModalProps = { onClose: () => void }
 
 const ModalContents: React.FC<
-  SetProjectCoverModalProps & { project?: ProjectWithFolders | null }
-> = ({ onClose, project }) => {
-  const [searchParams] = useSearchParams()
-  const fileId = searchParams.get('modal-fileId')
+  SetProjectCoverModalProps & {
+    project?: ProjectWithFolders | null
+    folder: FolderWithFiles | null
+  }
+> = ({ onClose, project, folder }) => {
+  const searchParams = new URLSearchParams(window.location.search)
+  const [fileId] = useState(searchParams.get('modal-fileId'))
+  const file = folder?.files.find((e) => e.id === fileId)
   const formAction = '/api/projects/' + project?.id + '/setCover'
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
-    submitConfig: { action: formAction, method: 'POST' },
+    submitConfig: {
+      action: formAction,
+      method: 'POST',
+      navigate: true,
+      preventScrollReset: true,
+    },
   })
   const isPending = useIsPending({ formMethod: 'POST', formAction })
 
-  if (!fileId) {
+  if (!file) {
     return (
       <ErrorModalContent onClose={onClose} title="Set Cover">
-        Missing file ID
+        File not found
       </ErrorModalContent>
     )
   }
@@ -55,9 +66,14 @@ const ModalContents: React.FC<
             value={fileId || ''}
             hidden
           />
-          <Note variant="success" fill>
-            You are setting file {fileId} as project cover
-          </Note>
+          <Image
+            file={file}
+            thumbnail="md"
+            containerProps={{ className: styles.image }}
+          />
+          <p>
+            You are setting file <b>&quot;{file.name}&quot;</b> as project cover
+          </p>
         </Form>
       </ModalContent>
       <ModalFooter
@@ -92,8 +108,9 @@ const SetProjectCoverModal: React.FC<SetProjectCoverModalProps> = ({
   onClose,
 }) => {
   const project = useProject()
+  const folder = useFolder()
 
-  return <ModalContents onClose={onClose} project={project} />
+  return <ModalContents onClose={onClose} project={project} folder={folder} />
 }
 
 export default SetProjectCoverModal

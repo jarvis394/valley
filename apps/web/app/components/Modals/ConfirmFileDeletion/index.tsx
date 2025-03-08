@@ -24,7 +24,12 @@ const ModalContents: React.FC<
   const redirectTo = `/projects/${projectId}/folder/${folderId}`
   const formAction = `/api/files/${file?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
-    submitConfig: { navigate: true, action: formAction, method: 'POST' },
+    submitConfig: {
+      navigate: true,
+      action: formAction,
+      method: 'POST',
+      preventScrollReset: true,
+    },
   })
   const isPending = useIsPending({ formAction })
 

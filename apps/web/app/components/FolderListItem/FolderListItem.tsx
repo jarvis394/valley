@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { CheckCircleFill, PencilEdit, Trash } from 'geist-ui-icons'
 import { formatBytes } from 'app/utils/misc'
 import type { Folder } from '@valley/db'
-import { useParams } from '@remix-run/react'
+import { useNavigation, useParams } from '@remix-run/react'
 import DragIndicator from '../svg/DragIndicator'
 import {
   AnimateLayoutChanges,
@@ -38,12 +38,17 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
   ...props
 }) => {
   const { openModal } = useModal()
-  const { folderId } = useParams()
+  const { projectId, folderId } = useParams()
   const isActive = useMemo(() => {
     if (mode === 'edit') return false
     return folderId ? folderId === folder.id : folder.isDefaultFolder
   }, [folder.id, folder.isDefaultFolder, folderId, mode])
   const totalSize = formatBytes(Number(folder.totalSize))
+  const folderLink = '/projects/' + projectId + '/folder/' + folder.id
+  const navigation = useNavigation()
+  const isLoading =
+    navigation.state === 'loading' &&
+    navigation.location?.pathname === folderLink
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true })
   const {
@@ -93,6 +98,7 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
     <ButtonBase
       {...props}
       asChild
+      shimmer={isLoading}
       ref={setNodeRef}
       variant="tertiary"
       style={style}

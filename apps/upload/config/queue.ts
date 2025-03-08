@@ -10,11 +10,11 @@ export default defineConfig({
   queue: {},
   worker: {},
   jobs: {
-    attempts: 1,
-    // backoff: {
-    //   type: 'exponential',
-    //   delay: 5000,
-    // },
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000,
+    },
     removeOnComplete: 100,
     removeOnFail: 100,
   },
