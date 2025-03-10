@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "service_domain" DROP DEFAULT;

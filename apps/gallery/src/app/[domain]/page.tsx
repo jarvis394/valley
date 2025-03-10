@@ -1,7 +1,8 @@
 import Wrapper from '@valley/ui/Wrapper'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
-import { prisma } from '../../server/db'
+import { db } from '@valley/db'
 import { notFound } from 'next/navigation'
+import { queryUserByDomainSql } from '../../server/user'
 
 export default async function DomainHome({
   params,
@@ -9,29 +10,19 @@ export default async function DomainHome({
   params: Promise<{ domain: string }>
 }) {
   const domain = (await params).domain
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [
-        {
-          domains: { has: domain },
-        },
-        {
-          serviceDomain: domain,
-        },
-      ],
+  const user = await db.query.users.findFirst({
+    columns: {
+      domains: true,
+      name: true,
     },
-    include: {
+    where: () => queryUserByDomainSql(domain),
+    with: {
+      avatar: true,
       projects: {
-        include: {
-          folders: true,
-          coverImage: {
-            include: {
-              File: true,
-            },
-            where: {
-              File: {
-                isPendingDeletion: false,
-              },
+        with: {
+          cover: {
+            with: {
+              file: true,
             },
           },
         },
@@ -45,7 +36,7 @@ export default async function DomainHome({
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full gap-4">
-      <h1 className="text-2xl font-medium">{user?.fullname}</h1>
+      <h1 className="text-2xl font-medium">{user?.name}</h1>
       <Wrapper>
         <div className="grid min-sm:grid-cols-2 min-lg:grid-cols-3 min-xl:grid-cols-4 grid-cols-1 gap-4 w-full">
           {user.projects.map((project) => (

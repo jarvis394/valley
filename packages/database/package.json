@@ -4,31 +4,33 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "db:generate": "yarn db-env prisma generate --no-hints",
-    "db:deploy": "yarn db:generate && yarn db-env prisma migrate deploy && yarn db:seed",
-    "db:migrate": "yarn db-env prisma migrate dev",
-    "db:migrate:reset": "yarn db-env prisma migrate reset",
-    "db:studio": "yarn db-env prisma studio",
-    "db:seed": "yarn db-env ts-node prisma/seed.ts",
-    "db-env": "dotenvx run -f ../../.env --",
+    "db:introspect": "drizzle-kit introspect --config=drizzle.config.ts",
+    "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config=drizzle.config.ts",
+    "db:check": "drizzle-kit check --config=drizzle.config.ts",
+    "db:up": "drizzle-kit up --config=drizzle.config.ts",
+    "db:push": "drizzle-kit push --config=drizzle.config.ts",
+    "db:drop": "drizzle-kit drop --config=drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config=drizzle.config.ts --port 8090",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.14.2",
-    "@prisma/client": "^6.4.1",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "postgres": "^3.4.5",
+    "drizzle-orm": "^0.40.0",
+    "pg": "^8.13.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
-    "eslint": "^8.56.11",
-    "prisma": "^6.4.1"
+    "@types/pg": "^8.11.11",
+    "drizzle-kit": "^0.30.5",
+    "eslint": "^8.56.11"
   }
 }

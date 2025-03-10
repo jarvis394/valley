@@ -6,15 +6,21 @@ import { Share } from 'geist-ui-icons'
 import IconButton from '@valley/ui/IconButton'
 import dayjs from 'dayjs'
 import Skeleton from '@valley/ui/Skeleton'
-import { ProjectWithFolders } from '@valley/shared'
 import cx from 'classnames'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from '@valley/ui/Image'
 import { WEB_SERVICE_URL } from '../../config/constants'
+import { Cover, Project, File } from '@valley/db'
 
 export type ProjectCardOwnProps =
-  | { project: ProjectWithFolders; domain: string; loading?: false }
+  | {
+      project: Project & {
+        cover?: Array<Cover & { file: File }> | null
+      }
+      domain: string
+      loading?: false
+    }
   | { project?: never; domain?: never; loading: true }
 
 export type ProjectCardProps = ProjectCardOwnProps &
@@ -27,8 +33,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   domain,
   ...props
 }) => {
-  const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
-  const projectLink = `/${domain}/gallery/${project?.url}`
+  const timestamp = dayjs(project?.dateShot || project?.createdAt).format(
+    'MMMM D, YYYY'
+  )
+  const projectLink = `/${domain}/gallery/${project?.slug}`
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -51,10 +59,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           href={projectLink}
           className={styles.projectCard__cover}
         >
-          {project.coverImage && (
+          {project.cover && project.cover.length > 0 && (
             <Image
               alt={project.title}
-              file={project.coverImage.File}
+              file={project.cover[0].file}
               thumbnail="md"
               imageHost={WEB_SERVICE_URL}
             />

@@ -4,12 +4,12 @@
   "globalEnv": ["*"],
   "tasks": {
     "dev": {
-      "dependsOn": ["^db:generate", "@valley/shared#build"],
+      "dependsOn": ["@valley/shared#build"],
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^db:generate", "^build"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env", "!**/*.stories.{tsx,jsx,mdx}"],
       "outputs": [
         ".next/**",
@@ -21,9 +21,7 @@
     },
     "build:storybook": {},
     "lint": {},
-    "typecheck": {
-      "dependsOn": ["^db:generate"]
-    },
+    "typecheck": {},
     "start": {
       "cache": false
     },

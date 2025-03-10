@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1741635345341,
+      "tag": "0000_uneven_the_santerians",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741635624681,
+      "tag": "0001_loud_skullbuster",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1741635674888,
+      "tag": "0002_redundant_wolverine",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1741637264282,
+      "tag": "0003_parallel_bushwacker",
+      "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1741639974783,
+      "tag": "0004_broad_lockjaw",
+      "breakpoints": false
+    }
+  ]
+}

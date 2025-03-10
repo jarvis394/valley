@@ -28,7 +28,9 @@ type ProjectCardProps =
     }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
-  const timestamp = dayjs(project?.dateShot).format('MMMM D, YYYY')
+  const timestamp = dayjs(project?.dateShot || project?.createdAt).format(
+    'MMMM D, YYYY'
+  )
   const defaultFolderId =
     project?.folders.find((e) => e.isDefaultFolder)?.id ||
     project?.folders[0]?.id
@@ -51,10 +53,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           to={projectLink}
           className={styles.projectCard__cover}
         >
-          {project.coverImage && (
+          {project.cover && project.cover.length > 0 && (
             <Image
               alt={project.title}
-              file={project.coverImage.File}
+              file={project.cover[0].file}
               thumbnail="md"
             />
           )}
@@ -99,7 +101,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
         <div className={styles.projectCard__linkContainer}>
           <div className={styles.projectCard__link}>
             <LinkIcon />
-            <div>{project?.url}</div>
+            <div>{project?.slug}</div>
           </div>
           <IconButton size="sm" variant="secondary-dimmed">
             <Copy />
