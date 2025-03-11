@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import { redirectWithToast } from 'app/server/toast.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'

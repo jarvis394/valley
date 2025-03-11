@@ -2,15 +2,9 @@ import { type Submission } from '@conform-to/react'
 import { parseWithZod } from '@conform-to/zod'
 import { z } from 'zod'
 import { requireUserId } from '../../../server/auth/auth.server'
-import { prisma } from '../../../server/db.server'
 import { getDomainUrl } from '../../../utils/misc'
 import { redirectWithToast } from '../../../server/toast.server'
 import { generateTOTP, verifyTOTP } from '../../../server/totp.server'
-import {
-  handleVerification as handleLoginVerification,
-  shouldRequestTwoFA,
-} from '../login/login.server'
-import { handleVerification as handleOnboardingVerification } from '../onboarding+/onboarding.server'
 import {
   VerifySchema,
   verifyCodeKey,

@@ -36,6 +36,20 @@
       "when": 1741639974783,
       "tag": "0004_broad_lockjaw",
       "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1741712887331,
+      "tag": "0005_white_outlaw_kid",
+      "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1741727953164,
+      "tag": "0006_clever_cable",
+      "breakpoints": false
     }
   ]
 }

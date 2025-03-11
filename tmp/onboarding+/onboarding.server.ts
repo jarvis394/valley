@@ -1,10 +1,7 @@
 import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
 import { type VerifyFunctionArgs } from '../verify+/verify.server'
-import {
-  authenticator,
-  requireAnonymous,
-} from '../../../server/auth/auth.server'
+import { requireAnonymous } from 'app/server/auth/auth.server'
 import { z } from 'zod'
 import { connectionSessionStorage } from '../../../server/auth/connections.server'
 import { combineHeaders } from '../../../utils/misc'
@@ -131,9 +128,8 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
 
   return redirect('/auth/onboarding/' + currentOnboardingStep, {
     headers: combineHeaders({
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     }),
   })
 }

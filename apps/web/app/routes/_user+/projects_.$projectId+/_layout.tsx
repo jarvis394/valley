@@ -10,10 +10,6 @@ import ProjectToolbar from 'app/components/Toolbar/ProjectToolbar'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
-  getUserIdFromSession,
-  requireLoggedIn,
-} from 'app/server/auth/auth.server'
-import {
   combineServerTimings,
   makeTimings,
   time,
@@ -29,20 +25,16 @@ import { invariantResponse } from 'app/utils/invariant'
 import { getUserProject } from 'app/server/project/project.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { FolderWithFiles } from '@valley/shared'
+import { requireUserId } from 'app/server/auth/auth.server'
 
 export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  await requireLoggedIn(request)
-
   const { projectId } = params
   invariantResponse(projectId, 'Missing project ID in route params')
 
   const timings = makeTimings('project loader')
-  const userId = await time(getUserIdFromSession(request), {
-    timings,
-    type: 'project get userId from session',
-  })
+  const userId = await requireUserId(request)
 
   if (!userId) {
     return redirect('/auth/login')

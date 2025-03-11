@@ -8,8 +8,11 @@ import {
   drizzle as drizzlePg,
   type PostgresJsDatabase,
 } from 'drizzle-orm/postgres-js'
-import { schema } from '.'
+import * as schema from './schema'
 import postgres from 'postgres'
+import { init } from './env'
+
+init()
 
 export type Schema = typeof schema
 

@@ -10,23 +10,23 @@ import styles from './styles.module.css'
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
 import type { LoaderFunctionArgs } from '@remix-run/node'
-import { requireLoggedIn, requireUserId } from '../../server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
+import { requireUserId } from '../../server/auth/auth.server'
 import { UserFull } from '@valley/shared'
 import { useUserStore } from 'app/utils/user'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
+import { db, users } from '@valley/db'
+import { eq } from 'drizzle-orm'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await requireLoggedIn(request)
   // TODO: deal with `throw redirect` in defer loders
   const userId = await requireUserId(request)
-  const user = new Promise<UserFull | null>((res) =>
-    prisma.user
-      .findUnique({
-        where: { id: userId },
-        include: {
-          settings: true,
+  const user = new Promise<UserFull | undefined>((res) =>
+    db.query.users
+      .findFirst({
+        where: eq(users.id, userId),
+        with: {
+          userSettings: true,
         },
       })
       .then(res)
@@ -43,7 +43,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-const UserCache: React.FC<{ user: UserFull | null }> = ({ user }) => {
+const UserCache: React.FC<{ user?: UserFull }> = ({ user }) => {
   const setUser = useUserStore((state) => state.setUser)
 
   useEffect(() => {

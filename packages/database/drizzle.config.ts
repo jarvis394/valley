@@ -7,7 +7,7 @@ dotenv.config({ path: path.join('../../.env') })
 export default defineConfig({
   dialect: 'postgresql',
   out: './src/drizzle',
-  schema: './src/schema/*.ts',
+  schema: './src/schema/index.ts',
   // Resulting schema fields are in snake_case
   casing: 'snake_case',
   dbCredentials: {

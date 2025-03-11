@@ -8,7 +8,6 @@ import {
   data,
   HeadersFunction,
 } from '@remix-run/node'
-import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
 import { prepareVerification } from '../verify+/verify.server'
@@ -21,7 +20,12 @@ import { PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
-import { redirectToKey, targetKey } from '../verify+'
+import {
+  redirectToKey,
+  targetKey,
+  VerificationType,
+  verifyTypeKey,
+} from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkHoneypot } from 'app/server/honeypot.server'
 import {
@@ -31,6 +35,9 @@ import {
 } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import TextField from '@valley/ui/TextField'
+import { db, users } from '@valley/db'
+import { eq } from 'drizzle-orm'
+import { auth } from '@valley/auth'
 
 const SignupSchema = z.intersection(
   z.object({
@@ -66,9 +73,9 @@ export async function action({ request }: ActionFunctionArgs) {
     )
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email: submissionData.email },
-    select: { id: true },
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, submissionData.email),
+    columns: { id: true },
   })
 
   if (existingUser) {
@@ -87,29 +94,26 @@ export async function action({ request }: ActionFunctionArgs) {
     )
   }
 
-  const { verifyUrl, redirectTo, otp } = await prepareVerification({
-    period: 10 * 60,
-    request,
-    type: 'onboarding',
-    target: submissionData.email,
-    redirectTo: submissionData.redirectTo,
+  const response = await auth.api.sendVerificationOTP({
+    body: {
+      email: submissionData.email,
+      type: 'sign-in',
+    },
   })
 
-  const response = await sendRegisterEmail({
-    code: otp,
-    email: submissionData.email,
-    magicLink: verifyUrl.toString(),
-  })
+  const searchParams = new URLSearchParams()
+  searchParams.set(targetKey, submissionData.email)
+  searchParams.set(verifyTypeKey, 'onboarding' satisfies VerificationType)
 
-  if (response.status === 'success') {
-    return redirect(redirectTo.toString())
+  if (response.success) {
+    return redirect('/auth/verify?' + searchParams.toString())
   } else {
     return data(
       {
         errors: {
           email: {
             type: 'value',
-            message: response.error.message,
+            message: 'Cannot register right now, try again later',
           },
         } satisfies FieldErrors<FormData>,
       },

@@ -1,8 +1,9 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { db, files, folders, projects } from '@valley/db'
 import { redirectToKey } from 'app/routes/_.auth+/verify+'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import { invariantResponse } from 'app/utils/invariant'
+import { and, eq, notExists, sql } from 'drizzle-orm'
 
 export const loader = () => redirect('/projects')
 
@@ -11,20 +12,23 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const { id } = params
   const url = new URL(request.url)
   const redirectTo = url.searchParams.get(redirectToKey)
+  const isUsersProject = db
+    .select({
+      id: sql`1`,
+    })
+    .from(projects)
+    .where(eq(projects.userId, user.id))
+    .as('isUsersProject')
+
+  invariantResponse(id, 'No file ID found in params')
 
   try {
-    const file = await prisma.file.findFirst({
-      where: {
-        id,
-        // Is not deleted
-        isPendingDeletion: false,
-        // Belongs to user
-        Folder: { Project: { userId: user.id } },
-      },
-      include: {
-        Folder: {
-          include: {
-            Project: true,
+    const file = await db.query.files.findFirst({
+      where: and(eq(files.id, id), isUsersProject, notExists(files.deletedAt)),
+      with: {
+        folder: {
+          with: {
+            project: true,
           },
         },
       },
@@ -32,46 +36,44 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
 
     invariantResponse(file, 'File not found', { status: 404 })
 
-    if (file.Folder) {
-      await prisma.$transaction(async (tx) => {
-        if (!file.Folder || !file.folderId) return
+    if (file.folder) {
+      await db.transaction(async (tx) => {
+        if (!file.folder || !file.folderId) return
 
-        const newFolderTotalFiles = file.Folder.totalFiles - 1
+        const newFolderTotalFiles = file.folder.totalFiles - 1
         const newFolderTotalSize =
-          Number(file.Folder.totalSize) - Number(file.size)
-        const newProjectTotalFiles = file.Folder.Project.totalFiles - 1
+          Number(file.folder.totalSize) - Number(file.size)
+        const newProjectTotalFiles = file.folder.project.totalFiles - 1
         const newProjectTotalSize =
-          Number(file.Folder.Project.totalSize) - Number(file.size)
+          Number(file.folder.project.totalSize) - Number(file.size)
 
-        await tx.file.update({
-          where: { id: file.id },
-          data: { isPendingDeletion: true, folderId: null },
-        })
-        await tx.folder.update({
-          where: {
-            id: file.folderId,
-          },
-          data: {
+        await tx
+          .update(files)
+          .set({ deletedAt: new Date(), folderId: null })
+          .where(eq(files.id, file.id))
+        await tx
+          .update(folders)
+          .set({
             totalFiles: newFolderTotalFiles,
             totalSize: newFolderTotalSize.toString(),
-          },
-        })
-        await tx.project.update({
-          where: {
-            id: file.Folder.projectId,
-          },
-          data: {
+          })
+          .where(eq(folders.id, file.folderId))
+        await tx
+          .update(projects)
+          .set({
             totalFiles: newProjectTotalFiles,
             totalSize: newProjectTotalSize.toString(),
-          },
-        })
+          })
+          .where(eq(projects.id, file.folder.projectId))
       })
     }
 
-    return redirect(
-      redirectTo ||
-        '/projects/' + file.Folder?.projectId + '/folder/' + file.folderId
-    )
+    if (redirectTo) return redirect(redirectTo)
+    if (file.folder)
+      return redirect(
+        '/projects/' + file.folder.projectId + '/folder/' + file.folderId
+      )
+    else return '/projects'
   } catch (e) {
     if (e instanceof Response) {
       throw e

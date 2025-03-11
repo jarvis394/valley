@@ -14,7 +14,7 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 
 const covers = [
   '/assets/cover-1.webp',
@@ -26,26 +26,11 @@ const covers = [
   '/assets/cover-7.webp',
   '/assets/cover-8.webp',
 ]
-const COVER_SWITCH_INTERVAL = 10000
+const COVER_SWITCH_INTERVAL = 7000
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
-  return null
-}
-
-export const meta: MetaFunction = () => {
-  return [
-    {
-      name: 'theme-color',
-      media: '(prefers-color-scheme: light)',
-      content: '#fafafa',
-    },
-    {
-      name: 'theme-color',
-      media: '(prefers-color-scheme: dark)',
-      content: '#0a0a0a',
-    },
-  ]
+  return {}
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {

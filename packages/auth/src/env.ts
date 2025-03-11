@@ -2,15 +2,9 @@ import { z } from 'zod'
 
 const schema = z.object({
   NODE_ENV: z.enum(['production', 'development', 'staging', 'test'] as const),
-  DATABASE_URL: z.string(),
-  REDIS_URL: z.string().optional(),
-  TUSD_URL: z.string(),
-  UPLOAD_SERVICE_URL: z.string(),
-  GALLERY_SERVICE_URL: z.string(),
+  DATABASE_DRIVER: z.enum(['neon', 'postgres']),
   SESSION_SECRET: z.string(),
   RESEND_API_KEY: z.string().optional().default('MOCK_'),
-  WEB_PORT: z.string(),
-  HOST: z.string().optional(),
 
   // GitHub OAuth
   GITHUB_TOKEN: z.string(),
@@ -39,32 +33,7 @@ export function init() {
   }
 }
 
-/**
- * This is used in both `entry.server.ts` and `root.tsx` to ensure that
- * the environment variables are set and globally available before the app is
- * started.
- *
- * WARNING: Do **not** add any environment variables in here that you do not wish to
- * be included in the client.
- * @returns all public ENV variables
- */
-export function getEnv() {
-  return {
-    MODE: process.env.NODE_ENV,
-    UPLOAD_SERVICE_URL: process.env.UPLOAD_SERVICE_URL,
-    GALLERY_SERVICE_URL: process.env.GALLERY_SERVICE_URL,
-    TUSD_URL: process.env.TUSD_URL,
-  }
-}
-
-type ENV = ReturnType<typeof getEnv>
-
 declare global {
-  export const ENV: ENV
-  interface Window {
-    ENV: ENV
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv extends z.infer<typeof schema> {}

@@ -1,23 +1,8 @@
-import { createId as cuid } from '@paralleldrive/cuid2'
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
-import { z } from 'zod'
 import { combineHeaders } from '../utils/misc'
+import { Toast, ToastInput, ToastSchema } from '@valley/ui/Toast'
 
 const toastKey = 'toast'
-const ToastSchema = z.object({
-  description: z.string(),
-  id: z
-    .string()
-    .or(z.number())
-    .default(() => cuid()),
-  title: z.string().optional(),
-  type: z
-    .enum(['default', 'success', 'info', 'warning', 'error'])
-    .default('default'),
-})
-
-export type Toast = z.infer<typeof ToastSchema>
-export type ToastInput = z.input<typeof ToastSchema>
 
 export const toastSessionStorage = createCookieSessionStorage<{
   toast: Toast

@@ -6,22 +6,24 @@ import {
   type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
-import { login, requireAnonymous } from '../../../server/auth/auth.server'
+import { requireAnonymous } from 'app/server/auth/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
-import { PasswordSchema, EmailSchema } from '../../../utils/user-validation'
+import { PasswordSchema, EmailSchema } from 'app/utils/user-validation'
 import { z } from 'zod'
-import { handleNewSession } from '../login/login.server'
-import { useIsPending } from '../../../utils/misc'
-import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
-import { redirectToKey, targetKey } from '../verify+'
-import PasswordField from '../../../components/PasswordField/PasswordField'
+import { safeRedirect } from 'remix-utils/safe-redirect'
+import { useIsPending } from 'app/utils/misc'
+import AuthFormHeader from 'app/components/AuthFormHeader/AuthFormHeader'
+import PasswordField from 'app/components/PasswordField/PasswordField'
+import { redirectToKey, targetKey } from 'app/config/paramsKeys'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import Stack from '@valley/ui/Stack'
 import { createToastHeaders } from 'app/server/toast.server'
+import { auth } from '@valley/auth'
+import { redirect } from '@remix-run/router'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -54,8 +56,14 @@ export async function action({ request }: ActionFunctionArgs) {
     return { errors, defaultValues }
   }
 
-  const session = await login(data)
-  if (!session) {
+  const response = await auth.api.signInEmail({
+    body: {
+      email: data.email,
+      password: data.password,
+    },
+  })
+
+  if (!response.user) {
     return {
       errors: {
         password: {
@@ -67,19 +75,15 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
-  return handleNewSession(
-    {
-      request,
-      session,
-      redirectTo: data.redirectTo,
-    },
-    {
-      headers: await createToastHeaders({
-        type: 'info',
-        description: 'You are now logged in',
-      }),
-    }
-  )
+  const toastHeaders = await createToastHeaders({
+    type: 'info',
+    description: 'You are now logged in',
+  })
+  const redirectTo = safeRedirect(data.redirectTo, '/projects')
+
+  return redirect(redirectTo, {
+    headers: toastHeaders,
+  })
 }
 
 const LoginViaEmailPage: React.FC = () => {

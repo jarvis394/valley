@@ -1,0 +1,34 @@
+{
+  "name": "@valley/auth",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./lib/*": "./src/lib/*.ts",
+    "./components/*": "./src/components/*.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0 --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@valley/database": "*",
+    "@valley/ui": "*",
+    "better-auth": "^1.2.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@valley/shared": "*",
+    "@dotenvx/dotenvx": "^1.14.2"
+  },
+  "devDependencies": {
+    "@valley/eslint-config": "*",
+    "@valley/typescript-config": "*",
+    "@types/node": "^22.9.0",
+    "eslint": "^8.56.11",
+    "typescript": "^5.7.2"
+  }
+}

@@ -4,6 +4,7 @@ import {
   type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Await, useLoaderData } from '@remix-run/react'
+import { accounts, db, users } from '@valley/db'
 import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
 import Spinner from '@valley/ui/Spinner'
@@ -19,11 +20,11 @@ import { VerificationType } from 'app/routes/_.auth+/verify+'
 import { requireUserId } from 'app/server/auth/auth.server'
 import { resolveConnectionData } from 'app/server/auth/connections.server'
 import { AuthProvider } from 'app/server/auth/providers/provider'
-import { prisma } from 'app/server/db.server'
 import { makeTimings } from 'app/server/timing.server'
 import { createToastHeaders } from 'app/server/toast.server'
 import { invariantResponse } from 'app/utils/invariant'
 import dayjs from 'dayjs'
+import { eq } from 'drizzle-orm'
 import React, { Suspense } from 'react'
 
 export const twoFAVerificationType = '2fa' satisfies VerificationType
@@ -39,25 +40,29 @@ export type ConnectionData = {
 }
 
 const userCanDeleteConnections = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    select: {
-      password: { select: { userId: true } },
-      _count: { select: { connections: true } },
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: {},
+    with: {
+      accounts: {
+        columns: {
+          password: true,
+        },
+      },
     },
-    where: { id: userId },
   })
   // user can delete their connections if they have a password
-  if (user?.password) return true
+  if (user?.accounts.some((e) => e.password)) return true
   // users have to have more than one remaining connection to delete one
-  return Boolean(user?._count.connections && user?._count.connections > 1)
+  return Boolean(user && user.accounts.length > 1)
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
   const timings = makeTimings('profile connections loader')
-  const rawConnections = await prisma.connection.findMany({
-    select: { id: true, providerName: true, providerId: true, createdAt: true },
-    where: { userId },
+  const rawConnections = await db.query.accounts.findMany({
+    columns: { id: true, providerId: true, createdAt: true },
+    where: eq(accounts.userId, userId),
   })
   const connections = new Promise<ConnectionData[]>((res) => {
     const result: ConnectionData[] = []

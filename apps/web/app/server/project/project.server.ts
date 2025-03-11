@@ -1,22 +1,27 @@
-import type { Prisma, Project, User } from '@valley/db'
-import { prisma } from '../db.server'
+import {
+  db,
+  files,
+  folders,
+  projects,
+  type Project,
+  type User,
+} from '@valley/db'
 import { ProjectWithFolders } from '@valley/shared'
+import { and, asc, desc, eq, notExists } from 'drizzle-orm'
 
 export const getUserProjects = ({
   userId,
-  orderBy = { dateCreated: 'desc' },
 }: {
   userId: User['id']
-  orderBy?: Prisma.ProjectFindManyArgs['orderBy']
 }): Promise<ProjectWithFolders[]> => {
-  return prisma.project.findMany({
-    orderBy,
-    where: { userId },
-    include: {
+  return db.query.projects.findMany({
+    orderBy: desc(projects.createdAt),
+    where: eq(projects.userId, userId),
+    with: {
       folders: true,
-      coverImage: {
-        include: { File: true },
-        where: { File: { isPendingDeletion: false } },
+      cover: {
+        with: { file: true },
+        where: notExists(files.deletedAt),
       },
     },
   })
@@ -25,21 +30,19 @@ export const getUserProjects = ({
 export const getUserProject = ({
   userId,
   projectId,
-  orderBy = { dateCreated: 'asc' },
 }: {
   userId: User['id']
   projectId: Project['id']
-  orderBy?: Prisma.FolderFindManyArgs['orderBy']
-}): Promise<ProjectWithFolders | null> => {
-  return prisma.project.findFirst({
-    where: { id: projectId, userId },
-    include: {
+}): Promise<ProjectWithFolders | undefined> => {
+  return db.query.projects.findFirst({
+    where: and(eq(projects.id, projectId), eq(projects.userId, userId)),
+    with: {
       folders: {
-        orderBy,
+        orderBy: asc(folders.createdAt),
       },
-      coverImage: {
-        include: { File: true },
-        where: { File: { isPendingDeletion: false } },
+      cover: {
+        with: { file: true },
+        where: notExists(files.deletedAt),
       },
     },
   })

@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { db, folders, projects } from '@valley/db'
+import { eq, and, sql } from 'drizzle-orm'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+import { invariantResponse } from 'app/utils/invariant'
 
 export const PROJECT_FOLDER_TITLE_MAX_LENGTH = 64
 export const PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH = 4096
@@ -48,14 +50,22 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
+  invariantResponse(id, 'No folder ID found in params')
+
   try {
-    const folder = await prisma.folder.update({
-      where: { id, Project: { userId: user.id } },
-      select: { projectId: true, id: true },
-      data: {
-        ...submissionData,
-      },
-    })
+    const isUsersProject = db
+      .select({
+        id: sql`1`,
+      })
+      .from(projects)
+      .where(eq(projects.userId, user.id))
+      .as('isUsersProject')
+
+    const [folder] = await db
+      .update(folders)
+      .set(submissionData)
+      .where(and(eq(folders.id, id), isUsersProject))
+      .returning()
 
     return redirect('/projects/' + folder.projectId + '/folder/' + folder.id)
   } catch (_e) {

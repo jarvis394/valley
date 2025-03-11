@@ -1,5 +1,5 @@
 import { defaultCUID, defaultId, timestamps } from '../extend'
-import { pgTable, varchar } from 'drizzle-orm/pg-core'
+import { boolean, pgTable, varchar } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferSelectModel,
@@ -15,6 +15,8 @@ import { accounts } from './accounts'
 export const users = pgTable('users', {
   id: varchar().default(defaultId).primaryKey().notNull(),
   email: varchar().notNull().unique(),
+  emailVerified: boolean().notNull().default(false),
+  onboarded: boolean().notNull().default(false),
   name: varchar().notNull(),
   /**
    * User gallery domains list.
@@ -22,6 +24,7 @@ export const users = pgTable('users', {
    */
   domains: varchar()
     .array()
+    .notNull()
     .default(sql`'{}'::varchar[]`),
   /** Unchangable user gallery domain */
   serviceDomain: varchar().$defaultFn(defaultCUID).notNull(),

@@ -4,10 +4,6 @@ import { data, Link, ShouldRevalidateFunction } from '@remix-run/react'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
-import {
-  getUserIdFromSession,
-  requireLoggedIn,
-} from 'app/server/auth/auth.server'
 import React from 'react'
 import styles from './projects.module.css'
 import ProjectCard from 'app/components/ProjectCard/ProjectCard'
@@ -36,23 +32,19 @@ import {
 import Menu from '@valley/ui/Menu'
 import { getUserProjects } from 'app/server/project/project.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
+import { auth } from '@valley/auth'
 
 export const getProjectsCacheKey = () => 'projects'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await requireLoggedIn(request)
-
+  const session = await auth.api.getSession({ headers: request.headers })
   const timings = makeTimings('projects loader')
-  const userId = await time(getUserIdFromSession(request), {
-    timings,
-    type: 'get userId from session',
-  })
 
-  if (!userId) {
+  if (!session) {
     return redirect('/auth/login')
   }
 
-  const projects = await time(getUserProjects({ userId }), {
+  const projects = await time(getUserProjects({ userId: session.user.id }), {
     timings,
     type: 'find projects',
   })
@@ -142,9 +134,7 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
 
   return (
     <Wrapper className={styles.projects__list}>
-      {projects?.map((project, i) => (
-        <ProjectCard project={project} key={i} />
-      ))}
+      {projects?.map((project, i) => <ProjectCard project={project} key={i} />)}
     </Wrapper>
   )
 }

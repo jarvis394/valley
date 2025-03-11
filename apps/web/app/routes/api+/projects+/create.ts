@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { db, projects } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import { UrlService } from 'app/server/services/url.server'
 import dayjs from 'dayjs'
 import { getValidatedFormData } from 'remix-hook-form'
@@ -51,28 +51,18 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
         .set('milliseconds', 0)
         .toDate()
     : null
-  const project = await prisma.project.create({
-    data: {
+  const [project] = await db
+    .insert(projects)
+    .values({
       title: submissionData.projectName,
       dateShot: submissionData.dateShot || undefined,
       storedUntil,
       protected: submissionData.visibility === 'private',
-      password: password || null,
-      url: UrlService.generateURL(submissionData.projectName),
-      User: {
-        connect: {
-          id: user.id,
-        },
-      },
-      folders: {
-        create: {
-          isDefaultFolder: true,
-          title: 'Default',
-          description: null,
-        },
-      },
-    },
-  })
+      passwordHash: password || null,
+      slug: UrlService.generateURL(submissionData.projectName),
+      userId: user.id,
+    })
+    .returning()
 
   return redirect('/projects/' + project.id)
 }

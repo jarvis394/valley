@@ -24,7 +24,6 @@ import {
   makeTimings,
   time,
 } from 'app/server/timing.server'
-import { getUserIdFromSession } from 'app/server/auth/auth.server'
 import {
   ClientLoaderFunction,
   Form,
@@ -82,6 +81,7 @@ import { getProjectFolder } from 'app/server/folder/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { useRootLoaderData } from 'app/root'
 import { useUserStore } from 'app/utils/user'
+import { auth } from '@valley/auth'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -95,20 +95,20 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   invariantResponse(folderId, 'Missing folder ID in route params')
   invariantResponse(projectId, 'Missing project ID in route params')
 
+  const session = await auth.api.getSession({ headers: request.headers })
   const timings = makeTimings('project folder loader')
-  const userId = await time(getUserIdFromSession(request), {
-    timings,
-    type: 'folder get userId from session',
-  })
 
-  if (!userId) {
+  if (!session) {
     return redirect('/auth/login')
   }
 
-  const folder = await time(getProjectFolder({ userId, projectId, folderId }), {
-    timings,
-    type: 'get folder',
-  })
+  const folder = await time(
+    getProjectFolder({ userId: session.user.id, projectId, folderId }),
+    {
+      timings,
+      type: 'get folder',
+    }
+  )
 
   if (!folder) {
     return redirect('/projects/' + projectId)
@@ -166,7 +166,7 @@ const ProjectHeader: React.FC<{
   const galleryUrl =
     user &&
     project &&
-    [GALLERY_SERVICE_URL, user.domains[0], 'gallery', project.url].join('/')
+    [GALLERY_SERVICE_URL, user.domains[0], 'gallery', project.slug].join('/')
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return
@@ -369,9 +369,9 @@ const ProjectBlock = React.memo(function ProjectBlock() {
 
   return (
     <>
-      <ProjectHeader project={project} currentFolder={currentFolder} />
+      <ProjectHeader project={project as ProjectWithFolders} currentFolder={currentFolder} />
       <Divider />
-      <ProjectFolders project={project} currentFolder={currentFolder} />
+      <ProjectFolders project={project as ProjectWithFolders} currentFolder={currentFolder} />
       <Divider />
       <FolderInfo currentFolder={currentFolder} />
     </>
@@ -391,7 +391,8 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
   const setFiles = useProjectsStore((state) => state.setFiles)
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
-  const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
+  // const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
+  const cover = files.find((e) => false)
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { delay: 200, tolerance: 5, distance: Infinity },
@@ -548,7 +549,7 @@ const ProjectRoute = () => {
   return (
     <div className={styles.project}>
       <ProjectBlock />
-      <FolderFiles folder={data.folder} />
+      <FolderFiles folder={data.folder as FolderWithFiles} />
     </div>
   )
 }

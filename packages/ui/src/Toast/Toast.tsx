@@ -1,11 +1,28 @@
 import React, { useEffect } from 'react'
 import { toast as toaster, Toaster as Sonner } from 'sonner'
-import { type Toast } from '../../server/toast.server'
 import styles from './Toast.module.css'
 import IconButton from '@valley/ui/IconButton'
 import { Cross } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
 import cx from 'classnames'
+import { z } from 'zod'
+import { createId as cuid } from '@paralleldrive/cuid2'
+
+export const ToastSchema = z.object({
+  description: z.string(),
+  id: z
+    .string()
+    .or(z.number())
+    .optional()
+    .default(() => cuid()),
+  title: z.string().optional(),
+  type: z
+    .enum(['default', 'success', 'info', 'warning', 'error'])
+    .default('default'),
+})
+
+export type Toast = z.infer<typeof ToastSchema>
+export type ToastInput = z.input<typeof ToastSchema>
 
 export const ToastElement: React.FC<{ toast: Toast }> = ({ toast }) => {
   const handleClose = () => {

@@ -1,10 +1,10 @@
 import { redirect, type LoaderFunction } from '@remix-run/node'
-import { isLoggedIn } from 'app/server/auth/auth.server'
+import { auth } from '@valley/auth'
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const loggedIn = await isLoggedIn(request)
+  const session = await auth.api.getSession({ headers: request.headers })
 
-  if (loggedIn) {
+  if (session) {
     return redirect('/projects')
   } else {
     return redirect('/auth/login')
