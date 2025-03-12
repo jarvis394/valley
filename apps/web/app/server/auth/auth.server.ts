@@ -1,10 +1,9 @@
 import { redirect } from '@remix-run/node'
 import { auth } from '@valley/auth'
-import { invariantResponse } from 'app/utils/invariant'
 
 type RedirectToProps = { redirectTo?: string | null }
 
-function getUnauthenticatedRedirectUrl(
+export function getUnauthenticatedRedirectUrl(
   request: Request,
   { redirectTo }: RedirectToProps = {}
 ) {
@@ -20,26 +19,52 @@ function getUnauthenticatedRedirectUrl(
   return loginRedirect
 }
 
-export const requireAnonymous = async (request: Request) => {
-  const session = await auth.api.getSession({
-    query: {
-      disableCookieCache: true,
-    },
+export const getSession = (
+  request: Request,
+  query?: {
+    disableCookieCache?: boolean
+  }
+) =>
+  auth.api.getSession({
+    ...query,
     headers: request.headers,
   })
 
-  if (session) {
+export const requireAnonymous = async (request: Request) => {
+  const pathname = new URL(request.url).pathname
+  const session = await getSession(request, {
+    disableCookieCache: true,
+  })
+
+  if (session && session.user.onboarded) {
     throw redirect('/projects')
+  }
+
+  if (
+    session &&
+    !session.user.onboarded &&
+    // TODO: kinda hacky, maybe refactor
+    // Do not infinitely redirect user on onboarding
+    !pathname.startsWith('/auth/onboarding')
+  ) {
+    throw redirect('/auth/onboarding')
   }
 }
 
-export async function getUserId(request: Request) {
-  const session = await auth.api.getSession({ headers: request.headers })
+export async function getUserId(
+  request: Request,
+  { redirectTo }: RedirectToProps = {}
+) {
+  const session = await getSession(request)
 
   // Other handlers might un-authenticate user,
   // redirect them to the home page
   if (!session) {
-    throw redirect('/auth/login')
+    throw redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
+  }
+
+  if (session && !session.user.onboarded) {
+    throw redirect('/auth/onboarding')
   }
 
   return session.user.id
@@ -62,10 +87,10 @@ export async function requireUser(
   request: Request,
   { redirectTo }: RedirectToProps = {}
 ) {
-  const session = await auth.api.getSession({ headers: request.headers })
+  const session = await getSession(request)
 
   if (!session) {
-    throw redirect('/auth/login')
+    throw redirect(getUnauthenticatedRedirectUrl(request, { redirectTo }))
   }
 
   return session.user

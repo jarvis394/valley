@@ -11,7 +11,7 @@ import Stack from '@valley/ui/Stack'
 import { useIsPending } from 'app/utils/misc'
 import { useProject } from 'app/utils/project'
 import { ProjectWithFolders } from '@valley/shared'
-import { redirectToKey } from 'app/routes/_.auth+/verify+'
+import { redirectToKey } from 'app/config/paramsKeys'
 import ErrorModalContent from '../ErrorModalContent'
 import ModalContent from '@valley/ui/ModalContent'
 

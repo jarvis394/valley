@@ -14,7 +14,6 @@ import TextField from '@valley/ui/TextField'
 import * as z from 'zod'
 import {
   EmailSchema,
-  PASSWORD_MIN_LENGTH,
   PasswordSchema,
 } from '../../../utils/user-validation'
 import Button from '@valley/ui/Button'
@@ -26,6 +25,7 @@ import FormCollapsibleField from '../../../components/FormCollapsibleField/FormC
 import FormHelperText from '@valley/ui/FormHelperText'
 import PasswordField from '../../../components/PasswordField/PasswordField'
 import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
+import { PASSWORD_MIN_LENGTH } from '@valley/shared'
 
 const SecurityFormSchema = z
   .object({

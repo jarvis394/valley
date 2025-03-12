@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { db, files, folders, projects } from '@valley/db'
-import { redirectToKey } from 'app/routes/_.auth+/verify+'
+import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { sql, eq } from 'drizzle-orm'

@@ -20,11 +20,22 @@ import { useCountdown } from 'usehooks-ts'
 import React, { useEffect, useState } from 'react'
 import { showToast } from '@valley/ui/Toast'
 import { auth } from '@valley/auth'
-import { getValidatedFormData, useRemixForm } from 'remix-hook-form'
+import {
+  getValidatedFormData,
+  RemixFormProvider,
+  useRemixForm,
+} from 'remix-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkHoneypot } from 'app/server/honeypot.server'
 import { Controller, FieldErrors } from 'react-hook-form'
-import { redirect } from '@remix-run/router'
+import { redirectWithToast } from 'app/server/toast.server'
+import { handleVerification as handleOnboardingVerification } from '../onboarding+/onboarding.server'
+import {
+  targetKey,
+  redirectToKey,
+  codeKey,
+  typeKey,
+} from 'app/config/paramsKeys'
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
@@ -32,10 +43,6 @@ export const handle: SEOHandle = {
 
 export const TOTP_RESEND_TIMEOUT = 30
 
-export const targetKey = 'target'
-export const verifyCodeKey = 'code'
-export const verifyTypeKey = 'type'
-export const redirectToKey = 'redirectTo'
 const types = [
   'auth',
   'onboarding',
@@ -46,8 +53,8 @@ const types = [
 const VerificationTypeSchema = z.enum(types)
 export type VerificationType = z.infer<typeof VerificationTypeSchema>
 export const VerifySchema = z.object({
-  [verifyCodeKey]: z.string().length(6),
-  [verifyTypeKey]: VerificationTypeSchema,
+  [codeKey]: z.string().length(6),
+  [typeKey]: VerificationTypeSchema,
   [targetKey]: z.string(),
   [redirectToKey]: z.string().optional(),
 })
@@ -74,37 +81,34 @@ export async function action({ request }: ActionFunctionArgs) {
     )
   }
 
-  try {
-    const result = await auth.api.signInEmailOTP({
-      body: {
-        email: submissionData[targetKey],
-        otp: submissionData[verifyCodeKey],
-      },
-      headers: request.headers,
-    })
+  const response = await auth.api.signInEmailOTP({
+    body: {
+      email: submissionData[targetKey],
+      otp: submissionData[codeKey],
+    },
+    headers: request.headers,
+    asResponse: true,
+    returnHeaders: true,
+  })
 
-    console.log(result)
-
-    switch (submissionData[verifyTypeKey]) {
+  if (response.ok) {
+    switch (submissionData[typeKey]) {
+      case 'auth':
+        return response
       case 'onboarding':
-        return redirect('/home')
+        return await handleOnboardingVerification({
+          target: submissionData[targetKey],
+          headers: response.headers,
+        })
       default:
-        return redirect('/home')
+        return await redirectWithToast('/auth/login', {
+          title: 'Not Implemented',
+          type: 'error',
+          description: 'This function was not implemented on backend',
+        })
     }
-  } catch (e) {
-    return data(
-      {
-        errors: {
-          code: {
-            type: 'value',
-            message: 'Invalid code',
-          },
-        } satisfies FieldErrors<FormData>,
-      },
-      {
-        status: 400,
-      }
-    )
+  } else {
+    return response
   }
 }
 
@@ -115,26 +119,25 @@ export default function VerifyRoute() {
   const isPending = useIsPending()
   const actionData = useActionData<typeof action>()
   const parseWithZodType = VerificationTypeSchema.safeParse(
-    searchParams.get(verifyTypeKey)
+    searchParams.get(typeKey)
   )
   const [count, { startCountdown, stopCountdown }] = useCountdown({
     countStart: TOTP_RESEND_TIMEOUT,
   })
   const target = searchParams.get(targetKey) || undefined
   const type = parseWithZodType.success ? parseWithZodType.data : '2fa'
-  const { handleSubmit, control, register } = useRemixForm<FormData>({
+  const methods = useRemixForm<FormData>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver,
     defaultValues: {
-      code: searchParams.get(verifyCodeKey) || undefined,
+      code: searchParams.get(codeKey) || undefined,
       redirectTo: searchParams.get(redirectToKey) || undefined,
       type,
       target,
     },
-    submitHandlers: {
-      onInvalid: (d) => console.log(d),
-    },
+    submitConfig: { viewTransition: true },
+    errors: actionData?.errors as FieldErrors<FormData>,
   })
 
   const isResendButtonDisabled = count !== 0 || didResendVerificationCode
@@ -150,9 +153,19 @@ export default function VerifyRoute() {
   }, [startCountdown])
 
   useEffect(() => {
-    if (actionData?.errors?.code) {
+    if (actionData?.code) {
+      let description = 'Unexpected error'
+      switch (actionData.code) {
+        case 'INVALID_OTP':
+          description = 'Invalid code'
+          break
+        case 'OTP_EXPIRED':
+          description = 'Verification has expired, try to authenticate again'
+          break
+      }
+
       showToast({
-        description: actionData.errors.code.message || 'Unexpected error',
+        description,
         type: 'error',
         id: 'verify-code',
       })
@@ -162,70 +175,72 @@ export default function VerifyRoute() {
   return (
     <main className={styles.auth__content}>
       <AuthFormHeader type={type} email={target} />
-      <Form
-        onSubmit={handleSubmit}
-        method="POST"
-        viewTransition
-        className={styles.auth__form}
-      >
-        <HoneypotInputs />
-        <Controller
-          control={control}
-          name="code"
-          render={({ field, fieldState }) => (
-            <OTPInput
-              inputProps={{
-                ...field,
-                autoComplete: 'one-time-code',
-                autoFocus: true,
-                autoCorrect: 'false',
-              }}
-              errors={[fieldState.error?.message]}
-            />
-          )}
-        />
-        <input {...register(verifyTypeKey)} hidden />
-        <input {...register(targetKey)} hidden />
-        <input {...register(redirectToKey)} hidden />
-        <Button
-          variant={count === 0 ? 'tertiary' : 'tertiary-dimmed'}
-          disabled={isResendButtonDisabled}
-          size="sm"
-          type="button"
-          onClick={handleCodeResend}
+      <RemixFormProvider {...methods}>
+        <Form
+          onSubmit={methods.handleSubmit}
+          method="POST"
+          viewTransition
+          className={styles.auth__form}
         >
-          {didResendVerificationCode && 'A new code has been sent'}
-          {!didResendVerificationCode &&
-            `Didn't recieve a code? Resend${count === 0 ? '' : ` (${count})`}`}
-        </Button>
-        <Button
-          fullWidth
-          variant="primary"
-          type="submit"
-          size="lg"
-          loading={isPending}
-          disabled={isPending}
-          style={{ viewTransitionName: 'auth-form-submit' }}
-        >
-          Submit
-        </Button>
-        <Button
-          asChild
-          variant="tertiary-dimmed"
-          before={<ArrowLeft />}
-          size="md"
-        >
-          {type === 'onboarding' ? (
-            <Link to="/auth/register" viewTransition>
-              Back to Sign Up options
-            </Link>
-          ) : (
-            <Link to="/auth/login" viewTransition>
-              Back to Login options
-            </Link>
-          )}
-        </Button>
-      </Form>
+          <HoneypotInputs />
+          <Controller
+            control={methods.control}
+            name={codeKey}
+            render={({ field, fieldState }) => (
+              <OTPInput
+                inputProps={{
+                  ...field,
+                  autoComplete: 'one-time-code',
+                  autoFocus: true,
+                  autoCorrect: 'false',
+                }}
+                errors={[fieldState.error?.message]}
+              />
+            )}
+          />
+          <input {...methods.register(typeKey)} hidden />
+          <input {...methods.register(targetKey)} hidden />
+          <input {...methods.register(redirectToKey)} hidden />
+          <Button
+            variant={count === 0 ? 'tertiary' : 'tertiary-dimmed'}
+            disabled={isResendButtonDisabled}
+            size="sm"
+            type="button"
+            onClick={handleCodeResend}
+          >
+            {didResendVerificationCode && 'A new code has been sent'}
+            {!didResendVerificationCode &&
+              `Didn't recieve a code? Resend${count === 0 ? '' : ` (${count})`}`}
+          </Button>
+          <Button
+            fullWidth
+            variant="primary"
+            type="submit"
+            size="lg"
+            loading={isPending}
+            disabled={isPending}
+            style={{ viewTransitionName: 'auth-form-submit' }}
+          >
+            Submit
+          </Button>
+          <Button
+            asChild
+            variant="tertiary-dimmed"
+            before={<ArrowLeft />}
+            size="md"
+          >
+            {type === 'onboarding' ? (
+              <Link to="/auth/register" viewTransition>
+                Back to Sign Up options
+              </Link>
+            ) : (
+              <Link to="/auth/login" viewTransition>
+                Back to Login options
+              </Link>
+            )}
+          </Button>
+        </Form>
+      </RemixFormProvider>
     </main>
   )
 }

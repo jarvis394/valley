@@ -8,7 +8,7 @@ import Note from '@valley/ui/Note'
 import { Form, useParams } from '@remix-run/react'
 import { useIsPending } from 'app/utils/misc'
 import { FolderWithFiles } from '@valley/shared'
-import { redirectToKey } from 'app/routes/_.auth+/verify+'
+import { redirectToKey } from 'app/config/paramsKeys'
 import ErrorModalContent from '../ErrorModalContent'
 import { useFolder } from 'app/utils/folder'
 

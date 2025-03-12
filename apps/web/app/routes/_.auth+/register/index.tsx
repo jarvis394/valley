@@ -10,22 +10,15 @@ import {
 } from '@remix-run/node'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
-import { prepareVerification } from '../verify+/verify.server'
-import { useIsPending } from '../../../utils/misc'
+import { getDomainUrl, useIsPending } from '../../../utils/misc'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
-import { sendRegisterEmail } from '../../../server/email.server'
 import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
 import { PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
-import {
-  redirectToKey,
-  targetKey,
-  VerificationType,
-  verifyTypeKey,
-} from '../verify+'
+import type { VerificationType } from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkHoneypot } from 'app/server/honeypot.server'
 import {
@@ -38,6 +31,7 @@ import TextField from '@valley/ui/TextField'
 import { db, users } from '@valley/db'
 import { eq } from 'drizzle-orm'
 import { auth } from '@valley/auth'
+import { typeKey, targetKey, redirectToKey } from 'app/config/paramsKeys'
 
 const SignupSchema = z.intersection(
   z.object({
@@ -53,6 +47,28 @@ const resolver = zodResolver(SignupSchema)
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
+}
+
+export function getRedirectToUrl({
+  request,
+  type,
+  target,
+  redirectTo,
+}: {
+  request: Request
+  type: VerificationType
+  target: string
+  redirectTo?: string
+}) {
+  const redirectToUrl = new URL(`${getDomainUrl(request)}/auth/verify`)
+  redirectToUrl.searchParams.set(typeKey, type)
+  redirectToUrl.searchParams.set(targetKey, target)
+
+  if (redirectTo) {
+    redirectToUrl.searchParams.set(redirectToKey, redirectTo)
+  }
+
+  return redirectToUrl
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -101,12 +117,15 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   })
 
-  const searchParams = new URLSearchParams()
-  searchParams.set(targetKey, submissionData.email)
-  searchParams.set(verifyTypeKey, 'onboarding' satisfies VerificationType)
+  const redirectTo = getRedirectToUrl({
+    request,
+    target: submissionData.email,
+    redirectTo: submissionData.redirectTo,
+    type: 'onboarding',
+  })
 
   if (response.success) {
-    return redirect('/auth/verify?' + searchParams.toString())
+    return redirect(redirectTo.toString())
   } else {
     return data(
       {

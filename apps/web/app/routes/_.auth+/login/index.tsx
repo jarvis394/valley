@@ -19,7 +19,7 @@ import { checkHoneypot } from 'app/server/honeypot.server'
 import { z } from 'zod'
 import { EmailSchema } from 'app/utils/user-validation'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
-import { redirectToKey, targetKey } from 'app/config/paramsKeys'
+import { redirectToKey, targetKey, typeKey } from 'app/config/paramsKeys'
 import TextField from '@valley/ui/TextField'
 import {
   getValidatedFormData,
@@ -31,6 +31,7 @@ import { FieldErrors } from 'react-hook-form'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { db } from '@valley/db'
 import { auth } from '@valley/auth'
+import { VerificationType } from '../verify+'
 
 const EmailFormSchema = z.intersection(
   z.object({
@@ -78,7 +79,6 @@ export async function action({ request }: ActionFunctionArgs) {
     with: {
       accounts: {
         columns: { password: true },
-        // where: (accounts, { exists }) => exists(accounts.password),
       },
     },
   })
@@ -102,6 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
   })
 
   if (response.success) {
+    searchParams.set(typeKey, 'auth' satisfies VerificationType)
     return redirect('/auth/verify?' + searchParams.toString())
   } else {
     return data(

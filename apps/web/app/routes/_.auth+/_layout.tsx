@@ -30,7 +30,7 @@ const COVER_SWITCH_INTERVAL = 7000
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
-  return {}
+  return null
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {

@@ -3488,30 +3488,10 @@
   resolved "https://registry.yarnpkg.com/@poppinss/validator-lite/-/validator-lite-2.1.0.tgz#9c4c769e3f68c1abc84430953aae12c0c6fe098b"
   integrity sha512-CfT8EPeB7jKxjCb5+KP32iu/0BB7cKlRRqMBcCwzky0WgFACsFlRtvHsy+CkOszHmNyOdoH3WoyMyoxVCu9qEw==
 
-"@prisma/adapter-neon@^6.4.1":
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/@prisma/adapter-neon/-/adapter-neon-6.4.1.tgz#67b794e4b621ecc3c1f31948bb141a0dd8f89123"
-  integrity sha512-9pgh5OR+tJfWCm6VNh6uxtUiBHvSKUBhCfrONMSMKmnYtPiY38bYwb5UXMwR+3CG+f4xmcACv0K7+UHWX8gaSw==
-  dependencies:
-    "@prisma/driver-adapter-utils" "6.4.1"
-    postgres-array "3.0.2"
-
 "@prisma/client@^6.4.1":
   version "6.4.1"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-6.4.1.tgz#2666796c862e71eb2a6f39e30b192236893e07d3"
   integrity sha512-A7Mwx44+GVZVexT5e2GF/WcKkEkNNKbgr059xpr5mn+oUm2ZW1svhe+0TRNBwCdzhfIZ+q23jEgsNPvKD9u+6g==
-
-"@prisma/debug@6.4.1":
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-6.4.1.tgz#b3b4982e107a456f848ced3386469b3a35bc76f3"
-  integrity sha512-Q9xk6yjEGIThjSD8zZegxd5tBRNHYd13GOIG0nLsanbTXATiPXCLyvlYEfvbR2ft6dlRsziQXfQGxAgv7zcMUA==
-
-"@prisma/driver-adapter-utils@6.4.1":
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/@prisma/driver-adapter-utils/-/driver-adapter-utils-6.4.1.tgz#001666772497e14b29c6cbae11ebda27dbb47286"
-  integrity sha512-WIVq6QUzz9HJXNa+6LmyLrW/KHOFQwmXYvpaVVECjwAUaAQXFw4g85i68GFPTYrfozwz5CntdHVVzXxInkk0fA==
-  dependencies:
-    "@prisma/debug" "6.4.1"
 
 "@radix-ui/primitive@1.1.1":
   version "1.1.1"
@@ -13957,11 +13937,6 @@ postcss@^8.0.0, postcss@^8.4.19, postcss@^8.4.35, postcss@^8.4.38, postcss@^8.4.
     nanoid "^3.3.8"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
-
-postgres-array@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/postgres-array/-/postgres-array-3.0.2.tgz#68d6182cb0f7f152a7e60dc6a6889ed74b0a5f98"
-  integrity sha512-6faShkdFugNQCLwucjPcY5ARoW1SlbnrZjmGl0IrrqewpvxvhSLHimCVzqeuULCbG0fQv7Dtk1yDbG3xv7Veog==
 
 postgres-array@~2.0.0:
   version "2.0.0"

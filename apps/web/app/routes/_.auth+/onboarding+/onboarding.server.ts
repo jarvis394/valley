@@ -1,9 +1,6 @@
-import { invariant } from '../../../utils/invariant'
 import { redirect } from '@remix-run/node'
-import { type VerifyFunctionArgs } from '../verify+/verify.server'
-import { requireAnonymous } from 'app/server/auth/auth.server'
+import { getSession, requireAnonymous } from 'app/server/auth/auth.server'
 import { z } from 'zod'
-import { connectionSessionStorage } from '../../../server/auth/connections.server'
 import { combineHeaders } from '../../../utils/misc'
 import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
 import { ProviderUser } from '../../../server/auth/providers/provider'
@@ -57,25 +54,28 @@ export async function requireOnboardingData(request: Request) {
   const lastName = onboardingSession.get('lastName')
   const phone = onboardingSession.get('phone')
   let currentOnboardingStep = onboardingSession.get('onboardingStep')
+  let userId = onboardingSession.get('userId')
 
   if (!currentOnboardingStep) {
     currentOnboardingStep = 'language-select'
     onboardingSession.set('onboardingStep', currentOnboardingStep)
   }
 
+  if (!userId) {
+    const session = await getSession(request)
+    if (!session) throw redirect('/auth/login')
+    userId = session.user.id
+  }
+
   if (providerName) {
     const { email } = await requireProviderData(request)
-    const connectionSession = await connectionSessionStorage.getSession(
-      request.headers.get('cookie')
-    )
     const prefilledProfile = onboardingSession.get('prefilledProfile')
-    const formError = connectionSession.get(authenticator.sessionErrorKey)
-    const hasError = typeof formError === 'string'
 
     return {
+      userId,
       currentOnboardingStep,
       submission: {
-        status: hasError ? 'error' : undefined,
+        status: undefined,
         prefilledProfile,
         data: {
           interfaceLanguage,
@@ -86,13 +86,14 @@ export async function requireOnboardingData(request: Request) {
           phone,
           email,
         },
-        error: { '': hasError ? [formError] : [] },
+        error: { '': [] },
       },
     }
   } else {
     const email = await requireOnboardingEmail(request)
 
     return {
+      userId,
       currentOnboardingStep,
       submission: {
         status: undefined,
@@ -111,15 +112,16 @@ export async function requireOnboardingData(request: Request) {
   }
 }
 
-export async function handleVerification({ submission }: VerifyFunctionArgs) {
-  invariant(
-    submission.status === 'success',
-    'Submission should be successful by now'
-  )
-
+export async function handleVerification({
+  target,
+  headers,
+}: {
+  target: string
+  headers: Headers
+}) {
   const onboardingSession = await onboardingSessionStorage.getSession()
   let currentOnboardingStep = onboardingSession.get('onboardingStep')
-  onboardingSession.set('email', submission.value.target)
+  onboardingSession.set('email', target)
 
   if (!currentOnboardingStep) {
     currentOnboardingStep = 'language-select'
@@ -127,9 +129,12 @@ export async function handleVerification({ submission }: VerifyFunctionArgs) {
   }
 
   return redirect('/auth/onboarding/' + currentOnboardingStep, {
-    headers: combineHeaders({
-      'set-cookie':
-        await onboardingSessionStorage.commitSession(onboardingSession),
-    }),
+    headers: combineHeaders(
+      {
+        'set-cookie':
+          await onboardingSessionStorage.commitSession(onboardingSession),
+      },
+      headers
+    ),
   })
 }

@@ -6,7 +6,11 @@ import {
   data,
 } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
-import { looseOptional, useIsPending } from '../../../utils/misc'
+import {
+  combineHeaders,
+  looseOptional,
+  useIsPending,
+} from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
@@ -19,11 +23,11 @@ import { NameSchema, PhoneSchema } from '../../../utils/user-validation'
 import TextField from '@valley/ui/TextField'
 import { Controller } from 'react-hook-form'
 import PhoneInput from 'react-phone-number-input/input'
-import { verifySessionStorage } from 'app/server/auth/verification.server'
 import { redirectWithToast } from 'app/server/toast.server'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { authSessionStorage } from 'app/server/auth/session.server'
 import { JSX } from 'react'
+import { auth } from '@valley/auth'
+import { db, userSettings } from '@valley/db'
 
 const DetailsFormSchema = z.object({
   firstName: NameSchema,
@@ -45,7 +49,7 @@ export const headers: HeadersFunction = ({ actionHeaders }) => {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { submission } = await requireOnboardingData(request)
+  const { submission, userId } = await requireOnboardingData(request)
   const {
     errors,
     data: submissionData,
@@ -61,16 +65,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   const url = new URL(request.url)
   const redirectTo = url.searchParams.get('redirectTo')
-
   const headers = new Headers()
   const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const verifySession = await verifySessionStorage.getSession(
-    request.headers.get('cookie')
-  )
-
-  const providerName = onboardingSession.get('provider')
+  // const providerName = onboardingSession.get('provider')
 
   onboardingSession.set('firstName', submissionData.firstName)
   submissionData.lastName &&
@@ -82,55 +81,39 @@ export async function action({ request }: ActionFunctionArgs) {
     await onboardingSessionStorage.commitSession(onboardingSession)
   )
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email: submission.data.email },
-    select: { id: true },
-  })
-
-  if (existingUser) {
-    return redirectWithToast(
-      request.url.toString(),
-      {
-        type: 'error',
-        description: 'A user already exists with this email',
+  if (submission.data.usePassword && submission.data.password) {
+    await auth.api.setPassword({
+      body: {
+        newPassword: submission.data.password,
       },
-      { headers }
-    )
+      headers: request.headers,
+    })
   }
 
-  const session = await register({
-    email: submission.data.email,
-    password: submission.data.usePassword
-      ? submission.data.password
-      : undefined,
-    connection:
-      providerName && submission.prefilledProfile?.id
-        ? {
-            providerId: submission.prefilledProfile?.id,
-            providerName,
-          }
-        : undefined,
-    fullname: [submissionData.firstName, submissionData.lastName]
-      .filter(Boolean)
-      .join(' '),
+  const response = await auth.api.updateUser({
+    body: {
+      name: [submissionData.firstName, submissionData.lastName]
+        .filter(Boolean)
+        .join(' '),
+      onboarded: true,
+    },
+    headers: request.headers,
+    returnHeaders: true,
   })
 
-  const authSession = await authSessionStorage.getSession(
-    request.headers.get('cookie')
-  )
-  authSession.set('sessionId', session.id)
-  authSession.set('userId', session.userId)
+  await db.insert(userSettings).values({
+    userId,
+    interfaceLanguage: submission.data.interfaceLanguage,
+    phone: submissionData.phone,
+  })
+  // connection:
+  //     providerName && submission.prefilledProfile?.id
+  //       ? {
+  //           providerId: submission.prefilledProfile?.id,
+  //           providerName,
+  //         }
+  //       : undefined,
 
-  headers.append(
-    'set-cookie',
-    await authSessionStorage.commitSession(authSession, {
-      expires: session.expirationDate,
-    })
-  )
-  headers.append(
-    'set-cookie',
-    await verifySessionStorage.destroySession(verifySession)
-  )
   headers.append(
     'set-cookie',
     await onboardingSessionStorage.destroySession(onboardingSession)
@@ -139,7 +122,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return redirectWithToast(
     safeRedirect(redirectTo || '/projects'),
     { description: 'You are now logged in', type: 'info' },
-    { headers }
+    { headers: combineHeaders(headers, response.headers) }
   )
 }
 
