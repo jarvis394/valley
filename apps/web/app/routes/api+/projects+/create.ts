@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { db, projects } from '@valley/db'
+import { db, folders, projects } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
 import { UrlService } from 'app/server/services/url.server'
 import dayjs from 'dayjs'
@@ -51,18 +51,34 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
         .set('milliseconds', 0)
         .toDate()
     : null
-  const [project] = await db
-    .insert(projects)
-    .values({
-      title: submissionData.projectName,
-      dateShot: submissionData.dateShot || undefined,
-      storedUntil,
-      protected: submissionData.visibility === 'private',
-      passwordHash: password || null,
-      slug: UrlService.generateURL(submissionData.projectName),
-      userId: user.id,
-    })
-    .returning()
 
-  return redirect('/projects/' + project.id)
+  const result = await db.transaction(async (tx) => {
+    const [project] = await tx
+      .insert(projects)
+      .values({
+        title: submissionData.projectName,
+        dateShot: submissionData.dateShot || undefined,
+        storedUntil,
+        protected: submissionData.visibility === 'private',
+        passwordHash: password || null,
+        slug: UrlService.generateURL(submissionData.projectName),
+        userId: user.id,
+      })
+      .returning()
+
+    const [folder] = await tx
+      .insert(folders)
+      .values({
+        projectId: project.id,
+        title: 'Default',
+        isDefaultFolder: true,
+      })
+      .returning()
+
+    return { project, folder }
+  })
+
+  return redirect(
+    '/projects/' + result.project.id + '/folder/' + result.folder.id
+  )
 }

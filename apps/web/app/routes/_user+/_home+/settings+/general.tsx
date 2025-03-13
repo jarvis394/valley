@@ -33,7 +33,7 @@ const AccountSettingsGeneral: React.FC<{
           <TextField
             {...register('fullname')}
             fieldState={getFieldState('fullname', formState)}
-            defaultValue={user?.fullname}
+            defaultValue={user?.name}
             size="lg"
             fullWidth={false}
           />

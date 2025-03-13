@@ -1,6 +1,7 @@
 import { useFormAction, useNavigation } from '@remix-run/react'
 import type { HTMLFormMethod } from '@remix-run/router'
 import prettyBytes from 'pretty-bytes'
+import { useMemo } from 'react'
 import * as z from 'zod'
 
 export function getErrorMessage(error: unknown) {
@@ -125,10 +126,14 @@ export function useIsPending({
 } = {}) {
   const contextualFormAction = useFormAction()
   const navigation = useNavigation()
-  const isPendingState =
-    state === 'non-idle'
-      ? navigation.state !== 'idle'
-      : navigation.state === state
+  const isPendingState = useMemo(
+    () =>
+      state === 'non-idle'
+        ? navigation.state !== 'idle'
+        : navigation.state === state,
+    [navigation.state, state]
+  )
+
   return (
     isPendingState &&
     navigation.formAction === (formAction ?? contextualFormAction) &&
@@ -150,10 +155,13 @@ export const parseCookies = () => {
   return document.cookie
     .split(';')
     .map((v) => v.split('='))
-    .reduce((acc, v) => {
-      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
-      return acc
-    }, {} as Record<string, string>)
+    .reduce(
+      (acc, v) => {
+        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
+        return acc
+      },
+      {} as Record<string, string>
+    )
 }
 
 export const lowerFirstLetter = (s: string) => {

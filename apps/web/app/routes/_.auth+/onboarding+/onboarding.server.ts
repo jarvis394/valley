@@ -11,7 +11,10 @@ export async function requireOnboardingEmail(request: Request) {
   const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const email = onboardingSession.get('email')
+  const onboardingSessionEmail = onboardingSession.get('email')
+  const session = await getSession(request)
+  const sessionEmail = session?.user.email
+  const email = sessionEmail || onboardingSessionEmail
 
   if (typeof email !== 'string' || !email) {
     throw redirect('/auth/register')

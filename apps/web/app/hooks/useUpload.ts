@@ -17,7 +17,7 @@ import { useRevalidator } from '@remix-run/react'
 import { useRootLoaderData } from 'app/root'
 import { useUploadsStore } from 'app/stores/uploads'
 import { invalidateCache } from 'app/utils/cache'
-import { getFolderCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
+import { getFilesCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 import { useProjectsStore } from 'app/stores/projects'
 import { parseCookies } from 'app/utils/misc'
@@ -60,7 +60,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
 
     await invalidateCache([
       getProjectCacheKey(file.data.projectId!),
-      getFolderCacheKey(file.data.folderId!),
+      getFilesCacheKey(file.data.folderId!),
     ])
 
     try {

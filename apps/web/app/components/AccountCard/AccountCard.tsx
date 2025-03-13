@@ -6,10 +6,9 @@ import {
   PROVIDER_MANAGE_LINKS,
   PROVIDER_WEBSITES,
 } from 'app/config/connections'
-import { ConnectionData } from 'app/routes/_user+/_home+/settings+/auth'
+import { AccountData } from 'app/routes/_user+/_home+/settings+/auth'
 import React, { Suspense, useState } from 'react'
-import styles from './ConnectionCard.module.css'
-import Link from '../Link/Link'
+import styles from './AccountCard.module.css'
 import Menu from '@valley/ui/Menu'
 import IconButton from '@valley/ui/IconButton'
 import { MoreHorizontal } from 'geist-ui-icons'
@@ -18,18 +17,26 @@ import Hidden from '@valley/ui/Hidden'
 import Modal from '@valley/ui/Modal'
 import ConfirmConnectionDeleteModal from '../Modals/ConfirmConnectionDelete'
 import { Await } from '@remix-run/react'
+import dayjs from 'dayjs'
+import { useHydrated } from 'remix-utils/use-hydrated'
 
-type ConnectionCardProps = {
-  data: ConnectionData
+type AccountCardProps = {
+  data: AccountData
   canDelete: Promise<boolean> | boolean
 }
 
-const ConnectionCard: React.FC<ConnectionCardProps> = ({ data, canDelete }) => {
-  const icon = PROVIDER_ICONS[data.providerName]
-  const label = PROVIDER_LABELS[data.providerName]
-  const manageLink = PROVIDER_MANAGE_LINKS[data.providerName]
-  const manageLinkLabel = PROVIDER_WEBSITES[data.providerName]
+const AccountCard: React.FC<AccountCardProps> = ({ data, canDelete }) => {
+  const icon = PROVIDER_ICONS[data.provider]
+  const label = PROVIDER_LABELS[data.provider]
+  const manageLink =
+    data.provider !== 'credential' && PROVIDER_MANAGE_LINKS[data.provider]
+  const manageLinkLabel =
+    data.provider !== 'credential' && PROVIDER_WEBSITES[data.provider]
   const [isDeletionModalOpen, setDeletionModalOpen] = useState(false)
+  const isHydrated = useHydrated()
+  const createdAtFormatted = isHydrated
+    ? lowerFirstLetter(dayjs(data.createdAt).calendar())
+    : ''
 
   const handleDeletionModalOpen = () => {
     setDeletionModalOpen(true)
@@ -40,27 +47,18 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ data, canDelete }) => {
   }
 
   return (
-    <Stack asChild align={'center'} gap={4} padding={4} direction={'row'}>
-      <Paper className={styles.connectionCard} variant="secondary">
+    <Stack asChild align={'center'} gap={4} padding={[3, 4]} direction={'row'}>
+      <Paper className={styles.accountCard} variant="secondary">
         {icon}
         <Stack direction={'column'} flex={'1 1'}>
           {label}
-          <div className={styles.connectionCard__subtitle}>
-            {data.displayName}
-            {data.link && (
-              <>
-                {' ('}
-                <Link to={data.link} className="underline">
-                  {data.alias}
-                </Link>
-                {')'}
-              </>
-            )}
-          </div>
         </Stack>
         <Hidden asChild sm>
-          <p className={styles.connectionCard__subtitle}>
-            Connected {lowerFirstLetter(data.createdAtFormatted)}
+          <p
+            className={styles.accountCard__subtitle + ' fade'}
+            data-fade-in={isHydrated}
+          >
+            Connected {createdAtFormatted}
           </p>
         </Hidden>
         <Menu.Root>
@@ -71,14 +69,22 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ data, canDelete }) => {
           </Menu.Trigger>
           <Menu.Content align="end">
             <Hidden asChild md lg xl>
-              <Stack className={styles.connectionCard__menuHeader} padding={2}>
-                <p>Connected {lowerFirstLetter(data.createdAtFormatted)}</p>
+              <Stack
+                className={styles.accountCard__menuHeader + ' fade'}
+                data-fade-in={isHydrated}
+                padding={2}
+              >
+                <p>Connected {createdAtFormatted}</p>
               </Stack>
             </Hidden>
             <Hidden asChild md lg xl>
               <Menu.Separator />
             </Hidden>
-            <Menu.Item href={manageLink}>Manage on {manageLinkLabel}</Menu.Item>
+            {manageLink && (
+              <Menu.Item href={manageLink}>
+                Manage on {manageLinkLabel}
+              </Menu.Item>
+            )}
             <Suspense
               fallback={<Menu.Item disabled>Disconnect {label}</Menu.Item>}
             >
@@ -87,13 +93,14 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ data, canDelete }) => {
                   <>
                     {resolvedCanDelete && (
                       <Menu.Item onClick={handleDeletionModalOpen}>
-                        Disconnect {label}
+                        {data.provider === 'credential' && 'Remove password'}
+                        {data.provider !== 'credential' &&
+                          'Disconnect ' + label}
                       </Menu.Item>
                     )}
                     {!resolvedCanDelete && (
                       <Menu.Item disabled>
-                        You cannot delete your last connection unless you have a
-                        password
+                        You cannot delete your last connection
                       </Menu.Item>
                     )}
                   </>
@@ -116,4 +123,4 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ data, canDelete }) => {
   )
 }
 
-export default React.memo(ConnectionCard)
+export default React.memo(AccountCard)

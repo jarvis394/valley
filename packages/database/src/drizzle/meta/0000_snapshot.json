@@ -1,5 +1,5 @@
 {
-  "id": "4ef94523-31e3-40ab-a6fb-5181e9180d84",
+  "id": "67337e6d-f7cc-4bbc-8361-333550c96add",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -238,16 +238,23 @@
           "onUpdate": "cascade"
         }
       },
-      "compositePrimaryKeys": {
-        "covers_file_id_project_id_pk": {
-          "name": "covers_file_id_project_id_pk",
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "covers_projectId_unique": {
+          "name": "covers_projectId_unique",
+          "nullsNotDistinct": false,
           "columns": [
-            "file_id",
             "project_id"
+          ]
+        },
+        "covers_fileId_unique": {
+          "name": "covers_fileId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "file_id"
           ]
         }
       },
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -304,12 +311,6 @@
         },
         "folder_id": {
           "name": "folder_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "cover_id": {
-          "name": "cover_id",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -502,12 +503,6 @@
           "notNull": true,
           "default": "'0'"
         },
-        "cover_id": {
-          "name": "cover_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "user_id": {
           "name": "user_id",
           "type": "varchar",
@@ -693,86 +688,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "domains": {
-          "name": "domains",
-          "type": "varchar[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::text[]"
-        },
-        "service_domain": {
-          "name": "service_domain",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'sgp72wpcfg1t3hzeyye2vwza'"
-        },
-        "avatar_id": {
-          "name": "avatar_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_settings_id": {
-          "name": "user_settings_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.user_settings": {
       "name": "user_settings",
       "schema": "",
@@ -870,6 +785,99 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "onboarded": {
+          "name": "onboarded",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domains": {
+          "name": "domains",
+          "type": "varchar[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::varchar[]"
+        },
+        "service_domain": {
+          "name": "service_domain",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_id": {
+          "name": "avatar_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_settings_id": {
+          "name": "user_settings_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

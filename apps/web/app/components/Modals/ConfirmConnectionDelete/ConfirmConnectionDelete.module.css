@@ -1,5 +1,6 @@
-.confirmConnectionDelete__form {
+.confirmConnectionDelete__content {
   color: var(--text-secondary);
+  padding-top: 4px !important;
 }
 
 .confirmConnectionDelete__label {

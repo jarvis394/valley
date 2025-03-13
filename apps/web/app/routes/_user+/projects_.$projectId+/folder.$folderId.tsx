@@ -35,13 +35,9 @@ import {
 } from '@remix-run/react'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
-import type { File, Folder } from '@valley/db'
+import type { File, Folder, Project } from '@valley/db'
 import { useProject } from 'app/utils/project'
-import {
-  FolderWithFiles,
-  PROJECT_MAX_FOLDERS,
-  ProjectWithFolders,
-} from '@valley/shared'
+import { PROJECT_MAX_FOLDERS, ProjectWithFolders } from '@valley/shared'
 import { formatNewLine } from 'app/utils/format-new-line'
 import {
   cacheClientLoader,
@@ -52,7 +48,7 @@ import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FoldersCreateSchema } from 'app/routes/api+/folders+/create'
+import { FoldersCreateSchema } from 'app/routes/api+/projects+/$projectId.folders+/create'
 import Hidden from '@valley/ui/Hidden'
 import Stack from '@valley/ui/Stack'
 import ButtonBase from '@valley/ui/ButtonBase'
@@ -77,7 +73,7 @@ import {
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
-import { getProjectFolder } from 'app/server/folder/folder.server'
+import { getProjectFolderFiles } from 'app/server/folder/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { useRootLoaderData } from 'app/root'
 import { useUserStore } from 'app/utils/user'
@@ -87,8 +83,10 @@ type FormData = z.infer<typeof FoldersCreateSchema>
 
 const resolver = zodResolver(FoldersCreateSchema)
 
-export const getFolderCacheKey = (folderId?: Folder['id']) =>
-  `folder:${folderId}`
+export const getFilesCacheKey = (
+  projectId?: Project['id'],
+  folderId?: Folder['id']
+) => `files:${projectId}:${folderId}`
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { projectId, folderId } = params
@@ -102,19 +100,15 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     return redirect('/auth/login')
   }
 
-  const folder = await time(
-    getProjectFolder({ userId: session.user.id, projectId, folderId }),
+  const files = await time(
+    getProjectFolderFiles({ userId: session.user.id, projectId, folderId }),
     {
       timings,
-      type: 'get folder',
+      type: 'get folder files',
     }
   )
 
-  if (!folder) {
-    return redirect('/projects/' + projectId)
-  }
-
-  return data({ folder }, { headers: { 'Server-Timing': timings.toString() } })
+  return data({ files }, { headers: { 'Server-Timing': timings.toString() } })
 }
 
 export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
@@ -124,7 +118,7 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
 
   return cacheClientLoader(
     { params, ...props },
-    { type: 'swr', key: getFolderCacheKey(params.folderId) }
+    { type: 'swr', key: getFilesCacheKey(params.projectId, params.folderId) }
   )
 }
 
@@ -140,7 +134,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   nextParams,
 }) => {
   if (formAction && currentParams.folderId) {
-    invalidateCache(getFolderCacheKey(currentParams.folderId))
+    invalidateCache(getFilesCacheKey(currentParams.folderId))
     return true
   }
 
@@ -369,30 +363,35 @@ const ProjectBlock = React.memo(function ProjectBlock() {
 
   return (
     <>
-      <ProjectHeader project={project as ProjectWithFolders} currentFolder={currentFolder} />
+      <ProjectHeader
+        project={project as ProjectWithFolders}
+        currentFolder={currentFolder}
+      />
       <Divider />
-      <ProjectFolders project={project as ProjectWithFolders} currentFolder={currentFolder} />
+      <ProjectFolders
+        project={project as ProjectWithFolders}
+        currentFolder={currentFolder}
+      />
       <Divider />
       <FolderInfo currentFolder={currentFolder} />
     </>
   )
 })
 
-const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
-  folder,
+const FolderFiles: React.FC<{ files: File[] | null }> = ({
+  files: propsFiles,
 }) => {
   const id = useId()
-  const folderId = folder?.id || ''
-  const projectId = folder?.projectId || ''
+  const { projectId = '', folderId = '' } = useParams()
   const storeFiles = useProjectsStore(
     (state) => state.projects[projectId]?.folders[folderId]?.files
   )
-  const files = storeFiles || folder?.files || []
+  const files = storeFiles || propsFiles || []
   const setFiles = useProjectsStore((state) => state.setFiles)
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
   // const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
-  const cover = files.find((e) => false)
+  const cover = files.find(() => false)
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { delay: 200, tolerance: 5, distance: Infinity },
@@ -426,11 +425,9 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
   // Set the folder's files to the cache store
   // Used for optimistic updates
   useEffect(() => {
-    setFiles({ projectId, folderId, files: folder?.files || [] })
+    setFiles({ projectId, folderId, files: files || [] })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [folderId, projectId, folder?.files])
-
-  if (!folder) return null
+  }, [folderId, projectId, files])
 
   if (files.length === 0) {
     return (
@@ -449,8 +446,8 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
           <p>Upload some photos to make it happier</p>
         </Stack>
         <UploadButton
-          projectId={folder.projectId}
-          folderId={folder.id}
+          projectId={projectId}
+          folderId={folderId}
           variant="button"
         />
       </Stack>
@@ -463,8 +460,8 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
         <Stack asChild gap={3} align={'center'} justify={'center'}>
           <Wrapper>
             <UploadButton
-              projectId={folder.projectId}
-              folderId={folder.id}
+              projectId={projectId}
+              folderId={folderId}
               variant="compact"
             />
             <IconButton variant="secondary-dimmed" size="xl">
@@ -478,8 +475,8 @@ const FolderFiles: React.FC<{ folder: FolderWithFiles | null }> = ({
           <Stack gap={4} align={'center'} justify={'space-between'}>
             <Stack gap={4} align={'center'}>
               <UploadButton
-                projectId={folder.projectId}
-                folderId={folder.id}
+                projectId={projectId}
+                folderId={folderId}
                 variant="button"
                 size="md"
               />
@@ -549,7 +546,7 @@ const ProjectRoute = () => {
   return (
     <div className={styles.project}>
       <ProjectBlock />
-      <FolderFiles folder={data.folder as FolderWithFiles} />
+      <FolderFiles files={data.files as File[]} />
     </div>
   )
 }

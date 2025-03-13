@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { db, users } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
 import { redirectWithToast } from 'app/server/toast.server'
+import { queryUserByDomain } from 'app/server/user/user.server'
+import { eq } from 'drizzle-orm'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
 
@@ -35,20 +38,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
   }
 
   const newDomain = submissionData.domain
-  const exists = await prisma.user.findFirst({
-    where: {
-      OR: [
-        {
-          domains: {
-            has: newDomain,
-          },
-        },
-        {
-          serviceDomain: newDomain,
-        },
-      ],
-    },
-  })
+  const [exists] = await queryUserByDomain(newDomain)
 
   if (exists && exists.id !== user.id) {
     return redirectWithToast('/settings/general', {
@@ -62,7 +52,7 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     let newDomains: string[]
 
     // Move new domain to be the first if it is included in user domains history
-    if (user.domains.includes(newDomain)) {
+    if (user.domains?.includes(newDomain)) {
       newDomains = [
         newDomain,
         ...user.domains.filter((e) => e !== newDomain),
@@ -70,20 +60,18 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
     }
     // Or just add it to the front
     else {
-      newDomains = [newDomain, ...user.domains].slice(
+      newDomains = [newDomain, ...(user.domains || [])].slice(
         0,
         MAX_USER_DOMAIN_HISTORY_LENGTH
       )
     }
 
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
+    await db
+      .update(users)
+      .set({
         domains: newDomains,
-      },
-    })
+      })
+      .where(eq(users.id, user.id))
 
     return redirectWithToast('/settings/general', {
       type: 'info',

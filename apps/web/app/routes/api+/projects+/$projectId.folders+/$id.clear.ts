@@ -2,52 +2,34 @@ import { LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { db, files, folders, projects } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
+import { getProjectFolderAndProject } from 'app/server/folder/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
-import { sql, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 export const loader = () => redirect('/projects')
 
 export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const user = await requireUser(request)
-  const { id } = params
+  const { id, projectId } = params
   const url = new URL(request.url)
   const redirectTo = url.searchParams.get(redirectToKey)
-  const isUsersProject = db
-    .select({
-      id: sql`1`,
-    })
-    .from(projects)
-    .where(eq(projects.userId, user.id))
-    .as('isUsersProject')
 
   invariantResponse(id, 'No folder ID found in params')
+  invariantResponse(projectId, 'No project ID found in params')
 
   try {
-    const folder = await db.query.folders.findFirst({
-      where: (fields, { eq, and }) => and(eq(fields.id, id), isUsersProject),
-      columns: {
-        projectId: true,
-        totalFiles: true,
-        totalSize: true,
-        id: true,
-        isDefaultFolder: true,
-      },
-      with: {
-        project: {
-          columns: {
-            totalFiles: true,
-            totalSize: true,
-          },
-        },
-      },
-    })
+    const { folders: folder, projects: project } =
+      await getProjectFolderAndProject({
+        folderId: id,
+        projectId,
+        userId: user.id,
+      })
 
     invariantResponse(folder, 'Folder not found', { status: 404 })
 
     await db.transaction(async (tx) => {
-      const newTotalFiles = folder.project.totalFiles - folder.totalFiles
-      const newTotalSize =
-        Number(folder.project.totalSize) - Number(folder.totalSize)
+      const newTotalFiles = project.totalFiles - folder.totalFiles
+      const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
 
       await tx
         .update(files)

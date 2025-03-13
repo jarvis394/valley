@@ -40,7 +40,7 @@ export function parsePermissionString(permissionString: PermissionString) {
   const [action, entity, access] = permissionString.split(':') as [
     Action,
     Entity,
-    Access | undefined
+    Access | undefined,
   ]
   return {
     action,

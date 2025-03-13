@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { db, folders, projects } from '@valley/db'
-import { eq, and, sql } from 'drizzle-orm'
+import { db, folders, projects, users } from '@valley/db'
+import { eq, and, sql, exists } from 'drizzle-orm'
 import { requireUser } from 'app/server/auth/auth.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
@@ -34,7 +34,7 @@ export const loader = () => redirect('/projects')
 
 export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const user = await requireUser(request)
-  const { id } = params
+  const { id, projectId } = params
 
   const {
     errors,
@@ -50,21 +50,26 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
+  invariantResponse(projectId, 'No project ID found in params')
   invariantResponse(id, 'No folder ID found in params')
 
   try {
-    const isUsersProject = db
-      .select({
-        id: sql`1`,
-      })
-      .from(projects)
-      .where(eq(projects.userId, user.id))
-      .as('isUsersProject')
-
     const [folder] = await db
       .update(folders)
       .set(submissionData)
-      .where(and(eq(folders.id, id), isUsersProject))
+      .where(
+        and(
+          eq(folders.id, id),
+          exists(
+            db
+              .select({ id: sql`TRUE` })
+              .from(folders)
+              .innerJoin(projects, eq(folders.projectId, projects.id))
+              .innerJoin(users, eq(projects.userId, users.id))
+              .where(and(eq(users.id, user.id), eq(projects.id, projectId)))
+          )
+        )
+      )
       .returning()
 
     return redirect('/projects/' + folder.projectId + '/folder/' + folder.id)

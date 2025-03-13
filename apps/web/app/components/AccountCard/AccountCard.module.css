@@ -1,30 +1,30 @@
-.connectionCard {
+.accountCard {
   --themed-border: transparent;
   border: 1px solid var(--alpha-transparent-12);
   border-top-width: 0;
 }
 
-.connectionCard > svg {
+.accountCard > svg {
   width: 20px;
   height: 20px;
 }
 
-.connectionCard:first-of-type {
+.accountCard:first-of-type {
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   border-top-width: 1px;
 }
 
-.connectionCard:last-of-type {
+.accountCard:last-of-type {
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
 }
 
-.connectionCard__subtitle {
+.accountCard__subtitle {
   color: var(--text-secondary);
 }
 
-.connectionCard__menuHeader {
+.accountCard__menuHeader {
   margin: 0;
   font-weight: 400;
   font-size: 14px;

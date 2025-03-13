@@ -1,14 +1,12 @@
 {
   "extends": "@valley/typescript-config/react-library.json",
   "compilerOptions": {
-    "allowJs": true,
-    "baseUrl": "src",
-    "esModuleInterop": true,
-    "incremental": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": ".",
   },
   "include": [
-    "src"
+    "src",
+    "turbo"
   ],
   "exclude": [
     "node_modules",

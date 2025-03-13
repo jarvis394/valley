@@ -1,13 +1,6 @@
-import {
-  db,
-  files,
-  folders,
-  projects,
-  type Project,
-  type User,
-} from '@valley/db'
+import { db, folders, projects, type Project, type User } from '@valley/db'
 import { ProjectWithFolders } from '@valley/shared'
-import { and, asc, desc, eq, isNull } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
 
 export const getUserProjects = ({
   userId,
@@ -21,7 +14,6 @@ export const getUserProjects = ({
       folders: true,
       cover: {
         with: { file: true },
-        // where: isNull(files.deletedAt),
       },
     },
   })
@@ -42,7 +34,6 @@ export const getUserProject = ({
       },
       cover: {
         with: { file: true },
-        where: isNull(files.deletedAt),
       },
     },
   })

@@ -5,8 +5,8 @@ import ModalFooter from '@valley/ui/ModalFooter'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import TextArea from '@valley/ui/TextArea'
-import { Form, useParams, useSearchParams } from '@remix-run/react'
-import { FoldersEditSchema } from 'app/routes/api+/folders+/$id.edit'
+import { Form, useParams } from '@remix-run/react'
+import { FoldersEditSchema } from 'app/routes/api+/projects+/$projectId.folders+/$id.edit'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { ProjectWithFolders } from '@valley/shared'
@@ -22,13 +22,14 @@ type EditFolderDescriptionModalProps = { onClose: () => void }
 const ModalContents: React.FC<
   EditFolderDescriptionModalProps & { project?: ProjectWithFolders | null }
 > = ({ onClose, project }) => {
-  const { folderId: paramsFolderId } = useParams()
-  const [searchParams] = useSearchParams()
+  const { projectId, folderId: paramsFolderId } = useParams()
+  const searchParams = new URLSearchParams(window.location.search)
   const modalPropsFolderId = searchParams.get('modal-folderId')
-  const folderId = modalPropsFolderId || paramsFolderId
   const currentFolder = project?.folders.find((f) => f.id === folderId)
+  const folderId = modalPropsFolderId || paramsFolderId
   const defaultDescription = currentFolder?.description || ''
-  const formAction = '/api/folders/' + folderId + '/edit'
+  const formAction =
+    '/api/projects/' + projectId + '/folders/' + folderId + '/edit'
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
     submitConfig: { action: formAction, method: 'POST' },

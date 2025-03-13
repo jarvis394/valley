@@ -12,10 +12,7 @@ import styles from '../auth.module.css'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import * as z from 'zod'
-import {
-  EmailSchema,
-  PasswordSchema,
-} from '../../../utils/user-validation'
+import { EmailSchema, PasswordSchema } from '../../../utils/user-validation'
 import Button from '@valley/ui/Button'
 import { ArrowRight } from 'geist-ui-icons'
 import { useRemixForm, getValidatedFormData } from 'remix-hook-form'
@@ -83,9 +80,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }

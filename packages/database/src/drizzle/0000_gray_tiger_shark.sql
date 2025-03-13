@@ -28,7 +28,8 @@ CREATE TABLE "covers" (
 	"y" double precision DEFAULT 0.5,
 	"project_id" varchar NOT NULL,
 	"file_id" varchar NOT NULL,
-	CONSTRAINT "covers_file_id_project_id_pk" PRIMARY KEY("file_id","project_id")
+	CONSTRAINT "covers_projectId_unique" UNIQUE("project_id"),
+	CONSTRAINT "covers_fileId_unique" UNIQUE("file_id")
 );
 
 CREATE TABLE "files" (
@@ -40,7 +41,6 @@ CREATE TABLE "files" (
 	"name" varchar,
 	"size" varchar,
 	"folder_id" varchar,
-	"cover_id" varchar,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"deleted_at" timestamp with time zone
@@ -69,7 +69,6 @@ CREATE TABLE "projects" (
 	"stored_until" timestamp with time zone DEFAULT null,
 	"total_files" integer DEFAULT 0 NOT NULL,
 	"total_size" text DEFAULT '0' NOT NULL,
-	"cover_id" varchar,
 	"user_id" varchar NOT NULL,
 	"translation_strings_id" varchar,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -95,19 +94,6 @@ CREATE TABLE "translation_strings" (
 	"project_id" varchar NOT NULL
 );
 
-CREATE TABLE "users" (
-	"id" varchar PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"email" varchar NOT NULL,
-	"name" varchar NOT NULL,
-	"domains" varchar[] DEFAULT '{}'::text[],
-	"service_domain" varchar DEFAULT 'sgp72wpcfg1t3hzeyye2vwza' NOT NULL,
-	"avatar_id" varchar,
-	"user_settings_id" varchar NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
-);
-
 CREATE TABLE "user_settings" (
 	"id" varchar PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"interface_language" text DEFAULT 'en' NOT NULL,
@@ -121,6 +107,21 @@ CREATE TABLE "user_settings" (
 	"vimeo" text,
 	"youtube" text,
 	"user_id" varchar NOT NULL
+);
+
+CREATE TABLE "users" (
+	"id" varchar PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"email" varchar NOT NULL,
+	"email_verified" boolean DEFAULT false NOT NULL,
+	"onboarded" boolean DEFAULT false NOT NULL,
+	"name" varchar NOT NULL,
+	"domains" varchar[] DEFAULT '{}'::varchar[] NOT NULL,
+	"service_domain" varchar NOT NULL,
+	"avatar_id" varchar,
+	"user_settings_id" varchar,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 
 CREATE TABLE "verifications" (

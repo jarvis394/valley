@@ -1,4 +1,4 @@
-import { File } from '@valley/db'
+import { type File } from '@valley/db'
 import cx from 'classnames'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import styles from './Image.module.css'
@@ -81,7 +81,7 @@ const Image: React.FC<ImageProps> = ({
         resizeQuery = qs.toString()
       }
 
-      return imageHost + '/api/files/' + file.key + '?' + resizeQuery
+      return imageHost + '/api/files/' + file.path + '?' + resizeQuery
     }
 
     return src

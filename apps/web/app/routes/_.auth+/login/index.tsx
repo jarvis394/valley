@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import { PROVIDER_NAMES } from 'app/config/connections'
+import { SOCIAL_PROVIDER_NAMES } from 'app/config/connections'
 import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
           direction={'column'}
           style={{ viewTransitionName: 'auth-providers' }}
         >
-          {PROVIDER_NAMES.map((providerName) => (
+          {SOCIAL_PROVIDER_NAMES.map((providerName) => (
             <ProviderConnectionForm
               key={providerName}
               providerName={providerName}

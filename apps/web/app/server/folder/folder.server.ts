@@ -2,14 +2,15 @@ import {
   db,
   files,
   folders,
+  projects,
+  users,
   type Folder,
   type Project,
   type User,
 } from '@valley/db'
-import { FolderWithFiles } from '@valley/shared'
-import { and, desc, eq, notExists } from 'drizzle-orm'
+import { and, desc, eq, exists, isNull, sql } from 'drizzle-orm'
 
-export const getProjectFolder = ({
+export const getProjectFolder = async ({
   folderId,
   projectId,
   userId,
@@ -17,22 +18,73 @@ export const getProjectFolder = ({
   folderId: Folder['id']
   projectId: Project['id']
   userId: User['id']
-}): Promise<FolderWithFiles | undefined> => {
-  return db.query.folders.findFirst({
-    where: and(eq(folders.id, folderId), eq(folders.projectId, projectId)),
+}) => {
+  const [folder] = await db
+    .select()
+    .from(folders)
+    .where(
+      and(
+        eq(folders.id, folderId),
+        exists(
+          db
+            .select({ id: sql`TRUE` })
+            .from(projects)
+            .innerJoin(users, eq(projects.userId, users.id))
+            .where(and(eq(users.id, userId), eq(projects.id, projectId)))
+        )
+      )
+    )
+  return folder
+}
 
-    // {
-    //   Project: {
-    //     id: projectId,
-    //     userId,
-    //   },
-    //   id: folderId,
-    // },
-    with: {
-      files: {
-        orderBy: desc(files.createdAt),
-        where: notExists(files.deletedAt),
-      },
-    },
-  })
+export const getProjectFolderAndProject = async ({
+  folderId,
+  projectId,
+  userId,
+}: {
+  folderId: Folder['id']
+  projectId: Project['id']
+  userId: User['id']
+}) => {
+  const [result] = await db
+    .select()
+    .from(folders)
+    .innerJoin(projects, eq(projects.id, projectId))
+    .where(and(eq(folders.id, folderId), eq(projects.userId, userId)))
+  return result
+}
+
+export const getProjectFolderFiles = ({
+  folderId,
+  projectId,
+  userId,
+}: {
+  folderId: Folder['id']
+  projectId: Project['id']
+  userId: User['id']
+}) => {
+  return db
+    .select()
+    .from(files)
+    .where(
+      and(
+        eq(files.folderId, folderId),
+        exists(
+          db
+            .select({ id: sql`TRUE` })
+            .from(folders)
+            .innerJoin(projects, eq(folders.projectId, projects.id))
+            .innerJoin(users, eq(projects.userId, users.id))
+            .where(
+              and(
+                eq(users.id, userId),
+                eq(projects.id, projectId),
+                eq(folders.id, folderId),
+                isNull(files.deletedAt)
+              )
+            )
+        )
+      )
+    )
+    .orderBy(desc(files.createdAt))
 }

@@ -3,7 +3,7 @@ import { db, files, folders, projects } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
-import { and, eq, notExists, sql } from 'drizzle-orm'
+import { and, eq, isNull } from 'drizzle-orm'
 
 export const loader = () => redirect('/projects')
 
@@ -12,19 +12,16 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const { id } = params
   const url = new URL(request.url)
   const redirectTo = url.searchParams.get(redirectToKey)
-  const isUsersProject = db
-    .select({
-      id: sql`1`,
-    })
-    .from(projects)
-    .where(eq(projects.userId, user.id))
-    .as('isUsersProject')
 
   invariantResponse(id, 'No file ID found in params')
 
   try {
     const file = await db.query.files.findFirst({
-      where: and(eq(files.id, id), isUsersProject, notExists(files.deletedAt)),
+      where: and(
+        eq(files.id, id),
+        isUsersProject(user.id),
+        isNull(files.deletedAt)
+      ),
       with: {
         folder: {
           with: {

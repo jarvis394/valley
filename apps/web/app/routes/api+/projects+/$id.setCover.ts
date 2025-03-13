@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
-import { covers, db, projects } from '@valley/db'
+import { covers, db } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
-import { sql, eq, and } from 'drizzle-orm'
+import { getUserProject } from 'app/server/project/project.server'
+import { getFile } from 'app/server/file/file.server'
 
 export const ProjectSetCoverSchema = z.object({
   fileId: z.string(),
@@ -20,13 +21,6 @@ export const loader = () => redirect('/projects')
 export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const projectId = params.id
   const user = await requireUser(request)
-  const isUsersProject = db
-    .select({
-      id: sql`1`,
-    })
-    .from(projects)
-    .where(eq(projects.userId, user.id))
-    .as('isUsersProject')
 
   invariantResponse(projectId, 'Missing project ID', { status: 400 })
 
@@ -44,23 +38,14 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
-  const cover = await db.query.covers.findFirst({
-    where: and(eq(covers.projectId, projectId), isUsersProject),
-    with: {
-      file: {
-        with: {
-          folder: {
-            columns: {
-              id: true,
-            },
-          },
-        },
-      },
-    },
-  })
-  const folderId = cover?.file.folder?.id
+  const project = await getUserProject({ userId: user.id, projectId })
+  invariantResponse(project, 'Project not found', { status: 404 })
 
-  invariantResponse(cover, 'Project not found', { status: 404 })
+  const file = await getFile({
+    userId: user.id,
+    fileId: submissionData.fileId,
+  })
+  invariantResponse(file.files.id, 'File not found', { status: 404 })
 
   await db
     .insert(covers)
@@ -75,8 +60,8 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
       },
     })
 
-  if (folderId) {
-    return redirect('/projects/' + projectId + '/folder/' + folderId)
+  if (file.files.folderId) {
+    return redirect('/projects/' + projectId + '/folder/' + file.files.folderId)
   } else {
     return redirect('/projects/' + projectId)
   }

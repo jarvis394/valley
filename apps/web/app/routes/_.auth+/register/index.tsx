@@ -14,7 +14,7 @@ import { getDomainUrl, useIsPending } from '../../../utils/misc'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
 import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
-import { PROVIDER_NAMES } from 'app/config/connections'
+import { SOCIAL_PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
@@ -173,7 +173,7 @@ const RegisterPage: React.FC = () => {
           direction={'column'}
           style={{ viewTransitionName: 'auth-providers' }}
         >
-          {PROVIDER_NAMES.map((providerName) => (
+          {SOCIAL_PROVIDER_NAMES.map((providerName) => (
             <ProviderConnectionForm
               key={providerName}
               providerName={providerName}
