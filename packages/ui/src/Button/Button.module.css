@@ -3,6 +3,7 @@
   --x-padding: 10px;
   --font-size: 14px;
   --line-height: 16px;
+  --button-icon-size: 16px;
 }
 
 .button {
@@ -76,9 +77,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 16px;
-  height: 16px;
+  width: var(--button-icon-size);
+  height: var(--button-icon-size);
   flex-shrink: 0;
+}
+
+.button .button__before svg,
+.button .button__after svg {
+  width: var(--button-icon-size);
+  height: var(--button-icon-size);
 }
 
 .button.button--align-start.button--size-md .button__before > *,

@@ -96,26 +96,6 @@ export const auth = betterAuth({
       },
     }),
   ],
-  // hooks: {
-  //   after: createAuthMiddleware(async (ctx) => {
-  //     if (ctx.path === '/callback/:id') {
-  //       const toast = {
-  //         description: 'Your account is linked',
-  //         type: 'info',
-  //         id: 'login',
-  //       } satisfies ToastInput
-  //       if (ctx.context.newSession) {
-  //         toast.description = 'You are now logged in'
-  //       }
-
-  //       const session = await toastSessionStorage.getSession()
-  //       session.flash('toast', toast)
-  //       const cookie = await toastSessionStorage.commitSession(session)
-
-  //       ctx.setHeader('Set-Cookie', cookie)
-  //     }
-  //   }),
-  // },
   rateLimit: {
     enabled: true,
     storage: 'memory',

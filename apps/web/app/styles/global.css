@@ -5,6 +5,8 @@ body {
   margin: 0;
   font-family: var(--font-geist-sans);
   background: var(--background-default);
+
+  --fieldset-max-width: 720px;
 }
 
 * {
