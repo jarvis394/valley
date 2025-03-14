@@ -1,9 +1,10 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { db, files, folders, projects } from '@valley/db'
+import { covers, db, files, folders, projects } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
+import { getFileWithUserProjectAndFolder } from 'app/server/services/file.server'
 import { invariantResponse } from 'app/utils/invariant'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 export const loader = () => redirect('/projects')
 
@@ -16,34 +17,31 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   invariantResponse(id, 'No file ID found in params')
 
   try {
-    const file = await db.query.files.findFirst({
-      where: and(
-        eq(files.id, id),
-        isUsersProject(user.id),
-        isNull(files.deletedAt)
-      ),
-      with: {
-        folder: {
-          with: {
-            project: true,
-          },
-        },
-      },
+    const { file, folder, project } = await getFileWithUserProjectAndFolder({
+      userId: user.id,
+      fileId: id,
     })
 
     invariantResponse(file, 'File not found', { status: 404 })
 
-    if (file.folder) {
+    if (folder) {
       await db.transaction(async (tx) => {
-        if (!file.folder || !file.folderId) return
+        if (!folder || !project || !file.folderId) return
 
-        const newFolderTotalFiles = file.folder.totalFiles - 1
-        const newFolderTotalSize =
-          Number(file.folder.totalSize) - Number(file.size)
-        const newProjectTotalFiles = file.folder.project.totalFiles - 1
+        const newFolderTotalFiles = folder.totalFiles - 1
+        const newFolderTotalSize = Number(folder.totalSize) - Number(file.size)
+        const newProjectTotalFiles = project.totalFiles - 1
         const newProjectTotalSize =
-          Number(file.folder.project.totalSize) - Number(file.size)
+          Number(project.totalSize) - Number(file.size)
 
+        await tx
+          .delete(covers)
+          .where(
+            and(
+              eq(covers.fileId, file.id),
+              eq(covers.projectId, covers.projectId)
+            )
+          )
         await tx
           .update(files)
           .set({ deletedAt: new Date(), folderId: null })
@@ -61,14 +59,14 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
             totalFiles: newProjectTotalFiles,
             totalSize: newProjectTotalSize.toString(),
           })
-          .where(eq(projects.id, file.folder.projectId))
+          .where(eq(projects.id, folder.projectId))
       })
     }
 
     if (redirectTo) return redirect(redirectTo)
-    if (file.folder)
+    if (folder)
       return redirect(
-        '/projects/' + file.folder.projectId + '/folder/' + file.folderId
+        '/projects/' + folder.projectId + '/folder/' + file.folderId
       )
     else return '/projects'
   } catch (e) {

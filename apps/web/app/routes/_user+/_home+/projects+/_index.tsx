@@ -30,7 +30,7 @@ import {
   useCachedLoaderData,
 } from 'app/utils/cache'
 import Menu from '@valley/ui/Menu'
-import { getUserProjects } from 'app/server/project/project.server'
+import { getUserProjects } from 'app/server/services/project.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { auth } from '@valley/auth'
 

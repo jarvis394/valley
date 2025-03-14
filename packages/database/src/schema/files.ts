@@ -1,5 +1,5 @@
 import { defaultId, timestamps } from '../extend'
-import { pgTable, jsonb, varchar, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, jsonb, varchar, boolean, integer } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferSelectModel,
@@ -7,7 +7,7 @@ import {
 } from 'drizzle-orm'
 import { folders } from './folders'
 
-type ExifDataValue = number | number[] | string | Buffer | Date
+type ExifDataValue = number | string | Date
 type ExifDataKey =
   | 'Artist'
   | 'Copyright'
@@ -36,6 +36,8 @@ export const files = pgTable('files', {
   contentType: varchar().default('application/octet-stream'),
   name: varchar(),
   size: varchar(),
+  width: integer(),
+  height: integer(),
   folderId: varchar(),
   ...timestamps({ softDelete: true }),
 })

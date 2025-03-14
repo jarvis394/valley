@@ -1,0 +1,1 @@
+ALTER TABLE "users" RENAME COLUMN "better_auth_image" TO "image";

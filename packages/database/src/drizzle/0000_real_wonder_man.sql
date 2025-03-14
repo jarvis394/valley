@@ -40,6 +40,8 @@ CREATE TABLE "files" (
 	"content_type" varchar DEFAULT 'application/octet-stream',
 	"name" varchar,
 	"size" varchar,
+	"width" integer,
+	"height" integer,
 	"folder_id" varchar,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,

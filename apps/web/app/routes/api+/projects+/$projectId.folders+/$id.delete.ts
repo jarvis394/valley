@@ -4,7 +4,7 @@ import { requireUser } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { db, files, folders, projects } from '@valley/db'
 import { eq } from 'drizzle-orm'
-import { getProjectFolderAndProject } from 'app/server/folder/folder.server'
+import { getProjectFolderAndProject } from 'app/server/services/folder.server'
 
 export const loader = () => redirect('/projects')
 

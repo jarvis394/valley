@@ -30,7 +30,7 @@ const ModalContents: React.FC<
   const redirectTo = `/projects/${projectId}${
     redirectToFolderId ? `/folder/${redirectToFolderId}` : ''
   }`
-  const formAction = `/api/folders/${folder?.id}/delete?${redirectToKey}=${redirectTo}`
+  const formAction = `/api/projects/${projectId}/folders/${folder?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
     submitConfig: { navigate: true, action: formAction, method: 'POST' },
   })

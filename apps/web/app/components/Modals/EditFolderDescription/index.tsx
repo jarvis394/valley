@@ -25,8 +25,8 @@ const ModalContents: React.FC<
   const { projectId, folderId: paramsFolderId } = useParams()
   const searchParams = new URLSearchParams(window.location.search)
   const modalPropsFolderId = searchParams.get('modal-folderId')
-  const currentFolder = project?.folders.find((f) => f.id === folderId)
   const folderId = modalPropsFolderId || paramsFolderId
+  const currentFolder = project?.folders.find((f) => f.id === folderId)
   const defaultDescription = currentFolder?.description || ''
   const formAction =
     '/api/projects/' + projectId + '/folders/' + folderId + '/edit'

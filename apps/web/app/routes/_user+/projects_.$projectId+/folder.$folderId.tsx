@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react'
+import React, { useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import styles from './project.module.css'
 import PageHeader from 'app/components/PageHeader/PageHeader'
@@ -73,7 +73,7 @@ import {
 } from '@dnd-kit/sortable'
 import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
-import { getProjectFolderFiles } from 'app/server/folder/folder.server'
+import { getProjectFolderFiles } from 'app/server/services/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { useRootLoaderData } from 'app/root'
 import { useUserStore } from 'app/utils/user'
@@ -100,7 +100,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     return redirect('/auth/login')
   }
 
-  const files = await time(
+  const result = await time(
     getProjectFolderFiles({ userId: session.user.id, projectId, folderId }),
     {
       timings,
@@ -108,7 +108,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     }
   )
 
-  return data({ files }, { headers: { 'Server-Timing': timings.toString() } })
+  return data(
+    { data: result },
+    { headers: { 'Server-Timing': timings.toString() } }
+  )
 }
 
 export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
@@ -233,7 +236,7 @@ const ProjectFolders: React.FC<{
 }> = ({ project, currentFolder }) => {
   const navigate = useNavigate()
   const { openModal } = useModal()
-  const createFolderAction = '/api/folders/create'
+  const createFolderAction = '/api/projects/' + project?.id + '/folders/create'
   const projectTotalSize = formatBytes(Number(project?.totalSize || '0'))
   const createFolderFetcher = useFetcher({ key: createFolderAction })
   const { register, handleSubmit } = useRemixForm<FormData>({
@@ -382,16 +385,19 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   files: propsFiles,
 }) => {
   const id = useId()
+  const project = useProject()
   const { projectId = '', folderId = '' } = useParams()
   const storeFiles = useProjectsStore(
     (state) => state.projects[projectId]?.folders[folderId]?.files
   )
-  const files = storeFiles || propsFiles || []
+  const files = useMemo(() => {
+    if (storeFiles && storeFiles?.length > 0) return storeFiles
+    else return propsFiles || []
+  }, [propsFiles, storeFiles])
   const setFiles = useProjectsStore((state) => state.setFiles)
   const [activeFileId, setActiveFileId] = useState<File['id'] | null>(null)
   const activeFile = files.find((e) => e.id === activeFileId)
-  // const cover = files.find((e) => e?.Cover?.find((c) => c.fileId === e.id))
-  const cover = files.find(() => false)
+  const cover = files.find((e) => e.id === project.cover?.[0]?.fileId)
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { delay: 200, tolerance: 5, distance: Infinity },
@@ -425,9 +431,8 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   // Set the folder's files to the cache store
   // Used for optimistic updates
   useEffect(() => {
-    setFiles({ projectId, folderId, files: files || [] })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [folderId, projectId, files])
+    setFiles({ projectId, folderId, files: propsFiles || [] })
+  }, [folderId, projectId, propsFiles, setFiles])
 
   if (files.length === 0) {
     return (
@@ -546,7 +551,7 @@ const ProjectRoute = () => {
   return (
     <div className={styles.project}>
       <ProjectBlock />
-      <FolderFiles files={data.files as File[]} />
+      <FolderFiles files={data.data} />
     </div>
   )
 }

@@ -7,20 +7,22 @@ import { useRemixForm } from 'remix-hook-form'
 import Note from '@valley/ui/Note'
 import { Form, useParams } from '@remix-run/react'
 import { useIsPending } from 'app/utils/misc'
-import { FolderWithFiles } from '@valley/shared'
 import { redirectToKey } from 'app/config/paramsKeys'
 import ErrorModalContent from '../ErrorModalContent'
-import { useFolder } from 'app/utils/folder'
+import { useFiles } from 'app/utils/files'
+import { Cover, File } from '@valley/db'
 
 type ConfirmFileDeletionProps = { onClose: () => void }
 
 const ModalContents: React.FC<
-  { folder?: FolderWithFiles | null } & ConfirmFileDeletionProps
-> = ({ folder, onClose }) => {
+  {
+    files?: Array<File & { cover?: Cover[] | null }> | null
+  } & ConfirmFileDeletionProps
+> = ({ files, onClose }) => {
   const searchParams = new URLSearchParams(window.location.search)
   const { folderId, projectId } = useParams()
   const [fileId] = useState(searchParams.get('modal-fileId'))
-  const file = folder?.files.find((e) => e.id === fileId)
+  const file = files?.find((e) => e.id === fileId)
   const redirectTo = `/projects/${projectId}/folder/${folderId}`
   const formAction = `/api/files/${file?.id}/delete?${redirectToKey}=${redirectTo}`
   const { handleSubmit } = useRemixForm<FormData>({
@@ -91,9 +93,11 @@ const ModalContents: React.FC<
 const ConfirmFileDeletionModal: React.FC<ConfirmFileDeletionProps> = ({
   onClose,
 }) => {
-  const folder = useFolder()
+  const files = useFiles()
 
-  return <ModalContents onClose={onClose} folder={folder} />
+  console.log(files)
+
+  return <ModalContents onClose={onClose} files={files} />
 }
 
 export default ConfirmFileDeletionModal

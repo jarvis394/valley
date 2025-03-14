@@ -8,12 +8,13 @@ import { Form } from '@remix-run/react'
 import { useRemixForm } from 'remix-hook-form'
 import { useIsPending } from 'app/utils/misc'
 import { useProject } from 'app/utils/project'
-import { FolderWithFiles, ProjectWithFolders } from '@valley/shared'
+import { ProjectWithFolders } from '@valley/shared'
+import { File } from '@valley/db'
 import ModalContent from '@valley/ui/ModalContent'
 import { ProjectSetCoverSchema } from 'app/routes/api+/projects+/$id.setCover'
 import ErrorModalContent from '../ErrorModalContent'
 import styles from './SetProjectCover.module.css'
-import { useFolder } from 'app/utils/folder'
+import { useFiles } from 'app/utils/files'
 import Image from '@valley/ui/Image'
 
 type FormData = z.infer<typeof ProjectSetCoverSchema>
@@ -25,12 +26,12 @@ type SetProjectCoverModalProps = { onClose: () => void }
 const ModalContents: React.FC<
   SetProjectCoverModalProps & {
     project?: ProjectWithFolders | null
-    folder: FolderWithFiles | null
+    files?: File[] | null
   }
-> = ({ onClose, project, folder }) => {
+> = ({ onClose, project, files }) => {
   const searchParams = new URLSearchParams(window.location.search)
   const [fileId] = useState(searchParams.get('modal-fileId'))
-  const file = folder?.files.find((e) => e.id === fileId)
+  const file = files?.find((e) => e.id === fileId)
   const formAction = '/api/projects/' + project?.id + '/setCover'
   const { register, handleSubmit } = useRemixForm<FormData>({
     resolver,
@@ -108,9 +109,9 @@ const SetProjectCoverModal: React.FC<SetProjectCoverModalProps> = ({
   onClose,
 }) => {
   const project = useProject()
-  const folder = useFolder()
+  const files = useFiles()
 
-  return <ModalContents onClose={onClose} project={project} folder={folder} />
+  return <ModalContents onClose={onClose} project={project} files={files} />
 }
 
 export default SetProjectCoverModal

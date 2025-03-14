@@ -1,6 +1,6 @@
 {
-  "id": "dd937ad2-7f41-4df1-ae46-eaa99edc6e18",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "63dc3a6e-9a3b-4a2a-a5ea-57fd6ceca74b",
+  "prevId": "dd937ad2-7f41-4df1-ae46-eaa99edc6e18",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -837,6 +837,12 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "domains": {
           "name": "domains",

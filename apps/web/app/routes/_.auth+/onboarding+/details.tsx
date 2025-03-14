@@ -69,7 +69,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  // const providerName = onboardingSession.get('provider')
 
   onboardingSession.set('firstName', submissionData.firstName)
   submissionData.lastName &&
@@ -106,13 +105,6 @@ export async function action({ request }: ActionFunctionArgs) {
     interfaceLanguage: submission.data.interfaceLanguage,
     phone: submissionData.phone,
   })
-  // connection:
-  //     providerName && submission.prefilledProfile?.id
-  //       ? {
-  //           providerId: submission.prefilledProfile?.id,
-  //           providerName,
-  //         }
-  //       : undefined,
 
   headers.append(
     'set-cookie',
@@ -121,7 +113,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirectWithToast(
     safeRedirect(redirectTo || '/projects'),
-    { description: 'You are now logged in', type: 'info' },
+    {
+      title: 'Welcome to Valley',
+      description: 'You are now logged in',
+      type: 'info',
+    },
     { headers: combineHeaders(headers, response.headers) }
   )
 }
@@ -133,7 +129,6 @@ export const meta: MetaFunction = () => {
 export default function OnboardingDetailsRoute() {
   const data = useLoaderData<typeof loader>()
   const isPending = useIsPending()
-  const prefilledFullName = data.submission.prefilledProfile?.name?.split(' ')
   const { handleSubmit, control, getFieldState, register, formState } =
     useRemixForm<FormData>({
       mode: 'all',
@@ -141,8 +136,7 @@ export default function OnboardingDetailsRoute() {
       resolver,
       defaultValues: {
         ...data.submission.data,
-        firstName: prefilledFullName?.slice(0, -1)?.join(' '),
-        lastName: prefilledFullName?.slice(-1)[0],
+        ...data.submission.prefilledProfile,
       },
       submitConfig: {
         viewTransition: true,

@@ -81,7 +81,7 @@
 .fileCard__coverBadge {
   position: absolute;
   width: fit-content;
-  left: 8px;
+  right: 8px;
   top: 8px;
   border-radius: 8px;
   font-size: 13px;
@@ -89,7 +89,6 @@
   font-weight: 500;
   user-select: none;
   transition: all 240ms ease;
-  width: 128px;
   white-space: nowrap;
   overflow: hidden;
   padding: 8px 12px;
@@ -101,7 +100,8 @@
 
 .fileCard:has(.fileCard__toolbar[data-menu-open='true']) .fileCard__coverBadge,
 .fileCard:hover .fileCard__coverBadge {
-  width: 32px;
+  opacity: 0;
+  transition-duration: 150ms;
   padding: 8px;
 }
 

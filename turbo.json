@@ -4,7 +4,6 @@
   "globalEnv": ["*"],
   "tasks": {
     "dev": {
-      "dependsOn": ["@valley/shared#build"],
       "cache": false,
       "persistent": true
     },

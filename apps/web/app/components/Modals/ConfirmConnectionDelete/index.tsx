@@ -56,6 +56,7 @@ const ConfirmConnectionDeleteModal: React.FC<ConfirmConnectionDeleteProps> = ({
   const handleClick = async () => {
     setPending(true)
     await authClient.unlinkAccount({
+      accountId: data.id,
       providerId: data.provider,
       fetchOptions: {
         onSuccess() {

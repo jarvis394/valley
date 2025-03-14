@@ -70,7 +70,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         folderId: file.data.folderId!,
         file: {
           ...file.data,
-          dateCreated: new Date(file.data.dateCreated),
+          createdAt: new Date(file.data.dateCreated),
           height: file.data.height || null,
           width: file.data.width || null,
         },

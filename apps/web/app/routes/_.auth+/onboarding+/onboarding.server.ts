@@ -3,7 +3,6 @@ import { getSession, requireAnonymous } from 'app/server/auth/auth.server'
 import { z } from 'zod'
 import { combineHeaders } from '../../../utils/misc'
 import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
-import { ProviderUser } from '../../../server/auth/providers/provider'
 
 export async function requireOnboardingEmail(request: Request) {
   await requireAnonymous(request)
@@ -49,7 +48,6 @@ export async function requireOnboardingData(request: Request) {
   const onboardingSession = await onboardingSessionStorage.getSession(
     request.headers.get('cookie')
   )
-  const providerName = onboardingSession.get('provider')
   const interfaceLanguage = onboardingSession.get('interfaceLanguage')
   const usePassword = onboardingSession.get('usePassword')
   const password = onboardingSession.get('password')
@@ -58,6 +56,7 @@ export async function requireOnboardingData(request: Request) {
   const phone = onboardingSession.get('phone')
   let currentOnboardingStep = onboardingSession.get('onboardingStep')
   let userId = onboardingSession.get('userId')
+  let userName = onboardingSession.get('userName')
 
   if (!currentOnboardingStep) {
     currentOnboardingStep = 'language-select'
@@ -68,50 +67,30 @@ export async function requireOnboardingData(request: Request) {
     const session = await getSession(request)
     if (!session) throw redirect('/auth/login')
     userId = session.user.id
+    userName = session.user.name
   }
 
-  if (providerName) {
-    const { email } = await requireProviderData(request)
-    const prefilledProfile = onboardingSession.get('prefilledProfile')
+  const email = await requireOnboardingEmail(request)
 
-    return {
-      userId,
-      currentOnboardingStep,
-      submission: {
-        status: undefined,
-        prefilledProfile,
-        data: {
-          interfaceLanguage,
-          usePassword,
-          password,
-          firstName,
-          lastName,
-          phone,
-          email,
-        },
-        error: { '': [] },
+  return {
+    userId,
+    currentOnboardingStep,
+    submission: {
+      status: undefined,
+      prefilledProfile: {
+        firstName: userName?.split(' ').slice(0, -1)?.join(' '),
+        lastName: userName?.split(' ').slice(-1)[0],
       },
-    }
-  } else {
-    const email = await requireOnboardingEmail(request)
-
-    return {
-      userId,
-      currentOnboardingStep,
-      submission: {
-        status: undefined,
-        prefilledProfile: {} as ProviderUser,
-        data: {
-          email,
-          interfaceLanguage,
-          usePassword,
-          password,
-          firstName,
-          lastName,
-          phone,
-        },
+      data: {
+        email,
+        interfaceLanguage,
+        usePassword,
+        password,
+        firstName,
+        lastName,
+        phone,
       },
-    }
+    },
   }
 }
 

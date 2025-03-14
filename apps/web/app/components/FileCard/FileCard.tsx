@@ -55,7 +55,7 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
         padding={2}
       >
         <h6>{formatBytes(Number(file.size))}</h6>
-        <p>{file.type}</p>
+        <p>{file.contentType}</p>
       </Stack>
       <Menu.Separator />
       <Menu.Item
@@ -158,7 +158,7 @@ const FileCard: React.FC<FileCardProps> = ({
           >
             <Paper variant="secondary">
               <Footer color="var(--text-secondary)" />
-              Folder Cover
+              Cover
             </Paper>
           </Stack>
         )}

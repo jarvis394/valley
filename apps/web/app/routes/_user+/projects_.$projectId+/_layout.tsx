@@ -22,7 +22,7 @@ import {
 } from 'app/utils/cache'
 import type { Folder, Project } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
-import { getUserProject } from 'app/server/project/project.server'
+import { getUserProject } from 'app/server/services/project.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { FolderWithFiles } from '@valley/shared'
 import { requireUserId } from 'app/server/auth/auth.server'

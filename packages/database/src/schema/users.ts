@@ -18,6 +18,9 @@ export const users = pgTable('users', {
   emailVerified: boolean().notNull().default(false),
   onboarded: boolean().notNull().default(false),
   name: varchar().notNull(),
+  // TODO: remove when better-auth allows to change schema
+  /** Better Auth required field */
+  image: varchar(),
   /**
    * User gallery domains list.
    * Only first item is shown in admin panel, other domains can be taken by other users

@@ -126,6 +126,7 @@
   grid-template-columns: var(--grid-columns);
   gap: var(--grid-gap);
   padding-bottom: 24px;
+  animation-duration: 150ms;
 }
 
 @media screen and (width < 600px) {

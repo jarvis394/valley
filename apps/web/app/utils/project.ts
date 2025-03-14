@@ -21,7 +21,10 @@ export function useProject(propsProject?: ProjectWithFolders) {
     (state) => state.projects[projectId || '']
   )
   const parsedStoreProject = useMemo(() => {
-    const res: ProjectWithFolders = { ...storeProject, folders: [] }
+    const res: ProjectWithFolders = {
+      ...storeProject,
+      folders: [],
+    }
     if (!storeProject) return propsProject || project
     for (const id in storeProject.folders) {
       const folder = storeProject.folders[id]

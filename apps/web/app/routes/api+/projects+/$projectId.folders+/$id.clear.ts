@@ -2,7 +2,7 @@ import { LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { db, files, folders, projects } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getProjectFolderAndProject } from 'app/server/folder/folder.server'
+import { getProjectFolderAndProject } from 'app/server/services/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { eq } from 'drizzle-orm'
 
