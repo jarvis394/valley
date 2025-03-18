@@ -1,7 +1,6 @@
 import { createCookieSessionStorage } from '@remix-run/node'
 import { InterfaceLanguage } from '../../config/language'
 import type { Account, User } from '@valley/db'
-import { ProviderName } from '../../config/connections'
 
 export type OnboardingStep = 'language-select' | 'security' | 'details'
 

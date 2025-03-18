@@ -16,7 +16,7 @@ const AccountSettingsGeneral: React.FC<{
   const activeDomain = user?.domains[0]
 
   return (
-    <Stack direction={'column'} gap={4} fullWidth>
+    <>
       <Fieldset
         title={'Display Name'}
         subtitle={
@@ -69,7 +69,7 @@ const AccountSettingsGeneral: React.FC<{
           />
         )}
       </Fieldset>
-    </Stack>
+    </>
   )
 }
 

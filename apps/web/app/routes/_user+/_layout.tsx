@@ -3,7 +3,9 @@ import {
   Await,
   Outlet,
   ShouldRevalidateFunction,
+  useAsyncError,
   useLoaderData,
+  useNavigate,
   useSubmit,
 } from '@remix-run/react'
 import styles from './styles.module.css'
@@ -76,8 +78,12 @@ const UserGroupLayout: React.FC = () => {
  */
 export function ErrorBoundary() {
   const submit = useSubmit()
+  const navigate = useNavigate()
+  const error = useAsyncError()
 
   useEffect(() => {
+    if (!error) return navigate('/home')
+
     submit(
       {},
       {
@@ -86,7 +92,7 @@ export function ErrorBoundary() {
         viewTransition: true,
       }
     )
-  }, [submit])
+  }, [error, navigate, submit])
 
   return (
     <Stack

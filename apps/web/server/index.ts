@@ -1,14 +1,13 @@
-import crypto from 'node:crypto'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
-import express, { Response } from 'express'
-import rateLimit from 'express-rate-limit'
+import express from 'express'
+import rateLimit, { Options as RateLimitOptions } from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
-import helmet from 'helmet'
+import { helmet } from '@nichtsam/helmet/node-http'
 import morgan from 'morgan'
 import dotenv from '@dotenvx/dotenvx'
 import path from 'path'
@@ -43,7 +42,7 @@ const app = express()
 const getHost = (req: { get: (key: string) => string | undefined }) =>
   req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
 
-// Redirect HTTP requests to HTTPSapp.use((req, res, next) => {
+// Redirect HTTP requests to HTTPS
 app.use((req, res, next) => {
   if (req.method !== 'GET') return next()
 
@@ -73,6 +72,12 @@ app.get('*', (req, res, next) => {
 app.use(compression())
 app.disable('x-powered-by')
 
+app.use((_, res, next) => {
+  // The referrerPolicy breaks our redirectTo logic
+  helmet(res, { general: { referrerPolicy: false } })
+  next()
+})
+
 if (viteDevServer) {
   app.use(viteDevServer.middlewares)
 } else {
@@ -86,68 +91,19 @@ if (viteDevServer) {
   app.use(express.static('build/client', { maxAge: '1h' }))
 }
 
-// TODO: fix types
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-app.get(['/img/*', '/favicons/*'], (_req, res) => {
-  // if we made it past the express.static for these, then we're missing something.
-  // So we'll just send a 404 and won't bother calling other middleware.
-  return res.status(404).send('Not found')
+morgan.token('url', (req) => {
+  try {
+    return decodeURIComponent(req.url ?? '')
+  } catch {
+    return req.url ?? ''
+  }
 })
-
-morgan.token('url', (req) => decodeURIComponent(req.url ?? ''))
-app.use(
-  morgan('tiny', {
-    skip: (req, res) =>
-      res.statusCode === 200 && req.url?.startsWith('/resources/healthcheck'),
-  })
-)
-
-app.use((_, res, next) => {
-  res.locals.cspNonce = crypto.randomUUID()
-  next()
-})
-
-app.use(
-  helmet({
-    xPoweredBy: false,
-    referrerPolicy: { policy: 'same-origin' },
-    crossOriginEmbedderPolicy: false,
-    contentSecurityPolicy: {
-      directives: {
-        'connect-src': [
-          MODE === 'development' ? 'ws:' : null,
-          SENTRY_ENABLED ? '*.sentry.io' : null,
-          process.env.TUSD_URL || null,
-          process.env.UPLOAD_SERVICE_URL || null,
-          "'self'",
-        ].filter((e) => e !== null),
-        'font-src': ["'self'"],
-        'frame-src': ["'self'"],
-        'img-src': [
-          "'self'",
-          'data:',
-          'https://avatars.githubusercontent.com',
-          process.env.UPLOAD_SERVICE_URL || null,
-        ].filter((e) => e !== null),
-        'script-src': [
-          "'strict-dynamic'",
-          "'self'",
-          (_, res) => `'nonce-${(res as Response).locals.cspNonce}'`,
-        ],
-        'script-src-attr': [
-          (_, res) => `'nonce-${(res as Response).locals.cspNonce}'`,
-        ],
-        'upgrade-insecure-requests': null,
-      },
-    },
-  })
-)
+app.use(morgan('tiny'))
 
 const maxMultiple = IS_PROD ? 1 : 10_000
-const rateLimitDefault = {
+const rateLimitDefault: Partial<RateLimitOptions> = {
   windowMs: 60 * 1000,
-  max: 1000 * maxMultiple,
+  limit: 1000 * maxMultiple,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -216,8 +172,7 @@ async function getBuild() {
 app.all(
   '*',
   createRequestHandler({
-    getLoadContext: (_: unknown, res: Response) => ({
-      cspNonce: res.locals.cspNonce,
+    getLoadContext: (_: unknown) => ({
       serverBuild: getBuild(),
     }),
     mode: MODE,

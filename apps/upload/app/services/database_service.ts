@@ -1,14 +1,14 @@
 import app from '@adonisjs/core/services/app'
-import { PrismaClient } from '@valley/db'
+import { DatabaseClientType } from '@valley/db'
 
-let prisma: PrismaClient
+let db: DatabaseClientType
 
 /**
  * Returns a singleton instance of the PrismaClient class from the
  * container.
  */
 await app.booted(async () => {
-  prisma = await app.container.make('prisma:db')
+  db = await app.container.make('drizzle:db')
 })
 
-export { prisma as default }
+export { db as default }

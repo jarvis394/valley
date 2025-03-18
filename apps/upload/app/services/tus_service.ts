@@ -13,8 +13,6 @@ import { Storage } from '@google-cloud/storage'
 import type { Bucket } from '@google-cloud/storage'
 import { ALLOWED_ORIGINS } from '#config/cors'
 import FileService from '#services/file_service'
-import cookieSignature from 'cookie-signature'
-import prisma from '#services/prisma_service'
 import {
   BaseTusHookResponseErrorBody,
   MAX_UPLOAD_FILE_SIZE,
@@ -23,11 +21,11 @@ import {
   TusUploadMetadata,
 } from '@valley/shared'
 import { inject } from '@adonisjs/core'
-import FolderService from '#services/folder_service'
 import { IncomingMessage } from 'node:http'
 import deburr from 'lodash.deburr'
 import { TusHookResponseBuilder } from '#lib/tus_hook_response_builder'
-import logger from '@adonisjs/core/services/logger'
+import { getProjectFolder } from '@valley/db'
+import { auth } from '@valley/auth'
 
 const gcsStorage = new Storage({
   keyFilename: GCS_KEY_FILENAME,
@@ -36,10 +34,7 @@ const gcsStorage = new Storage({
 
 @inject()
 export default class TusService {
-  constructor(
-    private fileService: FileService,
-    private folderService: FolderService
-  ) {}
+  constructor(private fileService: FileService) {}
 
   static TUS_ENDPOINT_PATH = '/api/storage'
 
@@ -129,16 +124,14 @@ export default class TusService {
   }
 
   async getSessionFromRequest(req: IncomingMessage) {
-    logger.debug(
-      'tus: Reading session cookie from request: ',
-      req.headers.authorization
-    )
-    const encodedSession = cookieSignature.unsign(
-      req.headers.authorization || '',
-      env.get('SESSION_SECRET')
-    )
-    const invalidSessionError =
-      new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
+    const session = await auth.api.getSession({
+      headers: new Headers([req.rawHeaders]),
+    })
+
+    console.log(session)
+
+    if (!session) {
+      throw new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
         .setStatusCode(401)
         .setBody({
           ok: false,
@@ -146,37 +139,9 @@ export default class TusService {
           statusCode: 401,
         })
         .build()
-
-    if (!encodedSession) {
-      throw invalidSessionError
     }
 
-    let session: { sessionId: string } | null
-    try {
-      session = JSON.parse(
-        Buffer.from(encodedSession, 'base64').toString('ascii')
-      )
-    } catch (e) {
-      throw invalidSessionError
-    }
-
-    logger.debug('tus: Decoded session:', session)
-
-    if (!session) {
-      throw invalidSessionError
-    }
-
-    const dbSession = await prisma.session.findFirst({
-      where: {
-        id: session.sessionId,
-      },
-    })
-
-    if (!dbSession || dbSession.expirationDate < new Date()) {
-      throw invalidSessionError
-    }
-
-    return dbSession
+    return session
   }
 
   handleIncomingRequest: ServerOptions['onIncomingRequest'] = async (
@@ -229,18 +194,10 @@ export default class TusService {
       throw { status_code: 400, message: 'No metadata found' }
     }
 
-    const uploadFolder = await this.folderService.folder({
-      where: {
-        id: metadata['folder-id'],
-        Project: {
-          id: metadata['project-id'],
-          userId: session.userId,
-        },
-      },
-      select: {
-        id: true,
-        projectId: true,
-      },
+    const uploadFolder = await getProjectFolder({
+      folderId: metadata['folder-id'],
+      projectId: metadata['project-id'],
+      userId: session.user.id,
     })
 
     if (!uploadFolder) {
@@ -268,7 +225,7 @@ export default class TusService {
   ) => {
     const { storage } = upload
     const metadata = upload.metadata as TusUploadMetadata
-    const type = metadata?.type || 'application/octet-stream'
+    const contentType = metadata?.type || 'application/octet-stream'
     const dateCreated = new Date()
     const folderId = metadata?.['folder-id']
     const projectId = metadata?.['project-id']
@@ -293,27 +250,25 @@ export default class TusService {
           folderId,
           projectId,
           size,
-          key: storage.path,
-          bucket: storage.bucket || '',
+          path: storage.path,
           name,
-          dateCreated: dateCreated.toISOString(),
-          exifMetadata: {},
+          exif: {},
           id: upload.id,
-          type,
-          isPendingDeletion: false,
+          contentType,
+          deletedAt: null,
           canHaveThumbnails: false,
+          createdAt: dateCreated,
+          updatedAt: dateCreated,
         },
       })
 
     try {
       const file = await this.fileService.createFileForProjectFolder({
         id: upload.id,
-        type,
-        bucket: storage.bucket || '',
-        key: storage.path,
+        contentType,
+        path: storage.path,
         projectId,
         folderId,
-        dateCreated,
         name,
         size,
       })
@@ -322,7 +277,6 @@ export default class TusService {
       resBuilder.setBodyRecord('data', {
         ...resBuilder.body.data,
         ...file,
-        dateCreated: dateCreated.toISOString(),
       })
 
       return { res, ...resBuilder.build() }

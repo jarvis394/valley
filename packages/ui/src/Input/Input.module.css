@@ -83,12 +83,20 @@
   padding-right: 12px;
 }
 
-.input__before:has(:global(> .Button)) {
+.input--size-lg .input__before:has(:global(> .Button)) {
   padding-left: 8px;
 }
 
-.input__after:has(:global(> .Button)) {
+.input--size-lg .input__after:has(:global(> .Button)) {
   padding-right: 8px;
+}
+
+.input--size-md .input__before:has(:global(> .Button)) {
+  padding-left: 4px;
+}
+
+.input--size-md .input__after:has(:global(> .Button)) {
+  padding-right: 4px;
 }
 
 .input--size-md {

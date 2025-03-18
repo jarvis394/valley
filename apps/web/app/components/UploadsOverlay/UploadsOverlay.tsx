@@ -10,13 +10,7 @@ import cx from 'classnames'
 import ButtonBase from '@valley/ui/ButtonBase'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import Gauge from '@valley/ui/Gauge'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import calendar from 'dayjs/plugin/calendar'
 import { ClientOnly } from 'remix-utils/client-only'
-
-dayjs.extend(calendar)
-dayjs.extend(relativeTime)
 
 type UploadsOverlayHeaderProps = {
   isExpanded: boolean

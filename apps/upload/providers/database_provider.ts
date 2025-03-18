@@ -1,32 +1,32 @@
 import { ApplicationService } from '@adonisjs/core/types'
 import { HttpContext } from '@adonisjs/core/http'
-import { PrismaClient } from '@prisma/client'
+import { type DatabaseClientType, db } from '@valley/db'
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
-    'prisma:db': PrismaClient
+    'drizzle:db': DatabaseClientType
   }
 }
 
 declare module '@adonisjs/core/http' {
   interface HttpContext {
-    prisma: PrismaClient
+    db: DatabaseClientType
   }
 }
 
-export default class PrismaProvider {
+export default class DrizzleProvider {
   constructor(protected app: ApplicationService) {}
 
   static makePrismaClient() {
-    return new PrismaClient()
+    return db
   }
 
   /**
    * Register bindings to the container
    */
   register() {
-    this.app.container.singleton('prisma:db', async () => {
-      return PrismaProvider.makePrismaClient()
+    this.app.container.singleton('drizzle:db', async () => {
+      return DrizzleProvider.makePrismaClient()
     })
   }
 
@@ -34,9 +34,9 @@ export default class PrismaProvider {
    * The container bindings have booted
    */
   async boot() {
-    const prismaDb = await this.app.container.make('prisma:db')
-    HttpContext.getter('prisma', function (this: HttpContext) {
-      return prismaDb
+    const drizzleDb = await this.app.container.make('drizzle:db')
+    HttpContext.getter('db', function (this: HttpContext) {
+      return drizzleDb
     })
   }
 
@@ -49,13 +49,4 @@ export default class PrismaProvider {
    * The process has been started
    */
   async ready() {}
-
-  /**
-   * Preparing to shutdown the app
-   */
-  async shutdown() {
-    this.app.container.resolving('prisma:db', (prisma) => {
-      return prisma.$disconnect()
-    })
-  }
 }

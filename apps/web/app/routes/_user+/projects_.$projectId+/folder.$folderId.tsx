@@ -17,7 +17,7 @@ import IconButton from '@valley/ui/IconButton'
 import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
-import { formatBytes } from 'app/utils/misc'
+import { formatBytes, useRootLoaderData } from 'app/utils/misc'
 import { data, HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   combineServerTimings,
@@ -75,7 +75,6 @@ import { ClientOnly } from 'remix-utils/client-only'
 import { useModal } from 'app/hooks/useModal'
 import { getProjectFolderFiles } from 'app/server/services/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
-import { useRootLoaderData } from 'app/root'
 import { useUserStore } from 'app/utils/user'
 import { auth } from '@valley/auth'
 

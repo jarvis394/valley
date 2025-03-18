@@ -12,7 +12,11 @@ import styles from '../auth.module.css'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import * as z from 'zod'
-import { EmailSchema, PasswordSchema } from '../../../utils/user-validation'
+import {
+  EmailSchema,
+  PasswordSchema,
+  passwordMinLengthError,
+} from '../../../utils/user-validation'
 import Button from '@valley/ui/Button'
 import { ArrowRight } from 'geist-ui-icons'
 import { useRemixForm, getValidatedFormData } from 'remix-hook-form'
@@ -22,7 +26,6 @@ import FormCollapsibleField from '../../../components/FormCollapsibleField/FormC
 import FormHelperText from '@valley/ui/FormHelperText'
 import PasswordField from '../../../components/PasswordField/PasswordField'
 import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
-import { PASSWORD_MIN_LENGTH } from '@valley/shared'
 
 const SecurityFormSchema = z
   .object({
@@ -135,7 +138,7 @@ export default function OnboardingSecurityRoute() {
                 size="lg"
                 placeholder="Password"
                 fieldState={getFieldState('password', formState)}
-                helperText={`Your password must contain ${PASSWORD_MIN_LENGTH} or more characters`}
+                helperText={passwordMinLengthError}
                 validHelperText="Your password meets all requirements"
                 {...register('password')}
               />

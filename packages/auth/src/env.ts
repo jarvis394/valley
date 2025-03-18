@@ -4,6 +4,7 @@ const schema = z.object({
   NODE_ENV: z.enum(['production', 'development', 'staging', 'test'] as const),
   DATABASE_DRIVER: z.enum(['neon', 'postgres']),
   SESSION_SECRET: z.string(),
+  WEB_SERVICE_URL: z.string(),
   RESEND_API_KEY: z.string().optional().default('MOCK_'),
 
   // GitHub OAuth

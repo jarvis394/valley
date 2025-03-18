@@ -1,9 +1,5 @@
 import { data, type LoaderFunctionArgs } from '@remix-run/node'
-import {
-  Await,
-  ShouldRevalidateFunction,
-  useLoaderData,
-} from '@remix-run/react'
+import { ShouldRevalidateFunction, useLoaderData } from '@remix-run/react'
 import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
 import Stack from '@valley/ui/Stack'
@@ -12,10 +8,9 @@ import { SOCIAL_PROVIDER_NAMES, ProviderName } from 'app/config/connections'
 import { VerificationType } from 'app/routes/_.auth+/verify+'
 import { requireUserId } from 'app/server/auth/auth.server'
 import { makeTimings, time } from 'app/server/timing.server'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { auth } from '@valley/auth'
 import AccountCard from 'app/components/AccountCard/AccountCard'
-import Skeleton from '@valley/ui/Skeleton'
 
 export const twoFAVerificationType = '2fa' satisfies VerificationType
 export const twoFAVerifyVerificationType = '2fa-verify'
@@ -77,12 +72,7 @@ const AccountSettingsAuthentication = () => {
   const data = useLoaderData<typeof loader>()
 
   return (
-    <Stack
-      gap={4}
-      style={{ maxWidth: 'var(--fieldset-max-width)' }}
-      direction={'column'}
-      fullWidth
-    >
+    <>
       <Stack asChild gap={3} direction={'column'} padding={4}>
         <Paper variant="border" rounded>
           <h3
@@ -108,7 +98,7 @@ const AccountSettingsAuthentication = () => {
         </Paper>
       </Stack>
       <Accounts data={data.accounts as AccountData[]} />
-    </Stack>
+    </>
   )
 }
 

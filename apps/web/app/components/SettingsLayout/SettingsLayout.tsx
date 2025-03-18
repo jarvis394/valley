@@ -98,6 +98,8 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
             <Stack
               className={styles.settings__outlet}
               padding={{ sm: 4, md: 4, lg: 0, xl: 0 }}
+              direction={'column'}
+              gap={4}
             >
               <Outlet />
             </Stack>

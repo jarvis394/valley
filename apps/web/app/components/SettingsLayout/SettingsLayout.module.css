@@ -2,6 +2,10 @@
   .settings__wrapper {
     --page-margin: 0px;
   }
+
+  .settings__outlet {
+    max-width: initial !important;
+  }
 }
 
 .settings__wrapper {

@@ -36,7 +36,7 @@ export default defineConfig({
     () => import('@adonisjs/core/providers/vinejs_provider'),
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/session/session_provider'),
-    () => import('#providers/prisma_provider'),
+    () => import('#providers/database_provider'),
     () => import('@adonisjs/drive/drive_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('@adonisjs/lock/lock_provider'),

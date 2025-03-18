@@ -15,7 +15,7 @@ export const UsernameSchema = z
   // users can type the username in any case, but we store it in lowercase
   .transform((value) => value.toLowerCase())
 
-const passwordMinLengthError = `Your password must contain ${PASSWORD_MIN_LENGTH} or more characters`
+export const passwordMinLengthError = `Your password must contain ${PASSWORD_MIN_LENGTH} or more characters`
 export const PasswordSchema = z
   .string({
     required_error: passwordMinLengthError,

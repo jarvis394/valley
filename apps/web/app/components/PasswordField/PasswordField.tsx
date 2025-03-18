@@ -6,7 +6,6 @@ import React, { useState } from 'react'
 const PasswordField = React.forwardRef<HTMLInputElement, TextFieldProps>(
   function PasswordField({ type = 'password', ...props }, ref) {
     const [showPassword, setShowPassword] = useState(false)
-
     const handleClickShowPassword = () => setShowPassword((show) => !show)
 
     return (
@@ -17,7 +16,7 @@ const PasswordField = React.forwardRef<HTMLInputElement, TextFieldProps>(
           <IconButton
             onClick={handleClickShowPassword}
             type="button"
-            variant="tertiary"
+            variant="tertiary-dimmed"
           >
             {showPassword ? <EyeOff /> : <Eye />}
           </IconButton>

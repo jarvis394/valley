@@ -1,8 +1,18 @@
-import { useFormAction, useNavigation } from '@remix-run/react'
+import {
+  useFormAction,
+  useNavigation,
+  useRouteLoaderData,
+} from '@remix-run/react'
 import type { HTMLFormMethod } from '@remix-run/router'
+import { loader as rootLoader } from 'app/root'
 import prettyBytes from 'pretty-bytes'
 import { useMemo } from 'react'
 import * as z from 'zod'
+
+export const useRootLoaderData = () => {
+  const rootContext = useRouteLoaderData<typeof rootLoader>('root')
+  return rootContext!
+}
 
 export function getErrorMessage(error: unknown) {
   if (typeof error === 'string') return error

@@ -1,4 +1,10 @@
 .Footer {
+  background-color: var(--background-paper);
+  width: 100%;
+  --page-margin: 0;
+}
+
+.Footer__wrapper {
   width: 100%;
   border: none;
   border-radius: 0;

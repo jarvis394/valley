@@ -1,34 +1,15 @@
+import { ExifData, ExifDataKey } from '@valley/db'
 import dec2frac from '#utils/dec2frac'
 import drive from '@adonisjs/drive/services/main'
 import { Readable } from 'node:stream'
 import sharp from 'sharp'
 import logger from '@adonisjs/core/services/logger'
-import exifReader, { GenericTag } from 'exif-reader'
-
-type ExifDataKey =
-  | 'Artist'
-  | 'Copyright'
-  | 'DateTimeOriginal'
-  | 'Make'
-  | 'Model'
-  | 'LensModel'
-  | 'ExifImageWidth'
-  | 'ExifImageHeight'
-  | 'ExposureTime'
-  | 'ISO'
-  | 'FocalLength'
-  | 'ApertureValue'
-  | 'GPSLatitude'
-  | 'GPSLongitude'
-  | 'Flash'
-  | 'FNumber'
-  | 'Orientation'
+import exifReader from 'exif-reader'
 
 type ImageMetadata = {
   width?: number
   height?: number
 }
-type ExifData = Partial<Record<ExifDataKey, GenericTag | Date>>
 type ExifParsedData =
   | { ok: true; data: ExifData }
   | { ok: false; reason: string }
@@ -130,7 +111,7 @@ export default class ImageService {
             value = Math.round(value * 100) / 100
           }
 
-          if (value) {
+          if (value && !Array.isArray(value) && !Buffer.isBuffer(value)) {
             exifParsedData.data[typedKey] = value
           }
         }

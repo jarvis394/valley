@@ -16,6 +16,7 @@ import Skeleton from '@valley/ui/Skeleton'
 import { ProjectWithFolders } from '@valley/shared'
 import cx from 'classnames'
 import Image from '@valley/ui/Image'
+import { useRequestInfo } from 'app/utils/request-info'
 
 type ProjectCardProps =
   | {
@@ -28,9 +29,10 @@ type ProjectCardProps =
     }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
-  const timestamp = dayjs(project?.dateShot || project?.createdAt).format(
-    'MMMM D, YYYY'
-  )
+  const requestInfo = useRequestInfo()
+  const timestamp = dayjs(project?.dateShot || project?.createdAt)
+    .tz(requestInfo.hints.timeZone)
+    .format('MMMM D, YYYY')
   const defaultFolderId =
     project?.folders.find((e) => e.isDefaultFolder)?.id ||
     project?.folders[0]?.id

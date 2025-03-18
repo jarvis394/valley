@@ -2,36 +2,12 @@ import { decode, encode } from 'turbo-stream'
 import localforage from 'localforage'
 import { CacheAdapter } from './cache'
 
-function promiseToReadableStream(
-  promise: Promise<Uint8Array | null>
-): ReadableStream<Uint8Array> {
-  return new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        const chunk = await promise
-        if (chunk !== null) {
-          controller.enqueue(chunk)
-        }
-        controller.close()
-      } catch (error) {
-        controller.error(error)
-      }
-    },
-  })
-}
-
 export class LocalForageAdapter {
   async getItem<T>(key: string): Promise<T | null> {
-    const encoded = localforage.getItem<Uint8Array>(key)
+    const encoded = await localforage.getItem<ReadableStream<string>>(key)
+    if (!encoded) return null
 
-    if (!(await encoded)) return null
-
-    const stream = promiseToReadableStream(encoded)
-    const decoded = await decode(stream)
-    const data = decoded.value
-
-    await decoded.done
-    return data as T
+    return (await decode(encoded)) as T
   }
 
   async setItem(key: string, value: unknown) {

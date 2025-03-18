@@ -1,5 +1,4 @@
 import {
-  covers,
   db,
   files,
   folders,

@@ -12,7 +12,7 @@
     "dotenv": "dotenvx run -f ../../.env --"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.14.2",
+    "@dotenvx/dotenvx": "^1.39.0",
     "@egjs/react-grid": "^1.17.0",
     "@valley/db": "*",
     "@valley/shared": "*",

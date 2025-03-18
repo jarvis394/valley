@@ -7,8 +7,8 @@ import {
 } from 'drizzle-orm'
 import { folders } from './folders'
 
-type ExifDataValue = number | string | Date
-type ExifDataKey =
+export type ExifDataValue = number | string | Date
+export type ExifDataKey =
   | 'Artist'
   | 'Copyright'
   | 'DateTimeOriginal'
@@ -26,7 +26,7 @@ type ExifDataKey =
   | 'Flash'
   | 'FNumber'
   | 'Orientation'
-type ExifData = Partial<Record<ExifDataKey, ExifDataValue>>
+export type ExifData = Partial<Record<ExifDataKey, ExifDataValue>>
 
 export const files = pgTable('files', {
   id: varchar().default(defaultId).primaryKey().notNull(),
