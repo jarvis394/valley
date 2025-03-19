@@ -3,7 +3,6 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db, schema } from '@valley/db'
 import { sendAuthEmail } from './lib/email'
 import { emailOTP, magicLink } from 'better-auth/plugins'
-import { passkey } from 'better-auth/plugins/passkey'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '@valley/shared'
 
 export const auth = betterAuth({
@@ -94,13 +93,6 @@ export const auth = betterAuth({
           email: data.email,
           magicLink: data.url,
         })
-      },
-    }),
-    passkey({
-      rpID: new URL(process.env.WEB_SERVICE_URL!).hostname,
-      rpName: 'Valley',
-      authenticatorSelection: {
-        userVerification: 'preferred',
       },
     }),
   ],

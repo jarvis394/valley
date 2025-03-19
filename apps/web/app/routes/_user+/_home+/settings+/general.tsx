@@ -25,6 +25,7 @@ const AccountSettingsGeneral: React.FC<{
         before={'Please use 32 characters at maximum.'}
         submitConfig={{
           action: '/api/user/edit',
+          preventScrollReset: true,
         }}
         schema={UserEditSchema}
         id="display-name-form"
@@ -55,6 +56,7 @@ const AccountSettingsGeneral: React.FC<{
         }
         submitConfig={{
           action: '/api/user/domain',
+          preventScrollReset: true,
         }}
         schema={UserDomainAddSchema}
         id="user-domain-form"

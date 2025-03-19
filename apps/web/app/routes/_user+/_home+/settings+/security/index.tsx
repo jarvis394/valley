@@ -1,41 +1,33 @@
-import { useActionData, useLoaderData, Form } from '@remix-run/react'
-import {
-  data,
-  LoaderFunctionArgs,
-  ShouldRevalidateFunction,
-} from '@remix-run/router'
-import Stack from '@valley/ui/Stack'
-import React, { useState } from 'react'
+import { data, type LoaderFunctionArgs } from '@remix-run/node'
+import { ShouldRevalidateFunction, useLoaderData } from '@remix-run/react'
+import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
-import Animated from '@valley/ui/Animated'
-import { CREDENTIAL_PROVIDER_NAME } from 'app/config/connections'
-import Button from '@valley/ui/Button'
-import styles from './security.module.css'
-import PasswordField from 'app/components/PasswordField/PasswordField'
-import {
-  getValidatedFormData,
-  RemixFormProvider,
-  useRemixForm,
-} from 'remix-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { requireUser, requireUserId } from 'app/server/auth/auth.server'
-import { db } from '@valley/db'
-import { FieldErrors } from 'react-hook-form'
-import { auth } from '@valley/auth'
-import { redirectWithToast } from 'app/server/toast.server'
-import {
-  PasswordSchema,
-  passwordMinLengthError,
-} from 'app/utils/user-validation'
-import { useIsPending } from 'app/utils/misc'
-import { authClient } from '@valley/auth/client'
+import Stack from '@valley/ui/Stack'
+import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
+import { SOCIAL_PROVIDER_NAMES, ProviderName } from 'app/config/connections'
+import { VerificationType } from 'app/routes/_.auth+/verify+'
+import { requireUserId } from 'app/server/auth/auth.server'
 import { makeTimings, time } from 'app/server/timing.server'
-import ButtonBase from '@valley/ui/ButtonBase'
-import dayjs from 'dayjs'
-import { useRequestInfo } from 'app/utils/request-info'
-import IconButton from '@valley/ui/IconButton'
-import { MoreHorizontal } from 'geist-ui-icons'
+import React from 'react'
+import { auth } from '@valley/auth'
+import AccountCard from 'app/components/AccountCard/AccountCard'
+import Password from './Password'
+import { action } from './security.server'
+import { z } from 'zod'
+import { PasswordSchema } from 'app/utils/user-validation'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+export const twoFAVerificationType = '2fa' satisfies VerificationType
+export const twoFAVerifyVerificationType = '2fa-verify'
+
+export type AccountData = {
+  id: string
+  provider: ProviderName
+  createdAt: Date
+  updatedAt: Date
+  accountId: string
+  scopes: string[]
+}
 
 export const UserSetPasswordSchema = z
   .object({
@@ -54,10 +46,13 @@ export const UserSetPasswordSchema = z
     }
   })
 
+export type FormData = z.infer<typeof UserSetPasswordSchema>
+export const resolver = zodResolver(UserSetPasswordSchema)
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireUserId(request)
   const timings = makeTimings('user accounts loader')
-  const accountsPromise = time(
+  const accounts = await time(
     () =>
       auth.api.listUserAccounts({
         headers: request.headers,
@@ -67,23 +62,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       type: 'user accounts',
     }
   )
-  const passkeysPromise = time(
-    () =>
-      auth.api.listPasskeys({
-        headers: request.headers,
-      }),
-    {
-      timings,
-      type: 'user passkeys',
-    }
-  )
-  const [accounts, passkeys] = await Promise.all([
-    accountsPromise,
-    passkeysPromise,
-  ])
 
   return data(
-    { accounts, passkeys },
+    { accounts },
     { headers: { 'Server-Timing': timings.toString() } }
   )
 }
@@ -92,374 +73,66 @@ export const shouldRevalidate: ShouldRevalidateFunction = () => {
   return true
 }
 
-export const action = async ({ request }: LoaderFunctionArgs) => {
-  const user = await requireUser(request)
+export { action }
 
-  const {
-    errors,
-    data: submissionData,
-    receivedValues: defaultValues,
-  } = await getValidatedFormData<FormData>(request, resolver)
-  if (errors) {
-    return data(
-      { ok: false, errors, defaultValues },
-      {
-        status: 400,
-      }
+const Accounts: React.FC<{
+  data: AccountData[] | null
+}> = ({ data }) => {
+  if (data && data.length > 0) {
+    return (
+      <Stack direction={'column'}>
+        {data.map((item) => (
+          <AccountCard canDelete={data.length > 1} data={item} key={item.id} />
+        ))}
+      </Stack>
     )
-  }
-
-  const exists = await db.query.accounts.findFirst({
-    where: (accounts, { eq, and }) =>
-      and(
-        eq(accounts.userId, user.id),
-        eq(accounts.providerId, CREDENTIAL_PROVIDER_NAME)
-      ),
-  })
-
-  if (exists) {
-    if (!submissionData.currentPassword) {
-      return data(
-        {
-          ok: false,
-          errors: {
-            currentPassword: {
-              type: 'required',
-            },
-          } satisfies FieldErrors<FormData>,
-          defaultValues,
-        },
-        {
-          status: 400,
-        }
-      )
-    }
-
-    try {
-      const res = await auth.api.changePassword({
-        body: {
-          currentPassword: submissionData.currentPassword,
-          newPassword: submissionData.password,
-          revokeOtherSessions: submissionData.revokeOtherSessions,
-        },
-        headers: request.headers,
-        returnHeaders: true,
-      })
-
-      return redirectWithToast(
-        '/settings/security',
-        {
-          type: 'info',
-          description: 'Password has been updated',
-        },
-        {
-          headers: res.headers,
-        }
-      )
-    } catch (e) {
-      return data(
-        {
-          ok: false,
-          errors: {
-            currentPassword: {
-              type: 'value',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              message: (e as any).body.message,
-            },
-          } satisfies FieldErrors<FormData>,
-          defaultValues,
-        },
-        {
-          status: 400,
-        }
-      )
-    }
   } else {
-    const res = await auth.api.setPassword({
-      body: {
-        newPassword: submissionData.password,
-      },
-      headers: request.headers,
-    })
-
-    if (res.status) {
-      return redirectWithToast('/settings/security', {
-        type: 'info',
-        description: 'Password has been set',
-      })
-    } else {
-      return data(
-        {
-          ok: false,
-          errors: {
-            password: {
-              type: 'value',
-              message: 'Unknown error occurred',
-            },
-          } satisfies FieldErrors<FormData>,
-          defaultValues,
-        },
-        {
-          status: 500,
-        }
-      )
-    }
+    return (
+      <Note variant="default" fill>
+        You don&apos;t have any connections yet.
+      </Note>
+    )
   }
 }
 
-type FormData = z.infer<typeof UserSetPasswordSchema>
+const AddNewAccount = () => (
+  <Stack asChild gap={3} direction={'column'} padding={4}>
+    <Paper variant="border" rounded>
+      <h3
+        style={{
+          fontSize: 16,
+          fontWeight: 500,
+          color: 'var(--text-secondary)',
+        }}
+      >
+        Add New
+      </h3>
+      <Stack wrap gap={2}>
+        {SOCIAL_PROVIDER_NAMES.map((providerName) => (
+          <ProviderConnectionForm
+            key={providerName}
+            redirectTo={'/settings/auth'}
+            type="Connect"
+            providerName={providerName}
+            buttonProps={{ fullWidth: false }}
+          />
+        ))}
+      </Stack>
+    </Paper>
+  </Stack>
+)
 
-const resolver = zodResolver(UserSetPasswordSchema)
-
-const SecurityPage = () => {
+const AccountSettingsSecurity = () => {
   const data = useLoaderData<typeof loader>()
-  const credentialsAccount = data.accounts.find(
-    (e) => e.provider === CREDENTIAL_PROVIDER_NAME
-  )
-  const actionData = useActionData<typeof action>()
-  const [isSetPasswordBlockShown, setSetPasswordBlockShown] = useState(false)
-  const methods = useRemixForm<FormData>({
-    mode: 'all',
-    reValidateMode: 'onChange',
-    resolver,
-    defaultValues: actionData?.defaultValues,
-    errors: actionData?.errors as FieldErrors<FormData>,
-  })
-  const isPending = useIsPending({
-    formMethod: 'POST',
-  })
-  const requestInfo = useRequestInfo()
-
-  const showSetPasswordBlock = (e: React.MouseEvent) => {
-    e.preventDefault()
-    methods.reset()
-    setSetPasswordBlockShown(true)
-  }
-
-  const hideSetPasswordBlock = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setSetPasswordBlockShown(false)
-  }
-
-  const setUpPasskey = async () => {
-    const session = await authClient.getSession()
-    await authClient.passkey.addPasskey({
-      name: session.data?.user.name || 'Passkey',
-    })
-  }
-
-  // TODO: implement in UI
-  const _updatePasskey = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const id = e.currentTarget[0].nodeValue
-    const name = e.currentTarget[1].nodeValue
-    if (!name || !id) return
-
-    await authClient.passkey.updatePasskey({
-      name,
-      id,
-    })
-  }
+  const accounts = data.accounts as AccountData[]
 
   return (
     <>
-      <Stack
-        padding={{ sm: [5, 4, 4, 4], md: 6, lg: 6, xl: 6 }}
-        direction={'column'}
-        gap={3}
-        asChild
-      >
-        <Paper variant="secondary" rounded>
-          <RemixFormProvider {...methods}>
-            <h2 className={styles.security__blockTitle}>Password</h2>
-            <p className={styles.security__blockSubtitle}>
-              When you set up password you will still be able to use magic links
-              to log in
-            </p>
-            <Animated>
-              {credentialsAccount && !isSetPasswordBlockShown && (
-                <Stack align="center" gap={4}>
-                  <p className={styles.security__password}>••••••••••</p>
-                  <Button
-                    onClick={showSetPasswordBlock}
-                    variant="secondary"
-                    size="md"
-                  >
-                    Update password
-                  </Button>
-                </Stack>
-              )}
-              {!credentialsAccount && !isSetPasswordBlockShown && (
-                <Button
-                  onClick={showSetPasswordBlock}
-                  variant="secondary"
-                  size="md"
-                >
-                  Set password
-                </Button>
-              )}
-              {!credentialsAccount && isSetPasswordBlockShown && (
-                <Stack
-                  gap={4}
-                  padding={[4, 5]}
-                  direction={'column'}
-                  className={styles.security__form}
-                  asChild
-                >
-                  <Form method="POST" onSubmit={methods.handleSubmit}>
-                    <h3 className={styles.security__formTitle}>Set password</h3>
-                    <PasswordField
-                      {...methods.register('password')}
-                      id="password"
-                      label={'New password'}
-                      helperText={passwordMinLengthError}
-                      validHelperText="Your password meets all requirements"
-                      fieldState={methods.getFieldState(
-                        'password',
-                        methods.formState
-                      )}
-                    />
-                    <PasswordField
-                      {...methods.register('confirmPassword')}
-                      label={'Confirm password'}
-                      id="confirm-password"
-                      fieldState={methods.getFieldState(
-                        'confirmPassword',
-                        methods.formState
-                      )}
-                    />
-                    <Stack gap={2} justify={'flex-end'}>
-                      <Button
-                        type="button"
-                        onClick={hideSetPasswordBlock}
-                        variant="tertiary-dimmed"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        loading={isPending}
-                        disabled={isPending}
-                        type="submit"
-                        variant="primary"
-                      >
-                        Save
-                      </Button>
-                    </Stack>
-                  </Form>
-                </Stack>
-              )}
-              {credentialsAccount && isSetPasswordBlockShown && (
-                <Stack
-                  gap={4}
-                  padding={[4, 5]}
-                  direction={'column'}
-                  className={styles.security__form}
-                  asChild
-                >
-                  <Form method="POST" onSubmit={methods.handleSubmit}>
-                    <h3 className={styles.security__formTitle}>
-                      Update password
-                    </h3>
-                    <PasswordField
-                      {...methods.register('currentPassword')}
-                      id="current-password"
-                      autoComplete="current-password"
-                      label={'Current password'}
-                      fieldState={{
-                        ...methods.getFieldState(
-                          'currentPassword',
-                          methods.formState
-                        ),
-                        isTouched: true,
-                      }}
-                    />
-                    <PasswordField
-                      {...methods.register('password')}
-                      id="password"
-                      label={'New password'}
-                      autoComplete="new-password"
-                      helperText={passwordMinLengthError}
-                      validHelperText="Your password meets all requirements"
-                      fieldState={methods.getFieldState(
-                        'password',
-                        methods.formState
-                      )}
-                    />
-                    <PasswordField
-                      {...methods.register('confirmPassword')}
-                      label={'Confirm password'}
-                      id="confirm-password"
-                      fieldState={methods.getFieldState(
-                        'confirmPassword',
-                        methods.formState
-                      )}
-                    />
-                    <Stack gap={2} justify={'flex-end'}>
-                      <Button
-                        type="button"
-                        onClick={hideSetPasswordBlock}
-                        variant="tertiary-dimmed"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        loading={isPending}
-                        disabled={isPending}
-                        type="submit"
-                        variant="primary"
-                      >
-                        Save
-                      </Button>
-                    </Stack>
-                  </Form>
-                </Stack>
-              )}
-            </Animated>
-          </RemixFormProvider>
-        </Paper>
-      </Stack>
-
-      <Stack
-        padding={{ sm: [5, 4, 4, 4], md: 6, lg: 6, xl: 6 }}
-        direction={'column'}
-        gap={3}
-        asChild
-      >
-        <Paper variant="secondary" rounded>
-          <h2 className={styles.security__blockTitle}>Passkey</h2>
-          <Stack direction="column" gap={1}>
-            {data.passkeys.map((passkey) => (
-              <Stack
-                gap={8}
-                key={passkey.id}
-                direction="row"
-                padding={2}
-                className={styles.security__passkey}
-                asChild
-              >
-                <ButtonBase variant="tertiary">
-                  <Stack gap={1.5} direction="column" align="flex-start">
-                    {passkey.name || 'Passkey'}
-                    <p className={styles.security__passkeySubtitle}>
-                      {dayjs(passkey.createdAt)
-                        .tz(requestInfo.hints.timeZone)
-                        .calendar()}
-                    </p>
-                  </Stack>
-                  <IconButton variant="tertiary-dimmed">
-                    <MoreHorizontal />
-                  </IconButton>
-                </ButtonBase>
-              </Stack>
-            ))}
-          </Stack>
-          <Button onClick={setUpPasskey} variant="secondary" size="md">
-            Add passkey
-          </Button>
-        </Paper>
-      </Stack>
+      <AddNewAccount />
+      <Accounts data={accounts} />
+      <Password data={accounts} />
     </>
   )
 }
 
-export default SecurityPage
+export default React.memo(AccountSettingsSecurity)

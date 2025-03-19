@@ -6,7 +6,7 @@ import {
   PROVIDER_MANAGE_LINKS,
   PROVIDER_WEBSITES,
 } from 'app/config/connections'
-import { AccountData } from 'app/routes/_user+/_home+/settings+/auth'
+import { AccountData } from 'app/routes/_user+/_home+/settings+/security'
 import React, { Suspense, useState } from 'react'
 import styles from './AccountCard.module.css'
 import Menu from '@valley/ui/Menu'

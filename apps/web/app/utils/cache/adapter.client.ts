@@ -1,21 +1,22 @@
-import { decode, encode } from 'turbo-stream'
 import localforage from 'localforage'
 import { CacheAdapter } from './cache'
 
 export class LocalForageAdapter {
-  async getItem<T>(key: string): Promise<T | null> {
-    const encoded = await localforage.getItem<ReadableStream<string>>(key)
-    if (!encoded) return null
+  constructor() {
+    localforage.config({
+      name: 'valley',
+      version: 1.0,
+      storeName: 'cache',
+    })
+  }
 
-    return (await decode(encoded)) as T
+  async getItem<T>(key: string): Promise<T | null> {
+    const value = await localforage.getItem<T>(key)
+    return value || null
   }
 
   async setItem(key: string, value: unknown) {
-    const stream = encode(value)
-    const reader = stream.getReader().read()
-    const setter = localforage.setItem(key, (await reader).value)
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    ;(await reader).done
+    const setter = localforage.setItem(key, value)
     return await setter
   }
 

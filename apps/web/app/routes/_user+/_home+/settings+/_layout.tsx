@@ -7,7 +7,6 @@ import PageHeader from 'app/components/PageHeader/PageHeader'
 const basePath = '/settings'
 const ACCOUNT_SETTINGS_TABS = [
   { label: 'General', to: '/general' },
-  { label: 'Authentication', to: '/auth' },
   { label: 'Security', to: '/security' },
 ]
 

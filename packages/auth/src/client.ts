@@ -1,13 +1,9 @@
-import {
-  emailOTPClient,
-  magicLinkClient,
-  passkeyClient,
-} from 'better-auth/client/plugins'
+import { emailOTPClient, magicLinkClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/react'
 import { showToast } from '@valley/ui/Toast'
 
 export const authClient = createAuthClient({
-  plugins: [emailOTPClient(), magicLinkClient(), passkeyClient()],
+  plugins: [emailOTPClient(), magicLinkClient()],
   fetchOptions: {
     onError: (ctx) => {
       showToast({
