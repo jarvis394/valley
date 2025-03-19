@@ -1,5 +1,5 @@
 import { invariant } from './invariant'
-import { useRootLoaderData } from '../root'
+import { useRootLoaderData } from './misc'
 
 /**
  * @returns the request info from the root loader (throws an error if it does not exist)

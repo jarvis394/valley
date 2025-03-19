@@ -203,7 +203,7 @@ const ProjectFoldersModal: React.FC<{ onClose?: () => void }> = ({
   onClose,
 }) => {
   const project = useProject()
-  const createFolderAction = '/api/folders/create'
+  const createFolderAction = '/api/projects/' + project.id + '/folders/create'
   const createFolderFetcher = useFetcher({ key: createFolderAction })
 
   return (

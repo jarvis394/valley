@@ -6,6 +6,7 @@ import {
   type ClientLoaderFunctionArgs,
   useLoaderData,
   useNavigate,
+  useRouteLoaderData,
 } from '@remix-run/react'
 import { cache } from './adapter.client'
 
@@ -110,16 +111,14 @@ export const createClientLoaderCache = (props?: CacheClientLoaderArgs) => {
   return clientLoader
 }
 
-export function useCachedLoaderData<T>(
-  {
-    adapter = cache,
-    data: propsData,
-  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  { adapter?: CacheAdapter; data?: any } = { adapter: cache }
-) {
+function useCachedData<T>({
+  data = {},
+  adapter = cache,
+}: {
+  adapter?: CacheAdapter
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loaderData = useLoaderData() as any
-  const data = propsData || loaderData
+  data?: any
+}) {
   const navigate = useNavigate()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [freshData, setFreshData] = useState<any>({
@@ -175,6 +174,37 @@ export function useCachedLoaderData<T>(
     cacheKey: data.key,
     invalidate: () => invalidateCache(data.key),
   } as SerializeFrom<T> & { cacheKey?: string; invalidate: () => Promise<void> }
+}
+
+export function useCachedRouteLoaderData<T>({
+  adapter = cache,
+  data: propsData,
+  route,
+}: {
+  route: string
+  adapter?: CacheAdapter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loaderData = useRouteLoaderData(route) as any
+  const data = propsData || loaderData
+  const res = useCachedData<T>({ data, adapter })
+  return res
+}
+
+export function useCachedLoaderData<T>(
+  {
+    adapter = cache,
+    data: propsData,
+  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { adapter?: CacheAdapter; data?: any } = { adapter: cache }
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loaderData = useLoaderData() as any
+  const data = propsData || loaderData
+  const res = useCachedData<T>({ data, adapter })
+  return res
 }
 
 const constructKey = (request: Request) => {

@@ -1,10 +1,23 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
-import { logout } from 'app/server/auth/auth.server'
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  redirect,
+} from '@remix-run/node'
+import { auth } from '@valley/auth'
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  return logout({ request })
+const logout = async (request: Request) => {
+  const response = await auth.api.signOut({
+    headers: request.headers,
+    asResponse: true,
+  })
+
+  return redirect('/auth/login', { headers: response.headers })
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-  return logout({ request })
+export function loader({ request }: LoaderFunctionArgs) {
+  return logout(request)
+}
+
+export function action({ request }: ActionFunctionArgs) {
+  return logout(request)
 }

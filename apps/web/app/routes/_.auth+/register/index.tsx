@@ -8,20 +8,17 @@ import {
   data,
   HeadersFunction,
 } from '@remix-run/node'
-import { prisma } from '../../../server/db.server'
 import { EmailSchema } from '../../../utils/user-validation'
 import { z } from 'zod'
-import { prepareVerification } from '../verify+/verify.server'
-import { useIsPending } from '../../../utils/misc'
+import { getDomainUrl, useIsPending } from '../../../utils/misc'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
-import { sendRegisterEmail } from '../../../server/email.server'
 import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
-import { PROVIDER_NAMES } from 'app/config/connections'
+import { SOCIAL_PROVIDER_NAMES } from 'app/config/connections'
 import Stack from '@valley/ui/Stack'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
-import { redirectToKey, targetKey } from '../verify+'
+import type { VerificationType } from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkHoneypot } from 'app/server/honeypot.server'
 import {
@@ -31,6 +28,10 @@ import {
 } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
 import TextField from '@valley/ui/TextField'
+import { db, users } from '@valley/db'
+import { eq } from 'drizzle-orm'
+import { auth } from '@valley/auth'
+import { typeKey, targetKey, redirectToKey } from 'app/config/paramsKeys'
 
 const SignupSchema = z.intersection(
   z.object({
@@ -46,6 +47,28 @@ const resolver = zodResolver(SignupSchema)
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
+}
+
+export function getRedirectToUrl({
+  request,
+  type,
+  target,
+  redirectTo,
+}: {
+  request: Request
+  type: VerificationType
+  target: string
+  redirectTo?: string
+}) {
+  const redirectToUrl = new URL(`${getDomainUrl(request)}/auth/verify`)
+  redirectToUrl.searchParams.set(typeKey, type)
+  redirectToUrl.searchParams.set(targetKey, target)
+
+  if (redirectTo) {
+    redirectToUrl.searchParams.set(redirectToKey, redirectTo)
+  }
+
+  return redirectToUrl
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -66,9 +89,9 @@ export async function action({ request }: ActionFunctionArgs) {
     )
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email: submissionData.email },
-    select: { id: true },
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, submissionData.email),
+    columns: { id: true },
   })
 
   if (existingUser) {
@@ -87,21 +110,21 @@ export async function action({ request }: ActionFunctionArgs) {
     )
   }
 
-  const { verifyUrl, redirectTo, otp } = await prepareVerification({
-    period: 10 * 60,
+  const response = await auth.api.sendVerificationOTP({
+    body: {
+      email: submissionData.email,
+      type: 'sign-in',
+    },
+  })
+
+  const redirectTo = getRedirectToUrl({
     request,
-    type: 'onboarding',
     target: submissionData.email,
     redirectTo: submissionData.redirectTo,
+    type: 'onboarding',
   })
 
-  const response = await sendRegisterEmail({
-    code: otp,
-    email: submissionData.email,
-    magicLink: verifyUrl.toString(),
-  })
-
-  if (response.status === 'success') {
+  if (response.success) {
     return redirect(redirectTo.toString())
   } else {
     return data(
@@ -109,7 +132,7 @@ export async function action({ request }: ActionFunctionArgs) {
         errors: {
           email: {
             type: 'value',
-            message: response.error.message,
+            message: 'Cannot register right now, try again later',
           },
         } satisfies FieldErrors<FormData>,
       },
@@ -150,7 +173,7 @@ const RegisterPage: React.FC = () => {
           direction={'column'}
           style={{ viewTransitionName: 'auth-providers' }}
         >
-          {PROVIDER_NAMES.map((providerName) => (
+          {SOCIAL_PROVIDER_NAMES.map((providerName) => (
             <ProviderConnectionForm
               key={providerName}
               providerName={providerName}

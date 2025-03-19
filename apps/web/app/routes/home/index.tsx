@@ -4,7 +4,7 @@ import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import { Link, useNavigation } from '@remix-run/react'
 import { ThemeSwitch } from '../resources+/theme-switch'
-import { useRootLoaderData } from '../../root'
+import { useRootLoaderData } from 'app/utils/misc'
 
 export const meta: MetaFunction = () => {
   return [

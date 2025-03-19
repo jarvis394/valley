@@ -29,9 +29,20 @@
   height: 20px;
 }
 
-.iconButton.iconButton--loading {
+.iconButton.iconButton.iconButton--size-sm.iconButton.iconButton--loading,
+.iconButton.iconButton.iconButton--size-md.iconButton.iconButton--loading {
+  --spinner-size: 16px;
+}
+
+.iconButton.iconButton.iconButton--size-lg.iconButton.iconButton--loading {
   padding: 14px;
   --x-padding: 14px;
+  --spinner-size: 20px;
+}
+
+.iconButton.iconButton.iconButton--size-xl.iconButton.iconButton--loading {
+  padding: 18px;
+  --x-padding: 18px;
   --spinner-size: 20px;
 }
 

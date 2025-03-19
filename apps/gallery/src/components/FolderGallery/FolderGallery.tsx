@@ -16,7 +16,8 @@ const FolderGallery: React.FC<FolderGalleryProps> = ({ folder }) => {
   const sortedFiles = useMemo(
     () =>
       folder.files.sort((a, b) => {
-        return a.name.localeCompare(b.name, undefined, {
+        if (!a.name || !b.name) return 1
+        return a.name?.localeCompare(b.name, undefined, {
           numeric: true,
         })
       }),

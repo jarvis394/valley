@@ -1,21 +1,17 @@
 import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
-import {
-  getUserIdFromSession,
-  requireLoggedIn,
-} from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
+import { db, projects } from '@valley/db'
+import { requireUserId } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
+import { and, eq } from 'drizzle-orm'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  await requireLoggedIn(request)
-
   const { projectId } = params
   invariantResponse(projectId, 'Missing project ID in route params')
 
-  const userId = await getUserIdFromSession(request)
-  const project = await prisma.project.findFirst({
-    where: { id: projectId, userId },
-    include: {
+  const userId = await requireUserId(request)
+  const project = await db.query.projects.findFirst({
+    where: and(eq(projects.id, projectId), eq(projects.userId, userId)),
+    with: {
       folders: true,
     },
   })

@@ -28,33 +28,39 @@ const Footer: React.FC = () => {
   return (
     <>
       <Divider variant="dimmed" />
-      <Stack
-        className={styles.Footer}
-        padding={6}
-        align={'center'}
-        justify={'center'}
-        asChild
-        direction={'column'}
-        gap={2}
-      >
-        <Wrapper>
-          <Link to="/">
-            <Logo className={styles.Footer__logo} withBrandName />
-          </Link>
-          <Stack gap={0} align={'center'}>
-            <IconButton asChild variant="tertiary-dimmed" size="md">
-              <a href={GITHUB_REPOSITORY_URL} target="_blank" rel="noreferrer">
-                <LogoGithub />
-              </a>
-            </IconButton>
-            <IconButton asChild variant="tertiary-dimmed" size="md">
-              <a href={TELEGRAM_PHOTOS_URL} target="_blank" rel="noreferrer">
-                <TelegramIcon />
-              </a>
-            </IconButton>
-          </Stack>
-        </Wrapper>
-      </Stack>
+      <div className={styles.Footer}>
+        <Stack
+          className={styles.Footer__wrapper}
+          padding={6}
+          align={'center'}
+          justify={'center'}
+          asChild
+          direction={'column'}
+          gap={2}
+        >
+          <Wrapper>
+            <Link to="/">
+              <Logo className={styles.Footer__logo} withBrandName />
+            </Link>
+            <Stack gap={0} align={'center'}>
+              <IconButton asChild variant="tertiary-dimmed" size="md">
+                <a
+                  href={GITHUB_REPOSITORY_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <LogoGithub />
+                </a>
+              </IconButton>
+              <IconButton asChild variant="tertiary-dimmed" size="md">
+                <a href={TELEGRAM_PHOTOS_URL} target="_blank" rel="noreferrer">
+                  <TelegramIcon />
+                </a>
+              </IconButton>
+            </Stack>
+          </Wrapper>
+        </Stack>
+      </div>
     </>
   )
 }

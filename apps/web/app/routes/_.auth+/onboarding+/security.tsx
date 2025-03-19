@@ -14,8 +14,8 @@ import TextField from '@valley/ui/TextField'
 import * as z from 'zod'
 import {
   EmailSchema,
-  PASSWORD_MIN_LENGTH,
   PasswordSchema,
+  passwordMinLengthError,
 } from '../../../utils/user-validation'
 import Button from '@valley/ui/Button'
 import { ArrowRight } from 'geist-ui-icons'
@@ -83,9 +83,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return redirect(url.toString(), {
     headers: {
-      'set-cookie': await onboardingSessionStorage.commitSession(
-        onboardingSession
-      ),
+      'set-cookie':
+        await onboardingSessionStorage.commitSession(onboardingSession),
     },
   })
 }
@@ -139,7 +138,7 @@ export default function OnboardingSecurityRoute() {
                 size="lg"
                 placeholder="Password"
                 fieldState={getFieldState('password', formState)}
-                helperText={`Your password must contain ${PASSWORD_MIN_LENGTH} or more characters`}
+                helperText={passwordMinLengthError}
                 validHelperText="Your password meets all requirements"
                 {...register('password')}
               />

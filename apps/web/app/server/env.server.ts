@@ -8,7 +8,7 @@ const schema = z.object({
   UPLOAD_SERVICE_URL: z.string(),
   GALLERY_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
-  RESEND_API_KEY: z.string(),
+  RESEND_API_KEY: z.string().optional().default('MOCK_'),
   WEB_PORT: z.string(),
   HOST: z.string().optional(),
 

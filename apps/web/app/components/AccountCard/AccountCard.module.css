@@ -1,0 +1,32 @@
+.accountCard {
+  --themed-border: transparent;
+  border: 1px solid var(--alpha-transparent-12);
+  border-top-width: 0;
+}
+
+.accountCard > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.accountCard:first-of-type {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border-top-width: 1px;
+}
+
+.accountCard:last-of-type {
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.accountCard__subtitle {
+  color: var(--text-secondary);
+}
+
+.accountCard__menuHeader {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-hint);
+}

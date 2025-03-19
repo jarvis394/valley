@@ -5,6 +5,7 @@ import {
   Outlet,
   ShouldRevalidateFunction,
   useLocation,
+  useNavigate,
 } from '@remix-run/react'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
@@ -14,7 +15,13 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
+import { authClient } from '@valley/auth/client'
+import Stack from '@valley/ui/Stack'
+import Avatar from '@valley/ui/Avatar'
+import IconButton from '@valley/ui/IconButton'
+import { Logout } from 'geist-ui-icons'
+import { useHydrated } from 'remix-utils/use-hydrated'
 
 const covers = [
   '/assets/cover-1.webp',
@@ -26,26 +33,11 @@ const covers = [
   '/assets/cover-7.webp',
   '/assets/cover-8.webp',
 ]
-const COVER_SWITCH_INTERVAL = 10000
+const COVER_SWITCH_INTERVAL = 7000
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAnonymous(request)
   return null
-}
-
-export const meta: MetaFunction = () => {
-  return [
-    {
-      name: 'theme-color',
-      media: '(prefers-color-scheme: light)',
-      content: '#fafafa',
-    },
-    {
-      name: 'theme-color',
-      media: '(prefers-color-scheme: dark)',
-      content: '#0a0a0a',
-    },
-  ]
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
@@ -56,14 +48,55 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
+const UserBlock = () => {
+  const session = authClient.useSession()
+  const navigate = useNavigate()
+  const [isPending, setPending] = useState(false)
+  const signOut = async () => {
+    setPending(true)
+    await authClient.signOut()
+    navigate('/auth/login')
+  }
+
+  if (session.error || session.isPending) return null
+
+  return (
+    <Stack gap={2} align={'center'} className="fade-in">
+      {session.data?.user.image && (
+        <Avatar src={session.data?.user.image || undefined}>
+          {session.data?.user.name[0]}
+        </Avatar>
+      )}
+      <p className={styles.auth__userBlockName}>
+        {session.data?.user.name || session.data?.user.email}
+      </p>
+      <IconButton
+        loading={isPending}
+        disabled={isPending}
+        variant="tertiary-dimmed"
+        onClick={signOut}
+      >
+        <Logout />
+      </IconButton>
+    </Stack>
+  )
+}
+
 const AuthGroupLayout = () => {
   const shouldShowCovers = useMediaQuery(
     `(min-width:${MIDDLE_VIEWPORT_WIDTH}px)`
   )
   const [activeCoverIndex, setActiveCoverIndex] = useState(0)
   const location = useLocation()
+  const isHydrated = useHydrated()
+  const isOnboarding = location.pathname.startsWith('/auth/onboarding')
   const linkButton = useMemo(() => {
     let data = { href: '#', label: '' }
+
+    if (isOnboarding) {
+      return null
+    }
+
     if (location.pathname.startsWith('/auth/login')) {
       data = { href: '/auth/register', label: 'I do not have an account' }
     } else if (location.pathname.startsWith('/auth/register')) {
@@ -79,7 +112,7 @@ const AuthGroupLayout = () => {
         </Link>
       </Button>
     )
-  }, [location.pathname])
+  }, [location.pathname, isOnboarding])
 
   useEffect(() => {
     if (!shouldShowCovers) {
@@ -100,7 +133,10 @@ const AuthGroupLayout = () => {
       <div className={styles.auth__section}>
         <AuthHeader />
         <Outlet />
-        {linkButton}
+        <div className={styles.auth__bottom}>
+          {linkButton}
+          {isOnboarding && isHydrated && <UserBlock />}
+        </div>
       </div>
       <Hidden sm md asChild>
         <div className={styles.auth__section}>

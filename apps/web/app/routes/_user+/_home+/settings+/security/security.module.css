@@ -1,0 +1,39 @@
+.security__blockTitle {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.security__blockSubtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.security__password {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.security__form {
+  background-color: var(--background-default);
+  border-radius: 12px;
+  border: 1px solid var(--alpha-transparent-07);
+  max-width: 360px;
+  box-shadow: var(--shadow-4);
+}
+
+.security__formTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.security__passkey {
+  font-size: 16px;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.security__passkeySubtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}

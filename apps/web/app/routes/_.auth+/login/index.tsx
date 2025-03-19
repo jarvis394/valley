@@ -1,28 +1,25 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import { PROVIDER_NAMES } from '../../../config/connections'
+import { SOCIAL_PROVIDER_NAMES } from 'app/config/connections'
 import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
-import { ProviderConnectionForm } from '../../../components/ProviderConnectionForm/ProviderConnectionForm'
+import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
 import { data, Form, useSearchParams } from '@remix-run/react'
 import {
   type ActionFunctionArgs,
   redirect,
   HeadersFunction,
 } from '@remix-run/node'
-import {
-  getSessionExpirationDate,
-  requireAnonymous,
-} from '../../../server/auth/auth.server'
+import { requireAnonymous } from 'app/server/auth/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { useIsPending } from '../../../utils/misc'
-import { checkHoneypot } from '../../../server/honeypot.server'
+import { useIsPending } from 'app/utils/misc'
+import { checkHoneypot } from 'app/server/honeypot.server'
 import { z } from 'zod'
-import { EmailSchema } from '../../../utils/user-validation'
-import { HoneypotInputs } from '../../../components/Honeypot/Honeypot'
-import { redirectToKey, targetKey } from '../verify+'
+import { EmailSchema } from 'app/utils/user-validation'
+import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
+import { redirectToKey, targetKey, typeKey } from 'app/config/paramsKeys'
 import TextField from '@valley/ui/TextField'
 import {
   getValidatedFormData,
@@ -30,12 +27,11 @@ import {
   useRemixForm,
 } from 'remix-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { prepareVerification } from '../verify+/verify.server'
-import { sendAuthEmail } from 'app/server/email.server'
 import { FieldErrors } from 'react-hook-form'
-import { prisma } from 'app/server/db.server'
-import { verifySessionStorage } from 'app/server/auth/verification.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
+import { db } from '@valley/db'
+import { auth } from '@valley/auth'
+import { VerificationType } from '../verify+'
 
 const EmailFormSchema = z.intersection(
   z.object({
@@ -77,60 +73,44 @@ export async function action({ request }: ActionFunctionArgs) {
     target: submissionData.email,
     ...(submissionData.redirectTo && { redirectTo: submissionData.redirectTo }),
   })
-  const user = await prisma.user.findUnique({
-    where: { email: submissionData.email },
-    include: { password: true },
+
+  const user = await db.query.users.findFirst({
+    where: (users, { eq }) => eq(users.email, submissionData.email),
+    with: {
+      accounts: {
+        columns: { password: true },
+      },
+    },
   })
+
   // Redirect to password login if no user to not to give any additional info to spambots
   if (!user) {
     return redirect('/auth/login/email?' + searchParams.toString())
   }
 
   // Redirect to password login if user has password
-  if (user.password) {
+  if (user.accounts.find((e) => e.password)) {
     return redirect('/auth/login/email?' + searchParams.toString())
   }
 
-  const session = await prisma.session.create({
-    select: { id: true, expirationDate: true, userId: true },
-    data: {
-      expirationDate: getSessionExpirationDate(),
-      userId: user.id,
+  // Send OTP code for sign-in and redirect to /auth/verify on success
+  const response = await auth.api.sendVerificationOTP({
+    body: {
+      email: submissionData.email,
+      type: 'sign-in',
     },
   })
-  const verifySession = await verifySessionStorage.getSession()
-  verifySession.set('unverifiedSessionId', session.id)
 
-  const { verifyUrl, redirectTo, otp } = await prepareVerification({
-    period: 10 * 60,
-    request,
-    type: 'auth',
-    target: submissionData.email,
-  })
-
-  const response = await sendAuthEmail({
-    code: otp,
-    email: submissionData.email,
-    magicLink: verifyUrl.toString(),
-  })
-
-  const headers = new Headers()
-  headers.append(
-    'set-cookie',
-    await verifySessionStorage.commitSession(verifySession)
-  )
-
-  if (response.status === 'success') {
-    return redirect(redirectTo.toString(), {
-      headers,
-    })
+  if (response.success) {
+    searchParams.set(typeKey, 'auth' satisfies VerificationType)
+    return redirect('/auth/verify?' + searchParams.toString())
   } else {
     return data(
       {
         errors: {
           email: {
             type: 'value',
-            message: response.error.message,
+            message: 'Could not send the OTP code, try again',
           },
         } satisfies FieldErrors<FormData>,
       },
@@ -173,7 +153,7 @@ const LoginPage: React.FC = () => {
           direction={'column'}
           style={{ viewTransitionName: 'auth-providers' }}
         >
-          {PROVIDER_NAMES.map((providerName) => (
+          {SOCIAL_PROVIDER_NAMES.map((providerName) => (
             <ProviderConnectionForm
               key={providerName}
               providerName={providerName}

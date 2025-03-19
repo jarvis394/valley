@@ -1,8 +1,8 @@
 import { inject } from '@adonisjs/core'
 import { Response } from '@adonisjs/http-server'
-import { Folder, Prisma, Project, File } from '@valley/db'
+import { Folder, Project, File, files, projects, eq } from '@valley/db'
 import { v4 as uuid } from 'uuid'
-import prisma from '#services/prisma_service'
+import db from '#services/database_service'
 import ImageService from '#services/image_service'
 import FolderService from '#services/folder_service'
 import ProjectService from '#services/project_service'
@@ -13,15 +13,20 @@ import logger from '@adonisjs/core/services/logger'
 
 type FileData = Omit<
   File,
-  | 'id'
-  | 'canHaveThumbnails'
-  | 'isPendingDeletion'
-  | 'exifMetadata'
+  | 'exif'
   | 'width'
   | 'height'
+  | 'canHaveThumbnails'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'deletedAt'
 > & {
-  id?: File['id']
   projectId: Project['id']
+  exif?: File['exif']
+  width?: File['width']
+  height?: File['height']
+  canHaveThumbnails?: File['canHaveThumbnails']
 }
 
 @inject()
@@ -41,35 +46,10 @@ export default class FileService {
     private readonly projectService: ProjectService
   ) {}
 
-  async file(args: Prisma.FileFindFirstArgs): Promise<File | null> {
-    return await prisma.file.findFirst(args)
-  }
-
-  async files(args: Prisma.FileFindManyArgs): Promise<File[]> {
-    return await prisma.file.findMany(args)
-  }
-
-  async createFile(data: Prisma.FileCreateInput): Promise<File> {
-    return await prisma.file.create({ data })
-  }
-
-  async update(params: {
-    where: Prisma.FileWhereUniqueInput
-    data: Prisma.FileUpdateInput
-  }): Promise<File> {
-    return await prisma.file.update(params)
-  }
-
-  async delete(where: Prisma.FileWhereUniqueInput): Promise<File> {
-    return await prisma.file.delete({ where })
-  }
-
-  async deleteMany(where: Prisma.FileWhereInput): Promise<Prisma.BatchPayload> {
-    return await prisma.file.deleteMany({ where })
-  }
-
   shouldProcessFileAsImage(data: FileData) {
-    const isImage = FileService.IMAGE_ALLOWED_CONTENT_TYPES.has(data.type)
+    const isImage =
+      data.contentType &&
+      FileService.IMAGE_ALLOWED_CONTENT_TYPES.has(data.contentType)
     const sizeAllowed = Number(data.size) <= FileService.MAX_PROCESSING_SIZE
     return isImage && sizeAllowed
   }
@@ -79,29 +59,24 @@ export default class FileService {
       throw new Error('createFileForProjectFolder: Folder ID is null')
     }
 
-    const fileData: Prisma.FileCreateInput = {
-      Folder: { connect: { id: data.folderId } },
-      key: data.key,
-      name: data.name,
-      size: data.size,
+    const fileData: FileData = {
+      ...data,
       // Set default file type if not present
-      type: data.type || 'application/octet-stream',
-      exifMetadata: {},
-      bucket: data.bucket,
+      contentType: data.contentType || 'application/octet-stream',
     }
 
     if (this.shouldProcessFileAsImage(data)) {
-      const { exif, metadata } = await this.imageService.parseImage(data.key)
+      const { exif, metadata } = await this.imageService.parseImage(data.path)
 
       if (exif.ok) {
-        fileData.exifMetadata = exif.data
+        fileData.exif = exif.data
       } else {
         logger.warn('Could not parse image EXIF: ' + exif.reason)
       }
 
       if (metadata.ok) {
-        fileData.width = metadata.data.width
-        fileData.height = metadata.data.height
+        fileData.width = metadata.data.width || null
+        fileData.height = metadata.data.height || null
         // API can only generate nice thumbnails when image dimensions are present
         fileData.canHaveThumbnails = true
       } else {
@@ -109,7 +84,7 @@ export default class FileService {
       }
     }
 
-    const databaseFile = await this.createFile(fileData)
+    const [databaseFile] = await db.insert(files).values(fileData).returning()
 
     await Promise.all([
       this.folderService.addFilesToFolder(data.folderId, [databaseFile]),
@@ -119,33 +94,28 @@ export default class FileService {
     return databaseFile
   }
 
-  async streamFile(key: string, res: Response) {
-    const parts = FileService.getFilePathnameParts(key)
+  async streamFile(path: string, res: Response) {
+    const parts = FileService.getFilePathnameParts(path)
     if (!parts.filename || !parts.projectId || !parts.folderId) {
       return res.badRequest('File path parts are missing')
     }
 
-    const parsedKey = FileService.makeUploadPath({
-      projectId: parts.projectId,
-      folderId: parts.folderId,
-      uploadId: parts.filename,
-    })
-
-    const databaseFile = await this.file({
-      where: {
-        key: parsedKey,
-        folderId: parts.folderId,
-        Folder: { projectId: parts.projectId },
-      },
-      select: { name: true, size: true, type: true },
-    })
+    // TODO: check for project protected status
+    const [result] = await db
+      .select()
+      .from(files)
+      .where(eq(files.path, path))
+      .leftJoin(projects, eq(projects.id, parts.projectId))
     const disk = drive.use()
+    const file = result?.files
 
-    if (!databaseFile) return res.notFound('File not found')
+    if (!file) return res.notFound('File not found')
+    // File is pending deletion
+    if (file.deletedAt) return res.notFound('File not found')
 
     try {
-      const metadata = await disk.getMetaData(key)
-      const data = await disk.getStream(key)
+      const metadata = await disk.getMetaData(path)
+      const data = await disk.getStream(path)
 
       if (!data) {
         return res.notFound('File not found on disk')
@@ -153,7 +123,7 @@ export default class FileService {
 
       res.header(
         'Content-Disposition',
-        contentDisposition(databaseFile.name, { type: 'inline' })
+        contentDisposition(file.name || file.id, { type: 'inline' })
       )
       res.header('Content-Length', metadata.contentLength)
       res.header(

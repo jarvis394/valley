@@ -66,11 +66,8 @@
   min-height: 5dvh;
   transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
   border: none;
-  box-shadow:
-    0 0 0 1px hsla(0, 0%, 100%, 0.145),
-    0px 1px 1px rgba(0, 0, 0, 0.02),
-    0px 4px 8px -4px rgba(0, 0, 0, 0.04),
-    0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-4);
+  border: 1px solid var(--alpha-transparent-07)
 }
 
 .modal__drawerHandle {

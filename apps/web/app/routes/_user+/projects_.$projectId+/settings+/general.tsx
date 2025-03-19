@@ -10,18 +10,18 @@ import { ProjectWithFolders } from '@valley/shared'
 const ProjectEditSchema: z.ZodType<Project> = z.object({
   id: z.string(),
   title: z.string(),
-  url: z.string(),
+  slug: z.string(),
   totalFiles: z.number(),
   totalSize: z.string(),
-  dateCreated: z.date(),
-  dateUpdated: z.date(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
   dateShot: z.date(),
   storedUntil: z.date().or(z.null()),
   language: z.string(),
   protected: z.boolean(),
-  password: z.string().or(z.null()),
+  passwordHash: z.string().or(z.null()),
   userId: z.string(),
-  translationStringsId: z.number().or(z.null()),
+  translationStringsId: z.string().or(z.null()),
 })
 
 const ProjectSettingsGeneral: React.FC<{
@@ -56,9 +56,9 @@ const ProjectSettingsGeneral: React.FC<{
       >
         {({ register, getFieldState, formState }) => (
           <TextField
-            {...register('url')}
-            fieldState={getFieldState('url', formState)}
-            defaultValue={project?.url}
+            {...register('slug')}
+            fieldState={getFieldState('slug', formState)}
+            defaultValue={project?.slug}
             size="lg"
             placeholder="Unique project URL"
           />
@@ -72,8 +72,8 @@ const ProjectSettingsGeneral: React.FC<{
       >
         {({ register, getFieldState, formState }) => (
           <TextField
-            {...register('url')}
-            fieldState={getFieldState('url', formState)}
+            {...register('slug')}
+            fieldState={getFieldState('slug', formState)}
             size="lg"
             placeholder="Unique project URL"
           />

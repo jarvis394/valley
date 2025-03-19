@@ -1,25 +1,23 @@
-import { Project, File } from '@valley/db'
+import { Project, File, projects, eq, covers } from '@valley/db'
 import type { SerializedProject } from '@valley/shared'
-import prisma from '#services/prisma_service'
+import db from '#services/database_service'
 
 export default class ProjectService {
   async addFilesToProject(
     projectId: Project['id'],
     files: File[]
   ): Promise<SerializedProject | null> {
-    return await prisma.$transaction(async (tx) => {
-      const [projectsQuery, projectCover] = await Promise.all([
-        tx.$queryRaw<
-          Project[]
-        >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`,
-        tx.cover.findFirst({
-          where: {
-            projectId,
-          },
-        }),
+    return await db.transaction(async (tx) => {
+      const [[project], [cover]] = await Promise.all([
+        tx
+          .select()
+          .from(projects)
+          .where(eq(projects.id, projectId))
+          .for('update'),
+        tx.select().from(covers).where(eq(covers.projectId, projectId)),
       ])
-      const project = projectsQuery[0]
-      const shouldCreateCover = !projectCover
+      const possibleCoverFile = files.find((e) => e.canHaveThumbnails)
+      const shouldCreateCover = !cover && possibleCoverFile
 
       if (!project) {
         return null
@@ -30,61 +28,26 @@ export default class ProjectService {
         allFilesSize += Number(file.size)
       })
 
+      const newProjectTotalFiles = project.totalFiles + files.length
       const newProjectTotalSize = Number(project.totalSize) + allFilesSize
-      const newProjectData = await tx.project.update({
-        where: { id: projectId },
-        data: {
-          ...(shouldCreateCover && {
-            coverImage: {
-              create: {
-                fileId: files[0].id,
-              },
-            },
-          }),
-          totalFiles: {
-            increment: files.length,
-          },
-          totalSize: {
-            set: newProjectTotalSize.toString(),
-          },
-        },
-      })
-
-      return ProjectService.serializeProject(newProjectData)
-    })
-  }
-
-  async deleteFilesFromProject(
-    projectId: Project['id'],
-    files: File[]
-  ): Promise<SerializedProject | null> {
-    return await prisma.$transaction(async (tx) => {
-      const query = await tx.$queryRaw<
-        Project[]
-      >`SELECT * FROM "Project" WHERE id=${projectId} FOR UPDATE`
-      const project = query[0]
-
-      if (!project) {
-        return null
-      }
-
-      let allFilesSize = 0
-      files.forEach((file) => {
-        allFilesSize += Number(file.size)
-      })
-
-      const newProjectTotalSize = Number(project.totalSize) - allFilesSize
-      const newProjectData = await tx.project.update({
-        where: { id: projectId },
-        data: {
-          totalFiles: {
-            decrement: files.length,
-          },
-          totalSize: {
-            set: newProjectTotalSize.toString(),
-          },
-        },
-      })
+      const updateProjectPromise = tx
+        .update(projects)
+        .set({
+          totalFiles: newProjectTotalFiles,
+          totalSize: newProjectTotalSize.toString(),
+        })
+        .where(eq(projects.id, projectId))
+        .returning()
+      const createFolderPromise =
+        shouldCreateCover &&
+        tx.insert(covers).values({
+          projectId,
+          fileId: possibleCoverFile.id,
+        })
+      const [[newProjectData]] = await Promise.all([
+        updateProjectPromise,
+        createFolderPromise,
+      ])
 
       return ProjectService.serializeProject(newProjectData)
     })

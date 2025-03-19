@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { db, users, userSettings } from '@valley/db'
 import { InterfaceLanguagesSchema } from 'app/config/language'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
 import { redirectWithToast } from 'app/server/toast.server'
 import { FullnameSchema } from 'app/utils/user-validation'
+import { eq } from 'drizzle-orm'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
 
@@ -25,7 +26,6 @@ export const UserSettingsEditSchema = z
 
 export const UserEditSchema = z
   .object({
-    email: z.string(),
     fullname: FullnameSchema,
     settings: UserSettingsEditSchema,
   })
@@ -55,18 +55,23 @@ export const action = async ({ request }: LoaderFunctionArgs) => {
   }
 
   try {
-    const updateUser = prisma.user.update({
-      where: { id: user.id },
-      data: {
-        fullname: submissionData.fullname,
-        email: submissionData.email,
-      },
+    await db.transaction(async (tx) => {
+      if (submissionData.fullname) {
+        await tx
+          .update(users)
+          .set({
+            name: submissionData.fullname,
+          })
+          .where(eq(users.id, user.id))
+      }
+
+      if (submissionData.settings) {
+        await tx
+          .update(userSettings)
+          .set(submissionData.settings)
+          .where(eq(userSettings.userId, user.id))
+      }
     })
-    const updateUserSettings = prisma.userSettings.update({
-      where: { userId: user.id },
-      data: submissionData.settings || {},
-    })
-    await prisma.$transaction([updateUser, updateUserSettings])
 
     return redirectWithToast('/settings/general', {
       type: 'info',

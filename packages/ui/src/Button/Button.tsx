@@ -16,6 +16,7 @@ export type ButtonOwnProps = Partial<
     after: React.ReactNode
     align: 'start' | 'center' | 'end'
     ref: React.Ref<HTMLButtonElement>
+    iconSize: number
   }> &
     ButtonBaseProps
 >
@@ -29,6 +30,7 @@ const Button = ({
   children,
   size = 'sm',
   variant = 'primary',
+  iconSize,
   loading,
   className,
   disabled,
@@ -56,6 +58,9 @@ const Button = ({
       variant={variant}
       disabled={disabled}
       shimmer={shimmer}
+      {...(iconSize && {
+        style: { ['--button-icon-size' as string]: iconSize + 'px' },
+      })}
       className={cx('Button', styles.button, className, {
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',

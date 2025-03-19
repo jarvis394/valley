@@ -1,16 +1,7 @@
 import { LoaderFunctionArgs } from '@remix-run/node'
-import { getUserId } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
-import { invariantResponse } from 'app/utils/invariant'
+import { requireUser } from 'app/server/auth/auth.server'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const userId = await getUserId(request)
-  invariantResponse(userId, 'User not found', { status: 404 })
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: { settings: true, projects: true },
-  })
-  invariantResponse(user, 'User not found', { status: 404 })
-
+  const user = await requireUser(request)
   return user
 }

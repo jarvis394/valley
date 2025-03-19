@@ -16,7 +16,7 @@ const AccountSettingsGeneral: React.FC<{
   const activeDomain = user?.domains[0]
 
   return (
-    <Stack direction={'column'} gap={4} fullWidth>
+    <>
       <Fieldset
         title={'Display Name'}
         subtitle={
@@ -25,6 +25,7 @@ const AccountSettingsGeneral: React.FC<{
         before={'Please use 32 characters at maximum.'}
         submitConfig={{
           action: '/api/user/edit',
+          preventScrollReset: true,
         }}
         schema={UserEditSchema}
         id="display-name-form"
@@ -33,7 +34,7 @@ const AccountSettingsGeneral: React.FC<{
           <TextField
             {...register('fullname')}
             fieldState={getFieldState('fullname', formState)}
-            defaultValue={user?.fullname}
+            defaultValue={user?.name}
             size="lg"
             fullWidth={false}
           />
@@ -55,6 +56,7 @@ const AccountSettingsGeneral: React.FC<{
         }
         submitConfig={{
           action: '/api/user/domain',
+          preventScrollReset: true,
         }}
         schema={UserDomainAddSchema}
         id="user-domain-form"
@@ -69,7 +71,7 @@ const AccountSettingsGeneral: React.FC<{
           />
         )}
       </Fieldset>
-    </Stack>
+    </>
   )
 }
 

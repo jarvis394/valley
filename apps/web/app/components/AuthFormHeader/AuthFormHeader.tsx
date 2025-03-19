@@ -4,7 +4,8 @@ import styles from './AuthFormHeader.module.css'
 import ButtonBase from '@valley/ui/ButtonBase'
 import { Link } from '@remix-run/react'
 import { PencilEdit } from 'geist-ui-icons'
-import { targetKey, VerificationType } from '../../routes/_.auth+/verify+'
+import type { VerificationType } from '../../routes/_.auth+/verify+'
+import { targetKey } from 'app/config/paramsKeys'
 
 type HeaderProps = {
   title: React.ReactElement | string

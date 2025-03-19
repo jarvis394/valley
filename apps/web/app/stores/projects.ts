@@ -1,19 +1,18 @@
-import type { File, Project, Folder, Cover } from '@valley/db'
+import type { File, Project, Folder } from '@valley/db'
+import { ProjectWithFolders } from '@valley/shared'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-
-type FileWithCover = File & { Cover?: Cover[] | null }
 
 type FolderWithFiles = Omit<Folder, 'files' | 'id' | 'projectId'> & {
   id: Folder['id']
   projectId: Project['id']
-  files?: FileWithCover[]
+  files?: File[]
 }
 
 type ProjectWithFoldersMap = Omit<Project, 'folders' | 'id'> & {
   id: Project['id']
   folders: Record<Folder['id'], FolderWithFiles>
-  coverImage?: (Cover & { File: File }) | null
+  cover?: ProjectWithFolders['cover']
 }
 
 export type ProjectsState = {
@@ -31,12 +30,12 @@ export type ProjectsAction = {
   setFiles: (props: {
     projectId: Project['id']
     folderId: Folder['id']
-    files: FileWithCover[]
+    files: File[]
   }) => void
   addFile: (props: {
     projectId: Project['id']
     folderId: Folder['id']
-    file: FileWithCover
+    file: File
   }) => void
 }
 
@@ -45,16 +44,16 @@ const makeDefaultProject = (id: Project['id']): ProjectWithFoldersMap => ({
   folders: {},
   totalFiles: 0,
   totalSize: '0',
-  dateCreated: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
   dateShot: new Date(),
-  dateUpdated: new Date(),
   language: 'ru',
-  password: null,
+  passwordHash: null,
   protected: false,
   storedUntil: null,
   title: '',
   translationStringsId: null,
-  url: '',
+  slug: '',
   userId: '',
 })
 
@@ -67,8 +66,8 @@ const makeDefaultFolder = (
   totalSize: '0',
   totalFiles: 0,
   files: [],
-  dateCreated: new Date(),
-  dateUpdated: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
   description: null,
   isDefaultFolder: false,
   title: 'Default',

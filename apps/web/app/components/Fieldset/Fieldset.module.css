@@ -17,6 +17,20 @@
   background-color: var(--red-100);
 }
 
+:global(body[data-theme='light']) {
+  .fieldset--danger {
+    border: 1px solid var(--red-900);
+  }
+
+  .fieldset--danger .fieldset__divider {
+    border-color: var(--red-900);
+  }
+
+  .fieldset--danger .fieldset__footer {
+    background-color: var(--red-1000);
+  }
+}
+
 .fieldset h2 {
   font-size: 20px;
   font-weight: 600;

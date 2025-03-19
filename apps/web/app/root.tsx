@@ -8,7 +8,6 @@ import {
   ScrollRestoration,
   ShouldRevalidateFunction,
   useLoaderData,
-  useRouteLoaderData,
 } from '@remix-run/react'
 import cx from 'classnames'
 import styles from './root.module.css'
@@ -28,10 +27,15 @@ import { combineHeaders, getDomainUrl } from './utils/misc'
 import { makeTimings, time } from './server/timing.server'
 import { HoneypotProvider } from './components/Honeypot/Honeypot'
 import { honeypot } from './server/honeypot.server'
-import Toaster, { useToast } from './components/Toast/Toast'
+import Toaster, { useToast } from '@valley/ui/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import calendar from 'dayjs/plugin/calendar'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -40,6 +44,11 @@ import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
+
+dayjs.extend(calendar)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 export const links: LinksFunction = () => [
   {
@@ -55,6 +64,11 @@ export const links: LinksFunction = () => [
     as: 'font',
     crossOrigin: 'anonymous',
     type: 'font/ttf',
+  },
+  {
+    rel: 'manifest',
+    href: '/site.webmanifest',
+    crossOrigin: 'use-credentials',
   },
 ]
 
@@ -170,7 +184,6 @@ export function Document({
           href="/apple-touch-icon.png"
           sizes="180x180"
         />
-        <link rel="manifest" href="/manifest.webmanifest" />
         <Meta />
         <Links />
       </head>
@@ -216,11 +229,6 @@ const App = () => {
       <Toaster theme={theme} />
     </HoneypotProvider>
   )
-}
-
-export const useRootLoaderData = () => {
-  const rootContext = useRouteLoaderData<typeof loader>('root')
-  return rootContext!
 }
 
 export const ErrorBoundary = GeneralErrorBoundary

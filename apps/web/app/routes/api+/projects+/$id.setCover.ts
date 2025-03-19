@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { requireUser } from 'app/server/auth/auth.server'
-import { prisma } from 'app/server/db.server'
+import { covers, db } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+import { getUserProject } from 'app/server/services/project.server'
+import { getUserFile } from 'app/server/services/file.server'
 
 export const ProjectSetCoverSchema = z.object({
   fileId: z.string(),
@@ -36,44 +38,30 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     )
   }
 
-  const cover = await prisma.cover.findFirst({
-    where: {
-      Project: {
-        id: projectId,
-        userId: user.id,
-      },
-    },
-    include: {
-      File: {
-        include: {
-          Folder: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      },
-    },
+  const project = await getUserProject({ userId: user.id, projectId })
+  invariantResponse(project, 'Project not found', { status: 404 })
+
+  const file = await getUserFile({
+    userId: user.id,
+    fileId: submissionData.fileId,
   })
-  const folderId = cover?.File.Folder?.id
+  invariantResponse(file.files.id, 'File not found', { status: 404 })
 
-  invariantResponse(cover, 'Project not found', { status: 404 })
-
-  await prisma.cover.upsert({
-    where: {
-      id: cover.id,
-    },
-    update: {
-      fileId: submissionData.fileId,
-    },
-    create: {
+  await db
+    .insert(covers)
+    .values({
       fileId: submissionData.fileId,
       projectId,
-    },
-  })
+    })
+    .onConflictDoUpdate({
+      target: covers.projectId,
+      set: {
+        fileId: submissionData.fileId,
+      },
+    })
 
-  if (folderId) {
-    return redirect('/projects/' + projectId + '/folder/' + folderId)
+  if (file.files.folderId) {
+    return redirect('/projects/' + projectId + '/folder/' + file.files.folderId)
   } else {
     return redirect('/projects/' + projectId)
   }

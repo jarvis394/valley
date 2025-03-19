@@ -2,6 +2,10 @@
   .settings__wrapper {
     --page-margin: 0px;
   }
+
+  .settings__outlet {
+    max-width: initial !important;
+  }
 }
 
 .settings__wrapper {
@@ -35,4 +39,8 @@
   justify-content: flex-start;
   border-radius: 0;
   border-bottom: 1px solid var(--alpha-transparent-07);
+}
+
+.settings__outlet {
+  max-width: var(--fieldset-max-width);
 }
