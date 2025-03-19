@@ -75,6 +75,7 @@ export const auth = betterAuth({
   advanced: {
     generateId: false,
     cookiePrefix: 'valley',
+    useSecureCookies: true,
   },
   plugins: [
     emailOTP({
