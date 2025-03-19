@@ -1,6 +1,13 @@
-import { db } from '../client'
+import { db } from '../client.js'
 import { and, eq, sql, exists } from 'drizzle-orm'
-import { Folder, Project, User, folders, projects, users } from '../schema'
+import {
+  Folder,
+  Project,
+  User,
+  folders,
+  projects,
+  users,
+} from '../schema/index.js'
 
 export const getProjectFolder = async ({
   folderId,

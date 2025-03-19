@@ -95,8 +95,6 @@ const ConfirmFileDeletionModal: React.FC<ConfirmFileDeletionProps> = ({
 }) => {
   const files = useFiles()
 
-  console.log(files)
-
   return <ModalContents onClose={onClose} files={files} />
 }
 

@@ -1,4 +1,4 @@
-import { defaultId, timestamps } from '../extend'
+import { defaultId, timestamps } from '../extend.js'
 import {
   pgTable,
   text,
@@ -12,10 +12,10 @@ import {
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { users } from './users'
-import { folders } from './folders'
-import { translationStrings } from './translationStrings'
-import { covers } from './covers'
+import { users } from './users.js'
+import { folders } from './folders.js'
+import { translationStrings } from './translationStrings.js'
+import { covers } from './covers.js'
 
 export const projects = pgTable('projects', {
   id: varchar().default(defaultId).primaryKey().notNull(),

@@ -1,12 +1,12 @@
-import { defaultId, timestamps } from '../extend'
+import { defaultId, timestamps } from '../extend.js'
 import { pgTable, text, varchar, boolean, integer } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { projects } from './projects'
-import { files } from './files'
+import { projects } from './projects.js'
+import { files } from './files.js'
 
 export const folders = pgTable('folders', {
   id: varchar().default(defaultId).primaryKey().notNull(),

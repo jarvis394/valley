@@ -22,7 +22,6 @@ type FileData = Omit<
   | 'updatedAt'
   | 'deletedAt'
 > & {
-  id?: File['id']
   projectId: Project['id']
   exif?: File['exif']
   width?: File['width']
@@ -95,33 +94,28 @@ export default class FileService {
     return databaseFile
   }
 
-  async streamFile(key: string, res: Response) {
-    const parts = FileService.getFilePathnameParts(key)
+  async streamFile(path: string, res: Response) {
+    const parts = FileService.getFilePathnameParts(path)
     if (!parts.filename || !parts.projectId || !parts.folderId) {
       return res.badRequest('File path parts are missing')
     }
 
-    const parsedPath = FileService.makeUploadPath({
-      projectId: parts.projectId,
-      folderId: parts.folderId,
-      uploadId: parts.filename,
-    })
-
     // TODO: check for project protected status
-    const [{ files: file }] = await db
+    const [result] = await db
       .select()
       .from(files)
+      .where(eq(files.path, path))
       .leftJoin(projects, eq(projects.id, parts.projectId))
-      .where(eq(files.path, parsedPath))
     const disk = drive.use()
+    const file = result?.files
 
     if (!file) return res.notFound('File not found')
     // File is pending deletion
     if (file.deletedAt) return res.notFound('File not found')
 
     try {
-      const metadata = await disk.getMetaData(key)
-      const data = await disk.getStream(key)
+      const metadata = await disk.getMetaData(path)
+      const data = await disk.getStream(path)
 
       if (!data) {
         return res.notFound('File not found on disk')

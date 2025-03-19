@@ -124,11 +124,14 @@ export default class TusService {
   }
 
   async getSessionFromRequest(req: IncomingMessage) {
-    const session = await auth.api.getSession({
-      headers: new Headers([req.rawHeaders]),
+    const headers = new Headers()
+    Object.entries(req.headers).forEach((entry) => {
+      const [key, value] = entry
+      value && headers.append(key, value.toString())
     })
-
-    console.log(session)
+    const session = await auth.api.getSession({
+      headers,
+    })
 
     if (!session) {
       throw new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
@@ -253,7 +256,7 @@ export default class TusService {
           path: storage.path,
           name,
           exif: {},
-          id: upload.id,
+          id: '',
           contentType,
           deletedAt: null,
           canHaveThumbnails: false,
@@ -264,7 +267,6 @@ export default class TusService {
 
     try {
       const file = await this.fileService.createFileForProjectFolder({
-        id: upload.id,
         contentType,
         path: storage.path,
         projectId,

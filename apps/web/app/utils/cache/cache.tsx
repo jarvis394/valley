@@ -112,7 +112,7 @@ export const createClientLoaderCache = (props?: CacheClientLoaderArgs) => {
 }
 
 function useCachedData<T>({
-  data,
+  data = {},
   adapter = cache,
 }: {
   adapter?: CacheAdapter

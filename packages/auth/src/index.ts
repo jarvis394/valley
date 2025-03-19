@@ -1,7 +1,7 @@
 import { betterAuth, Account } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db, schema } from '@valley/db'
-import { sendAuthEmail } from './lib/email'
+import { sendAuthEmail } from './lib/email.js'
 import { emailOTP, magicLink } from 'better-auth/plugins'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '@valley/shared'
 

@@ -1,11 +1,11 @@
-import { defaultId, timestamps } from '../extend'
+import { defaultId, timestamps } from '../extend.js'
 import { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { users } from './users'
+import { users } from './users.js'
 
 export const accounts = pgTable('accounts', {
   id: varchar().default(defaultId).primaryKey().notNull(),

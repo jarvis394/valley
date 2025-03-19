@@ -9,7 +9,7 @@ export function useFiles() {
   })
   const { projectId, folderId } = useParams()
   const storeFiles = useProjectsStore(
-    (state) => state.projects[projectId || ''].folders[folderId || ''].files
+    (state) => state.projects[projectId || '']?.folders?.[folderId || '']?.files
   )
 
   return storeFiles || folderData?.data || []

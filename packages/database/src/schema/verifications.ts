@@ -1,4 +1,4 @@
-import { timestamps, defaultId } from '../extend'
+import { timestamps, defaultId } from '../extend.js'
 import { pgTable, varchar, timestamp } from 'drizzle-orm/pg-core'
 import { type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
 

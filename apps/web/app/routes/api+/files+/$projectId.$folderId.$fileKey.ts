@@ -7,29 +7,31 @@ import { eq } from 'drizzle-orm'
 import { invariantResponse } from 'app/utils/invariant'
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { projectId, folderId, fileId } = params
+  const { projectId, folderId, fileKey } = params
   const headers = new Headers()
 
   headers.set('Cache-Control', 'public, max-age=31536000, immutable')
 
   invariantResponse(projectId, 'No project ID found in params')
   invariantResponse(folderId, 'No folder ID found in params')
-  invariantResponse(fileId, 'No file ID found in params')
+  invariantResponse(fileKey, 'No file key found in params')
 
+  const path = [projectId, folderId, fileKey].join('/')
   const [result] = await db
     .select()
     .from(files)
-    .leftJoin(folders, eq(folders.id, folderId))
-    .leftJoin(projects, eq(projects.id, projectId))
-    .where(eq(files.id, fileId))
+    .where(eq(files.path, path))
+    .leftJoin(folders, eq(folders.id, files.folderId))
+    .leftJoin(projects, eq(projects.id, folders.projectId))
 
-  if (!result.files || result.files.deletedAt) {
+  if (!result?.files || result?.files.deletedAt) {
     return data('File not found', { status: 404 })
   }
 
-  if (result.projects?.protected) {
-    return data('File not found', { status: 404 })
-  }
+  // TODO: implement protected projects
+  // if (result.projects?.protected) {
+  //   return data('File not found', { status: 404 })
+  // }
 
   const response = await getImgResponse(request, {
     headers,
@@ -41,10 +43,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     cacheFolder: process.env.VERCEL === '1' ? 'no_cache' : undefined,
     getImgSource: () => {
       return {
-        url:
-          process.env.UPLOAD_SERVICE_URL +
-          '/api/files/' +
-          [projectId, folderId, fileId].join('/'),
+        url: process.env.UPLOAD_SERVICE_URL + '/api/files/' + path,
         type: 'fetch',
       }
     },

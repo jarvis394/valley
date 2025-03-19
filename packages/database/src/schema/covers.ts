@@ -4,8 +4,8 @@ import {
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { files } from './files'
-import { projects } from './projects'
+import { files } from './files.js'
+import { projects } from './projects.js'
 
 export const covers = pgTable('covers', {
   x: doublePrecision().default(0.5),

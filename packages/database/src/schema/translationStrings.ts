@@ -4,8 +4,8 @@ import {
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { projects } from './projects'
-import { defaultId } from '../extend'
+import { projects } from './projects.js'
+import { defaultId } from '../extend.js'
 
 export const translationStrings = pgTable('translation_strings', {
   id: varchar().default(defaultId).primaryKey().notNull(),

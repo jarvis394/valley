@@ -4,8 +4,8 @@ import {
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { users } from './users'
-import { defaultId } from '../extend'
+import { users } from './users.js'
+import { defaultId } from '../extend.js'
 
 export const userSettings = pgTable('user_settings', {
   id: varchar().default(defaultId).primaryKey().notNull(),

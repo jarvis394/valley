@@ -1,7 +1,7 @@
 import { render } from '@react-email/components'
 import { type ReactElement } from 'react'
 import { z } from 'zod'
-import VerifyEmail from '../components/VerifyEmail'
+import VerifyEmail from '../components/VerifyEmail.js'
 
 const resendErrorSchema = z.union([
   z.object({

@@ -1,4 +1,4 @@
-import { defaultCUID, defaultId, timestamps } from '../extend'
+import { defaultCUID, defaultId, timestamps } from '../extend.js'
 import { boolean, pgTable, varchar } from 'drizzle-orm/pg-core'
 import {
   relations,
@@ -6,11 +6,11 @@ import {
   type InferInsertModel,
   sql,
 } from 'drizzle-orm'
-import { projects } from './projects'
-import { avatars } from './avatars'
-import { userSettings } from './userSettings'
-import { sessions } from './sessions'
-import { accounts } from './accounts'
+import { projects } from './projects.js'
+import { avatars } from './avatars.js'
+import { userSettings } from './userSettings.js'
+import { sessions } from './sessions.js'
+import { accounts } from './accounts.js'
 
 export const users = pgTable('users', {
   id: varchar().default(defaultId).primaryKey().notNull(),

@@ -1,11 +1,11 @@
-import { defaultId, timestamps } from '../extend'
+import { defaultId, timestamps } from '../extend.js'
 import { pgTable, jsonb, varchar, boolean, integer } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferSelectModel,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { folders } from './folders'
+import { folders } from './folders.js'
 
 export type ExifDataValue = number | string | Date
 export type ExifDataKey =

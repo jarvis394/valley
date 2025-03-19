@@ -1,4 +1,4 @@
-import { defaultId } from '../extend'
+import { defaultId } from '../extend.js'
 import {
   pgTable,
   varchar,
@@ -11,7 +11,7 @@ import {
   type InferInsertModel,
   relations,
 } from 'drizzle-orm'
-import { users } from './users'
+import { users } from './users.js'
 
 export const passkeys = pgTable('passkeys', {
   id: varchar().default(defaultId).primaryKey().notNull(),

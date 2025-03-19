@@ -1,7 +1,7 @@
-export * from './client'
-export * from './schema'
-export * from './queries'
-export * as schema from './schema'
+export * from './client.js'
+export * from './schema/index.js'
+export * from './queries/index.js'
+export * as schema from './schema/index.js'
 
 export * from 'drizzle-orm'
 

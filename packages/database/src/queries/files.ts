@@ -1,6 +1,6 @@
-import { db } from '../client'
+import { db } from '../client.js'
 import { eq } from 'drizzle-orm'
-import { files, folders, projects, File } from '../schema'
+import { files, folders, projects, File } from '../schema/index.js'
 
 export const getFileWithProjectAndFolder = async ({
   fileId,
