@@ -3879,6 +3879,32 @@
     "@react-email/tailwind" "1.0.4"
     "@react-email/text" "0.0.11"
 
+"@react-email/components@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@react-email/components/-/components-0.0.34.tgz#b89af3b42c395ccfce06b53e390beaf0bee8f403"
+  integrity sha512-9aUJJ4Yu5Cd5++2GHwdkmOHCghi0vPP/aZwMCGNNTovBTDCI3mc8YIUrDR7JfscrdkPK4s/E9AoD5lX6d/zITA==
+  dependencies:
+    "@react-email/body" "0.0.11"
+    "@react-email/button" "0.0.19"
+    "@react-email/code-block" "0.0.11"
+    "@react-email/code-inline" "0.0.5"
+    "@react-email/column" "0.0.13"
+    "@react-email/container" "0.0.15"
+    "@react-email/font" "0.0.9"
+    "@react-email/head" "0.0.12"
+    "@react-email/heading" "0.0.15"
+    "@react-email/hr" "0.0.11"
+    "@react-email/html" "0.0.11"
+    "@react-email/img" "0.0.11"
+    "@react-email/link" "0.0.12"
+    "@react-email/markdown" "0.0.14"
+    "@react-email/preview" "0.0.12"
+    "@react-email/render" "1.0.5"
+    "@react-email/row" "0.0.12"
+    "@react-email/section" "0.0.16"
+    "@react-email/tailwind" "1.0.4"
+    "@react-email/text" "0.1.0"
+
 "@react-email/container@0.0.15":
   version "0.0.15"
   resolved "https://registry.yarnpkg.com/@react-email/container/-/container-0.0.15.tgz#6a35f0792cfd4b1ec557c7d566cdc2ecbdeb6d01"
@@ -3959,6 +3985,11 @@
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/@react-email/text/-/text-0.0.11.tgz#b0c24a9eba5f841fe8c4d303dc6f5c1a1095b5e3"
   integrity sha512-a7nl/2KLpRHOYx75YbYZpWspUbX1DFY7JIZbOv5x0QU8SvwDbJt+Hm01vG34PffFyYvHEXrc6Qnip2RTjljNjg==
+
+"@react-email/text@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@react-email/text/-/text-0.1.0.tgz#8813ab1b5c1b18e4f823835e51b1bfde74b903e2"
+  integrity sha512-LG+gEuxpoIiOojkv40iktP8UVjkJVZ+ksEEuf7zRvrcwLcVuzYyirlWdkGr4Vu/AhsD4FDRoxDWlWvLTx+WHUg==
 
 "@react-stately/flags@^3.1.0":
   version "3.1.0"

@@ -44,7 +44,8 @@
     "@remix-run/node": "^2.16.0",
     "better-auth": "^1.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@react-email/components": "^0.0.34"
   },
   "devDependencies": {
     "@valley/eslint-config": "*",
