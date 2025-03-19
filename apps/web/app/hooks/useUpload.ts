@@ -122,7 +122,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
       onBeforeRequest(req) {
         const cookies = parseCookies()
-        const session = cookies['valley_session']
+        const session = cookies['valley.session_token']
         req.setHeader('Authorization', session)
       },
       onAfterResponse: handleUploadResponse,
