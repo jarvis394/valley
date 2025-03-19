@@ -42,12 +42,17 @@ const FolderGallery: React.FC<FolderGalleryProps> = ({ folder }) => {
             containerProps={{
               className:
                 'transition-all rounded-xs ' + styles.folderGallery__image,
+              style: {
+                aspectRatio: `${file.width} / ${file.height}`,
+              },
             }}
             className="h-full w-full object-cover"
             file={file}
             thumbnail="lg"
             loading="lazy"
-            style={{ animationPlayState: visible ? 'running' : 'paused' }}
+            style={{
+              animationPlayState: visible ? 'running' : 'paused',
+            }}
             imageHost={WEB_SERVICE_URL}
             key={file.id}
           />

@@ -23,7 +23,8 @@ export default class DeletePendingFilesJob extends BaseJob {
       const disk = drive.use()
       logger.info(`Deleting... ${file.id}`)
 
-      await disk.deleteAll(file.path)
+      await disk.delete(file.path)
+      await disk.delete(file.path + '.json')
       await db.delete(filesTable).where(eq(filesTable.id, file.id))
 
       logger.info(`Deleted ${file.id}`)

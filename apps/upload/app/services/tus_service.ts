@@ -129,6 +129,8 @@ export default class TusService {
       const [key, value] = entry
       value && headers.append(key, value.toString())
     })
+    const authCookie = encodeURIComponent(headers.get('authorization') || '')
+    headers.set('Cookie', 'valley.session_token=' + authCookie)
     const session = await auth.api.getSession({
       headers,
     })

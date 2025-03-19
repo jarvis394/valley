@@ -52,6 +52,20 @@ dayjs.extend(timezone)
 
 export const links: LinksFunction = () => [
   {
+    rel: 'preload',
+    href: '/fonts/webfonts/Geist[wght].woff2',
+    as: 'font',
+    crossOrigin: 'anonymous',
+    type: 'font/woff2',
+  },
+  {
+    rel: 'preload',
+    href: '/fonts/variable/Geist[wght].ttf',
+    as: 'font',
+    crossOrigin: 'anonymous',
+    type: 'font/ttf',
+  },
+  {
     rel: 'manifest',
     href: '/site.webmanifest',
     crossOrigin: 'use-credentials',
