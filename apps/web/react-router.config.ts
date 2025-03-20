@@ -1,4 +1,7 @@
 import type { Config } from '@react-router/dev/config'
+import { vercelPreset } from '@vercel/remix/vite'
+
+const isVercel = process.env.VERCEL === '1'
 
 export default {
   ssr: true,
@@ -7,4 +10,5 @@ export default {
     unstable_optimizeDeps: true,
   },
   serverModuleFormat: 'esm',
+  ...(isVercel && { presets: [vercelPreset()] }),
 } satisfies Config
