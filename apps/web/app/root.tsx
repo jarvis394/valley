@@ -2,21 +2,15 @@ import React from 'react'
 import {
   Links,
   Meta,
-  MetaFunction,
+  data,
   Outlet,
   Scripts,
   ScrollRestoration,
   ShouldRevalidateFunction,
   useLoaderData,
-} from '@remix-run/react'
+} from 'react-router'
 import cx from 'classnames'
 import styles from './root.module.css'
-import {
-  type HeadersFunction,
-  type LinksFunction,
-  type LoaderFunctionArgs,
-  data,
-} from '@remix-run/node'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
 import { getTheme, Theme } from './utils/theme'
@@ -36,6 +30,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import calendar from 'dayjs/plugin/calendar'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import { pipeHeaders } from './server/headers.server'
+import { Route } from './+types/root'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -50,7 +46,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-export const links: LinksFunction = () => [
+export const links: Route.LinksFunction = () => [
   {
     rel: 'preload',
     href: '/fonts/webfonts/Geist[wght].woff2',
@@ -72,7 +68,7 @@ export const links: LinksFunction = () => [
   },
 ]
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const timings = makeTimings('root loader')
   const honeypotProps = honeypot.getInputProps()
   const { toast, headers: toastHeaders } = await time(() => getToast(request), {
@@ -102,17 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   )
 }
 
-export const headers: HeadersFunction = ({
-  loaderHeaders,
-  actionHeaders,
-  parentHeaders,
-}) => {
-  return {
-    ...Object.fromEntries(loaderHeaders.entries()),
-    ...Object.fromEntries(actionHeaders.entries()),
-    ...Object.fromEntries(parentHeaders.entries()),
-  }
-}
+export const headers: Route.HeadersFunction = pipeHeaders
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   // Revalidate if formAction is present (it can return a toast)
@@ -123,7 +109,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     {
       name: 'theme-color',
@@ -215,8 +201,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
-const App = () => {
-  const loaderData = useLoaderData<typeof loader | null>()
+const App: React.FC<Route.ComponentProps> = ({ loaderData }) => {
   const theme = useOptionalTheme()
 
   useToast(loaderData?.toast)

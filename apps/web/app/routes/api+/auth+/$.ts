@@ -1,10 +1,10 @@
 import { auth } from '@valley/auth' // Adjust the path as necessary
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node'
+import { Route } from './+types/$'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   return auth.handler(request)
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   return auth.handler(request)
 }

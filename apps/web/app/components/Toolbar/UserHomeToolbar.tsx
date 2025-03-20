@@ -3,7 +3,7 @@ import styles from './Toolbar.module.css'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
 import { ToolbarItem } from './ToolbarItem'
 import LinkTabItem from './LinkTabItem'
-import { useLocation } from '@remix-run/react'
+import { useLocation } from 'react-router'
 
 const userHomeToolbarItems: ToolbarItem[] = [
   {

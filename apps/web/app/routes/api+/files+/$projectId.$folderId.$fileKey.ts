@@ -1,12 +1,13 @@
-import { data, LoaderFunctionArgs } from '@remix-run/node'
+import { data } from 'react-router'
 import { db, files, folders, projects } from '@valley/db'
 import { getDomainUrl } from 'app/utils/misc'
 import { getImgResponse } from 'openimg/node'
 import { cors } from 'remix-utils/cors'
 import { eq } from 'drizzle-orm'
 import { invariantResponse } from 'app/utils/invariant'
+import { Route } from './+types/$projectId.$folderId.$fileKey'
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId, folderId, fileKey } = params
   const headers = new Headers()
 

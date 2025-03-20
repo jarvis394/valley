@@ -1,16 +1,10 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import Button from '@valley/ui/Button'
-import { Form, useSearchParams } from '@remix-run/react'
-import {
-  type ActionFunctionArgs,
-  redirect,
-  data,
-  HeadersFunction,
-} from '@remix-run/node'
-import { EmailSchema } from '../../../utils/user-validation'
+import { redirect, data, Form, useSearchParams } from 'react-router'
+import { EmailSchema } from 'app/utils/user-validation'
 import { z } from 'zod'
-import { getDomainUrl, useIsPending } from '../../../utils/misc'
+import { getDomainUrl, useIsPending } from 'app/utils/misc'
 import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
 import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
@@ -32,6 +26,7 @@ import { db, users } from '@valley/db'
 import { eq } from 'drizzle-orm'
 import { auth } from '@valley/auth'
 import { typeKey, targetKey, redirectToKey } from 'app/config/paramsKeys'
+import { Route } from './+types'
 
 const SignupSchema = z.intersection(
   z.object({
@@ -71,7 +66,7 @@ export function getRedirectToUrl({
   return redirectToUrl
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const {
     errors,
     data: submissionData,
@@ -141,11 +136,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export const headers: HeadersFunction = ({ actionHeaders }) => {
+export const headers = ({ actionHeaders }: Route.HeadersArgs) => {
   return actionHeaders
 }
 
-const RegisterPage: React.FC = () => {
+const RegisterPage: React.FC<Route.ComponentProps> = () => {
   const isPending = useIsPending()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get(redirectToKey)

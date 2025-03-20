@@ -1,14 +1,15 @@
-import { LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { db, files, folders, projects } from '@valley/db'
 import { eq } from 'drizzle-orm'
 import { getProjectFolderAndProject } from 'app/server/services/folder.server'
+import { Route } from './+types/$id.delete'
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request, params }: LoaderFunctionArgs) => {
+export const action = async ({ request, params }: Route.ActionArgs) => {
   const user = await requireUser(request)
   const { id, projectId } = params
   const url = new URL(request.url)

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { db, folders, projects, users } from '@valley/db'
 import { eq, and, sql, exists } from 'drizzle-orm'
 import { requireUser } from 'app/server/auth/auth.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
 import { invariantResponse } from 'app/utils/invariant'
+import { Route } from './+types/$id.edit'
 
 export const PROJECT_FOLDER_TITLE_MAX_LENGTH = 64
 export const PROJECT_FOLDER_DESCRIPTION_MAX_LENGTH = 4096
@@ -32,7 +33,7 @@ const resolver = zodResolver(FoldersEditSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request, params }: LoaderFunctionArgs) => {
+export const action = async ({ request, params }: Route.ActionArgs) => {
   const user = await requireUser(request)
   const { id, projectId } = params
 

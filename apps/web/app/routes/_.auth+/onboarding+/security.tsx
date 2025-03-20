@@ -1,11 +1,4 @@
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-  redirect,
-  data,
-} from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+import { Form, redirect, data } from 'react-router'
 import { looseOptional, useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
@@ -26,6 +19,7 @@ import FormCollapsibleField from '../../../components/FormCollapsibleField/FormC
 import FormHelperText from '@valley/ui/FormHelperText'
 import PasswordField from '../../../components/PasswordField/PasswordField'
 import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
+import { Route } from './+types/security'
 
 const SecurityFormSchema = z
   .object({
@@ -47,12 +41,12 @@ type FormData = z.infer<typeof SecurityFormSchema>
 
 const resolver = zodResolver(SecurityFormSchema)
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const data = await requireOnboardingData(request)
   return data
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireOnboardingData(request)
   const {
     errors,
@@ -89,19 +83,20 @@ export async function action({ request }: ActionFunctionArgs) {
   })
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: 'Onboarding | Valley' }]
 }
 
-export default function OnboardingSecurityRoute() {
-  const data = useLoaderData<typeof loader>()
+const OnboardingSecurityRoute: React.FC<Route.ComponentProps> = ({
+  loaderData,
+}) => {
   const isPending = useIsPending()
   const { handleSubmit, watch, getFieldState, register, formState } =
     useRemixForm<FormData>({
       mode: 'all',
       reValidateMode: 'onChange',
       resolver,
-      defaultValues: data.submission.data,
+      defaultValues: loaderData.submission.data,
       submitConfig: {
         viewTransition: true,
       },
@@ -171,3 +166,5 @@ export default function OnboardingSecurityRoute() {
     </main>
   )
 }
+
+export default OnboardingSecurityRoute

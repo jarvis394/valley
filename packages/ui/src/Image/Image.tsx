@@ -45,7 +45,7 @@ const useImageLoaded = () => {
     if (ref.current && ref.current.complete) {
       onLoad()
     }
-  })
+  }, [])
 
   return [ref, loaded, onLoad] as const
 }
@@ -112,4 +112,4 @@ const Image: React.FC<ImageProps> = ({
   )
 }
 
-export default Image
+export default React.memo(Image)

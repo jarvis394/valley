@@ -1,4 +1,4 @@
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { auth } from '@valley/auth'
 
 type RedirectToProps = { redirectTo?: string | null }

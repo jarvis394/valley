@@ -1,5 +1,5 @@
-import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
+import { createRequestHandler } from '@react-router/express'
+import { type ServerBuild } from 'react-router'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
@@ -158,8 +158,9 @@ app.use((req, res, next) => {
 async function getBuild() {
   try {
     const build = viteDevServer
-      ? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
-      : await import('../server/index.js')
+      ? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
+      : // @ts-expect-error - the file might not exist yet but it will
+        await import('../build/server/index.js')
 
     return { build: build as unknown as ServerBuild, error: null }
   } catch (error) {

@@ -8,7 +8,7 @@ import { PROVIDER_LABELS } from 'app/config/connections'
 import type { AccountData } from 'app/routes/_user+/_home+/settings+/security'
 import { authClient } from '@valley/auth/client'
 import { showToast } from '@valley/ui/Toast'
-import { useRevalidator } from '@remix-run/react'
+import { useRevalidator } from 'react-router'
 
 type ConfirmConnectionDeleteProps = {
   onClose: () => void

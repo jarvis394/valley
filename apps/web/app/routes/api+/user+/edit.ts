@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { db, users, userSettings } from '@valley/db'
 import { InterfaceLanguagesSchema } from 'app/config/language'
 import { requireUser } from 'app/server/auth/auth.server'
@@ -8,6 +8,7 @@ import { FullnameSchema } from 'app/utils/user-validation'
 import { eq } from 'drizzle-orm'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+import { Route } from './+types/edit'
 
 export const UserSettingsEditSchema = z
   .object({
@@ -37,7 +38,7 @@ const resolver = zodResolver(UserEditSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request }: LoaderFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const user = await requireUser(request)
 
   const {

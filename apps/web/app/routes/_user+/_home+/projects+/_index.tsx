@@ -1,6 +1,4 @@
-import type { HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
-import { data, Link, ShouldRevalidateFunction } from '@remix-run/react'
+import { redirect, data, Link, ShouldRevalidateFunction } from 'react-router'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
 import Wrapper from '@valley/ui/Wrapper'
@@ -24,19 +22,16 @@ import {
 import CreateProjectButton from 'app/components/BannerBlocks/CreateProjectButton'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
-import {
-  cache,
-  createClientLoaderCache,
-  useCachedLoaderData,
-} from 'app/utils/cache'
+import { cache, createClientLoaderCache, useCachedData } from 'app/utils/cache'
 import Menu from '@valley/ui/Menu'
 import { getUserProjects } from 'app/server/services/project.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { auth } from '@valley/auth'
+import { Route } from './+types/_index'
 
 export const getProjectsCacheKey = () => 'projects'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const session = await auth.api.getSession({ headers: request.headers })
   const timings = makeTimings('projects loader')
 
@@ -55,7 +50,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   )
 }
 
-export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+export const headers = ({
+  loaderHeaders,
+  parentHeaders,
+}: Route.HeadersArgs) => {
   return {
     'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
   }
@@ -70,7 +68,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({ formAction }) => {
   return false
 }
 
-export const clientLoader = createClientLoaderCache({
+export const clientLoader = createClientLoaderCache<Route.ClientLoaderArgs>({
   key: getProjectsCacheKey(),
   type: 'swr',
 })
@@ -139,8 +137,8 @@ const ProjectsList: React.FC<{ projects?: ProjectWithFolders[] }> = ({
   )
 }
 
-const ProjectsRoute = () => {
-  const data = useCachedLoaderData<typeof loader>()
+const ProjectsRoute: React.FC<Route.ComponentProps> = ({ loaderData }) => {
+  const data = useCachedData({ data: loaderData })
 
   return (
     <Stack direction={'column'} fullHeight fullWidth>

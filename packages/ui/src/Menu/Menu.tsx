@@ -121,7 +121,10 @@ export const Separator: React.FC<MenuSeparatorProps> = ({
   )
 }
 
-export const Content: React.FC<MenuProps> = ({ children, ...props }) => {
+export const Content: React.FC<MenuProps> = React.memo(function Content({
+  children,
+  ...props
+}) {
   const handleCloseAutoFocus = (event: Event) => {
     event.preventDefault()
   }
@@ -172,22 +175,22 @@ export const Content: React.FC<MenuProps> = ({ children, ...props }) => {
       </MenuTypeProvider>
     </Slottable>
   )
-}
+})
 
-export const ContextMenuTrigger = ({
+export const ContextMenuTrigger = React.memo(function ContextMenuTrigger({
   children,
   enabled,
 }: React.PropsWithChildren<{
   enabled?: boolean
-}>) => {
+}>) {
   if (!enabled) {
     return children
   }
 
   return <ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
-}
+})
 
-export const Root = ({
+export const Root = React.memo(function Root({
   dropdownMenuProps,
   contextMenuProps,
   openOnContextMenu = false,
@@ -198,7 +201,7 @@ export const Root = ({
   contextMenuProps?: ContextMenu.ContextMenuProps
   openOnContextMenu?: boolean
   onOpenChange?: (open: boolean) => void
-}>) => {
+}>) {
   const shouldShowDrawer = useMediaQuery(
     `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
   )
@@ -247,7 +250,7 @@ export const Root = ({
       </Drawer.Root>
     </MenuActionsProvider>
   )
-}
+})
 
 export const Trigger = DropdownMenu.Trigger
 
