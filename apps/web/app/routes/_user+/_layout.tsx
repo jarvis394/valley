@@ -16,8 +16,7 @@ import { UserFull } from '@valley/shared'
 import { useUserStore } from 'app/utils/user'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
-import { db, users } from '@valley/db'
-import { eq } from 'drizzle-orm'
+import { db, users, eq } from '@valley/db'
 import { Route } from './+types/_layout'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

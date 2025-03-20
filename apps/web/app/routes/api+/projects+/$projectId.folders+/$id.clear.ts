@@ -1,10 +1,9 @@
 import { redirect } from 'react-router'
-import { db, files, folders, projects } from '@valley/db'
+import { db, files, folders, projects, eq } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
 import { getProjectFolderAndProject } from 'app/server/services/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
-import { eq } from 'drizzle-orm'
 import { Route } from './+types/$id.clear'
 
 export const loader = () => redirect('/projects')

@@ -9,7 +9,6 @@ export default defineConfig(() => ({
     port: Number(process.env.WEB_PORT) || 4200,
   },
   ssr: {
-    noExternal: ['remix-utils'],
     optimizeDeps: {
       include: [
         'react',

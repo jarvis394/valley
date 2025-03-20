@@ -3034,6 +3034,11 @@
     "@oslojs/asn1" "1.0.0"
     "@oslojs/binary" "1.0.0"
 
+"@oslojs/encoding@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@oslojs/encoding/-/encoding-1.1.0.tgz#55f3d9a597430a01f2a5ef63c6b42f769f9ce34e"
+  integrity sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==
+
 "@paralleldrive/cuid2@^2.2.2":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@paralleldrive/cuid2/-/cuid2-2.2.2.tgz#7f91364d53b89e2c9cb9e02e8dd0f129e834455f"
@@ -7875,7 +7880,7 @@ drizzle-kit@^0.30.5:
     esbuild-register "^3.5.0"
     gel "^2.0.0"
 
-drizzle-orm@^0.40.0, drizzle-orm@^0.40.1:
+drizzle-orm@^0.40.1:
   version "0.40.1"
   resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.40.1.tgz#15f1d970d4fb034db2b13e4a33fcbbccda9bf1cb"
   integrity sha512-aPNhtiJiPfm3qxz1czrnIDkfvkSdKGXYeZkpG55NPTVI186LmK2fBLMi4dsHpPHlJrZeQ92D322YFPHADBALew==

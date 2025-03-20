@@ -1,9 +1,8 @@
 import { data } from 'react-router'
-import { db, files, folders, projects } from '@valley/db'
+import { db, files, folders, projects, eq } from '@valley/db'
 import { getDomainUrl } from 'app/utils/misc'
 import { getImgResponse } from 'openimg/node'
 import { cors } from 'remix-utils/cors'
-import { eq } from 'drizzle-orm'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$projectId.$folderId.$fileKey'
 

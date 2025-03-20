@@ -6,8 +6,7 @@ import { z } from 'zod'
 import { FoldersEditSchema } from './$id.edit'
 import { FieldErrors } from 'react-hook-form'
 import { PROJECT_MAX_FOLDERS } from '@valley/shared'
-import { db, folders, projects } from '@valley/db'
-import { and, eq } from 'drizzle-orm'
+import { db, folders, projects, and, eq } from '@valley/db'
 import { Route } from './+types/create'
 
 export const FoldersCreateSchema = z

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { data, redirect } from 'react-router'
-import { db, folders, projects, users } from '@valley/db'
-import { eq, and, sql, exists } from 'drizzle-orm'
+import { db, folders, projects, users, eq, and, sql, exists } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'

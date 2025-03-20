@@ -1,5 +1,4 @@
-import { users, db } from '@valley/db'
-import { or, eq, sql } from 'drizzle-orm'
+import { users, db, or, eq, sql } from '@valley/db'
 
 export const queryUserByDomainSql = (domain: string) =>
   or(eq(users.serviceDomain, domain), sql`${domain} = ANY(${users.domains})`)

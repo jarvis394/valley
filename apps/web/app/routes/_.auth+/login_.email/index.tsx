@@ -24,6 +24,7 @@ import Stack from '@valley/ui/Stack'
 import { createToastHeaders } from 'app/server/toast.server'
 import { auth } from '@valley/auth'
 import { Route } from './+types'
+import { checkHoneypot } from 'app/server/honeypot.server'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -47,6 +48,9 @@ export async function action({ request }: Route.ActionArgs) {
     data,
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
+
+  checkHoneypot(defaultValues)
+
   if (errors) {
     return { errors, defaultValues }
   }
