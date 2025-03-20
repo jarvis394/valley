@@ -14,12 +14,10 @@ export function checkHoneypot(fields: FieldValues) {
     formData.append(key, fields[key])
   }
 
-  try {
-    honeypot.check(formData)
-  } catch (error) {
+  honeypot.check(formData).catch((error) => {
     if (error instanceof SpamError) {
       throw new Response('Form was not submitted properly', { status: 400 })
     }
     throw error
-  }
+  })
 }

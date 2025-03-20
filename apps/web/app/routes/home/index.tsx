@@ -1,12 +1,12 @@
 import React from 'react'
-import type { MetaFunction } from '@remix-run/node'
 import Button from '@valley/ui/Button'
 import Stack from '@valley/ui/Stack'
-import { Link, useNavigation } from '@remix-run/react'
+import { Link, useNavigation } from 'react-router'
 import { ThemeSwitch } from '../resources+/theme-switch'
 import { useRootLoaderData } from 'app/utils/misc'
+import { Route } from './+types'
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [
     { title: 'Valley' },
     { name: 'description', content: 'Platform for your photography sessions' },

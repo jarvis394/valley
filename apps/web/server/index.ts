@@ -1,5 +1,5 @@
-import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
+import { createRequestHandler } from '@react-router/express'
+import { type ServerBuild } from 'react-router'
 import { ip as ipAddress } from 'address'
 import ansis from 'ansis'
 import closeWithGrace from 'close-with-grace'
@@ -158,7 +158,7 @@ app.use((req, res, next) => {
 async function getBuild() {
   try {
     const build = viteDevServer
-      ? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+      ? await viteDevServer.ssrLoadModule('virtual:react-router/server-build')
       : await import('../server/index.js')
 
     return { build: build as unknown as ServerBuild, error: null }

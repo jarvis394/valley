@@ -1,4 +1,4 @@
-import type { MetaDescriptor, MetaFunction } from '@remix-run/node'
+import type { MetaDescriptor, MetaFunction } from 'react-router'
 
 export const mergeMeta = (
   overrideFn: MetaFunction,
@@ -12,6 +12,9 @@ export const mergeMeta = (
 
     // replace any parent meta with the same name or property with the override
     const overrides = overrideFn(arg)
+
+    if (!overrides) return []
+
     for (const override of overrides) {
       const index = mergedMeta.findIndex(
         (meta) =>
@@ -30,7 +33,10 @@ export const mergeMeta = (
 
     // append any additional meta
     if (appendFn) {
-      mergedMeta = mergedMeta.concat(appendFn(arg))
+      const additionalMeta = appendFn(arg)
+      if (additionalMeta) {
+        mergedMeta = mergedMeta.concat(additionalMeta)
+      }
     }
 
     return mergedMeta

@@ -1,5 +1,14 @@
-import { db, File, files, folders, projects, User, users } from '@valley/db'
-import { and, eq } from 'drizzle-orm'
+import {
+  db,
+  File,
+  files,
+  folders,
+  projects,
+  User,
+  users,
+  and,
+  eq,
+} from '@valley/db'
 
 export const getFileWithProjectAndFolder = async ({
   fileId,

@@ -2,8 +2,8 @@ import React, { useMemo } from 'react'
 import styles from './Toolbar.module.css'
 import AnimatedTabs from '../AnimatedTabs/AnimatedTabs'
 import { ToolbarItem } from './ToolbarItem'
-import { useLocation, useParams } from '@remix-run/react'
-import { useProjectAwait } from 'app/utils/project'
+import { useLocation, useParams } from 'react-router'
+import { useProject } from 'app/utils/project'
 import LinkTabItem from './LinkTabItem'
 
 const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
@@ -12,11 +12,11 @@ const ProjectsToolbarTabItemUnmemoized = React.forwardRef<
 >(function ProjectsToolbarTabItem({ value, label, ...props }, ref) {
   const { projectId, folderId } = useParams()
   const projectBaseUrl = `/projects/${projectId}`
-  const data = useProjectAwait()
+  const data = useProject()
 
   if (value === projectBaseUrl) {
     const defaultFolder =
-      data.project?.folders?.find((e) => e.isDefaultFolder)?.id || folderId
+      data?.folders?.find((e) => e.isDefaultFolder)?.id || folderId
     return (
       <LinkTabItem
         {...props}

@@ -1,8 +1,8 @@
-import { redirect } from '@remix-run/node'
+import { redirect } from 'react-router'
 import { getSession, requireAnonymous } from 'app/server/auth/auth.server'
 import { z } from 'zod'
-import { combineHeaders } from '../../../utils/misc'
-import { onboardingSessionStorage } from '../../../server/auth/onboarding.server'
+import { combineHeaders } from 'app/utils/misc'
+import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
 
 export async function requireOnboardingEmail(request: Request) {
   await requireAnonymous(request)

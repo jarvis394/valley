@@ -6,12 +6,7 @@ import Divider from '@valley/ui/Divider'
 import Stack from '@valley/ui/Stack'
 import { ArrowRight } from 'geist-ui-icons'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
-import { data, Form, useSearchParams } from '@remix-run/react'
-import {
-  type ActionFunctionArgs,
-  redirect,
-  HeadersFunction,
-} from '@remix-run/node'
+import { data, redirect, Form, useSearchParams } from 'react-router'
 import { requireAnonymous } from 'app/server/auth/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useIsPending } from 'app/utils/misc'
@@ -32,6 +27,7 @@ import { useHydrated } from 'remix-utils/use-hydrated'
 import { db } from '@valley/db'
 import { auth } from '@valley/auth'
 import { VerificationType } from '../verify+'
+import { Route } from './+types'
 
 const EmailFormSchema = z.intersection(
   z.object({
@@ -49,7 +45,7 @@ export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireAnonymous(request)
 
   const {
@@ -119,7 +115,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export const headers: HeadersFunction = ({ actionHeaders }) => {
+export const headers = ({ actionHeaders }: Route.HeadersArgs) => {
   return actionHeaders
 }
 
@@ -129,7 +125,6 @@ const LoginPage: React.FC = () => {
   const redirectTo = searchParams.get(redirectToKey)
   const target = searchParams.get(targetKey)
   const isHydrated = useHydrated()
-
   const methods = useRemixForm<FormData>({
     mode: 'all',
     reValidateMode: 'onChange',

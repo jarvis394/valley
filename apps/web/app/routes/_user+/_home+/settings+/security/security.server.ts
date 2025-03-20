@@ -1,4 +1,4 @@
-import { data, LoaderFunctionArgs } from '@remix-run/router'
+import { data, LoaderFunctionArgs } from 'react-router'
 import { auth } from '@valley/auth'
 import { db } from '@valley/db'
 import { CREDENTIAL_PROVIDER_NAME } from 'app/config/connections'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams } from '@remix-run/react'
+import { useParams } from 'react-router'
 import SettingsLayout from 'app/components/SettingsLayout/SettingsLayout'
 import Stack from '@valley/ui/Stack'
 import Divider from '@valley/ui/Divider'

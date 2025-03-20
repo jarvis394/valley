@@ -1,5 +1,5 @@
-import { data, type LoaderFunctionArgs } from '@remix-run/node'
-import { ShouldRevalidateFunction, useLoaderData } from '@remix-run/react'
+import { data, type LoaderFunctionArgs } from 'react-router'
+import { ShouldRevalidateFunction, useLoaderData } from 'react-router'
 import Note from '@valley/ui/Note'
 import Paper from '@valley/ui/Paper'
 import Stack from '@valley/ui/Stack'

@@ -1,8 +1,8 @@
-import { useRouteLoaderData } from '@remix-run/react'
-import { type loader as userLayoutLoader } from '../routes/_user+/_layout'
+import { useRouteLoaderData } from 'react-router'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import type { User } from '@valley/db'
+import { Route } from '../routes/_user+/+types/_layout'
 
 type UserState = {
   data: User | null
@@ -22,7 +22,7 @@ export const useUserStore = create<UserState & UserActions>()(
 )
 
 export function useUserAwait() {
-  const data = useRouteLoaderData<typeof userLayoutLoader>(
+  const data = useRouteLoaderData<Route.ComponentProps['loaderData']>(
     'routes/_user+/_layout'
   )
 

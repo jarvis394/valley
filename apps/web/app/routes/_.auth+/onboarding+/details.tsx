@@ -1,11 +1,4 @@
-import {
-  type HeadersFunction,
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-  data,
-} from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+import { Form, type MetaFunction, data } from 'react-router'
 import {
   combineHeaders,
   looseOptional,
@@ -25,9 +18,10 @@ import { Controller } from 'react-hook-form'
 import PhoneInput from 'react-phone-number-input/input'
 import { redirectWithToast } from 'app/server/toast.server'
 import { safeRedirect } from 'remix-utils/safe-redirect'
-import { JSX } from 'react'
+import React, { JSX } from 'react'
 import { auth } from '@valley/auth'
 import { db, userSettings } from '@valley/db'
+import { Route } from './+types/details'
 
 const DetailsFormSchema = z.object({
   firstName: NameSchema,
@@ -39,16 +33,16 @@ type FormData = z.infer<typeof DetailsFormSchema>
 
 const resolver = zodResolver(DetailsFormSchema)
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const data = await requireOnboardingData(request)
   return data
 }
 
-export const headers: HeadersFunction = ({ actionHeaders }) => {
+export const headers = ({ actionHeaders }: Route.HeadersArgs) => {
   return actionHeaders
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const { submission, userId } = await requireOnboardingData(request)
   const {
     errors,
@@ -126,8 +120,9 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Onboarding | Valley' }]
 }
 
-export default function OnboardingDetailsRoute() {
-  const data = useLoaderData<typeof loader>()
+const OnboardingDetailsRoute: React.FC<Route.ComponentProps> = ({
+  loaderData,
+}) => {
   const isPending = useIsPending()
   const { handleSubmit, control, getFieldState, register, formState } =
     useRemixForm<FormData>({
@@ -135,8 +130,8 @@ export default function OnboardingDetailsRoute() {
       reValidateMode: 'onChange',
       resolver,
       defaultValues: {
-        ...data.submission.data,
-        ...data.submission.prefilledProfile,
+        ...loaderData.submission.data,
+        ...loaderData.submission.prefilledProfile,
       },
       submitConfig: {
         viewTransition: true,
@@ -210,3 +205,5 @@ export default function OnboardingDetailsRoute() {
     </main>
   )
 }
+
+export default OnboardingDetailsRoute

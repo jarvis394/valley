@@ -2,7 +2,7 @@ import type { Project } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'
-import { useProjectAwait } from 'app/utils/project'
+import { useProject } from 'app/utils/project'
 import React from 'react'
 import { z } from 'zod'
 import { ProjectWithFolders } from '@valley/shared'
@@ -97,9 +97,9 @@ const ProjectSettingsGeneral: React.FC<{
 }
 
 const ProjectSettingsGeneralRoute = () => {
-  const data = useProjectAwait()
+  const data = useProject()
 
-  return <ProjectSettingsGeneral project={data.project} />
+  return <ProjectSettingsGeneral project={data} />
 }
 
 export default ProjectSettingsGeneralRoute

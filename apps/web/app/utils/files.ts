@@ -1,10 +1,12 @@
-import { loader as folderLoader } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { useCachedRouteLoaderData } from './cache'
 import { useProjectsStore } from 'app/stores/projects'
-import { useParams } from '@remix-run/react'
+import { useParams } from 'react-router'
+import { Route } from '../routes/_user+/projects_.$projectId+/+types/folder.$folderId'
 
 export function useFiles() {
-  const folderData = useCachedRouteLoaderData<typeof folderLoader>({
+  const folderData = useCachedRouteLoaderData<
+    Route.ComponentProps['loaderData']
+  >({
     route: 'routes/_user+/projects_.$projectId+/folder.$folderId',
   })
   const { projectId, folderId } = useParams()

@@ -1,21 +1,16 @@
-import { loader as projectLayoutLoader } from 'app/routes/_user+/projects_.$projectId+/_layout'
-import { useCachedLoaderData } from './cache'
-import { useParams, useRouteLoaderData } from '@remix-run/react'
+import { useCachedRouteLoaderData } from './cache'
+import { useParams } from 'react-router'
 import { useProjectsStore } from 'app/stores/projects'
 import { ProjectWithFolders } from '@valley/shared'
 import { useMemo } from 'react'
-
-export function useProjectAwait() {
-  const data = useRouteLoaderData<typeof projectLayoutLoader>(
-    'routes/_user+/projects_.$projectId+/_layout'
-  )
-  const projectData = useCachedLoaderData<typeof projectLayoutLoader>({ data })
-
-  return projectData
-}
+import { Route } from '../routes/_user+/projects_.$projectId+/+types/_layout'
 
 export function useProject(propsProject?: ProjectWithFolders) {
-  const { project } = useProjectAwait()
+  const { project } = useCachedRouteLoaderData<
+    Route.ComponentProps['loaderData']
+  >({
+    route: 'routes/_user+/projects_.$projectId+/_layout',
+  })
   const { projectId } = useParams()
   const storeProject = useProjectsStore(
     (state) => state.projects[projectId || '']

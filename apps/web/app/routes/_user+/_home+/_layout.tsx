@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet } from '@remix-run/react'
+import { Outlet } from 'react-router'
 import UserHomeToolbar from 'app/components/Toolbar/UserHomeToolbar'
 
 export const shouldRevalidate = () => {

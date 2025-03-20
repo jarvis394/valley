@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link as RouterLink, type LinkProps } from '@remix-run/react'
+import { Link as RouterLink, type LinkProps } from 'react-router'
 import cx from 'classnames'
 import styles from './Link.module.css'
 

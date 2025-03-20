@@ -6,7 +6,7 @@ import {
   ShouldRevalidateFunction,
   useLocation,
   useNavigate,
-} from '@remix-run/react'
+} from 'react-router'
 import { TELEGRAM_PHOTOS_URL } from '../../config/constants'
 import styles from './auth.module.css'
 import Button from '@valley/ui/Button'
@@ -15,13 +15,13 @@ import useMediaQuery from '@valley/ui/useMediaQuery'
 import Hidden from '@valley/ui/Hidden'
 import { MIDDLE_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 import { requireAnonymous } from 'app/server/auth/auth.server'
-import { type LoaderFunctionArgs } from '@remix-run/node'
 import { authClient } from '@valley/auth/client'
 import Stack from '@valley/ui/Stack'
 import Avatar from '@valley/ui/Avatar'
 import IconButton from '@valley/ui/IconButton'
 import { Logout } from 'geist-ui-icons'
 import { useHydrated } from 'remix-utils/use-hydrated'
+import { Route } from './+types/_layout'
 
 const covers = [
   '/assets/cover-1.webp',
@@ -35,7 +35,7 @@ const covers = [
 ]
 const COVER_SWITCH_INTERVAL = 7000
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireAnonymous(request)
   return null
 }

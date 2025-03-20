@@ -1,20 +1,15 @@
-import { type LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { db, projects } from '@valley/db'
+import { redirect } from 'react-router'
 import { requireUserId } from 'app/server/auth/auth.server'
 import { invariantResponse } from 'app/utils/invariant'
-import { and, eq } from 'drizzle-orm'
+import { getUserProject } from 'app/server/services/project.server'
+import { Route } from './+types/_index'
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId } = params
   invariantResponse(projectId, 'Missing project ID in route params')
 
   const userId = await requireUserId(request)
-  const project = await db.query.projects.findFirst({
-    where: and(eq(projects.id, projectId), eq(projects.userId, userId)),
-    with: {
-      folders: true,
-    },
-  })
+  const project = await getUserProject({ userId, projectId })
   const defaultFolder = project?.folders.find((e) => e.isDefaultFolder)
 
   if (!project || !defaultFolder) return redirect('/projects')

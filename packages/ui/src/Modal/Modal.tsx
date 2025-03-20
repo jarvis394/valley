@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './Modal.module.css'
 import useMediaQuery from '../useMediaQuery/useMediaQuery'
 import { SMALL_VIEWPORT_WIDTH } from '../config/theme'
-import { Drawer, DialogProps } from 'vaul'
+import { Drawer, type DialogProps } from 'vaul'
 import * as Dialog from '@radix-ui/react-dialog'
 
 export const modalKey = 'modal'

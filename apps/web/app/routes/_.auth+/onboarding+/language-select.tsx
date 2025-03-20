@@ -1,10 +1,4 @@
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-  redirect,
-} from '@remix-run/node'
-import { Form, useNavigation } from '@remix-run/react'
+import { redirect, Form, useNavigation } from 'react-router'
 import { useIsPending } from '../../../utils/misc'
 import { requireOnboardingData } from './onboarding.server'
 import styles from '../auth.module.css'
@@ -19,15 +13,16 @@ import { ChevronRight } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
 import { redirectWithToast } from '../../../server/toast.server'
 import { onboardingSessionStorage } from 'app/server/auth/onboarding.server'
+import { Route } from './+types/language-select'
 
 export const interfaceLanguageKey = 'interfaceLanguage'
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const data = await requireOnboardingData(request)
   return data
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireOnboardingData(request)
   const url = new URL(request.url)
   const formData = await request.formData()
@@ -60,11 +55,11 @@ export async function action({ request }: ActionFunctionArgs) {
   })
 }
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: 'Onboarding | Valley' }]
 }
 
-export default function OnboardingLanguageSelectRoute() {
+const OnboardingLanguageSelectRoute: React.FC<Route.ComponentProps> = () => {
   const isPending = useIsPending()
   const navigation = useNavigation()
   const selectedInterfaceLanguage =
@@ -97,3 +92,5 @@ export default function OnboardingLanguageSelectRoute() {
     </main>
   )
 }
+
+export default OnboardingLanguageSelectRoute

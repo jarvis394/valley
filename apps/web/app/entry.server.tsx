@@ -1,46 +1,52 @@
+import crypto from 'node:crypto'
 import { PassThrough } from 'node:stream'
-import type {
-  EntryContext,
-  HandleDocumentRequestFunction,
-} from '@remix-run/node'
-import { createReadableStreamFromReadable } from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
+import { styleText } from 'node:util'
+import { contentSecurity } from '@nichtsam/helmet/content'
+import { createReadableStreamFromReadable } from '@react-router/node'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
+import {
+  ServerRouter,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs,
+  type HandleDocumentRequestFunction,
+} from 'react-router'
+import { init } from './server/env.server'
 import { NonceProvider } from './components/NonceProvider/NonceProvider'
-import { init as envInit } from './server/env.server'
 import { makeTimings } from './server/timing.server'
-import { contentSecurity } from '@nichtsam/helmet/content'
 
-const ABORT_DELAY = 5_000
+export const streamTimeout = 5000
+
+init()
+
 const MODE = process.env.NODE_ENV ?? 'development'
-export const STREAMING_TIMEOUT = 5_000
 
-envInit()
+type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
-const handleRequest: HandleDocumentRequestFunction = (
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext
-) => {
-  const nonce = crypto.randomUUID()
+export default async function handleRequest(...args: DocRequestArgs) {
+  const [request, responseStatusCode, responseHeaders, reactRouterContext] =
+    args
+
+  if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+    responseHeaders.append('Document-Policy', 'js-profiling')
+  }
+
   const callbackName = isbot(request.headers.get('user-agent'))
     ? 'onAllReady'
     : 'onShellReady'
 
+  const nonce = crypto.randomBytes(16).toString('hex')
   return new Promise(async (resolve, reject) => {
     let didError = false
     // NOTE: this timing will only include things that are rendered in the shell
     // and will not include suspended components and deferred loaders
-    const timings = makeTimings('render')
+    const timings = makeTimings('render', 'renderToPipeableStream')
 
     const { pipe, abort } = renderToPipeableStream(
       <NonceProvider value={nonce}>
-        <RemixServer
+        <ServerRouter
           nonce={nonce}
-          context={remixContext}
-          abortDelay={ABORT_DELAY}
+          context={reactRouterContext}
           url={request.url}
         />
       </NonceProvider>,
@@ -53,23 +59,22 @@ const handleRequest: HandleDocumentRequestFunction = (
           contentSecurity(responseHeaders, {
             crossOriginEmbedderPolicy: false,
             contentSecurityPolicy: {
-              reportOnly: true,
               directives: {
                 fetch: {
                   'connect-src': [
-                    MODE === 'development' ? 'ws:' : null,
-                    process.env.TUSD_URL || null,
-                    process.env.UPLOAD_SERVICE_URL || null,
+                    MODE === 'development' ? 'ws:' : undefined,
+                    process.env.TUSD_URL,
+                    process.env.UPLOAD_SERVICE_URL,
                     "'self'",
-                  ].filter((e) => e !== null),
+                  ],
                   'font-src': ["'self'"],
                   'frame-src': ["'self'"],
                   'img-src': [
                     "'self'",
                     'data:',
                     'https://avatars.githubusercontent.com',
-                    process.env.UPLOAD_SERVICE_URL || null,
-                  ].filter((e) => e !== null),
+                    process.env.UPLOAD_SERVICE_URL,
+                  ],
                   'script-src': [
                     "'strict-dynamic'",
                     "'self'",
@@ -99,8 +104,27 @@ const handleRequest: HandleDocumentRequestFunction = (
       }
     )
 
-    setTimeout(abort, STREAMING_TIMEOUT + ABORT_DELAY)
+    setTimeout(abort, streamTimeout + 5000)
   })
 }
 
-export default handleRequest
+export async function handleDataRequest(response: Response) {
+  return response
+}
+
+export function handleError(
+  error: unknown,
+  { request }: LoaderFunctionArgs | ActionFunctionArgs
+): void {
+  // Skip capturing if the request is aborted as Remix docs suggest
+  // Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
+  if (request.signal.aborted) {
+    return
+  }
+
+  if (error instanceof Error) {
+    console.error(styleText('red', String(error.stack)))
+  } else {
+    console.error(error)
+  }
+}

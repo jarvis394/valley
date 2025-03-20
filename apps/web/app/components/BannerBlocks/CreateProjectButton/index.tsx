@@ -3,7 +3,7 @@ import BannerBlock from '../BannerBlock'
 import GalleryIcon from '../../svg/Gallery'
 import styles from './CreateProjectButton.module.css'
 import cx from 'classnames'
-import { Link } from '@remix-run/react'
+import { Link } from 'react-router'
 
 const CreateProjectButton = () => {
   return (

@@ -73,7 +73,7 @@
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {
-    "@base-ui-components/react": "^1.0.0-alpha.6",
+    "@base-ui-components/react": "^1.0.0-alpha.7",
     "@floating-ui/react-dom": "^2.1.2",
     "@formkit/auto-animate": "^0.8.2",
     "@radix-ui/react-context-menu": "^2.2.6",

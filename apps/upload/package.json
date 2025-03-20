@@ -80,7 +80,6 @@
     "cookie-signature": "^1.2.2",
     "cron": "^3.2.1",
     "cross-env": "^7.0.3",
-    "drizzle-orm": "^0.40.0",
     "exif-reader": "^2.0.2",
     "lodash.deburr": "^4.1.0",
     "pg": "^8.13.1",

@@ -1,4 +1,4 @@
-import { Await } from '@remix-run/react'
+import { Await } from 'react-router'
 import { UserFull } from '@valley/shared'
 import Note from '@valley/ui/Note'
 import Stack from '@valley/ui/Stack'

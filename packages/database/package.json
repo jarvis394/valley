@@ -50,7 +50,7 @@
     "@dotenvx/dotenvx": "^1.39.0",
     "@neondatabase/serverless": "^0.10.4",
     "@paralleldrive/cuid2": "^2.2.2",
-    "drizzle-orm": "^0.40.0",
+    "drizzle-orm": "^0.40.1",
     "pg": "^8.13.3",
     "postgres": "^3.4.5",
     "ts-node": "^10.9.2",
