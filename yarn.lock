@@ -6087,13 +6087,12 @@
     lodash "^4.17.21"
     preact "^10.5.13"
 
-"@vercel/remix@2.15.3":
-  version "2.15.3"
-  resolved "https://registry.yarnpkg.com/@vercel/remix/-/remix-2.15.3.tgz#3bec97c1abed4754208503635b257c5f2990e373"
-  integrity sha512-t6dh8j93CnlE/sd/hnutsMKYoogGmYbm+pkykJ/i6mWmEs2dqJMOhaV5axS3bVD1N+5ltyTR1vgk+D0y9tp9Og==
+"@vercel/react-router@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@vercel/react-router/-/react-router-1.1.0.tgz#b1936b17214f459c4dbd697df52ccc0b55446d1f"
+  integrity sha512-pcQEGIn23DoPhvKvRaE/vZZ0Sw7ZJBncLZq39UkzL4PXT24/5oKWStaZMYWMGwmM9YtnRpAVJBMLzSLD7MW3rQ==
   dependencies:
     "@vercel/static-config" "3.0.0"
-    isbot "^3.6.8"
     ts-morph "12.0.0"
 
 "@vercel/static-config@3.0.0":
@@ -10448,11 +10447,6 @@ isbinaryfile@^4.0.2:
   version "4.0.10"
   resolved "https://registry.yarnpkg.com/isbinaryfile/-/isbinaryfile-4.0.10.tgz#0c5b5e30c2557a2f06febd37b7322946aaee42b3"
   integrity sha512-iHrqe5shvBUcFbmZq9zOQHBoeOhZJu6RQGrDpBgenUm/Am+F3JM2MgQj+rK3Z601fzrL5gLZWtAPH2OBaSVcyw==
-
-isbot@^3.6.8:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/isbot/-/isbot-3.8.0.tgz#b1f8e3d19aca0961b5ed27b62bb8bb0a275781e4"
-  integrity sha512-vne1mzQUTR+qsMLeCBL9+/tgnDXRyc2pygLGl/WsgA+EZKIiB5Ehu0CiVTHIIk30zhJ24uGz4M5Ppse37aR0Hg==
 
 isbot@^5.1.25:
   version "5.1.25"
