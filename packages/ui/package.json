@@ -69,7 +69,7 @@
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
     "eslint": "^8.56.11",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.2",
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {

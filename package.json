@@ -30,7 +30,7 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "turbo": "^2.4.4",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.2",
     "cross-env": "^7.0.3"
   },
   "engines": {

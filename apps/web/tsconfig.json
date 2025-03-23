@@ -11,6 +11,7 @@
     "vite.config.js",
     ".react-router/types/**/*"
   ],
+  "exclude": [".react-router/types/+virtual.ts"],
   "compilerOptions": {
     "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"]

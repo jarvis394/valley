@@ -51,6 +51,6 @@
     "@valley/typescript-config": "*",
     "@types/node": "^22.9.0",
     "eslint": "^8.56.11",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }
