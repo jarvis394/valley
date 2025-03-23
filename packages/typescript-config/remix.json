@@ -3,7 +3,7 @@
   "display": "Remix",
   "extends": "./base.json",
   "compilerOptions": {
-    "types": ["@remix-run/node", "vite/client"],
+    "types": ["@react-router/node", "vite/client"],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"
@@ -15,7 +15,9 @@
     "allowJs": false,
     "jsx": "preserve",
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "declaration": false,
+    "declarationMap": false
   },
   "exclude": ["node_modules", ".cache"]
 }

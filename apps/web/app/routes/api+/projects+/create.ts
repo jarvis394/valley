@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { db, folders, projects } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
 import { UrlService } from 'app/server/services/url.server'
 import dayjs from 'dayjs'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+import { Route } from './+types/create'
 
 export const ProjectsCreateSchema = z.object({
   projectName: z.string(),
@@ -22,7 +23,7 @@ const resolver = zodResolver(ProjectsCreateSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request }: LoaderFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const user = await requireUser(request)
 
   const {

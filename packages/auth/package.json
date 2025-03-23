@@ -41,7 +41,6 @@
     "@valley/ui": "*",
     "@valley/shared": "*",
     "@dotenvx/dotenvx": "^1.39.0",
-    "@remix-run/node": "^2.16.0",
     "better-auth": "^1.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -52,6 +51,6 @@
     "@valley/typescript-config": "*",
     "@types/node": "^22.9.0",
     "eslint": "^8.56.11",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }

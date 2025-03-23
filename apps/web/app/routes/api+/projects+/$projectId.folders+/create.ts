@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { requireUser } from 'app/server/auth/auth.server'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
 import { FoldersEditSchema } from './$id.edit'
 import { FieldErrors } from 'react-hook-form'
 import { PROJECT_MAX_FOLDERS } from '@valley/shared'
-import { db, folders, projects } from '@valley/db'
-import { and, eq } from 'drizzle-orm'
+import { db, folders, projects, and, eq } from '@valley/db'
+import { Route } from './+types/create'
 
 export const FoldersCreateSchema = z
   .object({
@@ -21,7 +21,7 @@ const resolver = zodResolver(FoldersCreateSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request }: LoaderFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const user = await requireUser(request)
 
   const {

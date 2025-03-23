@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useLocation } from '@remix-run/react'
+import { Link, useLocation } from 'react-router'
 import Button from '@valley/ui/Button'
 import { GeneralErrorBoundary } from '../../components/ErrorBoundary'
 import styles from './ErrorBoundaryPage.module.css'

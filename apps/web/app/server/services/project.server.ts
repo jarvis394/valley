@@ -1,6 +1,15 @@
-import { db, folders, projects, type Project, type User } from '@valley/db'
+import {
+  db,
+  folders,
+  projects,
+  and,
+  asc,
+  desc,
+  eq,
+  type Project,
+  type User,
+} from '@valley/db'
 import { ProjectWithFolders } from '@valley/shared'
-import { and, asc, desc, eq } from 'drizzle-orm'
 
 export const getUserProjects = ({
   userId,

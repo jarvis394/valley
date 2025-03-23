@@ -1,13 +1,10 @@
-import type { SerializeFrom } from '@remix-run/server-runtime'
-import React, { startTransition, useCallback, useEffect, useState } from 'react'
+import { startTransition, useEffect, useState } from 'react'
 import {
-  Await,
   type ClientActionFunctionArgs,
-  type ClientLoaderFunctionArgs,
-  useLoaderData,
+  type LoaderFunctionArgs,
   useNavigate,
   useRouteLoaderData,
-} from '@remix-run/react'
+} from 'react-router'
 import { cache } from './adapter.client'
 
 export interface CacheAdapter {
@@ -17,6 +14,18 @@ export interface CacheAdapter {
   setItem: (key: string, value: any) => Promise<any> | any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   removeItem: (key: string) => Promise<any> | any
+}
+
+type ClientLoaderFunctionArgs<T = Record<string, unknown>> =
+  LoaderFunctionArgs & {
+    serverLoader: () => Promise<T>
+  }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CacheData<T = Record<string, any>> = T & {
+  serverData?: T
+  deferredServerData?: Promise<T>
+  key?: string
 }
 
 const augmentStorageAdapter = (storage: Storage) => {
@@ -64,8 +73,11 @@ type CacheClientLoaderArgs = {
   adapter?: CacheAdapter
 }
 
-export const cacheClientLoader = async <T,>(
-  { request, serverLoader }: ClientLoaderFunctionArgs,
+export const cacheClientLoader = async <
+  LoaderArgs extends ClientLoaderFunctionArgs = ClientLoaderFunctionArgs,
+  Data = ReturnType<LoaderArgs['serverLoader']>,
+>(
+  { request, serverLoader }: LoaderArgs,
   {
     type = 'swr',
     key = constructKey(request),
@@ -75,66 +87,64 @@ export const cacheClientLoader = async <T,>(
     key: constructKey(request),
     adapter: cache,
   }
-): Promise<
-  SerializeFrom<T> & {
-    serverData: SerializeFrom<T>
-    deferredServerData: Promise<SerializeFrom<T>> | undefined
-    key: string
-  }
-> => {
-  const existingData = await adapter.getItem(key)
+): Promise<CacheData<Data>> => {
+  const existingData = (await adapter.getItem(key)) as Data
 
   if (type === 'normal' && existingData) {
     return {
       ...existingData,
-      serverData: existingData as SerializeFrom<T>,
+      serverData: existingData,
       deferredServerData: undefined,
       key,
     }
   }
-  const data = existingData ? existingData : await serverLoader()
+
+  const data = existingData ? existingData : ((await serverLoader()) as Data)
+  const deferredServerData = existingData
+    ? (serverLoader() as Promise<Data>)
+    : undefined
 
   await adapter.setItem(key, data)
-  const deferredServerData = existingData ? serverLoader() : undefined
+
   return {
     ...(data ?? existingData),
-    serverData: data as SerializeFrom<T>,
+    serverData: data,
     deferredServerData,
     key,
   }
 }
 
-export const createClientLoaderCache = (props?: CacheClientLoaderArgs) => {
-  const clientLoader = (args: ClientLoaderFunctionArgs) =>
-    cacheClientLoader(args, props)
+export const createClientLoaderCache = <T extends ClientLoaderFunctionArgs>(
+  props?: CacheClientLoaderArgs
+) => {
+  const clientLoader = (args: T) => cacheClientLoader<T>(args, props)
   clientLoader.hydrate = true
   return clientLoader
 }
 
-function useCachedData<T>({
-  data = {},
-  adapter = cache,
-}: {
+type UseCachedDataArgs<T extends CacheData> = {
   adapter?: CacheAdapter
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: any
-}) {
+  data?: T
+}
+
+export function useCachedData<T extends CacheData>({
+  data,
+  adapter = cache,
+}: UseCachedDataArgs<T>) {
   const navigate = useNavigate()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [freshData, setFreshData] = useState<any>({
-    ...('serverData' in data ? data.serverData : data),
+  const [freshData, setFreshData] = useState<T['serverData']>({
+    ...('serverData' in (data || {}) ? data?.serverData : data),
   })
 
   // Unpack deferred data from the server
   useEffect(() => {
     let isMounted = true
-    if (data.deferredServerData) {
+    if (data?.deferredServerData) {
       data.deferredServerData
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then((newData: any) => {
+        .then((newData) => {
           if (isMounted) {
             startTransition(() => {
-              adapter.setItem(data.key, newData)
+              data.key && adapter.setItem(data.key, newData)
               setFreshData(newData)
             })
           }
@@ -158,7 +168,7 @@ function useCachedData<T>({
   // Update the cache if the data changes
   useEffect(() => {
     if (
-      data.serverData &&
+      data?.serverData &&
       JSON.stringify(data.serverData) !== JSON.stringify(freshData)
     ) {
       startTransition(() => {
@@ -171,37 +181,17 @@ function useCachedData<T>({
   return {
     ...data,
     ...freshData,
-    cacheKey: data.key,
-    invalidate: () => invalidateCache(data.key),
-  } as SerializeFrom<T> & { cacheKey?: string; invalidate: () => Promise<void> }
+    cacheKey: data?.key,
+    invalidate: () => data?.key && invalidateCache(data.key),
+  } as T & { cacheKey?: string; invalidate: () => Promise<void> }
 }
 
-export function useCachedRouteLoaderData<T>({
+export function useCachedRouteLoaderData<T extends CacheData>({
   adapter = cache,
   data: propsData,
   route,
-}: {
-  route: string
-  adapter?: CacheAdapter
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: any
-}) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loaderData = useRouteLoaderData(route) as any
-  const data = propsData || loaderData
-  const res = useCachedData<T>({ data, adapter })
-  return res
-}
-
-export function useCachedLoaderData<T>(
-  {
-    adapter = cache,
-    data: propsData,
-  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  { adapter?: CacheAdapter; data?: any } = { adapter: cache }
-) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const loaderData = useLoaderData() as any
+}: UseCachedDataArgs<T> & { route: string }) {
+  const loaderData = useRouteLoaderData(route) as T
   const data = propsData || loaderData
   const res = useCachedData<T>({ data, adapter })
   return res
@@ -222,59 +212,3 @@ export const invalidateCache = async (key: string | string[]) => {
 }
 
 export const useCacheInvalidator = () => ({ invalidateCache })
-
-export function useSwrData<T>({
-  serverData,
-  deferredServerData,
-  ...args
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-any) {
-  const memoized = useCallback(
-    ({
-      children,
-      fallback,
-    }: {
-      children: (data: SerializeFrom<T>) => React.ReactElement
-      fallback?: (data: SerializeFrom<T>) => React.ReactElement
-    }) => {
-      return (
-        <>
-          {deferredServerData ? (
-            <React.Suspense fallback={fallback?.(serverData)}>
-              <Await resolve={deferredServerData}>{children as never}</Await>
-            </React.Suspense>
-          ) : (
-            children(serverData ?? (args as T))
-          )}
-        </>
-      )
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [deferredServerData, serverData]
-  )
-
-  return memoized
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const SWRAwait = ({ data, children, resolve }: any) => {
-  if (data.deferredServerData) {
-    return (
-      <React.Suspense>
-        <Await resolve={data.deferredServerData}>
-          {(resolvedData) => (
-            <React.Suspense>
-              <Await resolve={resolvedData[resolve]}>{children as never}</Await>
-            </React.Suspense>
-          )}
-        </Await>
-      </React.Suspense>
-    )
-  }
-
-  return (
-    <React.Suspense>
-      <Await resolve={data[resolve]}>{children as never}</Await>
-    </React.Suspense>
-  )
-}

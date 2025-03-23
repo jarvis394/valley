@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { data, redirect } from 'react-router'
 import { requireUser } from 'app/server/auth/auth.server'
 import { covers, db } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
@@ -7,6 +7,7 @@ import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
 import { getUserProject } from 'app/server/services/project.server'
 import { getUserFile } from 'app/server/services/file.server'
+import { Route } from './+types/$id.setCover'
 
 export const ProjectSetCoverSchema = z.object({
   fileId: z.string(),
@@ -18,7 +19,7 @@ const resolver = zodResolver(ProjectSetCoverSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request, params }: LoaderFunctionArgs) => {
+export const action = async ({ request, params }: Route.ActionArgs) => {
   const projectId = params.id
   const user = await requireUser(request)
 

@@ -16,7 +16,7 @@ import { lowerFirstLetter } from 'app/utils/misc'
 import Hidden from '@valley/ui/Hidden'
 import Modal from '@valley/ui/Modal'
 import ConfirmConnectionDeleteModal from '../Modals/ConfirmConnectionDelete'
-import { Await } from '@remix-run/react'
+import { Await } from 'react-router'
 import dayjs from 'dayjs'
 import { useHydrated } from 'remix-utils/use-hydrated'
 

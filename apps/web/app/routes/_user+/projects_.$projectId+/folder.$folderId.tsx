@@ -18,21 +18,20 @@ import Menu from '@valley/ui/Menu'
 import FolderCard from 'app/components/FolderCard/FolderCard'
 import cx from 'classnames'
 import { formatBytes, useRootLoaderData } from 'app/utils/misc'
-import { data, HeadersFunction, LoaderFunctionArgs } from '@remix-run/node'
 import {
   combineServerTimings,
   makeTimings,
   time,
 } from 'app/server/timing.server'
 import {
-  ClientLoaderFunction,
+  data,
   Form,
   redirect,
   ShouldRevalidateFunction,
   useFetcher,
   useNavigate,
   useParams,
-} from '@remix-run/react'
+} from 'react-router'
 import FileCard from 'app/components/FileCard/FileCard'
 import UploadButton from 'app/components/UploadButton/UploadButton'
 import type { File, Folder, Project } from '@valley/db'
@@ -42,7 +41,7 @@ import { formatNewLine } from 'app/utils/format-new-line'
 import {
   cacheClientLoader,
   invalidateCache,
-  useCachedLoaderData,
+  useCachedData,
 } from 'app/utils/cache'
 import { invariantResponse } from 'app/utils/invariant'
 import { useRemixForm } from 'remix-hook-form'
@@ -77,6 +76,7 @@ import { getProjectFolderFiles } from 'app/server/services/folder.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { useUserStore } from 'app/utils/user'
 import { auth } from '@valley/auth'
+import { Route } from './+types/folder.$folderId'
 
 type FormData = z.infer<typeof FoldersCreateSchema>
 
@@ -87,7 +87,7 @@ export const getFilesCacheKey = (
   folderId?: Folder['id']
 ) => `files:${projectId}:${folderId}`
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId, folderId } = params
   invariantResponse(folderId, 'Missing folder ID in route params')
   invariantResponse(projectId, 'Missing project ID in route params')
@@ -113,12 +113,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   )
 }
 
-export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
+export const clientLoader = ({ params, ...props }: Route.ClientLoaderArgs) => {
   if (!params.folderId) {
     return redirect('/projects')
   }
 
-  return cacheClientLoader(
+  return cacheClientLoader<Route.ClientLoaderArgs>(
     { params, ...props },
     { type: 'swr', key: getFilesCacheKey(params.projectId, params.folderId) }
   )
@@ -126,7 +126,10 @@ export const clientLoader: ClientLoaderFunction = ({ params, ...props }) => {
 
 clientLoader.hydrate = true
 
-export const headers: HeadersFunction = ({ loaderHeaders, parentHeaders }) => {
+export const headers = ({
+  loaderHeaders,
+  parentHeaders,
+}: Route.HeadersArgs) => {
   return { 'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders) }
 }
 
@@ -544,8 +547,10 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   )
 }
 
-const ProjectRoute = () => {
-  const data = useCachedLoaderData<typeof loader>()
+const ProjectRoute: React.FC<Route.ComponentProps> = ({ loaderData }) => {
+  const data = useCachedData({
+    data: loaderData,
+  })
 
   return (
     <div className={styles.project}>

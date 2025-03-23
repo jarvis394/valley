@@ -1,8 +1,7 @@
 import React from 'react'
 import styles from '../auth.module.css'
 import { SEOHandle } from '@nasa-gcn/remix-seo'
-import { type ActionFunctionArgs } from '@remix-run/node'
-import { Form, Link, useActionData, useSearchParams } from '@remix-run/react'
+import { Form, Link, useSearchParams, redirect } from 'react-router'
 import { requireAnonymous } from 'app/server/auth/auth.server'
 import Button from '@valley/ui/Button'
 import { ArrowLeft } from 'geist-ui-icons'
@@ -24,7 +23,8 @@ import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import Stack from '@valley/ui/Stack'
 import { createToastHeaders } from 'app/server/toast.server'
 import { auth } from '@valley/auth'
-import { redirect } from '@remix-run/router'
+import { Route } from './+types'
+import { checkHoneypot } from 'app/server/honeypot.server'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -40,7 +40,7 @@ export const handle: SEOHandle = {
   getSitemapEntries: () => null,
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireAnonymous(request)
 
   const {
@@ -48,6 +48,9 @@ export async function action({ request }: ActionFunctionArgs) {
     data,
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
+
+  checkHoneypot(defaultValues)
+
   if (errors) {
     return { errors, defaultValues }
   }
@@ -83,8 +86,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-const LoginViaEmailPage: React.FC = () => {
-  const actionData = useActionData<typeof action>()
+const LoginViaEmailPage: React.FC<Route.ComponentProps> = ({ actionData }) => {
   const [searchParams] = useSearchParams()
   const isPending = useIsPending()
   const redirectTo = searchParams.get(redirectToKey)

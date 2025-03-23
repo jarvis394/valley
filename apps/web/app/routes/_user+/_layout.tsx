@@ -7,21 +7,19 @@ import {
   useLoaderData,
   useNavigate,
   useSubmit,
-} from '@remix-run/react'
+} from 'react-router'
 import styles from './styles.module.css'
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
-import type { LoaderFunctionArgs } from '@remix-run/node'
 import { requireUserId } from '../../server/auth/auth.server'
 import { UserFull } from '@valley/shared'
 import { useUserStore } from 'app/utils/user'
 import Stack from '@valley/ui/Stack'
 import Spinner from '@valley/ui/Spinner'
-import { db, users } from '@valley/db'
-import { eq } from 'drizzle-orm'
+import { db, users, eq } from '@valley/db'
+import { Route } from './+types/_layout'
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // TODO: deal with `throw redirect` in defer loders
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const userId = await requireUserId(request)
   const user = new Promise<UserFull | undefined>((res) =>
     db.query.users
@@ -76,13 +74,16 @@ const UserGroupLayout: React.FC = () => {
  * If an error happened at this stage, user's data load errored.
  * Log them out of their session.
  */
-export function ErrorBoundary() {
+export const ErrorBoundary: React.FC<Route.ErrorBoundaryProps> = () => {
   const submit = useSubmit()
   const navigate = useNavigate()
   const error = useAsyncError()
 
   useEffect(() => {
-    if (!error) return navigate('/home')
+    if (!error) {
+      navigate('/home')
+      return
+    }
 
     submit(
       {},

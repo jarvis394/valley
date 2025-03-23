@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { data, LoaderFunctionArgs, redirect } from '@remix-run/node'
-import { db, users } from '@valley/db'
+import { data, redirect } from 'react-router'
+import { db, users, eq } from '@valley/db'
 import { requireUser } from 'app/server/auth/auth.server'
 import { redirectWithToast } from 'app/server/toast.server'
 import { queryUserByDomain } from 'app/server/services/user.server'
-import { eq } from 'drizzle-orm'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
+import { Route } from './+types/domain'
 
 export const MAX_USER_DOMAIN_HISTORY_LENGTH = 5
 export const DomainSchema = z.string().max(32).min(4)
@@ -20,7 +20,7 @@ const resolver = zodResolver(UserDomainAddSchema)
 
 export const loader = () => redirect('/projects')
 
-export const action = async ({ request }: LoaderFunctionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const user = await requireUser(request)
 
   const {

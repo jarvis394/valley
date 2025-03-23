@@ -21,7 +21,8 @@
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "docker:upload:buildx": "docker buildx build --push --platform linux/arm64/v8,linux/amd64 -f ./apps/upload/Dockerfile --tag jarvis394/valley-upload ."
+    "docker:upload:buildx": "docker buildx build --push --platform linux/arm64/v8,linux/amd64 -f ./apps/upload/Dockerfile --tag jarvis394/valley-upload .",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@caxy/dotenv-updater": "^1.0.9",
@@ -30,8 +31,9 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "turbo": "^2.4.4",
-    "typescript": "^5.7.2",
-    "cross-env": "^7.0.3"
+    "typescript": "^5.8.2",
+    "cross-env": "^7.0.3",
+    "patch-package": "^8.0.0"
   },
   "engines": {
     "node": ">=22"

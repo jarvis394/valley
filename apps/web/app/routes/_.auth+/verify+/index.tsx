@@ -1,17 +1,10 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
-import { type ActionFunctionArgs } from '@remix-run/node'
-import {
-  data,
-  Form,
-  Link,
-  useActionData,
-  useSearchParams,
-} from '@remix-run/react'
+import { data, Form, Link, useSearchParams } from 'react-router'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
-import { GeneralErrorBoundary } from '../../../components/ErrorBoundary'
-import AuthFormHeader from '../../../components/AuthFormHeader/AuthFormHeader'
-import { useIsPending } from '../../../utils/misc'
+import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
+import AuthFormHeader from 'app/components/AuthFormHeader/AuthFormHeader'
+import { useIsPending } from 'app/utils/misc'
 import OTPInput from '@valley/ui/OTPInput'
 import Button from '@valley/ui/Button'
 import styles from '../auth.module.css'
@@ -36,6 +29,7 @@ import {
   codeKey,
   typeKey,
 } from 'app/config/paramsKeys'
+import { Route } from './+types'
 
 export const handle: SEOHandle = {
   getSitemapEntries: () => null,
@@ -63,7 +57,7 @@ type FormData = z.infer<typeof VerifySchema>
 
 const resolver = zodResolver(VerifySchema)
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const {
     errors,
     data: submissionData,
@@ -112,12 +106,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export default function VerifyRoute() {
+const VerifyRoute: React.FC<Route.ComponentProps> = ({ actionData }) => {
   const [searchParams] = useSearchParams()
   const [didResendVerificationCode, setDidResendVerificationCode] =
     useState(false)
   const isPending = useIsPending()
-  const actionData = useActionData<typeof action>()
   const parseWithZodType = VerificationTypeSchema.safeParse(
     searchParams.get(typeKey)
   )
@@ -153,7 +146,7 @@ export default function VerifyRoute() {
   }, [startCountdown])
 
   useEffect(() => {
-    if (actionData?.code) {
+    if (actionData && 'code' in actionData) {
       let description = 'Unexpected error'
       switch (actionData.code) {
         case 'INVALID_OTP':
@@ -248,3 +241,5 @@ export default function VerifyRoute() {
 export function ErrorBoundary() {
   return <GeneralErrorBoundary />
 }
+
+export default VerifyRoute
