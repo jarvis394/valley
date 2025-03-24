@@ -33,7 +33,7 @@
   --button-tertiary-hovered-fg: var(--text-primary);
   --button-tertiary-hovered-bg: var(--alpha-transparent-07);
 
-  /** Button / Tertiary  Dimmed */
+  /** Button / Tertiary Dimmed */
   --button-tertiary-dimmed-fg: var(--text-hint);
   --button-tertiary-dimmed-bg: transparent;
   --button-tertiary-dimmed-hovered-fg: var(--text-secondary);
@@ -51,6 +51,13 @@
   --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
   --button-danger-hovered-bg: var(--red-900);
+
+  /** Button / Danger Dimmed */
+  --button-danger-dimmed-fg: var(--red-800);
+  --button-danger-dimmed-bg: rgba(229, 72, 77, 0.12);
+  --button-danger-dimmed-hovered-fg: var(--red-900);
+  --button-danger-dimmed-hovered-bg: rgba(229, 72, 77, 0.16);
+  --button-danger-dimmed-focused-fg: var(--red-700);
 
   /** Button / Disabled */
   --button-disabled-fg: rgba(237, 237, 237, 0.5);
@@ -121,26 +128,32 @@
 
   /** Shadow */
   --shadow-0: none;
-  --shadow-1: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
-  --shadow-2: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-  --shadow-3: 0px 3px 3px -2px rgba(0, 0, 0, 0.2),
-    0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
-  --shadow-4: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-    0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-  --shadow-5: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-    0px 5px 8px 0px rgba(0, 0, 0, 0.14), 0px 1px 14px 0px rgba(0, 0, 0, 0.12);
-  --shadow-6: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  --shadow-1:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  --shadow-2:
+    0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  --shadow-3:
+    0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 8px 0px rgba(0, 0, 0, 0.12);
+  --shadow-4:
+    0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  --shadow-5:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 5px 8px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 14px 0px rgba(0, 0, 0, 0.12);
+  --shadow-6:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 18px 0px rgba(0, 0, 0, 0.12);
 
   /** Overlay */
-  --overlay-shadow: 0 0 4px 0 rgba(255, 255, 255, 0.03),
-    0 4px 16px 0 rgba(255, 255, 255, 0.03);
+  --overlay-shadow:
+    0 0 4px 0 rgba(255, 255, 255, 0.03), 0 4px 16px 0 rgba(255, 255, 255, 0.03);
 
   /** Modal */
   --modal-backdrop: rgba(10, 10, 10, 0.5);
-  
+
   /** Link */
   --link-color: var(--blue-900);
 }
@@ -180,7 +193,7 @@
   --button-tertiary-hovered-fg: var(--text-primary);
   --button-tertiary-hovered-bg: var(--alpha-transparent-07);
 
-  /** Button / Tertiary  Dimmed */
+  /** Button / Tertiary Dimmed */
   --button-tertiary-dimmed-fg: var(--text-hint);
   --button-tertiary-dimmed-bg: transparent;
   --button-tertiary-dimmed-hovered-fg: var(--text-secondary);
@@ -198,6 +211,13 @@
   --button-danger-bg: var(--red-800);
   --button-danger-hovered-fg: var(--button-danger-fg);
   --button-danger-hovered-bg: #b52e33;
+
+  /** Button / Danger Dimmed */
+  --button-danger-dimmed-fg: var(--red-800);
+  --button-danger-dimmed-bg: rgba(229, 72, 77, 0.12);
+  --button-danger-dimmed-hovered-fg: var(--red-900);
+  --button-danger-dimmed-hovered-bg: rgba(229, 72, 77, 0.16);
+  --button-danger-dimmed-focused-fg: var(--red-700);
 
   /** Button / Disabled */
   --button-disabled-fg: rgba(23, 23, 23, 0.5);
@@ -271,22 +291,28 @@
 
   /** Shadow */
   --shadow-0: none;
-  --shadow-1: 0px 2px 1px -1px rgba(0, 0, 0, 0.07),
-    0px 1px 1px 0px rgba(0, 0, 0, 0.03), 0px 1px 3px 0px rgba(0, 0, 0, 0.03);
-  --shadow-2: 0px 3px 1px -2px rgba(0, 0, 0, 0.07),
-    0px 2px 2px 0px rgba(0, 0, 0, 0.03), 0px 1px 5px 0px rgba(0, 0, 0, 0.03);
-  --shadow-3: 0px 3px 3px -2px rgba(0, 0, 0, 0.07),
-    0px 3px 4px 0px rgba(0, 0, 0, 0.03), 0px 1px 8px 0px rgba(0, 0, 0, 0.03);
-  --shadow-4: 0px 2px 4px -1px rgba(0, 0, 0, 0.07),
-    0px 4px 5px 0px rgba(0, 0, 0, 0.03), 0px 1px 10px 0px rgba(0, 0, 0, 0.03);
-  --shadow-5: 0px 3px 5px -1px rgba(0, 0, 0, 0.07),
-    0px 5px 8px 0px rgba(0, 0, 0, 0.03), 0px 1px 14px 0px rgba(0, 0, 0, 0.03);
-  --shadow-6: 0px 3px 5px -1px rgba(0, 0, 0, 0.07),
-    0px 6px 10px 0px rgba(0, 0, 0, 0.03), 0px 1px 18px 0px rgba(0, 0, 0, 0.03);
+  --shadow-1:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.07), 0px 1px 1px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.03);
+  --shadow-2:
+    0px 3px 1px -2px rgba(0, 0, 0, 0.07), 0px 2px 2px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.03);
+  --shadow-3:
+    0px 3px 3px -2px rgba(0, 0, 0, 0.07), 0px 3px 4px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 8px 0px rgba(0, 0, 0, 0.03);
+  --shadow-4:
+    0px 2px 4px -1px rgba(0, 0, 0, 0.07), 0px 4px 5px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.03);
+  --shadow-5:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.07), 0px 5px 8px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 14px 0px rgba(0, 0, 0, 0.03);
+  --shadow-6:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.07), 0px 6px 10px 0px rgba(0, 0, 0, 0.03),
+    0px 1px 18px 0px rgba(0, 0, 0, 0.03);
 
   /** Overlay */
-  --overlay-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.03),
-    0 4px 16px 0 rgba(0, 0, 0, 0.03);
+  --overlay-shadow:
+    0 0 4px 0 rgba(0, 0, 0, 0.03), 0 4px 16px 0 rgba(0, 0, 0, 0.03);
 
   /** Modal */
   --modal-backdrop: rgba(255, 255, 255, 0.5);

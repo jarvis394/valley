@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "turbo dev --filter !storybook",
     "storybook": "turbo dev --filter storybook",
-    "web:dev": "turbo dev --filter web",
-    "gallery:dev": "turbo dev --filter gallery",
-    "upload:dev": "turbo dev --filter upload",
+    "web:dev": "turbo dev -F web -F @valley/auth -F @valley/shared -F @valley/db",
+    "gallery:dev": "turbo dev -F gallery -F @valley/auth -F @valley/shared -F @valley/db",
+    "upload:dev": "turbo dev -F upload -F @valley/auth -F @valley/shared -F @valley/db",
     "docker:dev": "docker compose -f ./docker-compose.dev.yml up",
     "docker:start": "docker compose -f ./docker-compose.yml up",
     "build": "cross-env NODE_ENV=production turbo build",

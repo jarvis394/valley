@@ -16,9 +16,10 @@ export const useScrollProgress = (
     },
     [offset]
   )
-  const handlePageScroll = useCallback(() => {
-    setScrollProgress(calcScrollProgress(window.scrollY))
-  }, [calcScrollProgress])
+  const handlePageScroll = () => {
+    const newScrollProgress = calcScrollProgress(window.scrollY)
+    newScrollProgress !== scrollProgress && setScrollProgress(newScrollProgress)
+  }
 
   usePageScroll(handlePageScroll, props)
 

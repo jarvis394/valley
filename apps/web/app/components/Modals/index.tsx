@@ -38,9 +38,9 @@ export const Modals = () => {
           viewTransition: false,
         }
       )
+    } else {
+      navigate(-1)
     }
-
-    navigate(-1)
   }, [navigate, setSearchParams])
 
   return (

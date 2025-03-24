@@ -59,14 +59,17 @@ const Tabs = <T extends TabValue = TabValue>({
   defaultValue,
   indicator,
   className,
+  scrollProgressTransitionStyles,
   ...props
 }: TabsProps<T>): JSX.Element => {
   const [innerValue, setInnerValue] = useState(defaultValue)
   const scrollProgress = useScrollProgress(props.scrollProgressOffset || 0, {
     enabled: props.scrollProgressOffset !== undefined,
   })
-  const scrollProgressTransitionStyles =
-    props.scrollProgressTransitionStyles?.(scrollProgress)
+  const scrollProgressStyles = useMemo(
+    () => scrollProgressTransitionStyles?.(scrollProgress),
+    [scrollProgressTransitionStyles, scrollProgress]
+  )
   const value = useMemo(
     () => (propsValue !== undefined ? propsValue : innerValue),
     [innerValue, propsValue]
@@ -85,14 +88,14 @@ const Tabs = <T extends TabValue = TabValue>({
     null
   )
 
-  const onLeaveTabs = () => {
+  const onLeaveTabs = useCallback(() => {
     startTransition(() => {
       setHoveredTab(null)
       initialHoveredElementTimeoutRef.current = setTimeout(() => {
         setIsInitialHoveredElement(true)
       }, ANIMATION_DURATION)
     })
-  }
+  }, [])
 
   const onEnterTab = useCallback((value: T, e: React.PointerEvent) => {
     startTransition(() => {
@@ -218,7 +221,7 @@ const Tabs = <T extends TabValue = TabValue>({
       onPointerLeave={onLeaveTabs}
       ref={$root}
       className={cx(styles.tabs, className)}
-      style={scrollProgressTransitionStyles}
+      style={scrollProgressStyles}
     >
       {children}
       <div className={styles.tabs__hover} style={hoverStyles} />

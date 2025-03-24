@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import styles from './Menu.module.css'
 import modalStyles from '../Modal/Modal.module.css'
 import { Slot, Slottable } from '@radix-ui/react-slot'
@@ -190,7 +190,7 @@ export const ContextMenuTrigger = React.memo(function ContextMenuTrigger({
   return <ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
 })
 
-export const Root = React.memo(function Root({
+export const Root = ({
   dropdownMenuProps,
   contextMenuProps,
   openOnContextMenu = false,
@@ -201,12 +201,7 @@ export const Root = React.memo(function Root({
   contextMenuProps?: ContextMenu.ContextMenuProps
   openOnContextMenu?: boolean
   onOpenChange?: (open: boolean) => void
-}>) {
-  const shouldShowDrawer = useMediaQuery(
-    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
-  )
-  const shouldShowMenu = !shouldShowDrawer
-  const shouldEnableContextMenu = openOnContextMenu && !shouldShowDrawer
+}>) => {
   const [dropdownMenuOpen, setDropdownMenuOpen] = useState(
     dropdownMenuProps?.defaultOpen
   )
@@ -219,25 +214,34 @@ export const Root = React.memo(function Root({
     }),
     [onOpenChange]
   )
+  const shouldShowDrawer = useMediaQuery(
+    `(max-width:${SMALL_VIEWPORT_WIDTH}px)`
+  )
+  const shouldShowMenu = !shouldShowDrawer
+  const shouldEnableContextMenu = openOnContextMenu && !shouldShowDrawer
+  const isDrawerOpen = shouldShowDrawer && dropdownMenuOpen
+  const isMenuOpen = shouldShowMenu && dropdownMenuOpen
 
-  const handleOpenChange = (newIsOpen: boolean) => {
-    onOpenChange?.(newIsOpen)
-    setDropdownMenuOpen(newIsOpen)
-  }
+  const handleOpenChange = useCallback(
+    (newIsOpen: boolean) => {
+      onOpenChange?.(newIsOpen)
+      setDropdownMenuOpen(newIsOpen)
+    },
+    [onOpenChange]
+  )
 
   return (
     <MenuActionsProvider value={menuActions}>
       <Drawer.Root
         direction="bottom"
-        open={shouldShowDrawer && dropdownMenuOpen}
+        open={isDrawerOpen}
         onOpenChange={handleOpenChange}
         disablePreventScroll
         repositionInputs
       >
         <DropdownMenu.Root
           {...dropdownMenuProps}
-          modal={false}
-          open={shouldShowMenu && dropdownMenuOpen}
+          open={isMenuOpen}
           onOpenChange={handleOpenChange}
         >
           <ContextMenu.Root {...contextMenuProps}>
@@ -250,7 +254,7 @@ export const Root = React.memo(function Root({
       </Drawer.Root>
     </MenuActionsProvider>
   )
-})
+}
 
 export const Trigger = DropdownMenu.Trigger
 

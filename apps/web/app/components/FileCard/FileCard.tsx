@@ -5,9 +5,7 @@ import * as Menu from '@valley/ui/Menu'
 import {
   Download,
   MoreHorizontal,
-  PencilEdit,
   Trash,
-  Menu as MenuIcon,
   Link,
   Footer,
   Information,
@@ -16,12 +14,6 @@ import {
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
 import { formatBytes } from '../../utils/misc'
-import {
-  AnimateLayoutChanges,
-  defaultAnimateLayoutChanges,
-  useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import cx from 'classnames'
 import { useModal } from 'app/hooks/useModal'
 import Paper from '@valley/ui/Paper'
@@ -33,6 +25,8 @@ type FileCardMenuContentProps = {
 
 const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
   const { openModal } = useModal()
+  const contentType =
+    file.contentType?.split('/')[1].toUpperCase() || file.contentType
 
   const handleFileDelete = () => {
     openModal('confirm-file-deletion', {
@@ -49,13 +43,32 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
   return (
     <Menu.Content>
       <Stack
-        gap={0.5}
-        className={styles.fileCard__menuHeader}
-        direction={'column'}
+        gap={3}
+        direction={'row'}
         padding={2}
+        align={'center'}
+        className={styles.fileCard__menuHeader}
       >
-        <h6>{formatBytes(Number(file.size))}</h6>
-        <p>{file.contentType}</p>
+        <Stack
+          align={'center'}
+          justify={'center'}
+          className={styles.fileCard__menuHeaderPreview}
+        >
+          {file.canHaveThumbnails && (
+            <Image
+              containerProps={{ className: styles.fileCard__menuHeaderPreview }}
+              file={file}
+              thumbnail="sm"
+            />
+          )}
+          {!file.canHaveThumbnails && <FileIcon width={24} height={24} />}
+        </Stack>
+        <Stack gap={0.5} direction={'column'}>
+          <h6>{file.name}</h6>
+          <p>
+            {contentType} · {formatBytes(Number(file.size))}
+          </p>
+        </Stack>
       </Stack>
       <Menu.Separator />
       <Menu.Item
@@ -69,9 +82,6 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
       </Menu.Item>
       <Menu.Item before={<Download color="var(--text-secondary)" />}>
         Download
-      </Menu.Item>
-      <Menu.Item before={<MenuIcon color="var(--text-secondary)" />}>
-        Reorder
       </Menu.Item>
       <Menu.Item before={<Information color="var(--text-secondary)" />}>
         Info
@@ -90,51 +100,22 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
 type FileCardProps = {
   file: File
   isCover?: boolean
-  isOverlay?: boolean
+  preventSelection?: () => void
+  restoreSelection?: () => void
 }
 
 const FileCard: React.FC<FileCardProps> = ({
   file,
-  isOverlay,
   isCover,
+  preventSelection,
+  restoreSelection,
   ...props
 }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false)
-  const animateLayoutChanges: AnimateLayoutChanges = (args) =>
-    defaultAnimateLayoutChanges({ ...args, wasDragging: true })
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: file.id,
-    animateLayoutChanges,
-  })
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  const handleDropdownOpenChange = (isOpen: boolean) => {
-    setDropdownOpen(isOpen)
-  }
 
   return (
-    <Menu.Root openOnContextMenu onOpenChange={handleDropdownOpenChange}>
-      <li
-        {...props}
-        {...attributes}
-        {...listeners}
-        ref={setNodeRef}
-        className={cx(styles.fileCard, {
-          [styles['fileCard--dragging']]: isDragging,
-          [styles['fileCard--overlay']]: isOverlay,
-        })}
-        style={style}
-      >
+    <Menu.Root openOnContextMenu onOpenChange={setDropdownOpen}>
+      <li {...props} className={cx(styles.fileCard)} id={file.id}>
         <div className={styles.fileCard__imageContainer}>
           {file.canHaveThumbnails && (
             <Image
@@ -169,17 +150,18 @@ const FileCard: React.FC<FileCardProps> = ({
           align={'center'}
           data-menu-open={isDropdownOpen}
         >
-          <IconButton size="sm" variant="secondary-dimmed">
-            <PencilEdit />
-          </IconButton>
           <Menu.Trigger asChild>
-            <IconButton size="sm" variant="secondary-dimmed">
+            <IconButton
+              onMouseEnter={preventSelection}
+              onMouseLeave={restoreSelection}
+              size="sm"
+              variant="secondary-dimmed"
+            >
               <MoreHorizontal />
             </IconButton>
           </Menu.Trigger>
+          <FileCardMenuContent file={file} />
         </Stack>
-
-        <FileCardMenuContent file={file} />
       </li>
     </Menu.Root>
   )

@@ -142,6 +142,16 @@
   --themed-border: transparent;
 }
 
+.buttonBase--danger-dimmed {
+  --themed-color: var(--button-danger-dimmed-fg);
+  --themed-background: var(--button-danger-dimmed-bg);
+  --themed-background-hover: var(--button-danger-dimmed-hovered-bg);
+  --themed-background-focus: var(--button-danger-dimmed-focused-bg);
+  --themed-color-hover: var(--button-danger-dimmed-hovered-fg);
+  --themed-color-focus: var(--button-danger-dimmed-focused-fg);
+  --themed-border: transparent;
+}
+
 .buttonBase:not(:disabled):not(:has(button:hover)).buttonBase:hover {
   color: var(--themed-color-hover, var(--themed-color));
   background-color: var(--themed-background-hover, var(--themed-background));

@@ -104,7 +104,7 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
           <Link to={'/projects/' + project?.id}>
             {shouldShowCoverFile && <Avatar square file={coverFile} />}
             {!shouldShowCoverFile && (
-              <Avatar square>{lastProject?.title[0].toUpperCase()}</Avatar>
+              <Avatar square>{lastProject?.title?.[0]?.toUpperCase()}</Avatar>
             )}
             <p>{lastProject?.title}</p>
           </Link>

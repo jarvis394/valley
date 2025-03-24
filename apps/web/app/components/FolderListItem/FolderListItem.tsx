@@ -68,7 +68,8 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
     transition,
   }
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
     if (mode === 'edit') return
     onClick?.(folder)
   }

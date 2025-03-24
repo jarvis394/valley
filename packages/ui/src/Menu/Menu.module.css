@@ -13,11 +13,16 @@
   will-change: transform;
 }
 
+:global(div[data-vaul-drawer]) > .menu__inner {
+  max-width: none;
+}
+
 .menu__inner {
   display: flex;
   flex-direction: column;
   padding: 6px;
   min-width: 200px;
+  max-width: 270px;
 }
 
 .menu[data-type='context'][data-state='open'] {

@@ -13,6 +13,7 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
     | 'tertiary-dimmed'
     | 'warning'
     | 'danger'
+    | 'danger-dimmed'
   disabled?: boolean
   onClick?: React.MouseEventHandler
   shimmer?: boolean
@@ -48,6 +49,7 @@ const ButtonBase = ({
         [styles['buttonBase--tertiary-dimmed']]: variant === 'tertiary-dimmed',
         [styles['buttonBase--warning']]: variant === 'warning',
         [styles['buttonBase--danger']]: variant === 'danger',
+        [styles['buttonBase--danger-dimmed']]: variant === 'danger-dimmed',
         [styles['buttonBase--shimmer']]: shimmer,
         shimmer: shimmer,
       })}

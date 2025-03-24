@@ -25,13 +25,9 @@ import Toaster, { useToast } from '@valley/ui/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
 import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import calendar from 'dayjs/plugin/calendar'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
 import { pipeHeaders } from './server/headers.server'
 import { Route } from './+types/root'
+import { SortableProvider } from 'use-sortablejs'
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -40,11 +36,7 @@ import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
-
-dayjs.extend(calendar)
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
-dayjs.extend(timezone)
+import './utils/init'
 
 export const links: Route.LinksFunction = () => [
   {
@@ -209,12 +201,14 @@ const App: React.FC<Route.ComponentProps> = ({ loaderData }) => {
   useToast(loaderData?.toast)
 
   return (
-    <HoneypotProvider {...loaderData?.honeypotProps}>
-      <Outlet />
-      <Modals />
-      <UploadsOverlay />
-      <Toaster theme={theme} />
-    </HoneypotProvider>
+    <SortableProvider>
+      <HoneypotProvider {...loaderData?.honeypotProps}>
+        <Outlet />
+        <Modals />
+        <UploadsOverlay />
+        <Toaster theme={theme} />
+      </HoneypotProvider>
+    </SortableProvider>
   )
 }
 

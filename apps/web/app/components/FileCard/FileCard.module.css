@@ -1,6 +1,8 @@
 .fileCard {
   background-color: var(--background-paper);
   aspect-ratio: 1 / 1;
+  contain-intrinsic-size: 227px;
+  content-visibility: auto;
   padding: 12px;
   display: flex;
   justify-content: center;
@@ -20,17 +22,10 @@
 }
 
 .fileCard--dragging {
-  opacity: 0;
-}
-
-.fileCard--overlay {
+  opacity: 1;
   z-index: 2000;
   background-color: var(--blue-100);
   box-shadow: 0 0 0 1px inset var(--blue-600);
-}
-
-.fileCard--overlay .fileCard__toolbar {
-  opacity: 0 !important;
 }
 
 .fileCard__name {
@@ -81,7 +76,7 @@
 .fileCard__coverBadge {
   position: absolute;
   width: fit-content;
-  right: 8px;
+  left: 8px;
   top: 8px;
   border-radius: 8px;
   font-size: 13px;
@@ -92,6 +87,7 @@
   white-space: nowrap;
   overflow: hidden;
   padding: 8px 12px;
+  width: 84px;
 }
 
 .fileCard__coverBadge > svg {
@@ -100,21 +96,31 @@
 
 .fileCard:has(.fileCard__toolbar[data-menu-open='true']) .fileCard__coverBadge,
 .fileCard:hover .fileCard__coverBadge {
-  opacity: 0;
   transition-duration: 150ms;
   padding: 8px;
+  width: 32px;
 }
 
-.fileCard__menuHeader > h6 {
-  margin: 0;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.fileCard__menuHeader > p {
+.fileCard__menuHeader {
   margin: 0;
   font-weight: 400;
   font-size: 14px;
   color: var(--text-hint);
+  word-break: break-word;
+}
+
+.fileCard__menuHeader h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.fileCard__menuHeaderPreview {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px inset var(--alpha-transparent-03);
 }
