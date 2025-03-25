@@ -75,8 +75,10 @@ export const auth = betterAuth({
   advanced: {
     generateId: false,
     cookiePrefix: 'valley',
-    // TODO: change to true when one domain is used
     useSecureCookies: false,
+    defaultCookieAttributes: {
+      httpOnly: false,
+    },
   },
   plugins: [
     emailOTP({

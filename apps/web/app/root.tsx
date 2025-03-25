@@ -28,6 +28,33 @@ import UploadsOverlay from './components/UploadsOverlay/UploadsOverlay'
 import { pipeHeaders } from './server/headers.server'
 import { Route } from './+types/root'
 import { SortableProvider } from 'use-sortablejs'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import calendar from 'dayjs/plugin/calendar'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+dayjs.extend(calendar)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+const mountMultiDragPlugin = async () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+  try {
+    const pkg = await import(
+      // @ts-expect-error - @types/sortablejs doesn't have correct types
+      'sortablejs/modular/sortable.esm.js'
+    )
+    pkg.default.mount(new pkg.MultiDrag())
+  } catch (e) {
+    console.warn('Could not load MultiDrag sortablejs plugin:')
+    console.warn(e)
+  }
+}
+mountMultiDragPlugin()
 
 import './styles/fonts.css'
 import './styles/global.css'
@@ -36,7 +63,6 @@ import '@valley/ui/styles/reset.css'
 import '@valley/ui/styles/global.css'
 import '@uppy/core/dist/style.min.css'
 import 'overlayscrollbars/overlayscrollbars.css'
-import './utils/init'
 
 export const links: Route.LinksFunction = () => [
   {

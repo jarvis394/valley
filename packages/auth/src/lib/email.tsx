@@ -1,5 +1,5 @@
 import { render } from '@react-email/components'
-import { type ReactElement } from 'react'
+import React from 'react'
 import { z } from 'zod'
 import VerifyEmail from '../components/VerifyEmail.js'
 
@@ -27,7 +27,7 @@ type SendEmailOptions = {
   to: string
 } & (
   | { html: string; text: string; react?: never }
-  | { react: ReactElement; html?: never; text?: never }
+  | { react: React.ReactElement; html?: never; text?: never }
 )
 
 export const sendEmail = async ({ react, ...options }: SendEmailOptions) => {
@@ -122,7 +122,7 @@ export const sendRegisterEmail = async ({
   })
 }
 
-async function renderReactEmail(react: ReactElement) {
+async function renderReactEmail(react: React.ReactElement) {
   const [html, text] = await Promise.all([
     render(react),
     render(react, { plainText: true }),

@@ -15,6 +15,8 @@ import { File } from '@valley/db'
 import Sortable, { type SortableEvent } from 'sortablejs'
 import { useSortable } from 'use-sortablejs'
 import { AnimatePresence, motion } from 'framer-motion'
+import useMediaQuery from '@valley/ui/useMediaQuery'
+import { SMALL_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
 
 type SortableFile = File & {
   chosen: boolean
@@ -68,9 +70,7 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   }, [propsFiles, storeFiles])
   const setFiles = useProjectsStore((state) => state.setFiles)
   const cover = files.find((e) => e.id === project.cover?.[0]?.fileId)
-  const isMobile =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 960px)').matches
+  const isMobile = useMediaQuery(`(min-width:${SMALL_VIEWPORT_WIDTH}px)`)
   const isSafari =
     isMobile && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
   const timeDelay = isMobile ? 200 : 0
