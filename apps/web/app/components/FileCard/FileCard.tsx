@@ -10,6 +10,7 @@ import {
   Footer,
   Information,
   File as FileIcon,
+  CheckCircle,
 } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
 import IconButton from '@valley/ui/IconButton'
@@ -21,9 +22,13 @@ import Image from '@valley/ui/Image'
 
 type FileCardMenuContentProps = {
   file: File
+  selectItem?: (id: string) => void
 }
 
-const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
+const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({
+  file,
+  selectItem,
+}) => {
   const { openModal } = useModal()
   const contentType =
     file.contentType?.split('/')[1].toUpperCase() || file.contentType
@@ -86,6 +91,12 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({ file }) => {
       <Menu.Item before={<Information color="var(--text-secondary)" />}>
         Info
       </Menu.Item>
+      <Menu.Item
+        onClick={selectItem?.bind(null, file.id)}
+        before={<CheckCircle color="var(--text-secondary)" />}
+      >
+        Select
+      </Menu.Item>
       <Menu.Separator />
       <Menu.Item
         onClick={handleFileDelete}
@@ -102,13 +113,16 @@ type FileCardProps = {
   isCover?: boolean
   preventSelection?: () => void
   restoreSelection?: () => void
-}
+  selectItem?: (id: string) => void
+} & React.DetailedHTMLProps<
+  React.LiHTMLAttributes<HTMLLIElement>,
+  HTMLLIElement
+>
 
 const FileCard: React.FC<FileCardProps> = ({
   file,
   isCover,
-  preventSelection,
-  restoreSelection,
+  selectItem,
   ...props
 }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false)
@@ -151,16 +165,11 @@ const FileCard: React.FC<FileCardProps> = ({
           data-menu-open={isDropdownOpen}
         >
           <Menu.Trigger asChild>
-            <IconButton
-              onMouseEnter={preventSelection}
-              onMouseLeave={restoreSelection}
-              size="sm"
-              variant="secondary-dimmed"
-            >
+            <IconButton size="sm" variant="secondary-dimmed">
               <MoreHorizontal />
             </IconButton>
           </Menu.Trigger>
-          <FileCardMenuContent file={file} />
+          <FileCardMenuContent selectItem={selectItem} file={file} />
         </Stack>
       </li>
     </Menu.Root>

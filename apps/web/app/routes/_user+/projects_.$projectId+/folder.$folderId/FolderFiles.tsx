@@ -8,92 +8,24 @@ import { useProjectsStore } from 'app/stores/projects'
 import { useProject } from 'app/utils/project'
 import { SortAscending, Trash } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useParams } from 'react-router'
 import styles from './project.module.css'
 import { File } from '@valley/db'
-import Sortable, { type SortableEvent } from 'sortablejs'
-import { useSortable } from 'use-sortablejs'
+import { useSortable } from 'app/hooks/useSortable'
 import { AnimatePresence, motion } from 'framer-motion'
-import useMediaQuery from '@valley/ui/useMediaQuery'
-import { SMALL_VIEWPORT_WIDTH } from '@valley/ui/config/theme'
-
-type SortableFile = File & {
-  chosen: boolean
-  selected: boolean
-}
-
-const useEventHandlersManager = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler?: (this: Document, ev: PointerEvent | MouseEvent | TouchEvent) => any
-) => {
-  const removeHandlers = useCallback(() => {
-    if (handler) {
-      document.removeEventListener('pointerup', handler, false)
-      document.removeEventListener('mouseup', handler, false)
-      document.removeEventListener('touchend', handler, false)
-    }
-  }, [handler])
-
-  const addHandlers = useCallback(() => {
-    if (handler) {
-      document.removeEventListener('pointerup', handler, false)
-      document.addEventListener('pointerup', handler, false)
-      document.removeEventListener('mouseup', handler, false)
-      document.addEventListener('mouseup', handler, false)
-      document.removeEventListener('touchend', handler, false)
-      document.addEventListener('touchend', handler, false)
-    }
-  }, [handler])
-
-  return {
-    removeHandlers,
-    addHandlers,
-  }
-}
+import { useFiles } from 'app/utils/files'
 
 const FolderFiles: React.FC<{ files: File[] | null }> = ({
   files: propsFiles,
 }) => {
-  const [selectedFileIds, setSelectedFileIds] = useState<
-    Array<SortableFile['id']>
-  >([])
   const project = useProject()
   const { projectId = '', folderId = '' } = useParams()
-  const storeFiles = useProjectsStore(
-    (state) => state.projects[projectId]?.folders[folderId]?.files
-  )
-  const files = useMemo(() => {
-    if (storeFiles && storeFiles?.length > 0)
-      return storeFiles as SortableFile[]
-    else return (propsFiles as SortableFile[]) || []
-  }, [propsFiles, storeFiles])
+  const files = useFiles()
   const setFiles = useProjectsStore((state) => state.setFiles)
   const cover = files.find((e) => e.id === project.cover?.[0]?.fileId)
-  const isMobile = useMediaQuery(`(min-width:${SMALL_VIEWPORT_WIDTH}px)`)
-  const isSafari =
-    isMobile && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-  const timeDelay = isMobile ? 200 : 0
-  const [deselectPhotoHandlers, setDeselectPhotoHandlers] = useState()
-  const { addHandlers, removeHandlers } = useEventHandlersManager(
-    deselectPhotoHandlers
-  )
-  const sortableRef = useRef<Sortable>(null)
 
-  const onSelect = useCallback((event: SortableEvent) => {
-    // @ts-expect-error sortable has multiDrag property after plugins init
-    const handler = sortableRef.current?.multiDrag?._deselectMultiDrag
-    setDeselectPhotoHandlers(() => handler)
-    setSelectedFileIds(event.items.map((item) => item.id))
-  }, [])
-
-  const onDeselect = useCallback((event: SortableEvent) => {
-    setSelectedFileIds(event.items.map((item) => item.id))
-  }, [])
-
-  const onListUpdate: React.Dispatch<React.SetStateAction<SortableFile[]>> = (
-    prop
-  ) => {
+  const onListUpdate: React.Dispatch<React.SetStateAction<File[]>> = (prop) => {
     setFiles({
       projectId,
       folderId,
@@ -101,47 +33,20 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
     })
   }
 
-  const onSort = (event: SortableEvent) => {
-    const isMultiDragActive = event.items.length > 1
-    const draggedPhotosId = isMultiDragActive
-      ? event.items.map((e) => e.id)
-      : [event.item.id]
-
-    if (event.oldIndex === undefined || event.newIndex === undefined) return
-
-    const diff = event.oldIndex - event.newIndex
-    const oldIndicies = event.oldIndicies.map(({ index }) => index - diff)
-    const draggedPhotosPosition = isMultiDragActive
-      ? oldIndicies.map((index) => index)
-      : [event.newIndex]
-
-    const mediaFiles: Record<string, number> = {}
-    for (let i = 0; i < draggedPhotosId.length; i += 1) {
-      mediaFiles[draggedPhotosId[i]] = draggedPhotosPosition[i]
-    }
-
-    console.log(mediaFiles)
-  }
-
-  const { getRootProps, getItemProps } = useSortable({
+  const {
+    getItemProps,
+    getRootProps,
+    preventSelection,
+    restoreSelection,
+    selectItem,
+    selectedIds: selectedFileIds,
+  } = useSortable({
     setItems: onListUpdate,
-    sortableRef,
+    disableSelectionByDefault: true,
     options: {
-      multiDrag: true,
       ghostClass: styles['project__files--ghost'],
       selectedClass: styles['project__files--selected'],
       dragClass: styles['project__files--drag'],
-      animation: 200,
-      delay: timeDelay,
-      delayOnTouchOnly: true,
-      forceFallback: isSafari,
-      bubbleScroll: true,
-      dropBubble: true,
-      dragoverBubble: true,
-      fallbackTolerance: 3,
-      onSelect,
-      onDeselect,
-      onSort,
     },
   })
 
@@ -189,8 +94,10 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
           >
             <Wrapper asChild>
               <Stack
-                onMouseEnter={removeHandlers}
-                onMouseLeave={addHandlers}
+                onMouseEnter={preventSelection}
+                onTouchStart={preventSelection}
+                onMouseLeave={restoreSelection}
+                onTouchEnd={restoreSelection}
                 padding={2}
                 align={'center'}
                 gap={8}
@@ -252,8 +159,7 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
               isCover={cover?.id === file.id}
               key={folderId + '-' + file.id}
               file={file}
-              preventSelection={removeHandlers}
-              restoreSelection={addHandlers}
+              selectItem={selectItem}
             />
           ))}
         </Wrapper>

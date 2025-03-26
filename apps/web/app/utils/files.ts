@@ -7,12 +7,13 @@ export function useFiles() {
   const folderData = useCachedRouteLoaderData<
     Route.ComponentProps['loaderData']
   >({
-    route: 'routes/_user+/projects_.$projectId+/folder.$folderId',
+    route: 'routes/_user+/projects_.$projectId+/folder.$folderId/index',
   })
   const { projectId, folderId } = useParams()
   const storeFiles = useProjectsStore(
     (state) => state.projects[projectId || '']?.folders?.[folderId || '']?.files
   )
 
-  return storeFiles || folderData?.data || []
+  if (storeFiles && storeFiles.length > 0) return storeFiles
+  else return folderData?.data || []
 }
