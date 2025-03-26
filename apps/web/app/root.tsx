@@ -39,6 +39,10 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
+export const config = {
+  edge: true,
+}
+
 const mountMultiDragPlugin = async () => {
   if (typeof window === 'undefined') {
     return

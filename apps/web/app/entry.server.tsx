@@ -104,7 +104,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
       }
     )
 
-    setTimeout(abort, streamTimeout + 5000)
+    setTimeout(abort, streamTimeout + 1000)
   })
 }
 
