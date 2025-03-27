@@ -3,7 +3,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "declaration": false,
+    "declarationMap": false
   },
   "include": ["src", "turbo"],
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]

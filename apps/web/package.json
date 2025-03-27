@@ -42,7 +42,7 @@
     "@valley/ui": "*",
     "address": "^2.0.3",
     "ansis": "^3.17.0",
-    "better-auth": "^1.2.4",
+    "better-auth": "^1.2.5",
     "cachified-redis-json-adapter": "^2.0.0",
     "classnames": "^2.5.1",
     "close-with-grace": "^2.2.0",
