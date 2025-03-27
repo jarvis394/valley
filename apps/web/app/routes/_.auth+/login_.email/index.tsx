@@ -19,12 +19,10 @@ import {
   useRemixForm,
 } from 'remix-hook-form'
 import { FieldErrors } from 'react-hook-form'
-import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import Stack from '@valley/ui/Stack'
 import { createToastHeaders } from 'app/server/toast.server'
 import { auth } from '@valley/auth'
 import { Route } from './+types'
-import { checkHoneypot } from 'app/server/honeypot.server'
 
 const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -48,8 +46,6 @@ export async function action({ request }: Route.ActionArgs) {
     data,
     receivedValues: defaultValues,
   } = await getValidatedFormData<FormData>(request, resolver)
-
-  checkHoneypot(defaultValues)
 
   if (errors) {
     return { errors, defaultValues }
@@ -112,7 +108,6 @@ const LoginViaEmailPage: React.FC<Route.ComponentProps> = ({ actionData }) => {
             method="POST"
             style={{ viewTransitionName: 'auth-form' }}
           >
-            <HoneypotInputs />
             {redirectTo && <input {...methods.register('redirectTo')} hidden />}
             {target && (
               <input

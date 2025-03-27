@@ -5,7 +5,6 @@ import { redirect, data, Form, useSearchParams } from 'react-router'
 import { EmailSchema } from 'app/utils/user-validation'
 import { z } from 'zod'
 import { getDomainUrl, useIsPending } from 'app/utils/misc'
-import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
 import Divider from '@valley/ui/Divider'
 import { ProviderConnectionForm } from 'app/components/ProviderConnectionForm/ProviderConnectionForm'
 import { SOCIAL_PROVIDER_NAMES } from 'app/config/connections'
@@ -14,7 +13,6 @@ import { SEOHandle } from '@nasa-gcn/remix-seo'
 import { ArrowRight } from 'geist-ui-icons'
 import type { VerificationType } from '../verify+'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { checkHoneypot } from 'app/server/honeypot.server'
 import {
   getValidatedFormData,
   RemixFormProvider,
@@ -66,13 +64,10 @@ export function getRedirectToUrl({
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const {
-    errors,
-    data: submissionData,
-    receivedValues,
-  } = await getValidatedFormData<FormData>(request, resolver)
-
-  checkHoneypot(receivedValues)
+  const { errors, data: submissionData } = await getValidatedFormData<FormData>(
+    request,
+    resolver
+  )
 
   if (errors) {
     return data(
@@ -180,7 +175,6 @@ const RegisterPage: React.FC<Route.ComponentProps> = () => {
         <RemixFormProvider {...methods}>
           <Stack asChild gap={2} fullWidth direction={'column'}>
             <Form onSubmit={methods.handleSubmit} method="POST" viewTransition>
-              <HoneypotInputs />
               {redirectTo && (
                 <input
                   {...methods.register('redirectTo')}

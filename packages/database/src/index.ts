@@ -7,4 +7,4 @@ export * from 'drizzle-orm'
 
 // Export neon types
 export { type NeonHttpDatabase } from 'drizzle-orm/neon-http'
-export { type PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+// export { type PostgresJsDatabase } from 'drizzle-orm/postgres-js'

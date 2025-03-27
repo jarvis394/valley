@@ -19,8 +19,6 @@ import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
 import { combineHeaders, getDomainUrl } from './utils/misc'
 import { makeTimings } from './server/timing.server'
-import { HoneypotProvider } from './components/Honeypot/Honeypot'
-import { honeypot } from './server/honeypot.server'
 import Toaster, { useToast } from '@valley/ui/Toast'
 import { getToast } from './server/toast.server'
 import { Modals } from './components/Modals'
@@ -88,12 +86,7 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader({ request }: Route.LoaderArgs) {
   const timings = makeTimings('root loader')
-  const honeypotPropsPromise = honeypot.getInputProps()
-  const toastPromise = getToast(request)
-  const [honeypotProps, { toast, headers: toastHeaders }] = await Promise.all([
-    honeypotPropsPromise,
-    toastPromise,
-  ])
+  const { toast, headers: toastHeaders } = await getToast(request)
 
   return data(
     {
@@ -106,7 +99,6 @@ export async function loader({ request }: Route.LoaderArgs) {
         },
       },
       toast,
-      honeypotProps,
       ENV: getEnv(),
     },
     {
@@ -228,12 +220,10 @@ const App: React.FC<Route.ComponentProps> = ({ loaderData }) => {
 
   return (
     <SortableProvider>
-      <HoneypotProvider {...loaderData?.honeypotProps}>
-        <Outlet />
-        <Modals />
-        <UploadsOverlay />
-        <Toaster theme={theme} />
-      </HoneypotProvider>
+      <Outlet />
+      <Modals />
+      <UploadsOverlay />
+      <Toaster theme={theme} />
     </SortableProvider>
   )
 }

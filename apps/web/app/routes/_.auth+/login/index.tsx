@@ -10,10 +10,8 @@ import { data, redirect, Form, useSearchParams } from 'react-router'
 import { requireAnonymous } from 'app/server/auth/auth.server'
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { useIsPending } from 'app/utils/misc'
-import { checkHoneypot } from 'app/server/honeypot.server'
 import { z } from 'zod'
 import { EmailSchema } from 'app/utils/user-validation'
-import { HoneypotInputs } from 'app/components/Honeypot/Honeypot'
 import { redirectToKey, targetKey, typeKey } from 'app/config/paramsKeys'
 import TextField from '@valley/ui/TextField'
 import {
@@ -48,13 +46,10 @@ export const handle: SEOHandle = {
 export async function action({ request }: Route.ActionArgs) {
   await requireAnonymous(request)
 
-  const {
-    errors,
-    data: submissionData,
-    receivedValues,
-  } = await getValidatedFormData<FormData>(request, resolver)
-
-  checkHoneypot(receivedValues)
+  const { errors, data: submissionData } = await getValidatedFormData<FormData>(
+    request,
+    resolver
+  )
 
   if (errors) {
     return data(
@@ -161,7 +156,6 @@ const LoginPage: React.FC = () => {
         <RemixFormProvider {...methods}>
           <Stack asChild gap={2} fullWidth direction={'column'}>
             <Form onSubmit={methods.handleSubmit} viewTransition method="POST">
-              <HoneypotInputs />
               {redirectTo && (
                 <input
                   {...methods.register('redirectTo', {

@@ -1,4 +1,4 @@
-import { type CacheControlValue, parse, format } from '@tusbar/cache-control'
+// import { type CacheControlValue, parse, format } from '@tusbar/cache-control'
 import { type HeadersArgs } from 'react-router'
 
 /**
@@ -37,13 +37,13 @@ export function pipeHeaders({
     }
   }
 
-  headers.set(
-    'Cache-Control',
-    getConservativeCacheControl(
-      parentHeaders.get('Cache-Control'),
-      headers.get('Cache-Control')
-    )
-  )
+  // headers.set(
+  //   'Cache-Control',
+  //   getConservativeCacheControl(
+  //     parentHeaders.get('Cache-Control'),
+  //     headers.get('Cache-Control')
+  //   )
+  // )
 
   // append useful parent headers
   const inheritHeaders = ['Vary', 'Server-Timing']
@@ -72,47 +72,47 @@ export function pipeHeaders({
 /**
  * Given multiple Cache-Control headers, merge them and get the most conservative one.
  */
-export function getConservativeCacheControl(
-  ...cacheControlHeaders: Array<string | null>
-): string {
-  return format(
-    cacheControlHeaders
-      .filter(Boolean)
-      .map((header) => header && parse(header))
-      .reduce<CacheControlValue>((acc, current) => {
-        if (!current) return acc
-        for (const key in current) {
-          const directive = key as keyof Required<CacheControlValue> // keyof CacheControl includes functions
+// export function getConservativeCacheControl(
+//   ...cacheControlHeaders: Array<string | null>
+// ): string {
+//   return format(
+//     cacheControlHeaders
+//       .filter(Boolean)
+//       .map((header) => header && parse(header))
+//       .reduce<CacheControlValue>((acc, current) => {
+//         if (!current) return acc
+//         for (const key in current) {
+//           const directive = key as keyof Required<CacheControlValue> // keyof CacheControl includes functions
 
-          const currentValue = current[directive]
+//           const currentValue = current[directive]
 
-          switch (typeof currentValue) {
-            case 'boolean': {
-              if (currentValue) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                acc[directive] = true as any
-              }
+//           switch (typeof currentValue) {
+//             case 'boolean': {
+//               if (currentValue) {
+//                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//                 acc[directive] = true as any
+//               }
 
-              break
-            }
-            case 'number': {
-              const accValue = acc[directive] as number | undefined
+//               break
+//             }
+//             case 'number': {
+//               const accValue = acc[directive] as number | undefined
 
-              if (accValue === undefined) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                acc[directive] = currentValue as any
-              } else {
-                const result = Math.min(accValue, currentValue)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                acc[directive] = result as any
-              }
+//               if (accValue === undefined) {
+//                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//                 acc[directive] = currentValue as any
+//               } else {
+//                 const result = Math.min(accValue, currentValue)
+//                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//                 acc[directive] = result as any
+//               }
 
-              break
-            }
-          }
-        }
+//               break
+//             }
+//           }
+//         }
 
-        return acc
-      }, {})
-  )
-}
+//         return acc
+//       }, {})
+//   )
+// }

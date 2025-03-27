@@ -1,6 +1,5 @@
 import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import { data, Form, Link, useSearchParams } from 'react-router'
-import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import AuthFormHeader from 'app/components/AuthFormHeader/AuthFormHeader'
@@ -19,7 +18,6 @@ import {
   useRemixForm,
 } from 'remix-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { checkHoneypot } from 'app/server/honeypot.server'
 import { Controller, FieldErrors } from 'react-hook-form'
 import { redirectWithToast } from 'app/server/toast.server'
 import { handleVerification as handleOnboardingVerification } from '../onboarding+/onboarding.server'
@@ -58,13 +56,10 @@ type FormData = z.infer<typeof VerifySchema>
 const resolver = zodResolver(VerifySchema)
 
 export async function action({ request }: Route.ActionArgs) {
-  const {
-    errors,
-    data: submissionData,
-    receivedValues,
-  } = await getValidatedFormData<FormData>(request, resolver)
-
-  checkHoneypot(receivedValues)
+  const { errors, data: submissionData } = await getValidatedFormData<FormData>(
+    request,
+    resolver
+  )
 
   if (errors) {
     return data(
@@ -175,7 +170,6 @@ const VerifyRoute: React.FC<Route.ComponentProps> = ({ actionData }) => {
           viewTransition
           className={styles.auth__form}
         >
-          <HoneypotInputs />
           <Controller
             control={methods.control}
             name={codeKey}

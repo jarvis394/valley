@@ -19,6 +19,7 @@ export default defineConfig(() => ({
         'react-router',
       ],
     },
+    noExternal: ['better-auth'],
   },
   build: {
     ssr: true,
