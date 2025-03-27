@@ -13,14 +13,13 @@ import {
   invalidateCache,
   useCachedData,
 } from 'app/utils/cache'
-import type { Folder, Project } from '@valley/db'
+import type { Folder } from '@valley/db'
 import { getUserProject } from 'app/server/services/project.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { FolderWithFiles } from '@valley/shared'
 import { requireUserId } from 'app/server/auth/auth.server'
 import { Route } from './+types/_layout'
-
-export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
+import { getProjectCacheKey } from 'app/utils/project'
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId } = params

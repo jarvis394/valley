@@ -35,6 +35,8 @@ const covers = [
 ]
 const COVER_SWITCH_INTERVAL = 7000
 
+export const config = { runtime: 'edge' }
+
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAnonymous(request)
   return null

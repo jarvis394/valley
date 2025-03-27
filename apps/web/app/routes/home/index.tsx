@@ -13,6 +13,8 @@ export const meta: Route.MetaFunction = () => {
   ]
 }
 
+export const config = { runtime: 'edge' }
+
 const HomeRoute = () => {
   const data = useRootLoaderData()
   const navigation = useNavigation()

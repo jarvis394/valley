@@ -28,8 +28,7 @@ import { getUserProjects } from 'app/server/services/project.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { auth } from '@valley/auth'
 import { Route } from './+types/_index'
-
-export const getProjectsCacheKey = () => 'projects'
+import { getProjectsCacheKey } from 'app/utils/project'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const session = await auth.api.getSession({ headers: request.headers })

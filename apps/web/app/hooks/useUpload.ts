@@ -16,10 +16,10 @@ import type { Folder, Project } from '@valley/db'
 import { useRevalidator } from 'react-router'
 import { useUploadsStore } from 'app/stores/uploads'
 import { invalidateCache } from 'app/utils/cache'
-import { getFilesCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
-import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
+import { getProjectCacheKey } from 'app/utils/project'
 import { useProjectsStore } from 'app/stores/projects'
 import { parseCookies, useRootLoaderData } from 'app/utils/misc'
+import { getFilesCacheKey } from 'app/utils/files'
 
 const isClientSide = typeof document !== 'undefined'
 

@@ -6,7 +6,7 @@ const isVercel = process.env.VERCEL === '1'
 export default {
   ssr: true,
   future: {
-    unstable_splitRouteModules: true,
+    unstable_splitRouteModules: 'enforce',
     unstable_optimizeDeps: true,
   },
   serverModuleFormat: 'esm',

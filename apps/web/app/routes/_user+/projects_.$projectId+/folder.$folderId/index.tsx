@@ -1,4 +1,3 @@
-import { Project, Folder } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types'
 import { auth } from '@valley/auth'
@@ -19,11 +18,7 @@ import React from 'react'
 import styles from './project.module.css'
 import ProjectBlock from './ProjectBlock'
 import FolderFiles from './FolderFiles'
-
-export const getFilesCacheKey = (
-  projectId?: Project['id'],
-  folderId?: Folder['id']
-) => `files:${projectId}:${folderId}`
+import { getFilesCacheKey } from 'app/utils/files'
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId, folderId } = params

@@ -4,6 +4,10 @@ import { useProjectsStore } from 'app/stores/projects'
 import { ProjectWithFolders } from '@valley/shared'
 import { useMemo } from 'react'
 import { Route } from '../routes/_user+/projects_.$projectId+/+types/_layout'
+import { Project } from '@valley/db'
+
+export const getProjectsCacheKey = () => 'projects'
+export const getProjectCacheKey = (id?: Project['id']) => `project:${id}`
 
 export function useProject(propsProject?: ProjectWithFolders) {
   const { project } = useCachedRouteLoaderData<

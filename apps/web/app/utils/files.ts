@@ -2,6 +2,12 @@ import { useCachedRouteLoaderData } from './cache'
 import { useProjectsStore } from 'app/stores/projects'
 import { useParams } from 'react-router'
 import { Route } from '../routes/_user+/projects_.$projectId+/folder.$folderId/+types'
+import type { Folder, Project } from '@valley/db'
+
+export const getFilesCacheKey = (
+  projectId?: Project['id'],
+  folderId?: Folder['id']
+) => `files:${projectId}:${folderId}`
 
 export function useFiles() {
   const folderData = useCachedRouteLoaderData<
