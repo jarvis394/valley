@@ -78,29 +78,29 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({
       <Menu.Separator />
       <Menu.Item
         onClick={handleSetCover}
-        before={<Footer color="var(--text-secondary)" />}
+        before={<Footer className="text-secondary" />}
       >
         Set as folder cover
       </Menu.Item>
-      <Menu.Item before={<Link color="var(--text-secondary)" />}>
+      <Menu.Item before={<Link className="text-secondary" />}>
         Copy link
       </Menu.Item>
-      <Menu.Item before={<Download color="var(--text-secondary)" />}>
+      <Menu.Item before={<Download className="text-secondary" />}>
         Download
       </Menu.Item>
-      <Menu.Item before={<Information color="var(--text-secondary)" />}>
+      <Menu.Item before={<Information className="text-secondary" />}>
         Info
       </Menu.Item>
       <Menu.Item
         onClick={selectItem?.bind(null, file.id)}
-        before={<CheckCircle color="var(--text-secondary)" />}
+        before={<CheckCircle className="text-secondary" />}
       >
         Select
       </Menu.Item>
       <Menu.Separator />
       <Menu.Item
         onClick={handleFileDelete}
-        before={<Trash color="var(--red-600)" />}
+        before={<Trash className="text-ds-red-700" />}
       >
         Delete
       </Menu.Item>
@@ -152,7 +152,7 @@ const FileCard: React.FC<FileCardProps> = ({
             asChild
           >
             <Paper variant="secondary">
-              <Footer color="var(--text-secondary)" />
+              <Footer className="text-secondary" />
               Cover
             </Paper>
           </Stack>

@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "db:introspect": "drizzle-kit introspect --config=drizzle.config.ts",
+    "predb:generate": "yarn build",
     "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=drizzle.config.ts",
     "db:check": "drizzle-kit check --config=drizzle.config.ts",
@@ -63,6 +64,8 @@
     "@swc/helpers": "^0.5.15",
     "@types/node": "^22.9.0",
     "@types/pg": "^8.11.11",
-    "eslint": "^8.56.11"
+    "eslint": "^8.56.11",
+    "@valley/eslint-config": "*",
+    "@valley/typescript-config": "*"
   }
 }

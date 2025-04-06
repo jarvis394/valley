@@ -152,7 +152,7 @@ const FolderListItem: React.FC<FolderListItemProps> = ({
             variant="tertiary"
             size="md"
           >
-            <Trash color="var(--red-600)" />
+            <Trash color="var(--ds-red-600)" />
           </IconButton>
         </Stack>
       </li>

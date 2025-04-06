@@ -16,6 +16,13 @@ import { users } from './users.js'
 import { folders } from './folders.js'
 import { translationStrings } from './translationStrings.js'
 import { covers } from './covers.js'
+import {
+  ProjectHeadingFont,
+  ProjectCoverVariant,
+  ProjectGalleryOrientation,
+  ProjectGallerySpacing,
+  ProjectGalleryTheme,
+} from '../config/constants.js'
 
 export const projects = pgTable('projects', {
   id: varchar().default(defaultId).primaryKey().notNull(),
@@ -32,6 +39,26 @@ export const projects = pgTable('projects', {
     .default(null),
   totalFiles: integer().default(0).notNull(),
   totalSize: text().default('0').notNull(),
+  headingFont: text()
+    .$type<ProjectHeadingFont>()
+    .default(ProjectHeadingFont.MUSEO_SANS_CYRL)
+    .notNull(),
+  coverVariant: integer()
+    .$type<ProjectCoverVariant>()
+    .default(ProjectCoverVariant.LEFT)
+    .notNull(),
+  galleryOrientation: integer()
+    .$type<ProjectGalleryOrientation>()
+    .default(ProjectGalleryOrientation.HORIZONTAL)
+    .notNull(),
+  gallerySpacing: integer()
+    .$type<ProjectGallerySpacing>()
+    .default(ProjectGallerySpacing.MEDIUM)
+    .notNull(),
+  galleryTheme: text()
+    .$type<ProjectGalleryTheme>()
+    .default(ProjectGalleryTheme.SYSTEM)
+    .notNull(),
   userId: varchar()
     .notNull()
     .references(() => users.id, {
@@ -52,7 +79,10 @@ export const projectsRelations = relations(projects, ({ many, one }) => ({
     references: [translationStrings.id],
   }),
   folders: many(folders),
-  cover: many(covers),
+  cover: one(covers, {
+    fields: [projects.id],
+    references: [covers.projectId],
+  }),
 }))
 
 export type Project = InferSelectModel<typeof projects>

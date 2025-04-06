@@ -56,24 +56,30 @@ const ConfirmConnectionDeleteModal: React.FC<ConfirmConnectionDeleteProps> = ({
   const handleClick = async () => {
     setPending(true)
     await authClient.unlinkAccount({
-      accountId: data.id,
+      accountId: data.accountId,
       providerId: data.provider,
       fetchOptions: {
         onSuccess() {
           showToast({
-            type: 'default',
+            type: 'info',
             title: label,
             description:
               data.provider === 'credential'
                 ? 'Your password has been removed.'
                 : 'Your connection has been deleted.',
-            id: 'connection-deleted',
+            id: 'connection-unlink',
           })
           onClose()
           revalidator.revalidate()
         },
-        onError() {
+        onError(e) {
           setPending(false)
+          showToast({
+            type: 'error',
+            title: 'Error',
+            description: e.error.message,
+            id: 'connection-unlink-error',
+          })
         },
       },
     })

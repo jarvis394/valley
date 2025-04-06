@@ -8,8 +8,8 @@ import { files } from './files.js'
 import { projects } from './projects.js'
 
 export const covers = pgTable('covers', {
-  x: doublePrecision().default(0.5),
-  y: doublePrecision().default(0.5),
+  x: doublePrecision().default(0.5).notNull(),
+  y: doublePrecision().default(0.5).notNull(),
   projectId: varchar()
     .notNull()
     .unique()

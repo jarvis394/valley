@@ -99,7 +99,7 @@
 .folderCard__activeIcon {
   width: 24px;
   height: 24px;
-  color: var(--blue-600);
+  color: var(--ds-blue-600);
   position: absolute;
   z-index: 1;
   right: 16px;

@@ -1,3 +1,7 @@
+@import 'tailwindcss';
+@import '@valley/tailwind/styles';
+@source '../**/*.tsx';
+
 .fade {
   --fade-duration: 120ms;
   --fade-timing-function: ease-in-out;

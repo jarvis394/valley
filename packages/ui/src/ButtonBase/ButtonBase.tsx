@@ -22,7 +22,10 @@ export type ButtonBaseOwnProps = React.PropsWithChildren<{
   ref?: React.Ref<HTMLButtonElement>
 }>
 export type ButtonBaseProps = AsChildProps<
-  React.ButtonHTMLAttributes<HTMLButtonElement>
+  React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >
 > &
   ButtonBaseOwnProps
 

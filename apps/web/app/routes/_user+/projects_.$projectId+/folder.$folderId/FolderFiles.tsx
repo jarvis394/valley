@@ -23,7 +23,7 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   const { projectId = '', folderId = '' } = useParams()
   const files = useFiles()
   const setFiles = useProjectsStore((state) => state.setFiles)
-  const cover = files.find((e) => e.id === project.cover?.[0]?.fileId)
+  const cover = files.find((e) => e.id === project.cover?.fileId)
 
   const onListUpdate: React.Dispatch<React.SetStateAction<File[]>> = (prop) => {
     setFiles({

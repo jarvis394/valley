@@ -202,14 +202,15 @@ export const Root = ({
   openOnContextMenu?: boolean
   onOpenChange?: (open: boolean) => void
 }>) => {
-  const [dropdownMenuOpen, setDropdownMenuOpen] = useState(
+  const [innerDropdownMenuOpen, setInnerDropdownMenuOpen] = useState(
     dropdownMenuProps?.defaultOpen
   )
+  const dropdownMenuOpen = dropdownMenuProps?.open || innerDropdownMenuOpen
   const menuActions = useMemo(
     () => ({
       close: () => {
         onOpenChange?.(false)
-        setDropdownMenuOpen(false)
+        setInnerDropdownMenuOpen(false)
       },
     }),
     [onOpenChange]
@@ -225,7 +226,7 @@ export const Root = ({
   const handleOpenChange = useCallback(
     (newIsOpen: boolean) => {
       onOpenChange?.(newIsOpen)
-      setDropdownMenuOpen(newIsOpen)
+      setInnerDropdownMenuOpen(newIsOpen)
     },
     [onOpenChange]
   )

@@ -15,19 +15,19 @@
 }
 
 .formHelperText--error {
-  color: var(--red-700);
+  color: var(--ds-red-700);
 }
 
 .formHelperText--error > span::selection {
   color: var(--text-primary);
-  background: var(--red-800);
+  background: var(--ds-red-800);
 }
 
 .formHelperText--valid {
-  color: var(--green-700);
+  color: var(--ds-green-700);
 }
 
 .formHelperText--valid > span::selection {
   color: var(--text-primary);
-  background: var(--green-800);
+  background: var(--ds-green-800);
 }

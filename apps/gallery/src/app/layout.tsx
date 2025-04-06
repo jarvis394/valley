@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 
-import '@valley/ui/styles/theme.css'
-import '@valley/ui/styles/global.css'
+import '@valley/ui/styles'
 import '../styles/fonts.css'
 import '../styles/globals.css'
 
@@ -59,10 +58,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased valley-themed" data-theme="dark">
-        {children}
-      </body>
+    <html lang="en" data-theme="dark">
+      <body className="antialiased">{children}</body>
     </html>
   )
 }

@@ -49,9 +49,7 @@
     "./useViewportVariable": "./src/useViewportVariable/useViewportVariable.ts",
     "./useMediaQuery": "./src/useMediaQuery/useMediaQuery.ts",
     "./config/theme": "./src/config/theme.ts",
-    "./styles/global.css": "./src/styles/global.css",
-    "./styles/theme.css": "./src/styles/theme.css",
-    "./styles/reset.css": "./src/styles/reset.css"
+    "./styles": "./src/styles/global.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -76,6 +74,7 @@
     "@base-ui-components/react": "^1.0.0-alpha.7",
     "@floating-ui/react-dom": "^2.1.2",
     "@formkit/auto-animate": "^0.8.2",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@radix-ui/react-context-menu": "^2.2.6",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
@@ -84,6 +83,10 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@storybook/react": "^8.4.1",
     "@valley/shared": "*",
+    "@valley/tailwind": "*",
+    "@valley/db": "*",
+    "class-variance-authority": "^0.7.1",
+    "tailwindcss": "^4",
     "classnames": "^2.5.1",
     "framer-motion": "^12.4.9",
     "geist-ui-icons": "^1.2.0",
@@ -93,9 +96,8 @@
     "react-hook-form": "^7.54.2",
     "react-is": "^19.0.0",
     "react-textarea-autosize": "^8.5.7",
-    "vaul": "^1.1.2",
     "sonner": "^2.0.1",
-    "@paralleldrive/cuid2": "^2.2.2",
+    "vaul": "^1.1.2",
     "zod": "^3.24.2"
   }
 }

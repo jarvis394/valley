@@ -55,10 +55,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, loading }) => {
           to={projectLink}
           className={styles.projectCard__cover}
         >
-          {project.cover && project.cover.length > 0 && (
+          {project.cover && (
             <Image
               alt={project.title}
-              file={project.cover[0].file}
+              file={project.cover.file}
               thumbnail="md"
             />
           )}

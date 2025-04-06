@@ -1,6 +1,6 @@
 .note {
-  --note-border-color: var(--gray-400);
-  --note-fg: var(--gray-900);
+  --note-border-color: hsl(var(--ds-gray-400));
+  --note-fg: hsl(var(--ds-gray-900));
   --note-bg: transparent;
 
   padding: 8px 12px;
@@ -63,67 +63,67 @@
 
 .note--error,
 .note--alert {
-  --note-border-color: var(--red-400);
-  --note-fg: var(--red-900);
+  --note-border-color: var(--ds-red-400);
+  --note-fg: var(--ds-red-900);
   --note-bg: transparent;
-  --note-selection: var(--red-800);
-  --note-link: var(--red-1000);
+  --note-selection: var(--ds-red-800);
+  --note-link: var(--ds-red-1000);
 }
 
 .note--error.note--filled,
 .note--alert.note--filled {
-  --note-bg: var(--red-200);
-  --note-border-color: var(--red-100);
+  --note-bg: var(--ds-red-200);
+  --note-border-color: var(--ds-red-100);
 }
 
 .note--success {
-  --note-border-color: var(--blue-400);
-  --note-fg: var(--blue-900);
+  --note-border-color: var(--ds-blue-400);
+  --note-fg: var(--ds-blue-900);
   --note-bg: transparent;
-  --note-selection: var(--blue-700);
-  --note-link: var(--blue-1000);
+  --note-selection: var(--ds-blue-700);
+  --note-link: var(--ds-blue-1000);
 }
 
 .note--success.note--filled {
-  --note-bg: var(--blue-200);
-  --note-border-color: var(--blue-100);
+  --note-bg: var(--ds-blue-200);
+  --note-border-color: var(--ds-blue-100);
 }
 
 .note--warning {
-  --note-border-color: var(--amber-400);
-  --note-fg: var(--amber-900);
+  --note-border-color: var(--ds-amber-400);
+  --note-fg: var(--ds-amber-900);
   --note-bg: transparent;
-  --note-link: var(--amber-1000);
-  --note-selection: var(--amber-500);
+  --note-link: var(--ds-amber-1000);
+  --note-selection: var(--ds-amber-500);
 }
 
 .note--warning.note--filled {
-  --note-bg: var(--amber-200);
-  --note-border-color: var(--amber-100);
+  --note-bg: var(--ds-amber-200);
+  --note-border-color: var(--ds-amber-100);
 }
 
 .note--violet {
-  --note-border-color: var(--purple-400);
-  --note-fg: var(--purple-900);
+  --note-border-color: var(--ds-purple-400);
+  --note-fg: var(--ds-purple-900);
   --note-bg: transparent;
-  --note-link: var(--purple-1000);
-  --note-selection: var(--purple-600);
+  --note-link: var(--ds-purple-1000);
+  --note-selection: var(--ds-purple-600);
 }
 
 .note--violet.note--filled {
-  --note-bg: var(--purple-200);
-  --note-border-color: var(--purple-100);
+  --note-bg: var(--ds-purple-200);
+  --note-border-color: var(--ds-purple-100);
 }
 
 .note--cyan {
-  --note-border-color: var(--teal-400);
-  --note-fg: var(--teal-900);
+  --note-border-color: var(--ds-teal-400);
+  --note-fg: var(--ds-teal-900);
   --note-bg: transparent;
-  --note-link: var(--teal-1000);
-  --note-selection: var(--teal-600);
+  --note-link: var(--ds-teal-1000);
+  --note-selection: var(--ds-teal-600);
 }
 
 .note--cyan.note--filled {
-  --note-bg: var(--teal-200);
-  --note-border-color: var(--teal-100);
+  --note-bg: var(--ds-teal-200);
+  --note-border-color: var(--ds-teal-100);
 }

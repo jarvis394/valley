@@ -173,3 +173,31 @@ export const parseCookies = () => {
 export const lowerFirstLetter = (s: string) => {
   return s[0].toLowerCase() + s.slice(1)
 }
+
+export const capitalizeFirstLetter = (s: string) => {
+  return s[0].toUpperCase() + s.slice(1)
+}
+
+export const enumEntries = <T extends z.EnumLike>(t: T) => {
+  const entries = Object.entries(t) as unknown as Array<[string, T[keyof T]]>
+  const plainStringEnum = entries.every(
+    ([_, value]) => typeof value === 'string'
+  )
+  return plainStringEnum
+    ? entries
+    : entries.filter(([_, v]) => typeof v !== 'string')
+}
+
+export const enumKeys = <T extends z.EnumLike>(
+  t: T
+): ReadonlyArray<keyof T> => {
+  return enumEntries(t).map(([key]) => key)
+}
+
+export const enumValues = <T extends z.EnumLike>(
+  t: T
+): ReadonlyArray<T[keyof T]> => {
+  const values = Object.values(t) as Array<T[keyof T]>
+  const plainStringEnum = values.every((x) => typeof x === 'string')
+  return plainStringEnum ? values : values.filter((x) => typeof x !== 'string')
+}

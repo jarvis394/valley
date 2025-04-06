@@ -47,8 +47,13 @@ const UploadButton: React.FC<UploadButtonProps> = ({
       })}
     >
       <CloudUpload width={iconSize} height={iconSize} />
-      Upload files to {variant === 'square' && <br />}
-      the folder
+      <div>
+        Upload files{' '}
+        <span className="max-xs:hidden">
+          to {variant === 'square' && <br />}
+          the folder
+        </span>
+      </div>
     </ButtonBase>
   )
 }

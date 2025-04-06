@@ -1,13 +1,12 @@
 import { type File } from '@valley/db'
-import cx from 'classnames'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import styles from './Image.module.css'
 import Spinner from '@valley/ui/Spinner'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import {
   getFileThumbnailQuery,
   ThumbnailSize,
 } from '../utils/getFileThumbnailQuery'
+import { cn } from '@valley/shared'
 
 export type ImageOwnProps =
   | {
@@ -94,13 +93,18 @@ const Image: React.FC<ImageProps> = ({
         aspectRatio: width && height ? +width / +height : undefined,
         ...containerStyle,
       }}
-      className={cx(styles.image, containerClassName)}
+      className={cn(
+        'relative isolate flex h-full w-full shrink-0 items-center justify-center overflow-hidden',
+        containerClassName
+      )}
       data-loaded={loaded}
     >
-      {!loaded && <Spinner className={styles.image__spinner} />}
+      {!loaded && (
+        <Spinner className="absolute top-[50%] left-[50%] -z-1 -translate-x-[50%] -translate-y-[50%]" />
+      )}
       <img
         {...props}
-        className={cx(className, 'fade')}
+        className={cn(className, 'fade')}
         data-fade-in={isHydrated ? loaded : true}
         ref={ref}
         onLoad={onLoad}

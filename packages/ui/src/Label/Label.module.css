@@ -22,7 +22,7 @@
 }
 
 .label__requiredStar {
-  color: var(--red-600);
+  color: var(--ds-red-600);
 }
 
 .label--size-md {

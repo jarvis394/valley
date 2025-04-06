@@ -79,7 +79,7 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
   const { projectId } = useParams()
   const shouldShow = !!projectId
   const [lastProject, setLastProject] = React.useState(project)
-  const coverFile = project?.cover?.[0]?.file
+  const coverFile = project?.cover?.file
   const shouldShowCoverFile = coverFile?.canHaveThumbnails
 
   React.useEffect(() => {
@@ -102,7 +102,14 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
           className={styles.header__avatarAndNameContainer}
         >
           <Link to={'/projects/' + project?.id}>
-            {shouldShowCoverFile && <Avatar square file={coverFile} />}
+            {shouldShowCoverFile && (
+              <Avatar
+                key={'project-avatar-' + project?.id}
+                id={'project-avatar-' + project?.id}
+                square
+                file={coverFile}
+              />
+            )}
             {!shouldShowCoverFile && (
               <Avatar square>{lastProject?.title?.[0]?.toUpperCase()}</Avatar>
             )}

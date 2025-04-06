@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import '@valley/tailwind/styles';
 
 @layer base {
   html,

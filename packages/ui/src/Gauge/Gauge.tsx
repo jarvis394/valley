@@ -97,6 +97,7 @@ const Gauge: React.FC<GaugeProps> = ({
         width={circleSize}
         height={circleSize}
         strokeWidth="2"
+        className="svg-own-color"
         viewBox={`0 0 ${SVG_CIRCLE_SIZE} ${SVG_CIRCLE_SIZE}`}
       >
         <circle
@@ -111,7 +112,7 @@ const Gauge: React.FC<GaugeProps> = ({
         <circle
           {...vars.circleProps}
           className={styles.gauge__arcPrimary}
-          stroke="var(--blue-600)"
+          stroke="var(--ds-blue-600)"
           style={{
             opacity: 1,
             ['--stroke-percent' as string]: vars.primaryStrokePercent,

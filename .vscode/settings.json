@@ -2,6 +2,8 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsserver.pluginPaths": ["typescript-plugin-css-modules"],
+  "tailwindCSS.experimental.classRegex": [["cn\\(`([^`]*)"]],
+  "tailwindCSS.classFunctions": ["tw", "cx", "cn"],
   "files.associations": {
     "*.css": "tailwindcss"
   }

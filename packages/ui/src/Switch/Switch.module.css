@@ -78,7 +78,7 @@
 }
 
 .switch--checked {
-  background-color: var(--blue-900);
+  background-color: var(--ds-blue-900);
   border: 2px solid var(--alpha-transparent-12);
 }
 
@@ -87,7 +87,7 @@
 }
 
 .switch--checked > .switch__handle::after {
-  background-color: var(--blue-200);
+  background-color: var(--ds-blue-200);
   width: var(--switch-handle-checked-width);
   height: var(--switch-handle-checked-width);
 }
