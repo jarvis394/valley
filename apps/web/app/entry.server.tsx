@@ -73,6 +73,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
                     "'self'",
                     'data:',
                     'https://avatars.githubusercontent.com',
+                    '*.userapi.com',
                     process.env.UPLOAD_SERVICE_URL,
                   ],
                   'script-src': [
