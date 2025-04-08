@@ -11,14 +11,20 @@ const TopCover: React.FC<CoverDesignProps> = ({
   theme,
   cover,
   timeZone,
+  imageHost = '',
+  type: _type,
+  className,
+  ...props
 }) => {
   return (
     <div
+      {...props}
       className={cn(
         'fade-in flex h-full w-full flex-col items-center justify-between gap-4 bg-stone-100 px-4 pb-8 text-stone-900',
         {
           'bg-stone-950 text-stone-100': theme === 'dark',
-        }
+        },
+        className
       )}
     >
       <span />
@@ -28,6 +34,7 @@ const TopCover: React.FC<CoverDesignProps> = ({
             className="h-auto max-h-full w-auto max-w-full rounded-2xl"
             containerProps={{ className: 'mx-auto max-w-full' }}
             file={cover.file}
+            imageHost={imageHost}
           />
         )}
         <div className="absolute inset-0 flex w-full flex-col items-center justify-center gap-3">

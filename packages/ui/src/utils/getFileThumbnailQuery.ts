@@ -13,7 +13,22 @@ export type ThumbnailSize = keyof typeof THUMBNAIL_SIZES
 
 export type GetFileThumbnailQueryProps = {
   size?: ThumbnailSize
-  file: File
+  file: Pick<File, 'canHaveThumbnails' | 'width' | 'height'>
+}
+
+export const getFileThumbnailDimensions = ({
+  size,
+  file,
+}: GetFileThumbnailQueryProps) => {
+  if (!file.canHaveThumbnails || !file.width) return { width: 0, height: 0 }
+
+  const newWidth = size ? THUMBNAIL_SIZES[size] : file.width
+  const changeRatio = file.width ? newWidth / file.width : 1
+  const newHeight = file.height
+    ? Math.round(file.height * changeRatio)
+    : newWidth
+
+  return { width: newWidth, height: newHeight }
 }
 
 export const getFileThumbnailQuery = ({
@@ -23,14 +38,10 @@ export const getFileThumbnailQuery = ({
   if (!file.canHaveThumbnails || !file.width) return ''
 
   const qs = new URLSearchParams()
-  const newWidth = size ? THUMBNAIL_SIZES[size] : file.width
-  const changeRatio = file.width ? newWidth / file.width : 1
-  const newHeight = file.height
-    ? Math.round(file.height * changeRatio)
-    : newWidth
+  const { width, height } = getFileThumbnailDimensions({ file, size })
 
-  qs.append('w', newWidth.toString())
-  qs.append('h', newHeight.toString())
+  qs.append('w', width.toString())
+  qs.append('h', height.toString())
 
   return qs.toString()
 }

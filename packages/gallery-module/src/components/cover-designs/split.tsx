@@ -2,8 +2,8 @@ import React from 'react'
 import { ChevronDown } from 'geist-ui-icons'
 import { type CoverDesignProps } from '.'
 import { cn } from '@valley/shared'
-import { getFileThumbnailQuery } from '@valley/ui/utils/getFileThumbnailQuery'
 import { getFormattedDate } from '../../utils/get-formatted-date'
+import { makeFilePath } from '../../utils/make-file-path'
 
 const SplitCover: React.FC<CoverDesignProps> = ({
   title,
@@ -12,17 +12,24 @@ const SplitCover: React.FC<CoverDesignProps> = ({
   type,
   dateShot,
   timeZone,
+  imageHost = '',
+  className,
+  ...props
 }) => {
+  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+
   return (
     <div
+      {...props}
       className={cn('flex h-full w-full flex-col bg-stone-100 text-stone-900', {
         'flex-row': type === 'desktop',
         'bg-stone-950 text-stone-100': theme === 'dark',
+        className,
       })}
     >
       <div
         style={{
-          backgroundImage: `url(/api/files/${cover.file.path}?${getFileThumbnailQuery({ size: '2xl', file: cover.file })})`,
+          backgroundImage: `url(${path})`,
           backgroundPosition:
             'var(--cover-position-x, 50%) var(--cover-position-y, 50%)',
         }}

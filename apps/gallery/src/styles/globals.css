@@ -1,8 +1,15 @@
+@import 'tailwindcss';
 @import '@valley/tailwind/styles';
+@import '@valley/ui/styles';
+@import '@valley/gallery-module/styles';
+@import 'overlayscrollbars/overlayscrollbars.css';
+
+@tailwind utilities;
 
 @layer base {
   html,
   body {
+    min-height: 100%;
     height: 100%;
     color: var(--text-primary);
     background: var(--background-default);

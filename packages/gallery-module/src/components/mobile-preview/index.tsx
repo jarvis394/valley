@@ -1,15 +1,7 @@
 import type { Cover, File, Project } from '@valley/db'
-import { ProjectCoverVariant } from '@valley/db/config/constants'
 import React, { useMemo } from 'react'
-import AlbumCover from '../cover-designs/album'
-import CenterCover from '../cover-designs/center'
-import SplitCover from '../cover-designs/split'
-import LeftCover from '../cover-designs/left'
-import ClassicCover from '../cover-designs/classic'
-import { cn, exhaustivnessCheck } from '@valley/shared'
-import LineCover from '../cover-designs/line'
-import TopCover from '../cover-designs/top'
-import InvertCover from '../cover-designs/invert'
+import { cn } from '@valley/shared'
+import { getCoverComponent } from '../cover'
 
 export type MobilePreviewProps = {
   project: Project
@@ -27,28 +19,10 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
   timeZone,
 }) => {
   const { coverVariant } = project
-  const CoverComponent = useMemo(() => {
-    switch (coverVariant) {
-      case ProjectCoverVariant.CENTER:
-        return CenterCover
-      case ProjectCoverVariant.SPLIT:
-        return SplitCover
-      case ProjectCoverVariant.LEFT:
-        return LeftCover
-      case ProjectCoverVariant.ALBUM:
-        return AlbumCover
-      case ProjectCoverVariant.CLASSIC:
-        return ClassicCover
-      case ProjectCoverVariant.LINE:
-        return LineCover
-      case ProjectCoverVariant.TOP:
-        return TopCover
-      case ProjectCoverVariant.INVERT:
-        return InvertCover
-      default:
-        return exhaustivnessCheck(coverVariant)
-    }
-  }, [coverVariant])
+  const CoverComponent = useMemo(
+    () => getCoverComponent(coverVariant),
+    [coverVariant]
+  )
 
   return (
     <div

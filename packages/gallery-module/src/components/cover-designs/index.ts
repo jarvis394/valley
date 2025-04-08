@@ -4,5 +4,7 @@ export type CoverDesignProps = {
   type: 'desktop' | 'mobile'
   cover: Cover & { file: File }
   theme: 'dark' | 'light'
-  timeZone: string
-} & Pick<Project, 'title' | 'dateShot'>
+  timeZone?: string
+  imageHost?: string
+} & Pick<Project, 'title' | 'dateShot'> &
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import SelectButton from './SelectButton'
 import { Form, useFetchers } from 'react-router'
 import { capitalizeFirstLetter, enumEntries, enumValues } from 'app/utils/misc'
@@ -99,6 +99,23 @@ const ProjectDesignSettings: React.FC = () => {
   const fetchers = useFetchers()
   const deleteCoverFetcher = fetchers.find((e) => e.key === 'delete-cover')
   const isDeleteCoverPending = deleteCoverFetcher?.state === 'loading'
+  const coverVariantContainer = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!coverVariantContainer.current) return
+    const selectedCoverVariantId =
+      'project-cover-variant-' + project.coverVariant
+    const selectedCoverVariantElement = document.getElementById(
+      selectedCoverVariantId
+    )
+
+    if (selectedCoverVariantElement) {
+      coverVariantContainer.current.scrollTo({
+        left: selectedCoverVariantElement.offsetLeft - 95 / 2,
+        behavior: 'smooth',
+      })
+    }
+  }, [project.coverVariant])
 
   return (
     <div className="flex w-full flex-col gap-6 py-6 md:max-w-[320px]">
@@ -174,7 +191,10 @@ const ProjectDesignSettings: React.FC = () => {
       <Form method="post" preventScrollReset className="flex flex-col gap-3">
         <input name="intent" value="cover-variant" readOnly hidden />
         <h3 className={'px-4 text-sm font-semibold'}>Cover Variant</h3>
-        <div className="flex gap-2 overflow-x-auto px-4 pb-1">
+        <div
+          className="flex gap-2 overflow-x-auto px-4 pb-1"
+          ref={coverVariantContainer}
+        >
           {enumValues(ProjectCoverVariant).map((value) => (
             <SelectButton
               key={'project-cover-variant-' + value}
@@ -186,6 +206,7 @@ const ProjectDesignSettings: React.FC = () => {
                 { coverVariant: value },
                 project.id
               )}
+              id={'project-cover-variant-' + value}
             >
               {COVER_VARIANTS_ICONS_MAP[value]}
             </SelectButton>

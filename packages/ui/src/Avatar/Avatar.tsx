@@ -1,18 +1,29 @@
 import React from 'react'
-import styles from './Avatar.module.css'
-import cx from 'classnames'
-import Image, { ImageProps } from '../Image/Image'
+import Image from '../Image/Image'
+import { ThumbnailSize } from '../utils/getFileThumbnailQuery'
+import type { File } from '@valley/db'
+import { cn } from '@valley/shared'
 
-export type AvatarProps = ImageProps & {
+export type AvatarProps = {
+  file?: File | null
+  thumbnail?: ThumbnailSize
+  imageHost?: string
+  src?: string | null
   square?: boolean
-}
+} & Omit<
+  React.DetailedHTMLProps<
+    React.ImgHTMLAttributes<HTMLImageElement>,
+    HTMLImageElement
+  >,
+  'src'
+>
 
 const Avatar: React.FC<AvatarProps> = ({
   className,
   src,
   file,
   thumbnail,
-  imageHost,
+  imageHost = '',
   children,
   square,
   ...props
@@ -20,9 +31,13 @@ const Avatar: React.FC<AvatarProps> = ({
   return (
     <div
       {...props}
-      className={cx(styles.avatar, className, {
-        [styles['avatar--square']]: square,
-      })}
+      className={cn(
+        'copy-12 bg-alpha-transparent-12 flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full select-none',
+        {
+          'rounded-[6px]': square,
+        },
+        className
+      )}
     >
       {file && (
         <Image

@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import timezone from 'dayjs/plugin/timezone'
+import 'dayjs/plugin/timezone'
 
-dayjs.extend(timezone)
+const COVER_DATE_FORMAT = 'DD MMMM YYYY'
 
-export const getFormattedDate = (date?: Date, timezone: string = 'UTC') => {
+export const getFormattedDate = (date?: Date, timezone?: string) => {
   if (!date) return ''
-
-  return dayjs(date).tz(timezone).format('DD MMMM YYYY')
+  if (!timezone) return dayjs(date).format(COVER_DATE_FORMAT)
+  return dayjs(date).tz(timezone).format(COVER_DATE_FORMAT)
 }

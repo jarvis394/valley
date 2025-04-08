@@ -1,11 +1,11 @@
 import React from 'react'
-import cx from 'classnames'
 import styles from './Button.module.css'
 import ButtonBase, { ButtonBaseProps } from '../ButtonBase/ButtonBase'
 import Spinner from '../Spinner/Spinner'
 import { ViewportSize } from '../types/ViewportSize'
 import { Slot, Slottable } from '@radix-ui/react-slot'
 import { AsChildProps } from '../types/AsChildProps'
+import { cn } from '@valley/shared'
 
 export type ButtonOwnProps = Partial<
   React.PropsWithChildren<{
@@ -61,7 +61,7 @@ const Button = ({
       {...(iconSize && {
         style: { ['--button-icon-size' as string]: iconSize + 'px' },
       })}
-      className={cx('Button', styles.button, className, {
+      className={cn('Button', styles.button, className, {
         [styles['button--size-sm']]: size === 'sm',
         [styles['button--size-md']]: size === 'md',
         [styles['button--size-lg']]: size === 'lg',
@@ -75,13 +75,13 @@ const Button = ({
       <Root {...other}>
         {loading && (
           <Spinner
-            className={cx(styles.button__loading, {
+            className={cn(styles.button__loading, {
               [styles['button__loading--noAnimation']]: !!before,
             })}
           />
         )}
         {before && !loading && (
-          <div className={cx('Button__before', styles.button__before)}>
+          <div className={cn('Button__before', styles.button__before)}>
             {before}
           </div>
         )}
@@ -92,7 +92,7 @@ const Button = ({
               {React.cloneElement(
                 children as React.ReactElement,
                 undefined,
-                <span className={cx('Button__content', styles.button__content)}>
+                <span className={cn('Button__content', styles.button__content)}>
                   {
                     (children as React.ReactElement<React.PropsWithChildren>)
                       ?.props?.children
@@ -103,12 +103,12 @@ const Button = ({
           )
         }
         {children && !asChild && (
-          <span className={cx('Button__content', styles.button__content)}>
+          <span className={cn('Button__content', styles.button__content)}>
             {children}
           </span>
         )}
         {after && (
-          <div className={cx('Button__after', styles.button__after)}>
+          <div className={cn('Button__after', styles.button__after)}>
             {after}
           </div>
         )}

@@ -11,11 +11,17 @@ const AlbumCover: React.FC<CoverDesignProps> = ({
   theme,
   cover,
   timeZone,
+  imageHost = '',
+  type: _type,
+  className,
+  ...props
 }) => {
   return (
     <div
+      {...props}
       className={cn(
         'fade-in relative flex h-full w-full flex-col items-center justify-center gap-8 bg-stone-100 px-4 pb-8 text-center text-stone-900',
+        className,
         {
           'bg-stone-950 text-stone-100': theme === 'dark',
         }
@@ -26,6 +32,7 @@ const AlbumCover: React.FC<CoverDesignProps> = ({
           className="h-auto max-h-full w-auto max-w-full rounded-2xl"
           containerProps={{ className: 'mx-auto max-h-[50%] max-w-full' }}
           file={cover.file}
+          imageHost={imageHost}
         />
       )}
       <div className="flex w-full flex-col gap-3">

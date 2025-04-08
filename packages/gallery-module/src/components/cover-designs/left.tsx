@@ -1,24 +1,35 @@
 import React from 'react'
 import { type CoverDesignProps } from '.'
 import { cn } from '@valley/shared'
-import { getFileThumbnailQuery } from '@valley/ui/utils/getFileThumbnailQuery'
 import { getFormattedDate } from '../../utils/get-formatted-date'
+import { makeFilePath } from '../../utils/make-file-path'
 
 const LeftCover: React.FC<CoverDesignProps> = ({
   title,
   cover,
   dateShot,
   timeZone,
+  imageHost = '',
+  theme: _theme,
+  type: _type,
+  className,
+  style,
+  ...props
 }) => {
+  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+
   return (
     <div
+      {...props}
       style={{
-        backgroundImage: `url(/api/files/${cover.file.path}?${getFileThumbnailQuery({ size: '2xl', file: cover.file })})`,
+        ...style,
+        backgroundImage: `url(${path})`,
         backgroundPosition:
           'var(--cover-position-x, 50%) var(--cover-position-y, 50%)',
       }}
       className={cn(
-        'fade-in relative flex h-full w-full flex-col justify-end bg-cover bg-no-repeat text-stone-100 before:absolute before:inset-0 before:h-full before:w-full before:bg-stone-950/12 before:content-[""]'
+        'fade-in relative flex h-full w-full flex-col justify-end bg-cover bg-no-repeat text-stone-100 before:absolute before:inset-0 before:h-full before:w-full before:bg-stone-950/12 before:content-[""]',
+        className
       )}
     >
       <div

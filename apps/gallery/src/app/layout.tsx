@@ -1,8 +1,13 @@
 import type { Metadata, Viewport } from 'next'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 
-import '@valley/ui/styles'
-import '../styles/fonts.css'
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 import '../styles/globals.css'
+import '../styles/fonts.css'
 
 export const metadata: Metadata = {
   title: 'Gallery | Valley',

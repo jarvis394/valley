@@ -1,8 +1,8 @@
 import React, { CSSProperties } from 'react'
 import styles from './ButtonBase.module.css'
-import cx from 'classnames'
 import { AsChildProps } from '../types/AsChildProps'
 import { Slot } from '@radix-ui/react-slot'
+import { cn } from '@valley/shared'
 
 export type ButtonBaseOwnProps = React.PropsWithChildren<{
   variant?:
@@ -43,7 +43,7 @@ const ButtonBase = ({
     <Root
       {...other}
       disabled={disabled || shimmer}
-      className={cx(className, 'ButtonBase', styles.buttonBase, {
+      className={cn(className, 'ButtonBase', styles.buttonBase, {
         [styles['buttonBase--primary']]: variant === 'primary',
         [styles['buttonBase--secondary']]: variant === 'secondary',
         [styles['buttonBase--secondary-dimmed']]:

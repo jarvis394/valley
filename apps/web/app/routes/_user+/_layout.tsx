@@ -27,6 +27,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
         where: eq(users.id, userId),
         with: {
           userSettings: true,
+          avatar: true,
         },
       })
       .then(res)

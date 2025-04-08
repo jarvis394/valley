@@ -7,10 +7,10 @@ import {
   sql,
 } from 'drizzle-orm'
 import { projects } from './projects.js'
-import { avatars } from './avatars.js'
 import { userSettings } from './userSettings.js'
 import { sessions } from './sessions.js'
 import { accounts } from './accounts.js'
+import { files } from './files.js'
 
 export const users = pgTable('users', {
   id: varchar().default(defaultId).primaryKey().notNull(),
@@ -44,9 +44,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     fields: [users.avatarId],
     references: [userSettings.id],
   }),
-  avatar: one(avatars, {
+  avatar: one(files, {
     fields: [users.avatarId],
-    references: [avatars.id],
+    references: [files.id],
   }),
 }))
 

@@ -2,8 +2,8 @@ import React from 'react'
 import { ChevronDown } from 'geist-ui-icons'
 import { type CoverDesignProps } from '.'
 import { cn } from '@valley/shared'
-import { getFileThumbnailQuery } from '@valley/ui/utils/getFileThumbnailQuery'
 import { getFormattedDate } from '../../utils/get-formatted-date'
+import { makeFilePath } from '../../utils/make-file-path'
 
 const LineCover: React.FC<CoverDesignProps> = ({
   title,
@@ -11,11 +11,19 @@ const LineCover: React.FC<CoverDesignProps> = ({
   cover,
   dateShot,
   timeZone,
+  imageHost = '',
+  type: _type,
+  className,
+  ...props
 }) => {
+  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+
   return (
     <div
+      {...props}
       className={cn('flex h-full w-full flex-col bg-stone-100 text-stone-900', {
         'bg-stone-950 text-stone-100': theme === 'dark',
+        className,
       })}
     >
       <div className="fade-in relative flex flex-col items-center gap-3 py-8 text-center">
@@ -28,7 +36,7 @@ const LineCover: React.FC<CoverDesignProps> = ({
       </div>
       <div
         style={{
-          backgroundImage: `url(/api/files/${cover.file.path}?${getFileThumbnailQuery({ size: '2xl', file: cover.file })})`,
+          backgroundImage: `url(${path})`,
           backgroundPosition:
             'var(--cover-position-x, 50%) var(--cover-position-y, 50%)',
         }}

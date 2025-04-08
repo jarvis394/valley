@@ -1,7 +1,7 @@
 import { cn } from '@valley/shared'
 import ButtonBase from '@valley/ui/ButtonBase'
 import { CheckCircleFill } from 'geist-ui-icons'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 const SelectButton: React.FC<
   {
@@ -20,8 +20,17 @@ const SelectButton: React.FC<
   selected,
   className,
   id,
+  onClick,
   ...props
 }) => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = useCallback(
+    (e) => {
+      if (selected) return
+      onClick?.(e)
+    },
+    [onClick, selected]
+  )
+
   return (
     <div className="flex w-full flex-col items-center" {...containerProps}>
       <ButtonBase
@@ -31,6 +40,7 @@ const SelectButton: React.FC<
         )}
         id={id}
         variant={selected ? 'secondary' : 'secondary-dimmed'}
+        onClick={handleClick}
         {...props}
       >
         {children}

@@ -205,7 +205,13 @@
   --color-alpha-transparent-32: hsla(var(--ds-gray-1000) / 32%);
   --color-alpha-transparent-50: hsla(var(--ds-gray-1000) / 50%);
   --color-alpha-transparent-70: hsla(var(--ds-gray-1000) / 70%);
+  --color-alpha-transparent-80: hsla(var(--ds-gray-1000) / 80%);
   --color-alpha-inversed-transparent-32: hsla(var(--ds-gray-100) / 32%);
+
+  --color-button-primary: var(--button-primary-bg);
+  --color-button-primary-text: var(--button-primary-fg);
+  --color-button-primary-hovered: var(--button-primary-hovered-bg);
+  --color-button-primary-hovered-text: var(--button-primary-hovered-fg);
 
   --color-ds-gray-100: hsl(var(--ds-gray-100));
   --color-ds-gray-200: hsl(var(--ds-gray-200));
@@ -637,6 +643,7 @@
     --alpha-transparent-32: hsla(var(--ds-gray-1000) / 32%);
     --alpha-transparent-50: hsla(var(--ds-gray-1000) / 50%);
     --alpha-transparent-70: hsla(var(--ds-gray-1000) / 70%);
+    --alpha-transparent-80: hsla(var(--ds-gray-1000) / 80%);
     --alpha-inversed-transparent-32: hsla(var(--ds-gray-100) / 32%);
 
     /** Toast */
@@ -801,6 +808,7 @@
     --alpha-transparent-32: hsla(var(--ds-gray-1000) / 32%);
     --alpha-transparent-50: hsla(var(--ds-gray-1000) / 50%);
     --alpha-transparent-70: hsla(var(--ds-gray-1000) / 70%);
+    --alpha-transparent-80: hsla(var(--ds-gray-1000) / 80%);
     --alpha-inversed-transparent-32: hsla(var(--ds-gray-100) / 32%);
 
     /** Toast */

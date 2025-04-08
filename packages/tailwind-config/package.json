@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@valley/typescript-config": "*",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4.1.3"
   },
   "dependencies": {
     "tailwindcss-radix": "^4.0.2"

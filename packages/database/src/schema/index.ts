@@ -1,5 +1,4 @@
 export * from './accounts.js'
-export * from './avatars.js'
 export * from './covers.js'
 export * from './files.js'
 export * from './folders.js'
