@@ -56,17 +56,20 @@ export const FolderGallery: React.FC<FolderGalleryProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-4 pt-4" id={folder.id}>
+    <div
+      className="mx-auto flex w-full max-w-[2560px] flex-col gap-4 pt-4"
+      id={folder.id}
+    >
       <h3 className="heading-24 w-full text-center">{folder.title}</h3>
       <Gallery options={photoswipeOptions}>
         <JustifiedGrid
           className="fade transition-all"
           data-fade-in={visible}
           gap={2}
-          sizeRange={[240, Infinity]}
+          sizeRange={[240, 480]}
           isCroppedSize
           autoResize
-          columnRange={[2, 4]}
+          columnRange={[2, 8]}
           onRenderComplete={() => setVisible(true)}
         >
           {sortedFiles.map((file) => (
