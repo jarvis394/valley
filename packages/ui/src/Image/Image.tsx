@@ -1,13 +1,13 @@
 import { type File } from '@valley/db'
-import cx from 'classnames'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import styles from './Image.module.css'
 import Spinner from '@valley/ui/Spinner'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import {
   getFileThumbnailQuery,
   ThumbnailSize,
 } from '../utils/getFileThumbnailQuery'
+import { cn } from '@valley/shared'
+import { Image as ImageIcon } from 'geist-ui-icons'
 
 export type ImageOwnProps =
   | {
@@ -20,7 +20,7 @@ export type ImageOwnProps =
       file?: never
       thumbnail?: never
       imageHost?: never
-      src?: string
+      src?: string | null
     }
 
 export type ImageProps = ImageOwnProps & {
@@ -28,9 +28,12 @@ export type ImageProps = ImageOwnProps & {
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >
-} & React.DetailedHTMLProps<
-    React.ImgHTMLAttributes<HTMLImageElement>,
-    HTMLImageElement
+} & Omit<
+    React.DetailedHTMLProps<
+      React.ImgHTMLAttributes<HTMLImageElement>,
+      HTMLImageElement
+    >,
+    'src'
   >
 
 const useImageLoaded = () => {
@@ -50,6 +53,28 @@ const useImageLoaded = () => {
   return [ref, loaded, onLoad] as const
 }
 
+const mergeRefs = <T,>(
+  ...inputRefs: Array<React.Ref<T> | undefined>
+): React.Ref<T> | React.RefCallback<T> => {
+  const filteredInputRefs = inputRefs.filter(Boolean)
+
+  if (filteredInputRefs.length <= 1) {
+    const firstRef = filteredInputRefs[0]
+
+    return firstRef || null
+  }
+
+  return function mergedRefs(ref) {
+    for (const inputRef of filteredInputRefs) {
+      if (typeof inputRef === 'function') {
+        inputRef(ref)
+      } else if (inputRef) {
+        ;(inputRef as React.MutableRefObject<T | null>).current = ref
+      }
+    }
+  }
+}
+
 const Image: React.FC<ImageProps> = ({
   file,
   width,
@@ -60,6 +85,7 @@ const Image: React.FC<ImageProps> = ({
   className,
   containerProps = {},
   imageHost = '',
+  ref,
   ...props
 }) => {
   const {
@@ -67,7 +93,9 @@ const Image: React.FC<ImageProps> = ({
     style: containerStyle,
     ...otherContainerProps
   } = containerProps
-  const [ref, loaded, onLoad] = useImageLoaded()
+  const [error, setError] = useState(false)
+  const [imageRef, loaded, onLoad] = useImageLoaded()
+  const mergedRef = mergeRefs(ref, imageRef)
   const isHydrated = useHydrated()
   const imageSrc = useMemo(() => {
     if (file && !src) {
@@ -84,8 +112,12 @@ const Image: React.FC<ImageProps> = ({
       return imageHost + '/api/files/' + file.path + '?' + resizeQuery
     }
 
-    return src
+    return src || undefined
   }, [file, height, imageHost, src, thumbnail, width])
+
+  const onError = () => {
+    setError(true)
+  }
 
   return (
     <div
@@ -94,20 +126,30 @@ const Image: React.FC<ImageProps> = ({
         aspectRatio: width && height ? +width / +height : undefined,
         ...containerStyle,
       }}
-      className={cx(styles.image, containerClassName)}
+      className={cn(
+        'relative isolate flex h-full w-full shrink-0 items-center justify-center overflow-hidden',
+        containerClassName
+      )}
       data-loaded={loaded}
+      data-errored={error}
     >
-      {!loaded && <Spinner className={styles.image__spinner} />}
-      <img
-        {...props}
-        className={cx(className, 'fade')}
-        data-fade-in={isHydrated ? loaded : true}
-        ref={ref}
-        onLoad={onLoad}
-        decoding="async"
-        src={imageSrc}
-        alt={alt || file?.name || ''}
-      />
+      {error && <ImageIcon className="text-hint m-4" />}
+      {!loaded && !error && (
+        <Spinner className="absolute top-[50%] left-[50%] -z-1 -translate-x-[50%] -translate-y-[50%]" />
+      )}
+      {!error && (
+        <img
+          {...props}
+          className={cn(className, 'fade')}
+          data-fade-in={isHydrated ? loaded : true}
+          ref={mergedRef}
+          onLoad={onLoad}
+          onError={onError}
+          decoding="async"
+          src={imageSrc}
+          alt={alt || file?.name || ''}
+        />
+      )}
     </div>
   )
 }

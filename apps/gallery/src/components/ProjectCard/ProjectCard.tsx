@@ -16,7 +16,7 @@ import { Cover, Project, File } from '@valley/db'
 export type ProjectCardOwnProps =
   | {
       project: Project & {
-        cover?: Array<Cover & { file: File }> | null
+        cover?: (Cover & { file: File }) | null
       }
       domain: string
       loading?: false
@@ -59,10 +59,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           href={projectLink}
           className={styles.projectCard__cover}
         >
-          {project.cover && project.cover.length > 0 && (
+          {project.cover && (
             <Image
               alt={project.title}
-              file={project.cover[0].file}
+              file={project.cover.file}
               thumbnail="md"
               imageHost={WEB_SERVICE_URL}
             />

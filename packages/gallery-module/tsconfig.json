@@ -1,0 +1,14 @@
+{
+  "extends": "@valley/typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
+  },
+  "include": ["src", "tailwind.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

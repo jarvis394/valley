@@ -42,8 +42,10 @@ const FormHelperText: React.FC<FormHelperTextProps> = ({
             })}
             {...props}
           >
-            {state === 'error' && <InfoCircleFill color="var(--red-700)" />}
-            {state === 'valid' && <CheckCircleFill color="var(--green-700)" />}
+            {state === 'error' && <InfoCircleFill color="var(--ds-red-700)" />}
+            {state === 'valid' && (
+              <CheckCircleFill color="var(--ds-green-700)" />
+            )}
             <span role={state === 'error' ? 'alert' : 'note'}>{children}</span>
           </motion.p>
         )}

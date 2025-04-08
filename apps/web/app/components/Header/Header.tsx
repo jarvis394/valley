@@ -9,14 +9,13 @@ import { LogoGithub } from 'geist-ui-icons'
 import { HEADER_HEIGHT } from '../../config/constants'
 import Stack from '@valley/ui/Stack'
 import { Await, Link, useParams } from 'react-router'
-import type { User } from '@valley/db'
 import { useProject } from 'app/utils/project'
 import Hidden from '@valley/ui/Hidden'
 import MenuExpand from '../svg/MenuExpand'
 import cx from 'classnames'
 import Skeleton from '@valley/ui/Skeleton'
 import { useUserAwait } from 'app/utils/user'
-import type { ProjectWithFolders } from '@valley/shared'
+import type { ProjectWithFolders, UserFull } from '@valley/shared'
 
 const PathPartSkeleton: React.FC<{
   hideSlashOnSm?: boolean
@@ -46,7 +45,7 @@ const PathPartSkeleton: React.FC<{
   </Stack>
 )
 
-const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
+const CurrentUser: React.FC<{ user?: UserFull | null }> = ({ user }) => {
   return (
     <Stack
       align={'center'}
@@ -65,7 +64,9 @@ const CurrentUser: React.FC<{ user?: User | null }> = ({ user }) => {
         className={styles.header__avatarAndNameContainer}
       >
         <Link to={'/projects'}>
-          <Avatar>{user?.name?.[0]?.toUpperCase()}</Avatar>
+          <Avatar src={user?.image} file={user?.avatar}>
+            {user?.name?.[0]?.toUpperCase()}
+          </Avatar>
           <p className={styles.header__noShrink}>{user?.name}</p>
         </Link>
       </Stack>
@@ -79,7 +80,7 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
   const { projectId } = useParams()
   const shouldShow = !!projectId
   const [lastProject, setLastProject] = React.useState(project)
-  const coverFile = project?.cover?.[0]?.file
+  const coverFile = project?.cover?.file
   const shouldShowCoverFile = coverFile?.canHaveThumbnails
 
   React.useEffect(() => {
@@ -102,7 +103,14 @@ const CurrentProject: React.FC<{ project?: ProjectWithFolders | null }> = ({
           className={styles.header__avatarAndNameContainer}
         >
           <Link to={'/projects/' + project?.id}>
-            {shouldShowCoverFile && <Avatar square file={coverFile} />}
+            {shouldShowCoverFile && (
+              <Avatar
+                key={'project-avatar-' + project?.id}
+                id={'project-avatar-' + project?.id}
+                square
+                file={coverFile}
+              />
+            )}
             {!shouldShowCoverFile && (
               <Avatar square>{lastProject?.title?.[0]?.toUpperCase()}</Avatar>
             )}

@@ -1,4 +1,11 @@
-import type { File, Project, Folder } from '@valley/db'
+import { type File, type Project, type Folder, Cover } from '@valley/db'
+import {
+  ProjectHeadingFont,
+  ProjectCoverVariant,
+  ProjectGalleryOrientation,
+  ProjectGallerySpacing,
+  ProjectGalleryTheme,
+} from '@valley/db/config/constants'
 import { ProjectWithFolders } from '@valley/shared'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -22,6 +29,24 @@ export type ProjectsState = {
 export type ProjectsAction = {
   deleteProject: (id: string) => void
   setProject: (project: ProjectWithFoldersMap) => void
+  setProjectFields: (
+    settings: Partial<
+      Pick<
+        ProjectWithFolders,
+        | 'coverVariant'
+        | 'galleryOrientation'
+        | 'gallerySpacing'
+        | 'galleryTheme'
+        | 'headingFont'
+        | 'cover'
+      >
+    >,
+    projectId: Project['id']
+  ) => void
+  setProjectCoverPosition: (
+    position: Partial<Pick<Cover, 'x' | 'y'>>,
+    projectId: Project['id']
+  ) => void
   setProjectFolders: (
     projectId: Project['id'],
     folders: FolderWithFiles[]
@@ -55,6 +80,11 @@ const makeDefaultProject = (id: Project['id']): ProjectWithFoldersMap => ({
   translationStringsId: null,
   slug: '',
   userId: '',
+  coverVariant: ProjectCoverVariant.CENTER,
+  galleryOrientation: ProjectGalleryOrientation.HORIZONTAL,
+  gallerySpacing: ProjectGallerySpacing.MEDIUM,
+  galleryTheme: ProjectGalleryTheme.SYSTEM,
+  headingFont: ProjectHeadingFont.FORUM,
 })
 
 const makeDefaultFolder = (
@@ -91,6 +121,31 @@ export const useProjectsStore = create<ProjectsState & ProjectsAction>()(
         }
 
         state.projects[project.id] = project
+      }),
+    setProjectFields: (fields, projectId) =>
+      set((state) => {
+        if (!state.projects[projectId]) {
+          state.projects[projectId] = makeDefaultProject(projectId)
+        }
+
+        state.projects[projectId] = {
+          ...state.projects[projectId],
+          ...fields,
+        }
+      }),
+    setProjectCoverPosition: (position, projectId) =>
+      set((state) => {
+        if (!state.projects[projectId]) {
+          throw new Error(`Project ${projectId} not found`)
+        }
+        if (!state.projects[projectId].cover) {
+          throw new Error(`Project ${projectId} cover not found`)
+        }
+
+        state.projects[projectId].cover = {
+          ...state.projects[projectId].cover,
+          ...position,
+        }
       }),
     setProjectFolders: (projectId, folders) => {
       set((state) => {

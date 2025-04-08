@@ -1,4 +1,4 @@
-import type { Project } from '@valley/db'
+import type { NewProject } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'
@@ -7,7 +7,7 @@ import React from 'react'
 import { z } from 'zod'
 import { ProjectWithFolders } from '@valley/shared'
 
-const ProjectEditSchema: z.ZodType<Project> = z.object({
+const ProjectEditSchema: z.ZodType<NewProject> = z.object({
   id: z.string(),
   title: z.string(),
   slug: z.string(),

@@ -11,6 +11,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const headers = new Headers()
 
   headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+  headers.set('Cross-Origin-Resource-Policy', 'same-site')
 
   invariantResponse(projectId, 'No project ID found in params')
   invariantResponse(folderId, 'No folder ID found in params')
@@ -33,13 +34,19 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   //   return data('File not found', { status: 404 })
   // }
 
+  const allowedOrigins = new Set([
+    getDomainUrl(request),
+    process.env.UPLOAD_SERVICE_URL,
+    process.env.GALLERY_SERVICE_URL,
+  ])
+  const allowedOriginsArray: string[] = []
+  for (const url of allowedOrigins) {
+    url && allowedOriginsArray.push(url)
+  }
+
   const response = await getImgResponse(request, {
     headers,
-    allowlistedOrigins: [
-      getDomainUrl(request),
-      process.env.UPLOAD_SERVICE_URL,
-      process.env.GALLERY_SERVICE_URL,
-    ].filter(Boolean),
+    allowlistedOrigins: allowedOriginsArray,
     cacheFolder: process.env.VERCEL === '1' ? 'no_cache' : undefined,
     getImgSource: () => {
       return {
@@ -50,10 +57,6 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   })
 
   return await cors(request, response, {
-    origin: [
-      getDomainUrl(request),
-      process.env.UPLOAD_SERVICE_URL,
-      process.env.GALLERY_SERVICE_URL,
-    ].filter(Boolean),
+    origin: allowedOriginsArray,
   })
 }

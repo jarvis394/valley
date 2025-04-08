@@ -141,8 +141,8 @@ const OnboardingSecurityRoute: React.FC<Route.ComponentProps> = ({
             <FormHelperText animationKey={usePassword ? 'true' : 'false'}>
               {usePassword ? (
                 <>
-                  <span style={{ color: 'var(--blue-600)' }}>Tip:</span> you can
-                  go password-less and only use magic links for login — just
+                  <span style={{ color: 'var(--ds-blue-600)' }}>Tip:</span> you
+                  can go password-less and only use magic links for login — just
                   uncheck the checkbox
                 </>
               ) : (

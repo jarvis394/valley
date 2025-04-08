@@ -9,11 +9,10 @@ import {
   ShouldRevalidateFunction,
   useLoaderData,
 } from 'react-router'
-import cx from 'classnames'
 import styles from './root.module.css'
 import { GeneralErrorBoundary } from './components/ErrorBoundary'
 import { useNonce } from './components/NonceProvider/NonceProvider'
-import { getTheme, Theme } from './utils/theme'
+import { getTheme } from './utils/theme'
 import { useOptionalTheme } from './routes/resources+/theme-switch'
 import { getEnv } from './server/env.server'
 import { ClientHintCheck, getHints } from './components/ClientHints/ClientHints'
@@ -33,6 +32,9 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import calendar from 'dayjs/plugin/calendar'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import { Theme } from '@valley/shared'
+
+import './styles/global.css'
 
 dayjs.extend(calendar)
 dayjs.extend(relativeTime)
@@ -55,14 +57,6 @@ const mountMultiDragPlugin = async () => {
   }
 }
 mountMultiDragPlugin()
-
-import './styles/fonts.css'
-import './styles/global.css'
-import '@valley/ui/styles/theme.css'
-import '@valley/ui/styles/reset.css'
-import '@valley/ui/styles/global.css'
-import '@uppy/core/dist/style.min.css'
-import 'overlayscrollbars/overlayscrollbars.css'
 
 export const links: Route.LinksFunction = () => [
   {
@@ -147,7 +141,7 @@ export const meta: Route.MetaFunction = () => {
 export function Document({
   children,
   nonce,
-  theme = 'light',
+  theme = Theme.SYSTEM,
   env = {},
 }: {
   children: React.ReactNode
@@ -156,7 +150,7 @@ export function Document({
   env?: Record<string, string>
 }) {
   return (
-    <html lang="en">
+    <html data-theme={theme} lang="en">
       <head>
         <title>Valley</title>
         <meta charSet="utf-8" />
@@ -193,7 +187,7 @@ export function Document({
         <Meta />
         <Links />
       </head>
-      <body className={cx('valley-themed', styles.root)} data-theme={theme}>
+      <body className={styles.root}>
         {children}
         <script
           nonce={nonce}

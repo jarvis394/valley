@@ -28,7 +28,11 @@ const FolderInfo: React.FC = () => {
     <Wrapper className={styles.project__folderInfo}>
       <div className={styles.project__folderTitleContainer}>
         {currentFolder?.title}
-        <IconButton onClick={handleEditFolderTitle} variant="tertiary-dimmed">
+        <IconButton
+          className="mt-0.5"
+          onClick={handleEditFolderTitle}
+          variant="tertiary-dimmed"
+        >
           <PencilEdit />
         </IconButton>
       </div>

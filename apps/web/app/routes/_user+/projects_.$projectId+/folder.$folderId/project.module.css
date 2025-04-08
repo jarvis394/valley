@@ -166,8 +166,8 @@
 .project__files--ghost {
   z-index: 1000;
   position: relative;
-  background-color: var(--blue-100) !important;
-  box-shadow: 0 0 0 1px inset var(--blue-600) !important;
+  background-color: var(--ds-blue-100) !important;
+  box-shadow: 0 0 0 1px inset var(--ds-blue-600) !important;
   transition:
     background-color 200ms ease,
     box-shadow 200ms ease;

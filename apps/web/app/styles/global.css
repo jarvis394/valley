@@ -1,6 +1,18 @@
+@import 'tailwindcss';
+
+@tailwind utilities;
+
+@import '@valley/tailwind/styles';
+@import '@valley/ui/styles';
+@import '@valley/gallery-module/styles';
+@import '@uppy/core/dist/style.min.css';
+@import 'overlayscrollbars/overlayscrollbars.css';
+@import './fonts.css';
+
 #storybook-root,
 html,
 body {
+  min-height: 100%;
   height: 100%;
   margin: 0;
   font-family: var(--font-geist-sans);
@@ -13,7 +25,7 @@ body {
   box-sizing: border-box;
 }
 
-svg {
+svg:not(.svg-own-color) {
   fill: currentColor;
 }
 

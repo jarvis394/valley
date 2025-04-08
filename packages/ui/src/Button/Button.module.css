@@ -33,6 +33,7 @@
 .button.button--size-sm {
   border-radius: 8px;
   gap: 10px;
+  font-weight: 450;
   --x-padding: 12px;
   --height: 32px;
   --font-size: 14px;
@@ -42,6 +43,7 @@
 .button.button--size-md {
   border-radius: 12px;
   gap: 12px;
+  font-weight: 500;
   --x-padding: 16px;
   --height: 40px;
   --font-size: 14px;

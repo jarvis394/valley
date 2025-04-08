@@ -6,12 +6,14 @@ import Stack from '@valley/ui/Stack'
 
 type PageHeaderProps = WrapperProps & {
   before?: React.ReactElement
+  after?: React.ReactElement
   headerProps?: React.ComponentPropsWithoutRef<'h1'>
 } & React.ComponentPropsWithoutRef<'div'>
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   children,
   before,
+  after,
   className,
   headerProps,
   ...props
@@ -44,6 +46,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             {before}
           </Stack>
         )}
+        {after}
       </Wrapper>
     </Stack>
   )

@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import '@valley/tailwind/styles';
+@source './**/*.tsx';
+
+@theme {
+  --color-dark: #000;
+  --font-heading: var(--font-heading);
+}

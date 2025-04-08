@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'GeistSans';
+  font-family: 'Geist';
   src:
     url('/fonts/webfonts/Geist[wght].woff2') format('woff2'),
     url('/fonts/variable/Geist[wght].ttf') format('truetype');
@@ -8,7 +8,7 @@
 }
 
 @font-face {
-  font-family: 'GeistSans Fallback';
+  font-family: 'Geist Fallback';
   src: local('Arial');
   ascent-override: 85.83%;
   descent-override: 20.52%;
@@ -17,5 +17,5 @@
 }
 
 :root {
-  --font-geist-sans: 'GeistSans', 'GeistSans Fallback';
+  --font-geist-sans: 'Geist', 'Geist Fallback';
 }

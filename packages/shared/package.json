@@ -45,7 +45,12 @@
     "@valley/db": "*",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
+    "classnames": "^2.5.1",
     "eslint": "^8.56.11",
+    "tailwind-merge": "^3.0.2",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "tailwind-merge": "^3.0.2"
   }
 }

@@ -111,7 +111,7 @@ const AddNewAccount = () => (
         {SOCIAL_PROVIDER_NAMES.map((providerName) => (
           <ProviderConnectionForm
             key={providerName}
-            redirectTo={'/settings/auth'}
+            redirectTo={'/settings/security'}
             type="Connect"
             providerName={providerName}
             buttonProps={{ fullWidth: false }}

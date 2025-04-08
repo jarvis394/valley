@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ButtonBase from '@valley/ui/ButtonBase'
 import styles from './FolderCard.module.css'
 import cx from 'classnames'
@@ -47,11 +47,11 @@ const FolderCardMenuContent: React.FC<{
     <Menu.Content>
       <Menu.Item
         onClick={handleFolderRename}
-        before={<PencilEdit color="var(--text-secondary)" />}
+        before={<PencilEdit className="text-secondary" />}
       >
         Rename
       </Menu.Item>
-      <Menu.Item before={<MenuIcon color="var(--text-secondary)" />}>
+      <Menu.Item before={<MenuIcon className="text-secondary" />}>
         Reorder
       </Menu.Item>
       <Menu.Separator />
@@ -59,7 +59,7 @@ const FolderCardMenuContent: React.FC<{
         <>
           <Menu.Item
             onClick={handleFolderClear}
-            before={<Trash color="var(--red-600)" />}
+            before={<Trash className="text-ds-red-700" />}
           >
             Delete all files
           </Menu.Item>
@@ -68,7 +68,7 @@ const FolderCardMenuContent: React.FC<{
       {!folder.isDefaultFolder && (
         <Menu.Item
           onClick={handleFolderDelete}
-          before={<Trash color="var(--red-600)" />}
+          before={<Trash className="text-ds-red-700" />}
         >
           Delete
         </Menu.Item>
@@ -86,6 +86,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
   const isLoading =
     navigation.state === 'loading' &&
     navigation.location?.pathname === folderLink
+  const [isMenuOpen, setMenuOpen] = useState(false)
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -97,10 +98,19 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onClick }) => {
   ) => {
     e.preventDefault()
     e.stopPropagation()
+    setMenuOpen(true)
+  }
+
+  const closeMenu = () => {
+    setMenuOpen(false)
   }
 
   return (
-    <Menu.Root openOnContextMenu>
+    <Menu.Root
+      dropdownMenuProps={{ open: isMenuOpen }}
+      onOpenChange={closeMenu}
+      openOnContextMenu
+    >
       <ButtonBase
         asChild
         variant="secondary"

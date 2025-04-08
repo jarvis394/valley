@@ -7,6 +7,9 @@
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"
+      },
+      {
+        "name": "@react-router/dev"
       }
     ],
     "module": "ESNext",

@@ -98,7 +98,14 @@ morgan.token('url', (req) => {
     return req.url ?? ''
   }
 })
-app.use(morgan('tiny'))
+app.use(
+  morgan('tiny', {
+    skip(req) {
+      if (req.path.startsWith('/api/files/')) return true
+      return false
+    },
+  })
+)
 
 const maxMultiple = IS_PROD ? 1 : 10_000
 const rateLimitDefault: Partial<RateLimitOptions> = {

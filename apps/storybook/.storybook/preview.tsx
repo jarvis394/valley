@@ -5,9 +5,7 @@ import styles from './App.module.css'
 
 import './fonts.css'
 import './global.css'
-import '@valley/ui/styles/theme.css'
-import '@valley/ui/styles/reset.css'
-import '@valley/ui/styles/global.css'
+import '@valley/ui/styles'
 import '@uppy/core/dist/style.min.css'
 
 const preview: Preview = {

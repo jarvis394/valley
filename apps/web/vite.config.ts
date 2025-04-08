@@ -2,6 +2,7 @@ import { reactRouter } from '@react-router/dev/vite'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { envOnlyMacros } from 'vite-env-only'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(() => ({
   server: {
@@ -17,6 +18,7 @@ export default defineConfig(() => ({
         'react-dom',
         'react-dom/server',
         'react-router',
+        '@egjs/react-grid',
       ],
     },
   },
@@ -41,7 +43,12 @@ export default defineConfig(() => ({
     },
     sourcemap: process.env.NODE_ENV !== 'production',
   },
+  resolve: {
+    alias: {
+      '@egjs/react-grid': '@egjs/react-grid/dist/grid.esm.js',
+    },
+  },
   clearScreen: false,
   envDir: '../../',
-  plugins: [envOnlyMacros(), tsconfigPaths(), reactRouter()],
+  plugins: [envOnlyMacros(), tsconfigPaths(), tailwindcss(), reactRouter()],
 }))

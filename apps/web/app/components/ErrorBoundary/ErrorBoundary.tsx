@@ -9,12 +9,6 @@ import { getErrorMessage } from '../../utils/misc'
 import styles from './ErrorBoundary.module.css'
 import Stack from '@valley/ui/Stack'
 
-import '../../styles/fonts.css'
-import '../../styles/global.css'
-import '@valley/ui/styles/theme.css'
-import '@valley/ui/styles/reset.css'
-import '@valley/ui/styles/global.css'
-
 type StatusHandler = (info: {
   error: ErrorResponse
   params: Record<string, string | undefined>

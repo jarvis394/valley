@@ -1,19 +1,22 @@
 .authFormHeader h1 {
   font-size: 32px;
+  font-weight: 700;
   margin: 0;
   text-align: center;
+  line-height: normal;
   view-transition-name: auth-content-header;
 }
 
 .authFormHeader p {
   font-size: 16px;
   font-weight: 400;
+  line-height: 20px;
   margin: 0;
   text-align: center;
 }
 
 .authFormHeader__email {
-  color: var(--blue-900);
+  color: var(--ds-blue-900);
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
@@ -22,11 +25,11 @@
 
 .authFormHeader__emailEdit {
   --blue-bg-hover: rgba(82, 169, 255, 0.12);
-  --themed-color: var(--blue-900);
+  --themed-color: var(--ds-blue-900);
   --themed-background-hover: var(--blue-bg-hover);
   --themed-background-focus: var(--blue-bg-hover);
-  --themed-color-hover: var(--blue-900);
-  --themed-color-focus: var(--blue-600);
+  --themed-color-hover: var(--ds-blue-900);
+  --themed-color-focus: var(--ds-blue-600);
   padding: 8px;
   margin-left: -4px;
 }

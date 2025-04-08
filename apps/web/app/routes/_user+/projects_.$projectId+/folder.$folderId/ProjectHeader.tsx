@@ -25,7 +25,7 @@ const ProjectHeader = () => {
   const galleryUrl =
     user &&
     project &&
-    [GALLERY_SERVICE_URL, user.domains[0], 'gallery' + project.slug].join('/')
+    [GALLERY_SERVICE_URL, user.domains[0], 'gallery', project.slug].join('/')
 
   const handleEditFolderDescription = () => {
     if (!currentFolder) return

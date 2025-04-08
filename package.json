@@ -28,12 +28,13 @@
     "@caxy/dotenv-updater": "^1.0.9",
     "@valley/eslint-config": "*",
     "@valley/typescript-config": "*",
-    "lint-staged": "^15.2.9",
-    "prettier": "^3.3.3",
-    "turbo": "^2.4.4",
-    "typescript": "^5.8.2",
     "cross-env": "^7.0.3",
-    "patch-package": "^8.0.0"
+    "lint-staged": "^15.2.9",
+    "patch-package": "^8.0.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.2"
   },
   "engines": {
     "node": ">=22"

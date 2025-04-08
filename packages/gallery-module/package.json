@@ -1,0 +1,43 @@
+{
+  "name": "@valley/gallery-module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "exports": {
+    "./cover": "./src/components/cover/index.tsx",
+    "./folder-gallery": "./src/components/folder-gallery/index.tsx",
+    "./preview-on-devices": "./src/components/preview-on-devices/index.tsx",
+    "./mobile-preview": "./src/components/mobile-preview/index.tsx",
+    "./project-gallery": "./src/components/project-gallery/index.tsx",
+    "./styles": "./src/styles.css"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.11",
+    "@types/node": "^20.11.24",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@valley/eslint-config": "*",
+    "@valley/typescript-config": "*",
+    "eslint": "^8.56.11",
+    "typescript": "^5.8.2",
+    "typescript-plugin-css-modules": "^5.1.0"
+  },
+  "dependencies": {
+    "@egjs/react-grid": "^1.17.0",
+    "@valley/db": "*",
+    "@valley/shared": "*",
+    "@valley/tailwind": "*",
+    "@valley/ui": "*",
+    "classnames": "^2.5.1",
+    "framer-motion": "^12.4.9",
+    "geist-ui-icons": "^1.2.0",
+    "photoswipe": "^5.4.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-photoswipe-gallery": "^3.1.1",
+    "tailwindcss": "^4.1.3"
+  }
+}
