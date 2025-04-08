@@ -1,6 +1,5 @@
 import { data } from 'react-router'
 import { db, files, folders, projects, eq } from '@valley/db'
-import { getDomainUrl } from 'app/utils/misc'
 import { getImgResponse } from 'openimg/node'
 import { cors } from 'remix-utils/cors'
 import { invariantResponse } from 'app/utils/invariant'
@@ -11,7 +10,8 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const headers = new Headers()
 
   headers.set('Cache-Control', 'public, max-age=31536000, immutable')
-  headers.set('Cross-Origin-Resource-Policy', 'same-site')
+  // TODO: fixme
+  headers.set('Cross-Origin-Resource-Policy', 'cross-origin')
 
   invariantResponse(projectId, 'No project ID found in params')
   invariantResponse(folderId, 'No folder ID found in params')
@@ -35,7 +35,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   // }
 
   const allowedOrigins = new Set([
-    getDomainUrl(request),
+    process.env.WEB_SERVICE_URL,
     process.env.UPLOAD_SERVICE_URL,
     process.env.GALLERY_SERVICE_URL,
   ])

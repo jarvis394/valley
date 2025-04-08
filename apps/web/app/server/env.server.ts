@@ -5,6 +5,7 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   REDIS_URL: z.string().optional(),
   TUSD_URL: z.string(),
+  WEB_SERVICE_URL: z.string(),
   UPLOAD_SERVICE_URL: z.string(),
   GALLERY_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
