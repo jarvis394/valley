@@ -35,10 +35,10 @@ export default async function DomainHome({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-4">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-medium">{user?.name}</h1>
       <Wrapper>
-        <div className="grid min-sm:grid-cols-2 min-lg:grid-cols-3 min-xl:grid-cols-4 grid-cols-1 gap-4 w-full">
+        <div className="grid w-full grid-cols-1 gap-4 min-sm:grid-cols-2 min-lg:grid-cols-3 min-xl:grid-cols-4">
           {user.projects.map((project) => (
             <ProjectCard key={project.id} domain={domain} project={project} />
           ))}

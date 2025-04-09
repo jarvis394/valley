@@ -2,7 +2,7 @@ import { redirect } from 'react-router'
 import { covers, db, files, folders, projects, and, eq } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getFileWithUserProjectAndFolder } from 'app/server/services/file.server'
+import { FileService } from 'app/server/services/file.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.delete'
 
@@ -17,10 +17,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   invariantResponse(id, 'No file ID found in params')
 
   try {
-    const { file, folder, project } = await getFileWithUserProjectAndFolder({
-      userId: user.id,
-      fileId: id,
-    })
+    const { file, folder, project } =
+      await FileService.getFileWithUserProjectAndFolder({
+        userId: user.id,
+        fileId: id,
+      })
 
     invariantResponse(file, 'File not found', { status: 404 })
 

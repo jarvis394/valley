@@ -64,6 +64,13 @@
       "when": 1743618531365,
       "tag": "0008_natural_onslaught",
       "breakpoints": false
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1744158904625,
+      "tag": "0009_complete_deathbird",
+      "breakpoints": false
     }
   ]
 }

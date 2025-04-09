@@ -140,7 +140,7 @@ const UploadsOverlay: React.FC = () => {
                     </div>
                     <div data-hidden={!e.isUploaded}>
                       <CheckCircleFill
-                        color="var(--green-700)"
+                        color="var(--ds-green-700)"
                         width={24}
                         height={24}
                       />

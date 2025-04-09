@@ -2,11 +2,8 @@ import { type File } from '@valley/db'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Spinner from '@valley/ui/Spinner'
 import { useHydrated } from 'remix-utils/use-hydrated'
-import {
-  getFileThumbnailQuery,
-  ThumbnailSize,
-} from '../utils/getFileThumbnailQuery'
-import { cn } from '@valley/shared'
+import { ThumbnailSize } from '../utils/getFileThumbnailQuery'
+import { cn, makeFileThumbnailPath } from '@valley/shared'
 import { Image as ImageIcon } from 'geist-ui-icons'
 
 export type ImageOwnProps =
@@ -99,17 +96,13 @@ const Image: React.FC<ImageProps> = ({
   const isHydrated = useHydrated()
   const imageSrc = useMemo(() => {
     if (file && !src) {
-      let resizeQuery = ''
-      if (thumbnail) {
-        resizeQuery = getFileThumbnailQuery({ size: thumbnail, file })
-      } else {
-        const qs = new URLSearchParams()
-        width && qs.append('w', width.toString())
-        height && qs.append('h', height.toString())
-        resizeQuery = qs.toString()
-      }
-
-      return imageHost + '/api/files/' + file.path + '?' + resizeQuery
+      return makeFileThumbnailPath({
+        file,
+        imageHost,
+        size: thumbnail,
+        width: Number(width),
+        height: Number(height),
+      })
     }
 
     return src || undefined

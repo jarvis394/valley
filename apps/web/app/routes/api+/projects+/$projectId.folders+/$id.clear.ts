@@ -2,12 +2,13 @@ import { redirect } from 'react-router'
 import { db, files, folders, projects, eq } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getProjectFolderAndProject } from 'app/server/services/folder.server'
+import { FolderService } from 'app/server/services/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.clear'
 
 export const loader = () => redirect('/projects')
 
+// TODO: remove cover if inside folder
 export const action = async ({ request, params }: Route.ActionArgs) => {
   const user = await requireUser(request)
   const { id, projectId } = params
@@ -19,7 +20,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
   try {
     const { folders: folder, projects: project } =
-      await getProjectFolderAndProject({
+      await FolderService.getProjectFolderAndProject({
         folderId: id,
         projectId,
         userId: user.id,
@@ -31,18 +32,23 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       const newTotalFiles = project.totalFiles - folder.totalFiles
       const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
 
-      await tx
-        .update(files)
-        .set({ deletedAt: new Date(), folderId: null })
-        .where(eq(files.folderId, folder.id))
-      await tx
-        .update(folders)
-        .set({ totalFiles: 0, totalSize: '0' })
-        .where(eq(folders.id, folder.id))
-      await tx
-        .update(projects)
-        .set({ totalFiles: newTotalFiles, totalSize: newTotalSize.toString() })
-        .where(eq(projects.id, folder.projectId))
+      await Promise.allSettled([
+        tx
+          .update(files)
+          .set({ deletedAt: new Date(), folderId: null })
+          .where(eq(files.folderId, folder.id)),
+        tx
+          .update(folders)
+          .set({ totalFiles: 0, totalSize: '0' })
+          .where(eq(folders.id, folder.id)),
+        tx
+          .update(projects)
+          .set({
+            totalFiles: newTotalFiles,
+            totalSize: newTotalSize.toString(),
+          })
+          .where(eq(projects.id, folder.projectId)),
+      ])
     })
 
     return redirect(

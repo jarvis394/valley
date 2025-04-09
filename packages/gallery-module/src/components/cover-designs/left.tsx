@@ -1,8 +1,7 @@
 import React from 'react'
 import { type CoverDesignProps } from '.'
-import { cn } from '@valley/shared'
+import { cn, makeFileThumbnailPath } from '@valley/shared'
 import { getFormattedDate } from '../../utils/get-formatted-date'
-import { makeFilePath } from '../../utils/make-file-path'
 
 const LeftCover: React.FC<CoverDesignProps> = ({
   title,
@@ -16,7 +15,11 @@ const LeftCover: React.FC<CoverDesignProps> = ({
   style,
   ...props
 }) => {
-  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+  const path = makeFileThumbnailPath({
+    file: cover.file,
+    imageHost,
+    size: '2xl',
+  })
 
   return (
     <div
