@@ -16,7 +16,6 @@ import { ImageService } from './image.server'
 import { ProjectService } from './project.server'
 import { FolderService } from './folder.server'
 import { disk } from './drive.server'
-import contentDisposition from 'content-disposition'
 import { createReadableStreamFromReadable } from '@react-router/node'
 import { errors } from 'flydrive'
 
@@ -171,31 +170,14 @@ export class FileService {
     }
 
     try {
-      const metadata = await disk.getMetaData(path)
-      const data = await disk.getStream(path)
-      const headers = new Headers()
+      const [metadata, data] = await Promise.all([disk.getMetaData(path), disk.getStream(path)])
       const readable = createReadableStreamFromReadable(data)
 
-      if (!data) {
-        throw new Response('Not Found', {
-          status: 404,
-        })
+      return {
+        file,
+        metadata,
+        readable,
       }
-
-      headers.append(
-        'Content-Disposition',
-        contentDisposition(file.name || file.id, { type: 'inline' })
-      )
-      headers.append('Content-Length', metadata.contentLength.toString())
-      headers.append(
-        'Content-Type',
-        metadata.contentType || 'application/octet-stream'
-      )
-      headers.append('Cache-Control', 'public, max-age=31536000, immutable')
-      headers.append('Etag', metadata.etag)
-      return new Response(readable, {
-        headers,
-      })
     } catch (e) {
       if (e instanceof errors.E_CANNOT_READ_FILE) {
         throw new Response('Cannot read file, try again later', {
@@ -203,8 +185,8 @@ export class FileService {
         })
       }
       if (e instanceof errors.E_CANNOT_GET_METADATA) {
-        throw new Response('Not Found', {
-          status: 404,
+        throw new Response('Cannot get file metadata', {
+          status: 500,
         })
       }
 

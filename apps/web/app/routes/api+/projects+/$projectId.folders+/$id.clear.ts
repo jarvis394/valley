@@ -32,7 +32,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       const newTotalFiles = project.totalFiles - folder.totalFiles
       const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
 
-      await Promise.allSettled([
+      await Promise.all([
         tx
           .update(files)
           .set({ deletedAt: new Date(), folderId: null })
