@@ -42,7 +42,7 @@ const ClassicCover: React.FC<CoverDesignProps> = ({
       >
         <div
           className={cn(
-            'fade-in relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-b from-stone-950/32 to-transparent px-4 py-8 text-center'
+            'fade-in break-word relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-b from-stone-950/32 to-transparent px-4 py-8 text-center'
           )}
         >
           {dateShot && (

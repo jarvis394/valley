@@ -14,6 +14,7 @@ import {
   type Project,
   type User,
   File,
+  covers,
 } from '@valley/db'
 import { SerializedFolder } from '@valley/shared'
 
@@ -45,7 +46,7 @@ export class FolderService {
     return folder
   }
 
-  static async getProjectFolderAndProject({
+  static async getWithProject({
     folderId,
     projectId,
     userId,
@@ -58,8 +59,15 @@ export class FolderService {
       .select()
       .from(folders)
       .innerJoin(projects, eq(projects.id, projectId))
+      .leftJoin(covers, eq(covers.projectId, projectId))
+      .leftJoin(files, eq(files.id, covers.fileId))
       .where(and(eq(folders.id, folderId), eq(projects.userId, userId)))
-    return result
+    return {
+      folder: result?.folders,
+      project: result?.projects,
+      cover: result?.covers,
+      coverFile: result?.files,
+    }
   }
 
   static getProjectFolderFiles({

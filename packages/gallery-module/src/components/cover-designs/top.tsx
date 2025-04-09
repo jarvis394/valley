@@ -32,12 +32,15 @@ const TopCover: React.FC<CoverDesignProps> = ({
         {cover && (
           <Image
             className="h-auto max-h-full w-auto max-w-full rounded-2xl"
-            containerProps={{ className: 'mx-auto max-w-full' }}
+            containerProps={{
+              className:
+                'mx-auto max-w-full before:absolute before:inset-0 before:h-full before:w-full before:bg-stone-950/12 before:content-[""]',
+            }}
             file={cover.file}
             imageHost={imageHost}
           />
         )}
-        <div className="absolute inset-0 flex w-full flex-col items-center justify-center gap-3">
+        <div className="break-word absolute inset-0 flex w-full flex-col items-center justify-center gap-3 text-center">
           <h2 className="heading-48 font-heading">{title}</h2>
           {dateShot && (
             <p className="copy-16 opacity-80">

@@ -9,10 +9,10 @@ const LeftCover: React.FC<CoverDesignProps> = ({
   dateShot,
   timeZone,
   imageHost = '',
-  theme: _theme,
-  type: _type,
+  type,
   className,
   style,
+  theme: _theme,
   ...props
 }) => {
   const path = makeFileThumbnailPath({
@@ -37,7 +37,10 @@ const LeftCover: React.FC<CoverDesignProps> = ({
     >
       <div
         className={cn(
-          'fade-in relative z-100 flex w-full flex-col items-start gap-3 bg-linear-to-t from-stone-950/32 to-transparent p-16 text-center'
+          'fade-in break-word relative z-100 flex w-full flex-col items-start gap-3 bg-linear-to-t from-stone-950/32 to-transparent p-16',
+          {
+            'p-8': type === 'mobile',
+          }
         )}
       >
         <h2 className="heading-48 font-heading w-fit">{title}</h2>

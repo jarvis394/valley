@@ -18,7 +18,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
   try {
     const { file, folder, project } =
-      await FileService.getFileWithUserProjectAndFolder({
+      await FileService.getWithUserProjectAndFolder({
         userId: user.id,
         fileId: id,
       })
@@ -34,8 +34,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
         const newProjectTotalFiles = project.totalFiles - 1
         const newProjectTotalSize =
           Number(project.totalSize) - Number(file.size)
-
-        await tx
+        const deleteCoverPromise = tx
           .delete(covers)
           .where(
             and(
@@ -43,24 +42,31 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
               eq(covers.projectId, covers.projectId)
             )
           )
-        await tx
+        const deleteFilePromise = tx
           .update(files)
           .set({ deletedAt: new Date(), folderId: null })
           .where(eq(files.id, file.id))
-        await tx
+        const updateFolderSizePromise = tx
           .update(folders)
           .set({
             totalFiles: newFolderTotalFiles,
             totalSize: newFolderTotalSize.toString(),
           })
           .where(eq(folders.id, file.folderId))
-        await tx
+        const updateProjectSizePromise = tx
           .update(projects)
           .set({
             totalFiles: newProjectTotalFiles,
             totalSize: newProjectTotalSize.toString(),
           })
           .where(eq(projects.id, folder.projectId))
+
+        await Promise.all([
+          deleteCoverPromise,
+          deleteFilePromise,
+          updateFolderSizePromise,
+          updateProjectSizePromise,
+        ])
       })
     }
 

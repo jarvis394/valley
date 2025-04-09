@@ -38,7 +38,7 @@ const CenterCover: React.FC<CoverDesignProps> = ({
     >
       <div
         className={cn(
-          'fade-in relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-t from-stone-950/32 to-transparent px-4 py-8 text-center'
+          'fade-in break-word relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-t from-stone-950/32 to-transparent px-4 py-8 text-center'
         )}
       >
         <h2 className="heading-48 font-heading">{title}</h2>

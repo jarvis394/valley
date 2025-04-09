@@ -26,7 +26,10 @@ export class TusService {
   static TUS_ENDPOINT_PATH = '/api/storage'
 
   static getFileIdFromRequest(req: Request, lastPath?: string) {
-    return req.url?.replace(TusService.TUS_ENDPOINT_PATH + '/', '') || lastPath
+    const url = new URL(req.url)
+    return (
+      url.pathname.replace(TusService.TUS_ENDPOINT_PATH + '/', '') || lastPath
+    )
   }
 
   static namingFunction(

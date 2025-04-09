@@ -35,7 +35,7 @@ const AlbumCover: React.FC<CoverDesignProps> = ({
           imageHost={imageHost}
         />
       )}
-      <div className="flex w-full flex-col gap-3">
+      <div className="break-word flex w-full flex-col gap-3">
         <h2 className="heading-48 font-heading">{title}</h2>
         {dateShot && (
           <p className="copy-16 opacity-80">

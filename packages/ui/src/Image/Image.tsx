@@ -133,7 +133,7 @@ const Image: React.FC<ImageProps> = ({
       {!error && (
         <img
           {...props}
-          className={cn(className, 'fade')}
+          className={cn(className, 'fade object-cover')}
           data-fade-in={isHydrated ? loaded : true}
           ref={mergedRef}
           onLoad={onLoad}

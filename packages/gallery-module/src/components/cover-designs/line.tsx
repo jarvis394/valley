@@ -29,7 +29,7 @@ const LineCover: React.FC<CoverDesignProps> = ({
         className,
       })}
     >
-      <div className="fade-in relative flex flex-col items-center gap-3 py-8 text-center">
+      <div className="fade-in break-word relative flex flex-col items-center gap-3 py-8 text-center">
         <h2 className="heading-48 font-heading">{title}</h2>
         {dateShot && (
           <p className="copy-16 opacity-80">

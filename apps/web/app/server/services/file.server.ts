@@ -47,21 +47,7 @@ export class FileService {
   static readonly PROJECT_PATH_PREFIX = 'project-'
   static readonly FOLDER_PATH_PREFIX = 'folder-'
 
-  static async getFileWithProjectAndFolder({ fileId }: { fileId: File['id'] }) {
-    const [result] = await db
-      .select()
-      .from(files)
-      .leftJoin(folders, eq(folders.id, files.folderId))
-      .leftJoin(projects, eq(projects.id, folders.projectId))
-      .where(eq(files.id, fileId))
-    return {
-      file: result.files,
-      project: result.projects,
-      folder: result.folders,
-    }
-  }
-
-  static async getFileWithUserProjectAndFolder({
+  static async getWithUserProjectAndFolder({
     userId,
     fileId,
   }: {
@@ -170,7 +156,10 @@ export class FileService {
     }
 
     try {
-      const [metadata, data] = await Promise.all([disk.getMetaData(path), disk.getStream(path)])
+      const [metadata, data] = await Promise.all([
+        disk.getMetaData(path),
+        disk.getStream(path),
+      ])
       const readable = createReadableStreamFromReadable(data)
 
       return {
