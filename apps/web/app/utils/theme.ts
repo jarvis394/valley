@@ -1,7 +1,7 @@
 import { Theme } from '@valley/shared'
 import * as cookie from 'cookie'
 
-const themeCookieName = 'valley_theme'
+const themeCookieName = 'valley.theme'
 
 export function getTheme(request: Request): Theme | null {
   const cookieHeader = request.headers.get('cookie')

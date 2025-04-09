@@ -87,11 +87,21 @@
     "transliteration": "^2.3.5",
     "turbo-stream": "^3.1.0",
     "tus-js-client": "^4.3.1",
-    "use-sortablejs": "^1.1.7",
+    "use-sortablejs": "^1.2.0",
     "usehooks-ts": "^3.1.1",
     "vite-env-only": "^3.0.3",
     "zod": "^3.24.2",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@tus/server": "^2.0.0",
+    "@tus/gcs-store": "^2.0.0",
+    "@tus/file-store": "^2.0.0",
+    "@tus/s3-store": "^2.0.0",
+    "@google-cloud/storage": "^7.16.0",
+    "@laosb/exifr": "^7.2.1",
+    "flydrive": "^1.1.1",
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/lib-storage": "^3.758.0",
+    "content-disposition": "^0.5.4"
   },
   "devDependencies": {
     "@csstools/postcss-media-minmax": "^2.0.7",

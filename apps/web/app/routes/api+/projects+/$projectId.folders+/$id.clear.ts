@@ -1,8 +1,8 @@
 import { redirect } from 'react-router'
-import { db, files, folders, projects, eq } from '@valley/db'
+import { db, files, folders, projects, eq, covers } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getProjectFolderAndProject } from 'app/server/services/folder.server'
+import { FolderService } from 'app/server/services/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.clear'
 
@@ -18,31 +18,44 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   invariantResponse(projectId, 'No project ID found in params')
 
   try {
-    const { folders: folder, projects: project } =
-      await getProjectFolderAndProject({
-        folderId: id,
-        projectId,
-        userId: user.id,
-      })
+    const { coverFile, folder, project } = await FolderService.getWithProject({
+      folderId: id,
+      projectId,
+      userId: user.id,
+    })
 
     invariantResponse(folder, 'Folder not found', { status: 404 })
 
     await db.transaction(async (tx) => {
       const newTotalFiles = project.totalFiles - folder.totalFiles
       const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
-
-      await tx
+      const deleteFilesPromise = tx
         .update(files)
         .set({ deletedAt: new Date(), folderId: null })
         .where(eq(files.folderId, folder.id))
-      await tx
+      const updateFolderSizePromise = tx
         .update(folders)
         .set({ totalFiles: 0, totalSize: '0' })
         .where(eq(folders.id, folder.id))
-      await tx
+      const updateProjectSizePromise = tx
         .update(projects)
-        .set({ totalFiles: newTotalFiles, totalSize: newTotalSize.toString() })
+        .set({
+          totalFiles: newTotalFiles,
+          totalSize: newTotalSize.toString(),
+        })
         .where(eq(projects.id, folder.projectId))
+      const deleteCoverPromise =
+        coverFile?.folderId === id &&
+        tx.delete(covers).where(eq(covers.projectId, folder.projectId))
+
+      await Promise.all(
+        [
+          deleteFilesPromise,
+          updateFolderSizePromise,
+          updateProjectSizePromise,
+          deleteCoverPromise,
+        ].filter(Boolean)
+      )
     })
 
     return redirect(

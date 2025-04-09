@@ -42,6 +42,7 @@ const Avatar: React.FC<AvatarProps> = ({
       {file && (
         <Image
           {...props}
+          className="h-full w-full"
           file={file}
           thumbnail={thumbnail}
           imageHost={imageHost}
@@ -49,7 +50,15 @@ const Avatar: React.FC<AvatarProps> = ({
           height={64}
         />
       )}
-      {src && !file && <Image {...props} src={src} width={28} height={28} />}
+      {src && !file && (
+        <Image
+          {...props}
+          className="h-full w-full"
+          src={src}
+          width={28}
+          height={28}
+        />
+      )}
       {!src && children}
     </div>
   )

@@ -1,8 +1,7 @@
 import React from 'react'
 import { type CoverDesignProps } from '.'
-import { cn } from '@valley/shared'
+import { cn, makeFileThumbnailPath } from '@valley/shared'
 import { getFormattedDate } from '../../utils/get-formatted-date'
-import { makeFilePath } from '../../utils/make-file-path'
 
 const LeftCover: React.FC<CoverDesignProps> = ({
   title,
@@ -10,13 +9,17 @@ const LeftCover: React.FC<CoverDesignProps> = ({
   dateShot,
   timeZone,
   imageHost = '',
-  theme: _theme,
-  type: _type,
+  type,
   className,
   style,
+  theme: _theme,
   ...props
 }) => {
-  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+  const path = makeFileThumbnailPath({
+    file: cover.file,
+    imageHost,
+    size: '2xl',
+  })
 
   return (
     <div
@@ -34,7 +37,10 @@ const LeftCover: React.FC<CoverDesignProps> = ({
     >
       <div
         className={cn(
-          'fade-in relative z-100 flex w-full flex-col items-start gap-3 bg-linear-to-t from-stone-950/32 to-transparent p-16 text-center'
+          'fade-in break-word relative z-100 flex w-full flex-col items-start gap-3 bg-linear-to-t from-stone-950/32 to-transparent p-16',
+          {
+            'p-8': type === 'mobile',
+          }
         )}
       >
         <h2 className="heading-48 font-heading w-fit">{title}</h2>

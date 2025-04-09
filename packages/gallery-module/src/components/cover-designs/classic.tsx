@@ -1,9 +1,8 @@
 import React from 'react'
 import { ChevronDown } from 'geist-ui-icons'
 import { type CoverDesignProps } from '.'
-import { cn } from '@valley/shared'
+import { cn, makeFileThumbnailPath } from '@valley/shared'
 import { getFormattedDate } from '../../utils/get-formatted-date'
-import { makeFilePath } from '../../utils/make-file-path'
 
 const ClassicCover: React.FC<CoverDesignProps> = ({
   title,
@@ -16,7 +15,11 @@ const ClassicCover: React.FC<CoverDesignProps> = ({
   className,
   ...props
 }) => {
-  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+  const path = makeFileThumbnailPath({
+    file: cover.file,
+    imageHost,
+    size: '2xl',
+  })
 
   return (
     <div
@@ -39,7 +42,7 @@ const ClassicCover: React.FC<CoverDesignProps> = ({
       >
         <div
           className={cn(
-            'fade-in relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-b from-stone-950/32 to-transparent px-4 py-8 text-center'
+            'fade-in break-word relative z-100 flex w-full flex-col items-center gap-3 bg-linear-to-b from-stone-950/32 to-transparent px-4 py-8 text-center'
           )}
         >
           {dateShot && (

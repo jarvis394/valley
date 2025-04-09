@@ -4,9 +4,7 @@ const schema = z.object({
   NODE_ENV: z.enum(['production', 'development', 'staging', 'test'] as const),
   DATABASE_URL: z.string(),
   REDIS_URL: z.string().optional(),
-  TUSD_URL: z.string(),
   WEB_SERVICE_URL: z.string(),
-  UPLOAD_SERVICE_URL: z.string(),
   GALLERY_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
   RESEND_API_KEY: z.string().optional().default('MOCK_'),
@@ -25,6 +23,18 @@ const schema = z.object({
   // VK OAuth
   VK_CLIENT_ID: z.string().default('MOCK_VK_CLIENT_ID'),
   VK_CLIENT_SECRET: z.string().default('MOCK_VK_CLIENT_SECRET'),
+
+  DRIVE_DISK: z.enum(['fs', 's3', 'gcs']).default('fs'),
+
+  AWS_ACCESS_KEY_ID: z.string().optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().optional(),
+  AWS_REGION: z.string().optional(),
+  AWS_ENDPOINT: z.string().optional(),
+  AWS_BUCKET: z.string().optional(),
+
+  GCS_KEY_FILENAME: z.string().optional(),
+  GCS_BUCKET: z.string().optional(),
+  GCS_PROJECT_ID: z.string().optional(),
 })
 
 export function init() {
@@ -52,9 +62,7 @@ export function init() {
 export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
-    UPLOAD_SERVICE_URL: process.env.UPLOAD_SERVICE_URL,
     GALLERY_SERVICE_URL: process.env.GALLERY_SERVICE_URL,
-    TUSD_URL: process.env.TUSD_URL,
   }
 }
 

@@ -1,9 +1,8 @@
 import React from 'react'
 import { ChevronDown } from 'geist-ui-icons'
 import { type CoverDesignProps } from '.'
-import { cn } from '@valley/shared'
+import { cn, makeFileThumbnailPath } from '@valley/shared'
 import { getFormattedDate } from '../../utils/get-formatted-date'
-import { makeFilePath } from '../../utils/make-file-path'
 
 const SplitCover: React.FC<CoverDesignProps> = ({
   title,
@@ -16,7 +15,11 @@ const SplitCover: React.FC<CoverDesignProps> = ({
   className,
   ...props
 }) => {
-  const path = makeFilePath({ file: cover.file, imageHost, size: '2xl' })
+  const path = makeFileThumbnailPath({
+    file: cover.file,
+    imageHost,
+    size: '2xl',
+  })
 
   return (
     <div
@@ -35,7 +38,7 @@ const SplitCover: React.FC<CoverDesignProps> = ({
         }}
         className={'fade-in flex h-full basis-1/2 bg-cover bg-no-repeat'}
       />
-      <div className="fade-in relative flex h-full basis-1/2 flex-col items-center justify-between gap-4 py-8 text-center">
+      <div className="fade-in break-word relative flex h-full basis-1/2 flex-col items-center justify-between gap-4 py-8 text-center">
         <span />
         <div className="flex flex-col gap-3">
           <h2 className="heading-48 font-heading">{title}</h2>

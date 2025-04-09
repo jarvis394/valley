@@ -1055,3 +1055,9 @@
     animation-delay: 1s;
   }
 }
+
+@layer components {
+  .break-word {
+    word-break: break-word;
+  }
+}

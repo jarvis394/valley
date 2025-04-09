@@ -63,8 +63,6 @@ export default async function handleRequest(...args: DocRequestArgs) {
                 fetch: {
                   'connect-src': [
                     MODE === 'development' ? 'ws:' : undefined,
-                    process.env.TUSD_URL,
-                    process.env.UPLOAD_SERVICE_URL,
                     "'self'",
                   ],
                   'font-src': ["'self'"],
@@ -74,7 +72,6 @@ export default async function handleRequest(...args: DocRequestArgs) {
                     'data:',
                     'https://avatars.githubusercontent.com',
                     '*.userapi.com',
-                    process.env.UPLOAD_SERVICE_URL,
                   ],
                   'script-src': [
                     "'strict-dynamic'",

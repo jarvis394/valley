@@ -2,7 +2,7 @@ import { redirect } from 'react-router'
 import { covers, db, files, folders, projects, and, eq } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getFileWithUserProjectAndFolder } from 'app/server/services/file.server'
+import { FileService } from 'app/server/services/file.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.delete'
 
@@ -17,10 +17,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   invariantResponse(id, 'No file ID found in params')
 
   try {
-    const { file, folder, project } = await getFileWithUserProjectAndFolder({
-      userId: user.id,
-      fileId: id,
-    })
+    const { file, folder, project } =
+      await FileService.getWithUserProjectAndFolder({
+        userId: user.id,
+        fileId: id,
+      })
 
     invariantResponse(file, 'File not found', { status: 404 })
 
@@ -33,8 +34,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
         const newProjectTotalFiles = project.totalFiles - 1
         const newProjectTotalSize =
           Number(project.totalSize) - Number(file.size)
-
-        await tx
+        const deleteCoverPromise = tx
           .delete(covers)
           .where(
             and(
@@ -42,24 +42,31 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
               eq(covers.projectId, covers.projectId)
             )
           )
-        await tx
+        const deleteFilePromise = tx
           .update(files)
           .set({ deletedAt: new Date(), folderId: null })
           .where(eq(files.id, file.id))
-        await tx
+        const updateFolderSizePromise = tx
           .update(folders)
           .set({
             totalFiles: newFolderTotalFiles,
             totalSize: newFolderTotalSize.toString(),
           })
           .where(eq(folders.id, file.folderId))
-        await tx
+        const updateProjectSizePromise = tx
           .update(projects)
           .set({
             totalFiles: newProjectTotalFiles,
             totalSize: newProjectTotalSize.toString(),
           })
           .where(eq(projects.id, folder.projectId))
+
+        await Promise.all([
+          deleteCoverPromise,
+          deleteFilePromise,
+          updateFolderSizePromise,
+          updateProjectSizePromise,
+        ])
       })
     }
 

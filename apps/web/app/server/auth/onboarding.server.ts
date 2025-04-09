@@ -18,7 +18,7 @@ export const onboardingSessionStorage = createCookieSessionStorage<{
   phone?: string
 }>({
   cookie: {
-    name: 'valley_onboarding',
+    name: 'valley.onboarding',
     sameSite: 'lax',
     path: '/',
     httpOnly: true,

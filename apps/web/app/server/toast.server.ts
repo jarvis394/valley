@@ -8,7 +8,7 @@ export const toastSessionStorage = createCookieSessionStorage<{
   toast: Toast
 }>({
   cookie: {
-    name: 'valley_toast',
+    name: 'valley.toast',
     sameSite: 'lax',
     path: '/',
     httpOnly: true,
