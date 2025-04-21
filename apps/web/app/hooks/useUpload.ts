@@ -19,7 +19,7 @@ import { invalidateCache } from 'app/utils/cache'
 import { getFilesCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 import { useProjectsStore } from 'app/stores/projects'
-import { parseCookies, useRootLoaderData } from 'app/utils/misc'
+import { TUS_ENDPOINT_PATH } from 'app/config/constants'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -31,7 +31,6 @@ type UseUploadProps = {
 export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
   const inputId = useId()
   const revalidator = useRevalidator()
-  const rootContext = useRootLoaderData()
   const $root = useRef<HTMLElement>(null)
   const $input = useRef<HTMLInputElement>(
     isClientSide ? document.createElement('input') : null
@@ -114,17 +113,12 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       // Allows duplicate files
       onBeforeFileAdded: () => true,
       onBeforeUpload(files) {
-        console.log(files)
+        console.log('onBeforeUpload:', files)
         return files
       },
     }).use(Tus, {
-      endpoint: rootContext?.ENV.TUSD_URL,
+      endpoint: TUS_ENDPOINT_PATH,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
-      onBeforeRequest(req) {
-        const cookies = parseCookies()
-        const session = cookies['valley.session_token']
-        req.setHeader('Authorization', session)
-      },
       onAfterResponse: handleUploadResponse,
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,

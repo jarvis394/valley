@@ -18,12 +18,12 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
+    <div className="flex h-full w-full flex-col items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-center max-w-xs w-full"
+        className="flex w-full max-w-xs flex-col items-center justify-center"
       >
-        <h1 className="text-2xl font-medium mb-4">@valley/gallery</h1>
+        <h1 className="mb-4 text-2xl font-medium">@valley/gallery</h1>
         <Input
           name="username"
           size="lg"

@@ -1,10 +1,8 @@
 import { ExifData, ExifDataKey } from '@valley/db'
-import dec2frac from '#utils/dec2frac'
-import drive from '@adonisjs/drive/services/main'
-import { Readable } from 'node:stream'
+import { dec2frac } from '../../utils/misc'
 import sharp from 'sharp'
-import logger from '@adonisjs/core/services/logger'
 import exifReader from 'exif-reader'
+import { disk } from './drive.server'
 
 type ImageMetadata = {
   width?: number
@@ -38,30 +36,13 @@ const extractFields: Set<ExifDataKey> = new Set([
   'Orientation',
 ])
 
-export default class ImageService {
-  async reader(input: Readable, offset?: number, length?: number) {
-    const chunks = []
-
-    for await (const chunk of input) {
-      const buffer = Buffer.from(chunk)
-
-      if (length && offset && buffer.length >= offset + length) {
-        break
-      }
-
-      chunks.push(buffer)
-    }
-
-    return Buffer.concat(chunks)
-  }
-
+export class ImageService {
   /**
    * Extracts EXIF from S3 object (supports RAW, JPEG, WEBP and PNG formats)
    * And gets width/height of an image from metadata
    * @returns Parsed data
    */
-  async parseImage(filePath: string): Promise<ImageParsedData> {
-    const disk = drive.use()
+  static async parseImage(filePath: string): Promise<ImageParsedData> {
     let exifParsedData: ExifParsedData = {
       ok: false,
       reason: 'Internal parsing error',
@@ -118,7 +99,7 @@ export default class ImageService {
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(`Image parsing error (${filePath}): ${e.message}`)
+        console.error(`Image parsing error (${filePath}): ${e.message}`)
         exifParsedData = { ok: false, reason: e.message }
         metadataParsedData = { ok: false, reason: e.message }
       }

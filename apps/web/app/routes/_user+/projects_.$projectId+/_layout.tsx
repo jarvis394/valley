@@ -14,7 +14,7 @@ import {
   useCachedData,
 } from 'app/utils/cache'
 import type { Folder, Project } from '@valley/db'
-import { getUserProject } from 'app/server/services/project.server'
+import { ProjectService } from 'app/server/services/project.server'
 import { useProjectsStore } from 'app/stores/projects'
 import { FolderWithFiles } from '@valley/shared'
 import { requireUserId } from 'app/server/auth/auth.server'
@@ -26,10 +26,13 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { projectId } = params
   const timings = makeTimings('project loader')
   const userId = await requireUserId(request)
-  const project = await time(getUserProject({ userId, projectId }), {
-    timings,
-    type: 'get project',
-  })
+  const project = await time(
+    ProjectService.getUserProject({ userId, projectId }),
+    {
+      timings,
+      type: 'get project',
+    }
+  )
 
   if (!project) {
     return redirect('/projects')

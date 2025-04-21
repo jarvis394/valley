@@ -1,28 +1,12 @@
-import type { NewProject } from '@valley/db'
 import Stack from '@valley/ui/Stack'
 import TextField from '@valley/ui/TextField'
 import Fieldset from 'app/components/Fieldset/Fieldset'
 import { useProject } from 'app/utils/project'
 import React from 'react'
-import { z } from 'zod'
 import { ProjectWithFolders } from '@valley/shared'
+import { ProjectEditSchema, action as rootAction } from './_layout'
 
-const ProjectEditSchema: z.ZodType<NewProject> = z.object({
-  id: z.string(),
-  title: z.string(),
-  slug: z.string(),
-  totalFiles: z.number(),
-  totalSize: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  dateShot: z.date(),
-  storedUntil: z.date().or(z.null()),
-  language: z.string(),
-  protected: z.boolean(),
-  passwordHash: z.string().or(z.null()),
-  userId: z.string(),
-  translationStringsId: z.string().or(z.null()),
-})
+export const action = rootAction
 
 const ProjectSettingsGeneral: React.FC<{
   project?: ProjectWithFolders | null

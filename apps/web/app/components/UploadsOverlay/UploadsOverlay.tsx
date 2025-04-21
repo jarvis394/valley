@@ -44,7 +44,11 @@ const UploadsOverlayHeader: React.FC<UploadsOverlayHeaderProps> = ({
       <div className={styles.uploadsOverlay__headerContent}>
         <div className={styles.uploadsOverlay__spinner}>
           {!isUploading && (
-            <CheckCircleFill color="var(--green-700)" width={20} height={20} />
+            <CheckCircleFill
+              color="var(--ds-green-700)"
+              width={20}
+              height={20}
+            />
           )}
           {isUploading && <Spinner />}
         </div>
@@ -140,7 +144,7 @@ const UploadsOverlay: React.FC = () => {
                     </div>
                     <div data-hidden={!e.isUploaded}>
                       <CheckCircleFill
-                        color="var(--green-700)"
+                        color="var(--ds-green-700)"
                         width={24}
                         height={24}
                       />

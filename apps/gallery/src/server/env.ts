@@ -5,7 +5,6 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   REDIS_URL: z.string().optional(),
   TUSD_URL: z.string(),
-  UPLOAD_SERVICE_URL: z.string(),
   SESSION_SECRET: z.string(),
   GALLERY_PORT: z.string(),
   HOST: z.string().optional(),
@@ -32,7 +31,6 @@ export function init() {
 export function getEnv() {
   return {
     MODE: process.env.NODE_ENV,
-    UPLOAD_SERVICE_URL: process.env.UPLOAD_SERVICE_URL,
     TUSD_URL: process.env.TUSD_URL,
   }
 }

@@ -13,7 +13,7 @@ import {
   time,
 } from 'app/server/timing.server'
 import { data, redirect, ShouldRevalidateFunction } from 'react-router'
-import { getProjectFolderFiles } from 'app/server/services/folder.server'
+import { FolderService } from 'app/server/services/folder.server'
 import { GeneralErrorBoundary } from 'app/components/ErrorBoundary'
 import React from 'react'
 import styles from './project.module.css'
@@ -38,7 +38,11 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   const result = await time(
-    getProjectFolderFiles({ userId: session.user.id, projectId, folderId }),
+    FolderService.getProjectFolderFiles({
+      userId: session.user.id,
+      projectId,
+      folderId,
+    }),
     {
       timings,
       type: 'get folder files',

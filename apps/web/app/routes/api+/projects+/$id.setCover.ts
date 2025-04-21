@@ -5,8 +5,8 @@ import { covers, db } from '@valley/db'
 import { invariantResponse } from 'app/utils/invariant'
 import { getValidatedFormData } from 'remix-hook-form'
 import { z } from 'zod'
-import { getUserProject } from 'app/server/services/project.server'
-import { getUserFile } from 'app/server/services/file.server'
+import { ProjectService } from 'app/server/services/project.server'
+import { FileService } from 'app/server/services/file.server'
 import { Route } from './+types/$id.setCover'
 
 export const ProjectSetCoverSchema = z.object({
@@ -39,10 +39,13 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     )
   }
 
-  const project = await getUserProject({ userId: user.id, projectId })
+  const project = await ProjectService.getUserProject({
+    userId: user.id,
+    projectId,
+  })
   invariantResponse(project, 'Project not found', { status: 404 })
 
-  const file = await getUserFile({
+  const file = await FileService.getUserFile({
     userId: user.id,
     fileId: submissionData.fileId,
   })

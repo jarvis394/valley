@@ -2,7 +2,7 @@ import { redirect } from 'react-router'
 import { covers, db, files, folders, projects, and, eq } from '@valley/db'
 import { redirectToKey } from 'app/config/paramsKeys'
 import { requireUser } from 'app/server/auth/auth.server'
-import { getFileWithUserProjectAndFolder } from 'app/server/services/file.server'
+import { FileService } from 'app/server/services/file.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.delete'
 
@@ -17,51 +17,58 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   invariantResponse(id, 'No file ID found in params')
 
   try {
-    const { file, folder, project } = await getFileWithUserProjectAndFolder({
-      userId: user.id,
-      fileId: id,
-    })
+    const { file, folder, project } =
+      await FileService.getWithUserProjectAndFolder({
+        userId: user.id,
+        fileId: id,
+      })
 
     invariantResponse(file, 'File not found', { status: 404 })
+    invariantResponse(folder, 'Folder not found', { status: 404 })
+    invariantResponse(project, 'Project not found', { status: 404 })
 
-    if (folder) {
-      await db.transaction(async (tx) => {
-        if (!folder || !project || !file.folderId) return
+    await db.transaction(async (tx) => {
+      if (!folder || !project || !file.folderId) return
 
-        const newFolderTotalFiles = folder.totalFiles - 1
-        const newFolderTotalSize = Number(folder.totalSize) - Number(file.size)
-        const newProjectTotalFiles = project.totalFiles - 1
-        const newProjectTotalSize =
-          Number(project.totalSize) - Number(file.size)
-
-        await tx
-          .delete(covers)
-          .where(
-            and(
-              eq(covers.fileId, file.id),
-              eq(covers.projectId, covers.projectId)
-            )
+      const newFolderTotalFiles = folder.totalFiles - 1
+      const newFolderTotalSize = Number(folder.totalSize) - Number(file.size)
+      const newProjectTotalFiles = project.totalFiles - 1
+      const newProjectTotalSize = Number(project.totalSize) - Number(file.size)
+      const deleteCoverPromise = tx
+        .delete(covers)
+        .where(
+          and(
+            eq(covers.fileId, file.id),
+            eq(covers.projectId, covers.projectId)
           )
-        await tx
-          .update(files)
-          .set({ deletedAt: new Date(), folderId: null })
-          .where(eq(files.id, file.id))
-        await tx
-          .update(folders)
-          .set({
-            totalFiles: newFolderTotalFiles,
-            totalSize: newFolderTotalSize.toString(),
-          })
-          .where(eq(folders.id, file.folderId))
-        await tx
-          .update(projects)
-          .set({
-            totalFiles: newProjectTotalFiles,
-            totalSize: newProjectTotalSize.toString(),
-          })
-          .where(eq(projects.id, folder.projectId))
-      })
-    }
+        )
+      const deleteFilePromise = tx.delete(files).where(eq(files.id, file.id))
+      const deleteFileFromStoragePromise = FileService.deleteFromStorageByPath(
+        file.path
+      )
+      const updateFolderSizePromise = tx
+        .update(folders)
+        .set({
+          totalFiles: newFolderTotalFiles,
+          totalSize: newFolderTotalSize.toString(),
+        })
+        .where(eq(folders.id, file.folderId))
+      const updateProjectSizePromise = tx
+        .update(projects)
+        .set({
+          totalFiles: newProjectTotalFiles,
+          totalSize: newProjectTotalSize.toString(),
+        })
+        .where(eq(projects.id, folder.projectId))
+
+      await Promise.all([
+        deleteCoverPromise,
+        deleteFilePromise,
+        deleteFileFromStoragePromise,
+        updateFolderSizePromise,
+        updateProjectSizePromise,
+      ])
+    })
 
     if (redirectTo) return redirect(redirectTo)
     if (folder)

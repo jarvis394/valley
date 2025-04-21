@@ -24,7 +24,7 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { ProjectWithFolders } from '@valley/shared'
 import { cache, createClientLoaderCache, useCachedData } from 'app/utils/cache'
 import Menu from '@valley/ui/Menu'
-import { getUserProjects } from 'app/server/services/project.server'
+import { ProjectService } from 'app/server/services/project.server'
 import { useHydrated } from 'remix-utils/use-hydrated'
 import { auth } from '@valley/auth'
 import { Route } from './+types/_index'
@@ -39,10 +39,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     return redirect('/auth/login')
   }
 
-  const projects = await time(getUserProjects({ userId: session.user.id }), {
-    timings,
-    type: 'find projects',
-  })
+  const projects = await time(
+    ProjectService.getUserProjects({ userId: session.user.id }),
+    {
+      timings,
+      type: 'find projects',
+    }
+  )
 
   return data(
     { projects },

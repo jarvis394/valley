@@ -1,18 +1,9 @@
-import env from '#start/env'
 import { DataStore, Server, ServerOptions } from '@tus/server'
 import { GCSStore } from '@tus/gcs-store'
 import { FileStore } from '@tus/file-store'
 import { S3Store } from '@tus/s3-store'
-import {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  GCS_KEY_FILENAME,
-  GCS_PROJECT_ID,
-} from '#config/drive'
 import { Storage } from '@google-cloud/storage'
 import type { Bucket } from '@google-cloud/storage'
-import { ALLOWED_ORIGINS } from '#config/cors'
-import FileService from '#services/file_service'
 import {
   BaseTusHookResponseErrorBody,
   MAX_UPLOAD_FILE_SIZE,
@@ -20,30 +11,26 @@ import {
   TusHookType,
   TusUploadMetadata,
 } from '@valley/shared'
-import { inject } from '@adonisjs/core'
-import { IncomingMessage } from 'node:http'
 import deburr from 'lodash.deburr'
-import { TusHookResponseBuilder } from '#lib/tus_hook_response_builder'
-import { getProjectFolder } from '@valley/db'
+import { TusHookResponseBuilder } from 'app/server/utils/tus-hook-response-builder'
 import { auth } from '@valley/auth'
+import { FileService } from './file.server'
+import { FolderService } from './folder.server'
+import { TUS_ENDPOINT_PATH } from 'app/config/constants'
 
 const gcsStorage = new Storage({
-  keyFilename: GCS_KEY_FILENAME,
-  projectId: GCS_PROJECT_ID,
+  keyFilename: process.env.GCS_KEY_FILENAME,
+  projectId: process.env.GCS_PROJECT_ID,
 })
 
-@inject()
-export default class TusService {
-  constructor(private fileService: FileService) {}
-
-  static TUS_ENDPOINT_PATH = '/api/storage'
-
-  static getFileIdFromRequest(req: IncomingMessage, lastPath?: string) {
-    return req.url?.replace(TusService.TUS_ENDPOINT_PATH + '/', '') || lastPath
+export class TusService {
+  static getFileIdFromRequest(req: Request, lastPath?: string) {
+    const url = new URL(req.url)
+    return url.pathname.replace(TUS_ENDPOINT_PATH + '/', '') || lastPath
   }
 
   static namingFunction(
-    _req: IncomingMessage,
+    _req: Request,
     metadata?: Record<string, string | null>
   ) {
     if (!metadata) return crypto.randomUUID()
@@ -59,9 +46,7 @@ export default class TusService {
 
   static makeGCSStore() {
     return new GCSStore({
-      // Type is wrong in @tus/gcs-store
-      // @ts-expect-error
-      bucket: gcsStorage.bucket(env.get('GCS_BUCKET')!) as Bucket,
+      bucket: gcsStorage.bucket(process.env.GCS_BUCKET!) as Bucket,
     })
   }
 
@@ -78,20 +63,20 @@ export default class TusService {
         // Fix for B2 storage (disables checksum header)
         requestChecksumCalculation: 'WHEN_REQUIRED',
         responseChecksumValidation: 'WHEN_REQUIRED',
-        bucket: env.get('AWS_BUCKET')!,
-        endpoint: env.get('AWS_ENDPOINT'),
-        region: env.get('AWS_REGION'),
+        bucket: process.env.AWS_BUCKET!,
+        endpoint: process.env.AWS_ENDPOINT,
+        region: process.env.AWS_REGION,
         forcePathStyle: true,
         credentials: {
-          accessKeyId: AWS_ACCESS_KEY_ID || '',
-          secretAccessKey: AWS_SECRET_ACCESS_KEY || '',
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
         },
       },
     })
   }
 
   makeTusServer() {
-    const storageDriver = env.get('DRIVE_DISK')
+    const storageDriver = process.env.DRIVE_DISK
     let datastore: DataStore
 
     switch (storageDriver) {
@@ -109,34 +94,22 @@ export default class TusService {
     }
 
     return new Server({
-      path: TusService.TUS_ENDPOINT_PATH,
+      path: TUS_ENDPOINT_PATH,
       datastore,
       allowedCredentials: true,
       respectForwardedHeaders: true,
-      allowedOrigins: ALLOWED_ORIGINS,
       maxSize: MAX_UPLOAD_FILE_SIZE,
       namingFunction: TusService.namingFunction,
       getFileIdFromRequest: TusService.getFileIdFromRequest,
       onIncomingRequest: this.handleIncomingRequest?.bind(this),
-      onUploadCreate: this.handlUploadCreate?.bind(this),
+      onUploadCreate: this.handleUploadCreate?.bind(this),
       onUploadFinish: this.handleUploadFinish?.bind(this),
     })
   }
 
-  async getSessionFromRequest(req: IncomingMessage) {
-    const headers = new Headers()
-    Object.entries(req.headers).forEach((entry) => {
-      const [key, value] = entry
-      value && headers.append(key, value.toString())
-    })
-    const authCookie = encodeURIComponent(headers.get('authorization') || '')
-    headers.set('Cookie', 'valley.session_token=' + authCookie)
-    const session = await auth.api.getSession({
-      headers,
-    })
-
-    if (!session) {
-      throw new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
+  async getSessionFromRequest(req: Request) {
+    const errorResponse =
+      new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
         .setStatusCode(401)
         .setBody({
           ok: false,
@@ -144,16 +117,23 @@ export default class TusService {
           statusCode: 401,
         })
         .build()
-    }
 
-    return session
+    try {
+      const session = await auth.api.getSession({
+        headers: req.headers,
+      })
+
+      if (!session) {
+        throw errorResponse
+      }
+
+      return session
+    } catch (e) {
+      throw errorResponse
+    }
   }
 
-  handleIncomingRequest: ServerOptions['onIncomingRequest'] = async (
-    req,
-    res,
-    _uploadId
-  ) => {
+  handleIncomingRequest: ServerOptions['onIncomingRequest'] = async (req) => {
     let operation: 'create' | 'upload' | 'download' | 'default'
     switch (req.method) {
       case 'POST':
@@ -175,23 +155,18 @@ export default class TusService {
     if (operation === 'create' || operation === 'upload') return
     // Disable downloads
     if (operation === 'download') {
-      res.write(
-        JSON.stringify({
+      throw new TusHookResponseBuilder<BaseTusHookResponseErrorBody>()
+        .setStatusCode(401)
+        .setBody({
           ok: false,
-          statusCode: 401,
           message: 'Download is not allowed in Tus instance',
+          statusCode: 401,
         })
-      )
-      res.end()
-      return
+        .build()
     }
   }
 
-  handlUploadCreate: ServerOptions['onUploadCreate'] = async (
-    req,
-    res,
-    upload
-  ) => {
+  handleUploadCreate: ServerOptions['onUploadCreate'] = async (req, upload) => {
     const session = await this.getSessionFromRequest(req)
     const metadata = upload.metadata as TusUploadMetadata
 
@@ -199,7 +174,7 @@ export default class TusService {
       throw { status_code: 400, message: 'No metadata found' }
     }
 
-    const uploadFolder = await getProjectFolder({
+    const uploadFolder = await FolderService.getProjectFolder({
       folderId: metadata['folder-id'],
       projectId: metadata['project-id'],
       userId: session.user.id,
@@ -216,16 +191,11 @@ export default class TusService {
       }
     }
 
-    return {
-      type: 'pre-create',
-      upload,
-      res,
-    }
+    return { metadata: upload.metadata }
   }
 
   handleUploadFinish: ServerOptions['onUploadFinish'] = async (
     _req,
-    res,
     upload
   ) => {
     const { storage } = upload
@@ -268,7 +238,7 @@ export default class TusService {
       })
 
     try {
-      const file = await this.fileService.createFileForProjectFolder({
+      const file = await FileService.createFileForProjectFolder({
         contentType,
         path: storage.path,
         projectId,
@@ -283,9 +253,12 @@ export default class TusService {
         ...file,
       })
 
-      return { res, ...resBuilder.build() }
+      return resBuilder.build()
     } catch (e) {
       throw { status_code: 500, body: (e as Error).message }
     }
   }
 }
+
+export const tusService = new TusService()
+export const tusServer = tusService.makeTusServer()

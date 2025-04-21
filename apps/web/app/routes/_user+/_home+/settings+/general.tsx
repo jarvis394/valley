@@ -8,10 +8,13 @@ import { UserDomainAddSchema } from 'app/routes/api+/user+/domain'
 import { UserEditSchema } from 'app/routes/api+/user+/edit'
 import { useUserAwait } from 'app/utils/user'
 import React, { Suspense } from 'react'
+import { useRootLoaderData } from 'app/utils/misc'
+import ExternalLink from '@valley/ui/ExternalLink'
 
 const AccountSettingsGeneral: React.FC<{
   user?: UserFull | null
 }> = ({ user }) => {
+  const { ENV } = useRootLoaderData()
   const serviceDomain = user?.serviceDomain
   const activeDomain = user?.domains[0]
 
@@ -44,7 +47,13 @@ const AccountSettingsGeneral: React.FC<{
         title={'Domain'}
         before={'Please use 32 characters at maximum.'}
         subtitle={
-          'Your galleries will be accessible on valley-gallery.vercel.app domain'
+          <>
+            Your galleries will be accessible on the{' '}
+            <ExternalLink href={ENV.GALLERY_SERVICE_URL}>
+              {ENV.GALLERY_SERVICE_URL}
+            </ExternalLink>{' '}
+            domain
+          </>
         }
         content={
           <Note variant="default" fill style={{ width: 'fit-content' }}>

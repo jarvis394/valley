@@ -863,7 +863,7 @@
 
   :root {
     ::selection {
-      @apply bg-ds-blue-700 text-primary;
+      @apply bg-ds-blue-700 text-white;
     }
   }
 
@@ -1053,5 +1053,11 @@
   }
   .animation-delay-1000 {
     animation-delay: 1s;
+  }
+}
+
+@layer components {
+  .break-word {
+    word-break: break-word;
   }
 }

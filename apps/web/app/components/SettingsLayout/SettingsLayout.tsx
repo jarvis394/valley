@@ -35,7 +35,9 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   const navigation = useNavigation()
   const isRouteLoading = (url: string) => {
     return (
-      navigation.state === 'loading' && navigation.location?.pathname === url
+      navigation.state === 'loading' &&
+      !navigation.formAction &&
+      navigation.location?.pathname === url
     )
   }
 

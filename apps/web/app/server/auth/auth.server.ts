@@ -43,7 +43,6 @@ export const requireAnonymous = async (request: Request) => {
   if (
     session &&
     !session.user.onboarded &&
-    // TODO: kinda hacky, maybe refactor
     // Do not infinitely redirect user on onboarding
     !pathname.startsWith('/auth/onboarding')
   ) {

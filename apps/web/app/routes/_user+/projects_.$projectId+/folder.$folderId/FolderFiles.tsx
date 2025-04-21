@@ -8,13 +8,14 @@ import { useProjectsStore } from 'app/stores/projects'
 import { useProject } from 'app/utils/project'
 import { SortAscending, Trash } from 'geist-ui-icons'
 import Stack from '@valley/ui/Stack'
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router'
 import styles from './project.module.css'
 import { File } from '@valley/db'
 import { useSortable } from 'app/hooks/useSortable'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useFiles } from 'app/utils/files'
+import { sortFiles } from '@valley/gallery-module/utils/sort-files'
 
 const FolderFiles: React.FC<{ files: File[] | null }> = ({
   files: propsFiles,
@@ -22,6 +23,15 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
   const project = useProject()
   const { projectId = '', folderId = '' } = useParams()
   const files = useFiles()
+  const sortedFiles = useMemo(
+    () =>
+      sortFiles({
+        files,
+        orderBy: 'dateShot',
+        direction: 'asc',
+      }),
+    [files]
+  )
   const setFiles = useProjectsStore((state) => state.setFiles)
   const cover = files.find((e) => e.id === project.cover?.fileId)
 
@@ -153,7 +163,7 @@ const FolderFiles: React.FC<{ files: File[] | null }> = ({
         </Hidden>
 
         <Wrapper {...getRootProps()} className={styles.project__files}>
-          {files.map((file) => (
+          {sortedFiles.map((file) => (
             <FileCard
               {...getItemProps(file)}
               isCover={cover?.id === file.id}

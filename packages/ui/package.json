@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./ExternalLink": "./src/ExternalLink/ExternalLink.tsx",
     "./Toast": "./src/Toast/Toast.tsx",
     "./SelectField": "./src/SelectField/SelectField.tsx",
     "./Select": "./src/Select/Select.tsx",

@@ -16,6 +16,7 @@ node_modules
 
 # FS storage
 apps/upload/storage
+apps/web/storage
 
 # openimg cache
 apps/web/data
