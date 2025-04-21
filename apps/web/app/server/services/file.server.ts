@@ -185,9 +185,10 @@ export class FileService {
     }
   }
 
-  async deleteFileFromStorage(path: string) {
+  static async deleteFromStorageByPath(path: string) {
     try {
-      await disk.delete(path)
+      // Deletes file and .info Tus metadata
+      await disk.deleteAll(path)
       return { ok: true }
     } catch (e) {
       return { ok: false, message: (e as Error).message }

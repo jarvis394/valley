@@ -5,7 +5,7 @@
   "scripts": {
     "_dev": "next dev --turbopack -p ${GALLERY_PORT}",
     "dev": "yarn dotenv yarn _dev",
-    "build": "yarn dotenv next build",
+    "build": "yarn dotenv next build --turbopack",
     "_start": "yarn dotenv next start -p ${GALLERY_PORT}",
     "start": "yarn dotenv yarn _start",
     "lint": "next lint",
@@ -19,7 +19,7 @@
     "@valley/ui": "*",
     "@valley/tailwind": "*",
     "geist-ui-icons": "^1.2.0",
-    "next": "15.2.0",
+    "next": "15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^3.24.2",

@@ -5,6 +5,7 @@ import { requireUser } from 'app/server/auth/auth.server'
 import { FolderService } from 'app/server/services/folder.server'
 import { invariantResponse } from 'app/utils/invariant'
 import { Route } from './+types/$id.clear'
+import { FileService } from 'app/server/services/file.server'
 
 export const loader = () => redirect('/projects')
 
@@ -30,9 +31,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       const newTotalFiles = project.totalFiles - folder.totalFiles
       const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
       const deleteFilesPromise = tx
-        .update(files)
-        .set({ deletedAt: new Date(), folderId: null })
+        .delete(files)
         .where(eq(files.folderId, folder.id))
+      const deleteFilesFromStoragePromise = FileService.deleteFromStorageByPath(
+        [project.id, folder.id].join('/')
+      )
       const updateFolderSizePromise = tx
         .update(folders)
         .set({ totalFiles: 0, totalSize: '0' })
@@ -51,6 +54,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       await Promise.all(
         [
           deleteFilesPromise,
+          deleteFilesFromStoragePromise,
           updateFolderSizePromise,
           updateProjectSizePromise,
           deleteCoverPromise,

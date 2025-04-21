@@ -19,6 +19,7 @@ import { invalidateCache } from 'app/utils/cache'
 import { getFilesCacheKey } from 'app/routes/_user+/projects_.$projectId+/folder.$folderId'
 import { getProjectCacheKey } from 'app/routes/_user+/projects_.$projectId+/_layout'
 import { useProjectsStore } from 'app/stores/projects'
+import { TUS_ENDPOINT_PATH } from 'app/config/constants'
 
 const isClientSide = typeof document !== 'undefined'
 
@@ -116,13 +117,8 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
         return files
       },
     }).use(Tus, {
-      endpoint: '/api/storage',
+      endpoint: TUS_ENDPOINT_PATH,
       chunkSize: MULTIPART_UPLOAD_CHUNK_SIZE,
-      // onBeforeRequest(req) {
-      //   const cookies = parseCookies()
-      //   const session = cookies['valley.session_token']
-      //   req.setHeader('Authorization', session)
-      // },
       onAfterResponse: handleUploadResponse,
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,

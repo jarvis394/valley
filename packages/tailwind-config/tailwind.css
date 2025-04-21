@@ -863,7 +863,7 @@
 
   :root {
     ::selection {
-      @apply bg-ds-blue-700 text-primary;
+      @apply bg-ds-blue-700 text-white;
     }
   }
 

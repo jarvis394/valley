@@ -6,6 +6,7 @@ import { Gallery, Item } from 'react-photoswipe-gallery'
 import type { PreparedPhotoSwipeOptions } from 'photoswipe'
 
 import 'photoswipe/dist/photoswipe.css'
+import { sortFiles } from '../../utils/sort-files'
 
 const closeSVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
@@ -42,12 +43,7 @@ export const FolderGallery: React.FC<FolderGalleryProps> = ({
   const [visible, setVisible] = useState(false)
   const sortedFiles = useMemo(
     () =>
-      folder.files.sort((a, b) => {
-        if (!a.name || !b.name) return 1
-        return a.name?.localeCompare(b.name, undefined, {
-          numeric: true,
-        })
-      }),
+      sortFiles({ files: folder.files, direction: 'asc', orderBy: 'dateShot' }),
     [folder.files]
   )
 

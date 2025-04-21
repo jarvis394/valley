@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, SubmitOptions } from 'react-router'
+import { Form, SubmitOptions, useLocation } from 'react-router'
 import Stack, { StackProps } from '@valley/ui/Stack'
 import React, { useMemo } from 'react'
 import { useRemixForm, UseRemixFormOptions } from 'remix-hook-form'
@@ -22,7 +22,7 @@ type FieldsetProps<T extends ZodType = ZodType> = {
   variant?: 'default' | 'danger'
   id?: string
   submitLabel?: React.ReactNode
-  submitProps?: Omit<ButtonProps, 'asChild'>
+  submitProps?: Partial<ButtonProps & { asChild: false }>
   children?: (
     ctx: Omit<ReturnType<typeof useRemixForm<z.infer<T>>>, 'handleSubmit'>
   ) => React.ReactNode
@@ -46,8 +46,12 @@ const Fieldset = <T extends ZodType>({
   submitProps,
   ...props
 }: FieldsetProps<T>): React.ReactNode => {
+  const location = useLocation()
+  const formAction =
+    submitConfig?.action ||
+    (id ? location.pathname + '?intent=' + id : location.pathname)
   const isPending = useIsPending({
-    formAction: submitConfig?.action,
+    formAction,
     formMethod: submitConfig?.method,
   })
   type FormData = z.infer<typeof schema>
@@ -73,9 +77,10 @@ const Fieldset = <T extends ZodType>({
     ...formConfig,
     resolver,
     submitConfig: {
-      navigate: true,
-      viewTransition: true,
       method: 'POST',
+      action: formAction,
+      preventScrollReset: true,
+      replace: true,
       ...submitConfig,
     },
   })

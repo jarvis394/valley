@@ -5,6 +5,7 @@ import { invariantResponse } from 'app/utils/invariant'
 import { db, files, folders, projects, eq, covers } from '@valley/db'
 import { FolderService } from 'app/server/services/folder.server'
 import { Route } from './+types/$id.delete'
+import { FileService } from 'app/server/services/file.server'
 
 export const loader = () => redirect('/projects')
 
@@ -33,12 +34,14 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       const newTotalFiles = project.totalFiles - folder.totalFiles
       const newTotalSize = Number(project.totalSize) - Number(folder.totalSize)
       const deleteFilesPromise = tx
-        .update(files)
-        .set({ deletedAt: new Date(), folderId: null })
+        .delete(files)
         .where(eq(files.folderId, folder.id))
       const deleteFolderPromise = tx
         .delete(folders)
         .where(eq(folders.id, folder.id))
+      const deleteFilesFromStoragePromise = FileService.deleteFromStorageByPath(
+        [project.id, folder.id].join('/')
+      )
       const updateProjectSizePromise = tx
         .update(projects)
         .set({
@@ -54,6 +57,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
         [
           deleteFilesPromise,
           deleteFolderPromise,
+          deleteFilesFromStoragePromise,
           updateProjectSizePromise,
           deleteCoverPromise,
         ].filter(Boolean)

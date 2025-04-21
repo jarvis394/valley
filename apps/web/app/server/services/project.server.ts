@@ -51,6 +51,19 @@ export class ProjectService {
     })
   }
 
+  static updateUserProject(data: {
+    userId: User['id']
+    projectId: Project['id']
+    data: Partial<Project>
+  }) {
+    return db
+      .update(projects)
+      .set(data.data)
+      .where(
+        and(eq(projects.id, data.projectId), eq(projects.userId, data.userId))
+      )
+  }
+
   static async addFilesToProject(
     projectId: Project['id'],
     files: File[]

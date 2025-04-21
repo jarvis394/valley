@@ -16,6 +16,7 @@ import { TusHookResponseBuilder } from 'app/server/utils/tus-hook-response-build
 import { auth } from '@valley/auth'
 import { FileService } from './file.server'
 import { FolderService } from './folder.server'
+import { TUS_ENDPOINT_PATH } from 'app/config/constants'
 
 const gcsStorage = new Storage({
   keyFilename: process.env.GCS_KEY_FILENAME,
@@ -23,13 +24,9 @@ const gcsStorage = new Storage({
 })
 
 export class TusService {
-  static TUS_ENDPOINT_PATH = '/api/storage'
-
   static getFileIdFromRequest(req: Request, lastPath?: string) {
     const url = new URL(req.url)
-    return (
-      url.pathname.replace(TusService.TUS_ENDPOINT_PATH + '/', '') || lastPath
-    )
+    return url.pathname.replace(TUS_ENDPOINT_PATH + '/', '') || lastPath
   }
 
   static namingFunction(
@@ -97,7 +94,7 @@ export class TusService {
     }
 
     return new Server({
-      path: TusService.TUS_ENDPOINT_PATH,
+      path: TUS_ENDPOINT_PATH,
       datastore,
       allowedCredentials: true,
       respectForwardedHeaders: true,

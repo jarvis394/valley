@@ -17,6 +17,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   headers.append('Cache-Control', 'public, max-age=31536000, immutable')
+  headers.append('cross-origin-resource-policy', 'same-site')
 
   try {
     const { readable } = await FileService.streamFile(path)

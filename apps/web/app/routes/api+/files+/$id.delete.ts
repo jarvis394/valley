@@ -24,51 +24,51 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       })
 
     invariantResponse(file, 'File not found', { status: 404 })
+    invariantResponse(folder, 'Folder not found', { status: 404 })
+    invariantResponse(project, 'Project not found', { status: 404 })
 
-    if (folder) {
-      await db.transaction(async (tx) => {
-        if (!folder || !project || !file.folderId) return
+    await db.transaction(async (tx) => {
+      if (!folder || !project || !file.folderId) return
 
-        const newFolderTotalFiles = folder.totalFiles - 1
-        const newFolderTotalSize = Number(folder.totalSize) - Number(file.size)
-        const newProjectTotalFiles = project.totalFiles - 1
-        const newProjectTotalSize =
-          Number(project.totalSize) - Number(file.size)
-        const deleteCoverPromise = tx
-          .delete(covers)
-          .where(
-            and(
-              eq(covers.fileId, file.id),
-              eq(covers.projectId, covers.projectId)
-            )
+      const newFolderTotalFiles = folder.totalFiles - 1
+      const newFolderTotalSize = Number(folder.totalSize) - Number(file.size)
+      const newProjectTotalFiles = project.totalFiles - 1
+      const newProjectTotalSize = Number(project.totalSize) - Number(file.size)
+      const deleteCoverPromise = tx
+        .delete(covers)
+        .where(
+          and(
+            eq(covers.fileId, file.id),
+            eq(covers.projectId, covers.projectId)
           )
-        const deleteFilePromise = tx
-          .update(files)
-          .set({ deletedAt: new Date(), folderId: null })
-          .where(eq(files.id, file.id))
-        const updateFolderSizePromise = tx
-          .update(folders)
-          .set({
-            totalFiles: newFolderTotalFiles,
-            totalSize: newFolderTotalSize.toString(),
-          })
-          .where(eq(folders.id, file.folderId))
-        const updateProjectSizePromise = tx
-          .update(projects)
-          .set({
-            totalFiles: newProjectTotalFiles,
-            totalSize: newProjectTotalSize.toString(),
-          })
-          .where(eq(projects.id, folder.projectId))
+        )
+      const deleteFilePromise = tx.delete(files).where(eq(files.id, file.id))
+      const deleteFileFromStoragePromise = FileService.deleteFromStorageByPath(
+        file.path
+      )
+      const updateFolderSizePromise = tx
+        .update(folders)
+        .set({
+          totalFiles: newFolderTotalFiles,
+          totalSize: newFolderTotalSize.toString(),
+        })
+        .where(eq(folders.id, file.folderId))
+      const updateProjectSizePromise = tx
+        .update(projects)
+        .set({
+          totalFiles: newProjectTotalFiles,
+          totalSize: newProjectTotalSize.toString(),
+        })
+        .where(eq(projects.id, folder.projectId))
 
-        await Promise.all([
-          deleteCoverPromise,
-          deleteFilePromise,
-          updateFolderSizePromise,
-          updateProjectSizePromise,
-        ])
-      })
-    }
+      await Promise.all([
+        deleteCoverPromise,
+        deleteFilePromise,
+        deleteFileFromStoragePromise,
+        updateFolderSizePromise,
+        updateProjectSizePromise,
+      ])
+    })
 
     if (redirectTo) return redirect(redirectTo)
     if (folder)
