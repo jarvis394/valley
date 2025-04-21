@@ -203,7 +203,9 @@ const VerifyRoute: React.FC<Route.ComponentProps> = ({ actionData }) => {
           >
             {didResendVerificationCode && 'A new code has been sent'}
             {!didResendVerificationCode &&
-              `Didn't recieve a code? Resend${count === 0 ? '' : ` (${count})`}`}
+              `Didn't recieve a code? Resend${
+                count === 0 ? '' : ` (${count})`
+              }`}
           </Button>
           <Button
             fullWidth

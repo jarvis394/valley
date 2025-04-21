@@ -75,7 +75,9 @@ export const headers = ({
   loaderHeaders,
   parentHeaders,
 }: Route.HeadersArgs) => {
-  return { 'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders) }
+  return {
+    'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
+  }
 }
 
 const ProjectLayout: React.FC<Route.ComponentProps> = ({ loaderData }) => {

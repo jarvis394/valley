@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { db } from '@valley/db'
 import { queryUserByDomain } from '../../../../server/user'
 import ProjectGallery from '../../../../components/ProjectGallery/ProjectGallery'
+import Head from 'next/head'
 
 export default async function Gallery({
   params,
@@ -42,5 +43,12 @@ export default async function Gallery({
     return notFound()
   }
 
-  return <ProjectGallery project={project} />
+  return (
+    <>
+      <Head>
+        <title>{project.title} | Valley</title>
+      </Head>
+      <ProjectGallery project={project} />
+    </>
+  )
 }

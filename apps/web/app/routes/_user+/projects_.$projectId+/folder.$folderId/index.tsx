@@ -72,7 +72,9 @@ export const headers = ({
   loaderHeaders,
   parentHeaders,
 }: Route.HeadersArgs) => {
-  return { 'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders) }
+  return {
+    'Server-Timing': combineServerTimings(parentHeaders, loaderHeaders),
+  }
 }
 
 export const shouldRevalidate: ShouldRevalidateFunction = ({

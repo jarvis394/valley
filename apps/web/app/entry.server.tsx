@@ -65,7 +65,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
                     MODE === 'development' ? 'ws:' : undefined,
                     "'self'",
                   ],
-                  'font-src': ["'self'"],
+                  'font-src': ["'self'", 'https://fonts.gstatic.com'],
                   'frame-src': ["'self'"],
                   'img-src': [
                     "'self'",

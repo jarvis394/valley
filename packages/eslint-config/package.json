@@ -6,7 +6,7 @@
     "base.js",
     "library.js",
     "remix.js",
-    "prettier-base.js",
+    "next.js",
     "react-internal.js"
   ],
   "devDependencies": {
