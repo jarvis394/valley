@@ -40,7 +40,10 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
         .delete(folders)
         .where(eq(folders.id, folder.id))
       const deleteFilesFromStoragePromise = FileService.deleteFromStorageByPath(
-        [project.id, folder.id].join('/')
+        [
+          FileService.getUploadProjectName(project.id),
+          FileService.getUploadFolderName(folder.id),
+        ].join('/')
       )
       const updateProjectSizePromise = tx
         .update(projects)

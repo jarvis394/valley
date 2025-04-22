@@ -1,4 +1,4 @@
-import { FolderWithFiles } from '@valley/shared'
+import { FolderWithFiles, makeFileThumbnailPath } from '@valley/shared'
 import React, { useMemo, useState } from 'react'
 import Image from '@valley/ui/Image'
 import { JustifiedGrid } from '@egjs/react-grid'
@@ -57,30 +57,34 @@ export const FolderGallery: React.FC<FolderGalleryProps> = ({
       id={folder.id}
     >
       <h3 className="heading-24 w-full text-center">{folder.title}</h3>
-      <Gallery options={photoswipeOptions}>
-        <JustifiedGrid
-          className="fade transition-all"
-          data-fade-in={visible}
-          gap={2}
-          sizeRange={[240, 480]}
-          isCroppedSize
-          autoResize
-          columnRange={[2, 8]}
-          onRenderComplete={() => setVisible(true)}
-        >
+      <JustifiedGrid
+        className="fade transition-all"
+        data-fade-in={visible}
+        gap={2}
+        sizeRange={[240, 480]}
+        isCroppedSize
+        autoResize
+        columnRange={[2, 8]}
+        onRenderComplete={() => setVisible(true)}
+        isConstantSize
+      >
+        <Gallery options={photoswipeOptions}>
           {sortedFiles.map((file) => (
             <Item
               width={file.width!}
               height={file.height!}
               key={file.id}
-              content={
-                <Image
-                  className="h-full w-full"
-                  file={file}
-                  thumbnail="xl"
-                  imageHost={imageHost}
-                />
-              }
+              original={makeFileThumbnailPath({
+                file,
+                imageHost,
+                size: 'original',
+              })}
+              thumbnail={makeFileThumbnailPath({
+                file,
+                imageHost,
+                size: 'lg',
+              })}
+              cropped
             >
               {({ ref, open }) => (
                 <Image
@@ -105,8 +109,8 @@ export const FolderGallery: React.FC<FolderGalleryProps> = ({
               )}
             </Item>
           ))}
-        </JustifiedGrid>
-      </Gallery>
+        </Gallery>
+      </JustifiedGrid>
     </div>
   )
 }

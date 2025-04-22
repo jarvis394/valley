@@ -123,6 +123,7 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       uploadDataDuringCreation: true,
       removeFingerprintOnSuccess: true,
       withCredentials: true,
+      parallelUploads: 1,
     })
   )
 
@@ -208,10 +209,9 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
 
     const handleUploadSuccess = (
       file: UppyFile<Meta, Record<string, never>> | undefined,
-      response: unknown
+      _response: unknown
     ) => {
       if (!file) return
-      console.log({ file, response })
       setFileUploaded(file.id)
     }
 
@@ -224,7 +224,8 @@ export const useUpload = ({ projectId, folderId }: UseUploadProps) => {
       uppy.off('upload-error', handleUploadError)
       uppy.off('upload-success', handleUploadSuccess)
     }
-  }, [setFileUploadError, setFileUploadProgress, setFileUploaded, uppy])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const handleChange = (e: Event) =>

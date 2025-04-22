@@ -12,7 +12,7 @@ export const THUMBNAIL_SIZES = {
 export type ThumbnailSize = keyof typeof THUMBNAIL_SIZES
 
 export type GetFileThumbnailQueryProps = {
-  size?: ThumbnailSize
+  size?: ThumbnailSize | 'original'
   file: Pick<File, 'canHaveThumbnails' | 'width' | 'height'>
 }
 
@@ -20,7 +20,9 @@ export const getFileThumbnailDimensions = ({
   size,
   file,
 }: GetFileThumbnailQueryProps) => {
-  if (!file.canHaveThumbnails || !file.width) return { width: 0, height: 0 }
+  if (!file.canHaveThumbnails || !file.width || !file.height)
+    return { width: 0, height: 0 }
+  if (size === 'original') return { width: file.width, height: file.height }
 
   const newWidth = size ? THUMBNAIL_SIZES[size] : file.width
   const changeRatio = file.width ? newWidth / file.width : 1

@@ -14,6 +14,7 @@ import { ProjectWithFolders } from '@valley/shared'
 import { redirectToKey } from 'app/config/paramsKeys'
 import ErrorModalContent from '../ErrorModalContent'
 import ModalContent from '@valley/ui/ModalContent'
+import escape from 'regexp.escape'
 
 type ConfirmFolderClearProps = { onClose: () => void }
 
@@ -36,7 +37,7 @@ const ModalContents: React.FC<
   })
   const isFolderWithFiles = folder?.totalFiles !== 0
   const isPending = useIsPending({ formAction })
-  const folderTitlePattern = `\\s*${folder?.title}\\s*`
+  const folderTitlePattern = `\\s*${escape(folder?.title || '')}\\s*`
   const deleteConfirmPattern = '\\s*delete my files\\s*'
 
   if (!folder) {

@@ -175,7 +175,7 @@ export class FileService {
       }
       if (e instanceof errors.E_CANNOT_GET_METADATA) {
         throw new Response('Cannot get file metadata', {
-          status: 500,
+          status: 404,
         })
       }
 

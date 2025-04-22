@@ -18,6 +18,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
     metadata.contentType || 'application/octet-stream'
   )
   headers.append('Cache-Control', 'public, max-age=31536000, immutable')
+  headers.append('cross-origin-resource-policy', 'cross-origin')
   headers.append('Etag', metadata.etag)
 
   return new Response(readable, { headers })

@@ -2,7 +2,9 @@ import { ExifData, ExifDataKey } from '@valley/db'
 import { dec2frac } from '../../utils/misc'
 import sharp from 'sharp'
 import exifReader from 'exif-reader'
-import { disk } from './drive.server'
+import { disk, DRIVE_DISK, s3Client } from './drive.server'
+import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { IncomingMessage } from 'node:http'
 
 type ImageMetadata = {
   width?: number
@@ -37,6 +39,21 @@ const extractFields: Set<ExifDataKey> = new Set([
 ])
 
 export class ImageService {
+  // TODO: implement for GCS and local
+  static async fetchFileRange(filePath: string) {
+    if (DRIVE_DISK === 's3') {
+      const command = new GetObjectCommand({
+        Key: filePath,
+        Bucket: process.env.AWS_BUCKET!,
+        Range: 'bytes=0-1000000',
+      })
+      const res = await s3Client.send(command)
+      return res?.Body as IncomingMessage
+    } else {
+      return await disk.getStream(filePath)
+    }
+  }
+
   /**
    * Extracts EXIF from S3 object (supports RAW, JPEG, WEBP and PNG formats)
    * And gets width/height of an image from metadata
@@ -53,7 +70,7 @@ export class ImageService {
     }
 
     try {
-      const data = await disk.getStream(filePath)
+      const data = await ImageService.fetchFileRange(filePath)
       const image = sharp()
       data.pipe(image)
       const metadata = await image.metadata()

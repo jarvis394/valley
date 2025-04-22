@@ -6,13 +6,17 @@ import {
 
 export const makeFileThumbnailPath = (props: {
   imageHost?: string
-  size?: ThumbnailSize
+  size?: ThumbnailSize | 'original'
   width?: number
   height?: number
   qs?: string
   file: Pick<File, 'canHaveThumbnails' | 'width' | 'height' | 'path'>
 }) => {
   let qs = ''
+
+  if (props.size === 'original') {
+    return props.imageHost + '/api/files/' + props.file.path
+  }
 
   if (props.qs) {
     qs = props.qs

@@ -57,4 +57,6 @@ const drives = {
   }),
 } as const
 
-export const disk = new Disk(drives[process.env.DRIVE_DISK || 'fs']!)
+export const DRIVE_DISK = process.env.DRIVE_DISK || 'fs'
+
+export const disk = new Disk(drives[DRIVE_DISK]!)
