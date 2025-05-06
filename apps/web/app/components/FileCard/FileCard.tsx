@@ -45,6 +45,11 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({
     })
   }
 
+  const handleCopy = () => {
+    const url = `${window.location.origin}/api/files/${file.path}/thumbnail`;
+    navigator.clipboard.writeText(url);
+  };
+
   return (
     <Menu.Content>
       <Stack
@@ -82,7 +87,9 @@ const FileCardMenuContent: React.FC<FileCardMenuContentProps> = ({
       >
         Set as folder cover
       </Menu.Item>
-      <Menu.Item before={<Link className="text-secondary" />}>
+      <Menu.Item
+        onClick={handleCopy}
+        before={<Link className="text-secondary" />}>
         Copy link
       </Menu.Item>
       <Menu.Item before={<Download className="text-secondary" />}>
@@ -125,7 +132,7 @@ const FileCard: React.FC<FileCardProps> = ({
   selectItem,
   ...props
 }) => {
-  const [isDropdownOpen, setDropdownOpen] = useState(false)
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <Menu.Root openOnContextMenu onOpenChange={setDropdownOpen}>
