@@ -1,0 +1,32 @@
+{
+  "name": "@valley/canvas",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dnd-kit/dom": "^0.5.1",
+    "@dnd-kit/helpers": "^0.5.1",
+    "@dnd-kit/react": "^0.5.1",
+    "@valley/ui": "workspace:*",
+    "immer": "^11.2.9",
+    "lucide-react": "^1.61.0",
+    "nanoid": "^6.0.2",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

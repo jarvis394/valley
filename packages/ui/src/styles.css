@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
+
+/* Scan this package's components; packages built on ui import this file and add their own. */
+@source '.';
+
+@theme {
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+
+  /* App chrome */
+  --color-canvas: #131314;
+  --color-surface: #1a1a1b;
+  --color-line: #282829;
+  --color-fg: #ebebeb;
+  /* Inputs, segmented controls, buttons inside panels */
+  --color-control: #131314;
+  --color-control-hover: #1f1f20;
+  --color-accent: #52a8ff;
+  /* Canvas selection */
+  --color-focus: #0b8ce9;
+  --color-focus-fg: #3eaeff;
+  /* Selected list rows and "new" badges */
+  --color-selected: #022248;
+  --color-selected-fg: #dbeafe;
+  --color-info-fg: #51a2ff;
+  --color-danger: #d93036;
+
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-fg);
+  }
+}
+
+/* Shared popup look for menus, selects and popovers. */
+@utility popup-surface {
+  transform-origin: var(--transform-origin);
+  border-radius: var(--radius-2xl);
+  border: 0.5px solid --alpha(var(--color-white) / 7%);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 0.4),
+    0 0 4px rgb(0 0 0 / 0.24);
+  transition-property: scale, opacity;
+  transition-duration: 100ms;
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    scale: 0.95;
+    opacity: 0;
+  }
+}
+
+/* Fades overflowing single-line text instead of an ellipsis (outline rows). */
+@utility fade-x {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(to left, transparent, black 24px);
+}

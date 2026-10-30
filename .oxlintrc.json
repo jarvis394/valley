@@ -5,9 +5,48 @@
     "correctness": "error",
     "suspicious": "warn"
   },
-  "env": { "browser": true, "node": true, "es2024": true },
-  "rules": {
-    "react/react-in-jsx-scope": "off"
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
   },
-  "ignorePatterns": ["**/.output/**", "**/.nitro/**", "**/dist/**", "**/routeTree.gen.ts"]
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "valley/no-em-dash-copy": "error",
+    "valley/no-hookless-use-function": "error",
+    "valley/no-low-value-comments": "error",
+    "valley/no-native-title-tooltip": "error",
+    "valley/no-raw-resize-observer": "error",
+    "valley/no-unreasoned-state-sync": "error",
+    "valley/no-unscoped-has": "error",
+    "valley/require-centered-scroll-gutter": "error"
+  },
+  "ignorePatterns": ["**/.output/**", "**/.nitro/**", "**/dist/**", "**/routeTree.gen.ts"],
+  "jsPlugins": [
+    {
+      "name": "valley",
+      "specifier": "./oxlint-plugin-valley/index.ts"
+    }
+  ],
+  "overrides": [
+    {
+      "files": ["apps/web/src/**"],
+      "rules": {
+        "valley/no-manual-memo": "error"
+      }
+    },
+    {
+      "files": ["packages/ui/src/lib/resizeObserve.ts"],
+      "rules": {
+        "valley/no-raw-resize-observer": "off"
+      }
+    },
+    {
+      "files": ["oxlint-plugin-valley/**"],
+      "rules": {
+        "valley/no-em-dash-copy": "off",
+        "valley/no-unscoped-has": "off"
+      }
+    }
+  ]
 }

@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "oxlint-plugin-valley"
   ],
   "type": "module",
   "scripts": {
@@ -18,7 +19,7 @@
     "check": "turbo run typecheck && oxlint && oxfmt --check"
   },
   "devDependencies": {
-    "oxfmt": "^0.74.0",
+    "oxfmt": "^0.75.0",
     "oxlint": "^1.89.0",
     "turbo": "^2.11.10",
     "typescript": "^7.0.2"
