@@ -24,11 +24,11 @@ import slashBack from './slash-back.svg'
 import textFormat from './text-format.svg'
 import toolbar from './toolbar.svg'
 
-export type IconComponent = (props: { className?: string }) => React.ReactElement
+export type IconComponent = (props: { className?: string; opacity?: number }) => React.ReactElement
 
 /**
  * Design-system icons (Geist set, exported from Figma). They render as a CSS mask over
- * `currentColor`, so color and opacity come from the surrounding text styles.
+ * `currentColor`. Mute them with `opacity`, not a translucent text color.
  */
 const createIcon = (src: string, name: string): IconComponent => {
   const style: CSSProperties = {
@@ -36,12 +36,12 @@ const createIcon = (src: string, name: string): IconComponent => {
     maskSize: '100% 100%',
     maskRepeat: 'no-repeat',
   }
-  const Icon: IconComponent = ({ className }) => (
+  const Icon: IconComponent = ({ className, opacity }) => (
     <span
       aria-hidden
       data-icon={name}
       className={cn('inline-block size-4 shrink-0 bg-current', className)}
-      style={style}
+      style={opacity === undefined ? style : { ...style, opacity }}
     />
   )
   return Icon

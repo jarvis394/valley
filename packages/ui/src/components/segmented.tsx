@@ -40,9 +40,11 @@ export function Segmented<T extends string | number>({
           key={keyOf(option.value)}
           value={keyOf(option.value)}
           title={option.title}
-          className="flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-[13px] text-fg/63 transition-colors outline-none select-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7 data-pressed:text-fg"
+          className="group flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-[13px] text-fg transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7"
         >
-          {option.label}
+          <span className="flex min-w-0 items-center opacity-63 transition-opacity group-hover:opacity-100 group-data-pressed:opacity-100">
+            {option.label}
+          </span>
         </Toggle>
       ))}
     </ToggleGroup>

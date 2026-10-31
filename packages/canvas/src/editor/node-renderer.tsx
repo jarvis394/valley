@@ -51,7 +51,7 @@ function NodeChildren({ parentId }: { parentId: NodeId }) {
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(parentId)
   return (
     <div
-      className="relative flex flex-col gap-4"
+      className="relative flex flex-col"
       data-canvas-container={parentId}
       {...dropContainerProps(parentId)}
     >
@@ -105,18 +105,18 @@ function FlowItem({
         if (!selected) editor.select(id)
       }}
       className={cn(
-        'group/block relative flex flex-col gap-1.5 transition-opacity',
+        'group/block relative flex flex-col transition-opacity',
         selected && 'z-10',
         isDragSource && 'opacity-40',
       )}
     >
-      <div className="flex h-[18px] items-center justify-between gap-2 pr-2 select-none">
+      <div className="flex h-10 justify-between gap-2 pr-2 select-none">
         <button
           ref={handleRef}
           type="button"
           aria-label={`Drag ${label}`}
           className={cn(
-            'max-w-full cursor-grab touch-none truncate bg-canvas px-4 text-[13px] leading-[18px] font-medium text-fg/32 outline-none hover:text-fg/63 active:cursor-grabbing',
+            'max-w-full cursor-grab touch-none truncate bg-canvas px-4 pt-4 pb-1.5 text-left text-[13px] leading-[18px] font-medium text-fg/32 outline-none hover:text-fg/63 active:cursor-grabbing',
             selected && 'text-focus-fg hover:text-focus-fg',
           )}
         >
@@ -132,7 +132,7 @@ function FlowItem({
       >
         <NodeRenderer id={id} />
       </div>
-      <DropLine edge={dropEdge} gap={16} />
+      <DropLine edge={dropEdge} />
     </div>
   )
 }
@@ -150,7 +150,7 @@ function BlockToolbar({ id }: { id: NodeId }) {
     }
   }
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5 pt-4 pb-1.5">
       <ToolbarButton label="Move up" onClick={() => moveToGap(-1)}>
         <ArrowUp className="size-3" />
       </ToolbarButton>
@@ -181,7 +181,7 @@ function ToolbarButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex size-[18px] items-center justify-center rounded text-focus-fg/63 hover:bg-white/7 hover:text-focus-fg"
+      className="flex size-[18px] items-center justify-center rounded text-focus-fg *:opacity-63 hover:bg-white/7 hover:*:opacity-100"
     >
       {children}
     </button>

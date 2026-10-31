@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/react'
 import { Upload } from 'lucide-react'
-import { useRef, type ReactNode } from 'react'
+import { useRef } from 'react'
 import type { NodeId } from '../core/ids'
 import { useChildIds, useDocumentState, useNode } from '../render/context'
 import { useEditor, useEditorState } from './context'
@@ -37,13 +37,11 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex flex-col pb-2">
-      <div className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
-        <span className="flex h-7 flex-1 items-center text-[15px] leading-5 text-fg/32">
-          Blocks
-        </span>
+      <div className="flex h-11 items-center gap-2 pr-2 pl-4">
+        <span className="flex-1 text-[15px] leading-5 text-fg/32">Blocks</span>
         <AddBlockMenu
           trigger={
-            <Menu.Trigger render={<IconButton size="sm" aria-label="Add block" />}>
+            <Menu.Trigger render={<IconButton size="bar" aria-label="Add block" />}>
               <PlusIcon />
             </Menu.Trigger>
           }
@@ -145,16 +143,21 @@ function OutlineItem({
   )
 }
 
-/** Menu of insertable blocks, built from the registry. */
-export function AddBlockMenu({
-  trigger,
-  children,
-}: {
-  trigger: React.ReactElement
-  /** Extra items appended after the block types. */
-  children?: ReactNode
-}) {
+/** Uploads files and inserts them as a new block at the end of the document. */
+function useInsertFiles() {
   const editor = useEditor()
+  return async (files: FileList) => {
+    const ids = await editor.commands.uploadAssets([...files])
+    if (ids.length === 0) return
+    editor.commands.insertFromAssets(ids, { parentId: editor.getState().doc.rootId })
+  }
+}
+
+/** Menu of insertable blocks, built from the registry, followed by an upload action. */
+export function AddBlockMenu({ trigger }: { trigger: React.ReactElement }) {
+  const editor = useEditor()
+  const insertFiles = useInsertFiles()
+  const inputRef = useRef<HTMLInputElement>(null)
   return (
     <Menu.Root>
       {trigger}
@@ -169,7 +172,7 @@ export function AddBlockMenu({
                 if (id) requestAnimationFrame(() => scrollToNode(id))
               }}
             >
-              <Icon className="size-4 text-fg/63" />
+              <Icon className="size-4" opacity={0.63} />
               <span className="flex-1">{definition.label}</span>
               {definition.experimental && (
                 <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-[10px] text-amber-300 uppercase">
@@ -179,21 +182,32 @@ export function AddBlockMenu({
             </Menu.Item>
           )
         })}
-        {children}
+        <Menu.Separator />
+        <Menu.Item onClick={() => inputRef.current?.click()}>
+          <Upload className="size-4" opacity={0.63} />
+          Upload images
+        </Menu.Item>
       </Menu.Popup>
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept="image/*,video/*"
+        className="sr-only"
+        tabIndex={-1}
+        onChange={(event) => {
+          const { files } = event.currentTarget
+          if (files?.length) void insertFiles(files)
+          event.currentTarget.value = ''
+        }}
+      />
     </Menu.Root>
   )
 }
 
 /** "Add block or upload files": opens the block menu; dropped files go into a new block. */
 function AddBlockDropzone() {
-  const editor = useEditor()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const insertFiles = async (files: FileList) => {
-    const ids = await editor.commands.uploadAssets([...files])
-    if (ids.length === 0) return
-    editor.commands.insertFromAssets(ids, { parentId: editor.getState().doc.rootId })
-  }
+  const insertFiles = useInsertFiles()
   return (
     <div className="py-1.5">
       <AddBlockMenu
@@ -210,25 +224,6 @@ function AddBlockDropzone() {
             Add block or upload files
           </Menu.Trigger>
         }
-      >
-        <Menu.Separator />
-        <Menu.Item onClick={() => inputRef.current?.click()}>
-          <Upload className="size-4 text-fg/63" />
-          Upload files
-        </Menu.Item>
-      </AddBlockMenu>
-      <input
-        ref={inputRef}
-        type="file"
-        multiple
-        accept="image/*,video/*"
-        className="sr-only"
-        tabIndex={-1}
-        onChange={(event) => {
-          const { files } = event.currentTarget
-          if (files?.length) void insertFiles(files)
-          event.currentTarget.value = ''
-        }}
       />
     </div>
   )

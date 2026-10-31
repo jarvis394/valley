@@ -30,11 +30,7 @@ export function ListItem({
       {...props}
     >
       <span className="flex min-w-0 flex-1 items-center gap-3">
-        {icon && (
-          <span className={cn('flex shrink-0', selected ? 'text-selected-fg' : 'text-fg/63')}>
-            {icon}
-          </span>
-        )}
+        {icon && <span className={cn('flex shrink-0', !selected && 'opacity-63')}>{icon}</span>}
         <span className="fade-x min-w-0 flex-1">{label}</span>
       </span>
       {end}

@@ -93,7 +93,8 @@ function RailItem({
 export function AppSidebar() {
   return (
     <nav className="flex h-full w-[73px] shrink-0 flex-col border-r border-line bg-canvas">
-      <div className="flex h-[52px] shrink-0 items-center justify-center">
+      {/* 51px plus the divider lines up with the 52px bordered bars of the editor panels. */}
+      <div className="flex h-[51px] shrink-0 items-center justify-center">
         <img
           src="/demo/user.jpg"
           alt="Account"
@@ -121,7 +122,7 @@ export function AppSidebar() {
         ))}
       </div>
       <Divider className="mx-3" />
-      <div className="flex shrink-0 justify-center px-2 py-3">
+      <div className="flex h-[51px] shrink-0 items-center justify-center">
         <span className="flex size-7 items-center justify-center rounded-md bg-black text-fg">
           <LogoIcon />
         </span>
@@ -140,7 +141,7 @@ export function ProjectNav() {
         end={
           <ListItemMeta>
             12.4k
-            <EyeIcon className="text-fg/30" />
+            <EyeIcon opacity={0.3} />
           </ListItemMeta>
         }
       />

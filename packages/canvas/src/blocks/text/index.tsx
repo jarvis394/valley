@@ -96,7 +96,7 @@ export const textBlock = defineBlock({
   type: 'text',
   label: 'Text',
   icon: TextFormatIcon,
-  title: (props) => props.value.trim().split('\n')[0]!.slice(0, 64),
+  title: (props) => props.value.trim().split('\n')[0]!,
   version: 1,
   schema: textSchema,
   create: () => ({ value: '', align: 'center', padding: 'medium', width: 'wide' }),

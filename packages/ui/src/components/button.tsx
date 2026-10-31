@@ -58,8 +58,9 @@ export function Button({
 }
 
 const ICON_VARIANTS = {
+  /** Fades the icon element rather than its color, so overlapping strokes stay even. */
   default:
-    'text-fg/63 hover:bg-white/5 hover:text-fg data-popup-open:bg-white/7 data-popup-open:text-fg',
+    'text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
 } as const
@@ -67,6 +68,8 @@ const ICON_VARIANTS = {
 /** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */
 const ICON_SIZES = {
   sm: 'size-7 rounded-lg',
+  /** `sm` look with a 44px square hit area, for the trailing action of a panel header bar. */
+  bar: 'relative size-7 rounded-lg before:absolute before:-inset-2',
   md: 'size-8 rounded-[10px]',
   lg: 'size-10 rounded-xl',
 } as const

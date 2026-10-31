@@ -58,7 +58,7 @@ export interface BlockDefinition<T extends BlockType> {
   type: T
   label: string
   description?: string
-  icon: ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string; opacity?: number }>
   /** Bump when `props` shape changes; provide `migrate` to upgrade stored nodes. */
   version: number
   schema: z.ZodType<BlockProps<T>>

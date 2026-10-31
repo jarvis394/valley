@@ -93,10 +93,10 @@ function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
       </aside>
 
       <main
-        className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain pt-5 pb-24 lg:pb-5"
+        className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain pb-24 lg:pb-5"
         onPointerDown={() => editor.select(null)}
       >
-        <div className="sticky top-0 z-30 -mt-5 mb-5 flex items-center justify-between border-b border-line bg-canvas/90 px-3 py-2 backdrop-blur lg:hidden">
+        <div className="sticky top-0 z-30 mb-5 flex items-center justify-between border-b border-line bg-canvas/90 px-3 py-2 backdrop-blur lg:hidden">
           <ProjectTitle />
           <HistoryButtons />
         </div>
@@ -243,20 +243,24 @@ function MobileDock({
   return (
     <nav className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 flex gap-1 rounded-2xl border-[0.5px] border-white/7 bg-surface/95 p-1 shadow-2xl backdrop-blur lg:hidden">
       <button type="button" className={item} onClick={() => onOpen('outline')}>
-        <Layers className="size-5" /> Blocks
+        <Layers className="size-5 text-fg" opacity={0.63} /> Blocks
       </button>
       <AddBlockMenu
         trigger={
           <Menu.Trigger className={item}>
-            <Plus className="size-5" /> Add
+            <Plus className="size-5 text-fg" opacity={0.63} /> Add
           </Menu.Trigger>
         }
       />
       <button type="button" className={item} onClick={() => onOpen('inspector')}>
-        <SlidersHorizontal className={cn('size-5', hasSelection && 'text-focus-fg')} /> Edit
+        <SlidersHorizontal
+          className={cn('size-5 text-fg', hasSelection && 'text-focus-fg')}
+          opacity={hasSelection ? 1 : 0.63}
+        />{' '}
+        Edit
       </button>
       <button type="button" className={item} onClick={onPreview}>
-        <Eye className="size-5" /> Preview
+        <Eye className="size-5 text-fg" opacity={0.63} /> Preview
       </button>
     </nav>
   )

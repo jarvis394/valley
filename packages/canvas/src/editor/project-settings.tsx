@@ -3,9 +3,8 @@ import { useRef, useState } from 'react'
 import type { DocumentMeta } from '../core/document'
 import { formatBytes, formatShortDate, formatUsDate } from '../core/format'
 import type { ProjectSettings as Settings } from '../core/settings'
-import { useAssets, useMeta, useTheme } from '../render/context'
+import { useAssets, useMeta } from '../render/context'
 import { useEditor, useSettings } from './context'
-import { GalleryControls, TypographyControls } from './theme-controls'
 import {
   Button,
   EyeIcon,
@@ -40,13 +39,12 @@ const VISIBILITY_DESCRIPTION = {
 const randomPassword = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(9)), (n) => n.toString(36).slice(-1)).join('')
 
-/** Project tab of the inspector: document meta, access, statistics and theme. */
+/** Project tab of the inspector: document meta, access, statistics and actions. */
 export function ProjectSettings() {
   const editor = useEditor()
   const meta = useMeta()
   const settings = useSettings()
   const { galleryUrl } = editor
-  const theme = useTheme()
   const set = <K extends keyof DocumentMeta>(key: K, value: DocumentMeta[K]) =>
     editor.commands.updateMeta((m) => void (m[key] = value), { mergeKey: `meta.${key}` })
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
@@ -60,7 +58,11 @@ export function ProjectSettings() {
     <div className="flex flex-col">
       <Section title="Project">
         <Field label="Title">
-          <TextField value={meta.title} onChange={(title) => set('title', title)} />
+          <TextField
+            value={meta.title}
+            placeholder="Japan Trip"
+            onChange={(title) => set('title', title)}
+          />
         </Field>
         <Field label="Short URL">
           <TextField
@@ -132,23 +134,6 @@ export function ProjectSettings() {
           </Button>
         </Field>
       </Section>
-
-      <Section title="Typography">
-        <TypographyControls
-          value={theme.typography}
-          onChange={(patch) =>
-            editor.commands.updateTheme((t) => void Object.assign(t.typography, patch))
-          }
-        />
-      </Section>
-      <Section title="Gallery Style">
-        <GalleryControls
-          value={theme.gallery}
-          onChange={(patch) =>
-            editor.commands.updateTheme((t) => void Object.assign(t.gallery, patch))
-          }
-        />
-      </Section>
     </div>
   )
 }
@@ -162,8 +147,8 @@ function DateField({ value, onChange }: { value: string; onChange: (value: strin
       onClick={() => inputRef.current?.showPicker()}
       className="relative flex h-10 w-full min-w-0 items-center rounded-xl bg-control p-1 text-left text-[13px] leading-5 text-fg outline-none hover:bg-control-hover focus-visible:ring-2 focus-visible:ring-accent/60"
     >
-      <span className="-mr-2 flex size-8 shrink-0 items-center justify-center text-fg/63">
-        <CalendarDays className="size-4" />
+      <span className="-mr-2 flex size-8 shrink-0 items-center justify-center">
+        <CalendarDays className="size-4" opacity={0.63} />
       </span>
       <span className="truncate px-2">{formatShortDate(value)}</span>
       <input

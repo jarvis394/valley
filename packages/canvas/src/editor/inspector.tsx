@@ -1,4 +1,4 @@
-import { Copy, MousePointerClick, Trash2 } from 'lucide-react'
+import { MousePointerClick, X } from 'lucide-react'
 import type { NodeId } from '../core/ids'
 import type { AbsolutePlacement } from '../core/placement'
 import type { ReactNode } from 'react'
@@ -70,21 +70,13 @@ function NodeInspector({ id }: { id: NodeId }) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
-        <Icon className="size-4 shrink-0 text-fg/63" />
-        <h3 className="flex h-7 min-w-0 flex-1 items-center truncate text-[15px] leading-5 font-medium text-fg">
+      <div className="flex h-11 items-center gap-2 border-b border-line pr-2 pl-4">
+        <Icon className="size-4 shrink-0" opacity={0.63} />
+        <h3 className="min-w-0 flex-1 truncate text-[15px] leading-5 font-medium text-fg">
           {editor.registry.titleOf(node)}
         </h3>
-        <IconButton size="sm" title="Duplicate" onClick={() => editor.commands.duplicateNode(id)}>
-          <Copy className="size-4" />
-        </IconButton>
-        <IconButton
-          size="sm"
-          variant="danger"
-          title="Delete"
-          onClick={() => editor.commands.removeNode(id)}
-        >
-          <Trash2 className="size-4" />
+        <IconButton size="bar" aria-label="Deselect" onClick={() => editor.select(null)}>
+          <X className="size-4" />
         </IconButton>
       </div>
       {BlockInspector && (

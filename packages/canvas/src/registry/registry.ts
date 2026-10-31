@@ -5,6 +5,8 @@ import type { Placement, PlacementMode } from '../core/placement'
 import { walk } from '../core/tree'
 import type { AnyBlockDefinition, BlockDefinition, CreateBlockContext } from './types'
 
+const TITLE_LENGTH = 64
+
 /**
  * A set of blocks available to a given surface. Different surfaces (project editor,
  * portfolio editor, public viewer) can be handed different registries.
@@ -33,7 +35,9 @@ export class BlockRegistry implements ContainmentRules {
 
   titleOf(node: CanvasNode): string {
     const definition = this.get(node.type) as BlockDefinition<BlockType>
-    return definition.title?.(node.props).trim() || definition.label
+    const title = definition.title?.(node.props).trim()
+    if (!title) return definition.label
+    return title.length > TITLE_LENGTH ? `${title.slice(0, TITLE_LENGTH).trimEnd()}…` : title
   }
 
   list(): AnyBlockDefinition[] {

@@ -167,12 +167,14 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
         <Field label="Title">
           <TextField
             value={props.title}
+            placeholder="Japan Trip"
             onChange={(title) => update((d) => void (d.title = title), { mergeKey: 'cover.title' })}
           />
         </Field>
         <Field label="Subtitle">
           <TextField
             value={props.subtitle}
+            placeholder="Two weeks between Tokyo and Kyoto"
             onChange={(subtitle) =>
               update((d) => void (d.subtitle = subtitle), { mergeKey: 'cover.subtitle' })
             }
