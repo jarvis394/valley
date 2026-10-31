@@ -5,7 +5,7 @@ import type { Asset } from '../../core/document'
 import type { AssetId } from '../../core/ids'
 import { clamp } from '../../core/placement'
 import { useAssets, useRenderContext } from '../../render/context'
-import { Button, cn, FileInput, IconButton, Popover } from '@valley/ui'
+import { Button, cn, FileInput, IconButton, Popover, ScrollArea } from '@valley/ui'
 
 export const focalPointSchema = z.object({
   x: z.number().min(0).max(1),
@@ -190,7 +190,11 @@ export function AssetPicker({
         {label}
       </Popover.Trigger>
       <Popover.Popup>
-        <div className="grid max-h-72 grid-cols-3 gap-1 overflow-y-auto">
+        <ScrollArea
+          scrollbar="plain"
+          className="max-h-72"
+          contentClassName="grid grid-cols-3 gap-1"
+        >
           {assets.map((asset) => (
             <Popover.Close
               key={asset.id}
@@ -203,7 +207,7 @@ export function AssetPicker({
               <Media asset={asset} className="size-full" />
             </Popover.Close>
           ))}
-        </div>
+        </ScrollArea>
         <UploadButton className="mt-2" onUploaded={([id]) => id && onChange(id)} />
       </Popover.Popup>
     </Popover.Root>

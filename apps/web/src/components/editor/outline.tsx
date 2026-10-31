@@ -22,6 +22,7 @@ import {
   ListItemMeta,
   Menu,
   PlusIcon,
+  ScrollArea,
 } from '@valley/ui'
 import { Upload } from 'lucide-react'
 import { useRef, type ReactElement } from 'react'
@@ -42,8 +43,8 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
   }
 
   return (
-    <div className="flex flex-col pb-2">
-      <div className="flex h-11 items-center gap-2 pr-2 pl-4">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex h-11 shrink-0 items-center gap-2 pr-2 pl-4">
         <span className="flex-1 text-[15px] leading-5 text-fg/32">Blocks</span>
         <AddBlockMenu
           trigger={
@@ -53,7 +54,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
           }
         />
       </div>
-      <div className="flex flex-col gap-1 px-1.5">
+      <ScrollArea className="flex-1" contentClassName="flex flex-col gap-1 px-1.5 pb-2">
         <BlockDragProvider>
           <div className="flex flex-col gap-1" {...dropContainerProps(rootId)}>
             {flowIds.map((id, index) => (
@@ -77,7 +78,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
           </>
         )}
         <AddBlockDropzone />
-      </div>
+      </ScrollArea>
     </div>
   )
 }

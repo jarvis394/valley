@@ -6,7 +6,7 @@ import {
   type AbsolutePlacement,
   type NodeId,
 } from '@valley/canvas'
-import { cn, Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
+import { cn, Field, IconButton, ScrollArea, Section, SliderField, Tabs } from '@valley/ui'
 import { MousePointerClick, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ProjectSettings } from './project-settings'
@@ -37,14 +37,14 @@ export function Inspector({
           <Tabs.Tab value="project">Project</Tabs.Tab>
         </Tabs.List>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-14">
+      <ScrollArea className="flex-1" contentClassName="pb-14">
         <Tabs.Panel value="component">
           <ComponentPanel />
         </Tabs.Panel>
         <Tabs.Panel value="project">
           <ProjectSettings />
         </Tabs.Panel>
-      </div>
+      </ScrollArea>
     </Tabs.Root>
   )
 }

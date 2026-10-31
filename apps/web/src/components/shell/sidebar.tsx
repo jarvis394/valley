@@ -8,6 +8,7 @@ import {
   IconButton,
   ListItem,
   LogoIcon,
+  ScrollArea,
   Section,
   SwitcherBar,
   SwitcherMenu,
@@ -129,17 +130,17 @@ function Projects({
 }) {
   if (useCollapsed()) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-1 [scrollbar-width:none]">
+      <ScrollArea scrollbar="hidden" className="flex-1" contentClassName="flex flex-col pt-1">
         {children}
-      </div>
+      </ScrollArea>
     )
   }
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto pb-2 [scrollbar-width:none]">
+    <ScrollArea scrollbar="hidden" className="flex-1" contentClassName="pb-2">
       <Section title={title} action={action} body="list">
         {children}
       </Section>
-    </div>
+    </ScrollArea>
   )
 }
 
@@ -221,7 +222,7 @@ function Footer({ version, repositoryUrl }: { version: string; repositoryUrl: st
 const RAIL_VARIANTS = {
   section: {
     item: 'gap-0.5 pt-2 pb-1',
-    tile: 'size-8 rounded-lg transition-colors group-hover:bg-white/5 group-aria-[current=page]:bg-white/7',
+    tile: 'size-8 rounded-lg text-fg transition-[background-color] *:opacity-63 *:transition-opacity group-hover:bg-white/5 group-hover:*:opacity-100 group-aria-[current=page]:*:opacity-100 group-aria-[current=page]:bg-white/7',
     label: 'truncate px-1',
   },
   project: {

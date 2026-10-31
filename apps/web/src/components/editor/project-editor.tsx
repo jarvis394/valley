@@ -22,6 +22,7 @@ import {
   ListItem,
   ListItemMeta,
   Menu,
+  ScrollArea,
   Sheet,
   SlashBackIcon,
   Switch,
@@ -74,8 +75,10 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
   if (mode === 'preview') {
     // Covers the app shell, so the preview reads like the published page.
     return (
-      <div className="fixed inset-0 isolate z-50 overflow-y-auto bg-neutral-950 text-white">
-        <Canvas />
+      <div className="fixed inset-0 isolate z-50 bg-neutral-950 text-white">
+        <ScrollArea scrollbar="canvas" className="h-full">
+          <Canvas />
+        </ScrollArea>
         <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2">
           <Button
             variant="primary"
@@ -94,19 +97,20 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
     <div className="isolate flex h-full min-w-0 flex-1 overflow-hidden bg-canvas text-fg">
       <aside className="hidden w-80 shrink-0 flex-col border-r border-line bg-surface lg:flex">
         <ProjectHeader switcher={switcher} />
-        <div className="min-h-0 flex-1 overflow-x-clip overflow-y-auto overscroll-contain">
-          <div className="flex flex-col gap-1 px-1.5 py-2">
-            <ProjectRow />
-            {nav}
-          </div>
-          <Divider />
-          <Outline />
+        <div className="flex shrink-0 flex-col gap-1 px-1.5 py-2">
+          <ProjectRow />
+          {nav}
         </div>
+        <Divider />
+        <Outline />
         <PreviewFooter />
       </aside>
 
-      <main
-        className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain pb-24 lg:pb-5"
+      <ScrollArea
+        render={<main />}
+        scrollbar="canvas"
+        className="min-w-0 flex-1"
+        contentClassName="pb-24 lg:pb-5"
         onPointerDown={() => editor.select(null)}
       >
         <div className="sticky top-0 z-30 mb-5 flex items-center justify-between border-b border-line bg-canvas/90 px-3 py-2 backdrop-blur lg:hidden">
@@ -114,7 +118,7 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
           <HistoryButtons />
         </div>
         <Canvas />
-      </main>
+      </ScrollArea>
 
       <aside className="hidden w-80 shrink-0 flex-col border-l border-line bg-surface lg:flex">
         <Inspector

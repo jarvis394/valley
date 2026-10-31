@@ -3,6 +3,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu'
 import { Popover as BasePopover } from '@base-ui/react/popover'
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '../cn'
+import { ScrollArea } from './scroll-area'
 
 /**
  * Styled Base UI overlays. Parts that need no styling are re-exported as-is,
@@ -100,12 +101,14 @@ export function Sheet({
       <Drawer.Portal>
         <Drawer.Backdrop className="fixed inset-0 z-50 bg-black opacity-[calc(0.6*(1-var(--drawer-swipe-progress)))] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Drawer.Viewport className="fixed inset-0 z-50 flex items-end justify-center">
-          <Drawer.Popup className="max-h-[85dvh] w-full overflow-y-auto [scrollbar-gutter:stable_both-edges] overscroll-contain rounded-t-3xl border-t border-white/10 bg-surface pb-[env(safe-area-inset-bottom)] text-white outline-none [transform:translateY(var(--drawer-swipe-movement-y))] transition-transform duration-[400ms] ease-sheet data-ending-style:[transform:translateY(100%)] data-starting-style:[transform:translateY(100%)]">
-            <div className="sticky top-0 z-10 bg-surface pt-3">
+          <Drawer.Popup className="flex max-h-[85dvh] w-full flex-col rounded-t-3xl border-t border-white/10 bg-surface pb-[env(safe-area-inset-bottom)] text-white outline-none [transform:translateY(var(--drawer-swipe-movement-y))] transition-transform duration-[400ms] ease-sheet data-ending-style:[transform:translateY(100%)] data-starting-style:[transform:translateY(100%)]">
+            <div className="shrink-0 pt-3">
               <div className="mx-auto h-1 w-10 rounded-full bg-white/20" />
               <Drawer.Title className="sr-only">{title}</Drawer.Title>
             </div>
-            <Drawer.Content>{children}</Drawer.Content>
+            <ScrollArea scrollbar="plain">
+              <Drawer.Content>{children}</Drawer.Content>
+            </ScrollArea>
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>

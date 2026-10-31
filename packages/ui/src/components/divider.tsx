@@ -5,7 +5,7 @@ export function Divider({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       aria-hidden
-      className={cn('h-px shrink-0 self-stretch bg-white/7', className)}
+      className={cn('h-px shrink-0 self-stretch bg-line', className)}
       {...props}
     />
   )
