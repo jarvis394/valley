@@ -2,11 +2,13 @@ import { Copy, MousePointerClick, Trash2 } from 'lucide-react'
 import type { NodeId } from '../core/ids'
 import type { AbsolutePlacement } from '../core/placement'
 import type { ReactNode } from 'react'
-import { useEditor, useNode, useSelectedId, useUpdateProps } from './context'
+import { useNode } from '../render/context'
+import { useEditor, useSelectedId, useUpdateProps } from './context'
 import { ProjectSettings } from './project-settings'
+import { GalleryControls, ThemeGroupSection, TypographyControls } from './theme-controls'
 import { Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
 
-type InspectorTab = 'component' | 'project'
+export type InspectorTab = 'component' | 'project'
 
 export function Inspector({
   tab,
@@ -81,15 +83,35 @@ function NodeInspector({ id }: { id: NodeId }) {
         </IconButton>
         <IconButton
           size="sm"
+          variant="danger"
           title="Delete"
           onClick={() => editor.commands.removeNode(id)}
-          className="text-danger hover:bg-danger/12 hover:text-danger"
         >
           <Trash2 className="size-4" />
         </IconButton>
       </div>
       {BlockInspector && (
         <BlockInspector node={node as never} props={node.props as never} update={update} />
+      )}
+      {definition.themeGroups?.includes('typography') && (
+        <ThemeGroupSection
+          group="typography"
+          title="Typography"
+          override={node.overrides?.typography}
+          onOverrideChange={(value) => editor.commands.setOverride(id, 'typography', value)}
+        >
+          {(value, set) => <TypographyControls value={value} onChange={set} />}
+        </ThemeGroupSection>
+      )}
+      {definition.themeGroups?.includes('gallery') && (
+        <ThemeGroupSection
+          group="gallery"
+          title="Gallery Style"
+          override={node.overrides?.gallery}
+          onOverrideChange={(value) => editor.commands.setOverride(id, 'gallery', value)}
+        >
+          {(value, set) => <GalleryControls value={value} onChange={set} />}
+        </ThemeGroupSection>
       )}
       {node.placement.mode === 'absolute' && (
         <PlacementSection id={id} placement={node.placement} />

@@ -5,6 +5,7 @@ import {
   createEditor,
   persistEditor,
   sampleDocument,
+  sampleSettings,
 } from '@valley/canvas'
 import { useEffect, useState } from 'react'
 import { AppSidebar, ProjectActions, ProjectNav } from '../components/app-chrome'
@@ -15,12 +16,17 @@ export const Route = createFileRoute('/')({
 })
 
 // Bump when the sample document changes shape so stale demos don't shadow it.
-const STORAGE_KEY = 'valley.canvas.demo.v2'
+const STORAGE_KEY = 'valley.canvas.demo.v3'
 const registry = createDefaultRegistry()
 
 function Home() {
   const [editor] = useState(() =>
-    createEditor({ doc: sampleDocument, registry, galleryUrl: GALLERY_SERVICE_URL }),
+    createEditor({
+      doc: sampleDocument,
+      settings: sampleSettings,
+      registry,
+      galleryUrl: GALLERY_SERVICE_URL,
+    }),
   )
 
   // oxlint-disable-next-line valley/no-unreasoned-state-sync -- localStorage is only readable after hydration

@@ -1,6 +1,7 @@
 import type { Asset, CanvasDocument, CanvasNode } from '../core/document'
 import { assetId, nodeId } from '../core/ids'
 import { FLOW } from '../core/placement'
+import type { ProjectSettings } from '../core/settings'
 import { defaultTheme } from '../core/theme'
 
 /** Deterministic ids so the server- and client-rendered demo match. Files live in the app's /demo. */
@@ -76,8 +77,8 @@ const children: CanvasNode[] = [
       title: 'Collection',
       showTitle: false,
       assetIds: [...images.slice(1, 2), images[0]!, ...images.slice(2)],
-      overrides: { gallery: { layout: 'files' } },
     },
+    overrides: { gallery: { layout: 'files' } },
   }),
   node<CanvasNode<'scene'>>({
     id: nodeId('n_scene'),
@@ -100,8 +101,8 @@ const children: CanvasNode[] = [
       title: 'A very long name for a collection',
       showTitle: false,
       assetIds: images,
-      overrides: { gallery: { layout: 'grid', spacing: 'small', roundness: 0 } },
     },
+    overrides: { gallery: { layout: 'grid', spacing: 'small', roundness: 0 } },
   }),
 ]
 
@@ -113,12 +114,7 @@ export const sampleDocument: CanvasDocument = {
     author: 'Vladislav Ekushev',
     authorAvatar: '/demo/author.jpg',
     date: '2026-05-02',
-    slug: 'august-qu0s6j',
     location: '',
-    storeUntil: 'month',
-    visibility: 'private',
-    usePassword: true,
-    password: 'valley-2026',
     createdAt: '2026-07-29',
     updatedAt: '2026-07-30',
   },
@@ -139,4 +135,12 @@ export const sampleDocument: CanvasDocument = {
     ],
     ...children.map((c) => [c.id, c]),
   ]),
+}
+
+export const sampleSettings: ProjectSettings = {
+  slug: 'august-qu0s6j',
+  storeUntil: 'month',
+  visibility: 'private',
+  usePassword: true,
+  password: 'valley-2026',
 }

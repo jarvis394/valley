@@ -1,7 +1,10 @@
 import type { BlockType, CanvasDocument, CanvasNode } from './document'
+import { CanvasOperationError } from './errors'
 import { createNodeId, type NodeId } from './ids'
 import type { Placement, PlacementMode } from './placement'
-import { collectSubtree, getNode, isAncestor } from './tree'
+import { collectSubtree, flowChildIds, flowIndexOf, getNode, isAncestor } from './tree'
+
+export { CanvasOperationError }
 
 /**
  * Structural mutations. They operate on a mutable document (an immer draft in practice),
@@ -11,8 +14,6 @@ import { collectSubtree, getNode, isAncestor } from './tree'
 export interface ContainmentRules {
   canContain(parent: CanvasNode, childType: BlockType, mode: PlacementMode): boolean
 }
-
-export class CanvasOperationError extends Error {}
 
 function assertCanContain(rules: ContainmentRules, parent: CanvasNode, child: CanvasNode) {
   if (!parent.children) {
@@ -37,11 +38,10 @@ function attach(doc: CanvasDocument, parent: CanvasNode, node: CanvasNode, index
     children.push(node.id)
     return
   }
-  const flowPositions = children.flatMap((id, position) =>
-    doc.nodes[id]?.placement.mode === 'flow' ? [position] : [],
-  )
-  const position =
-    index < flowPositions.length ? flowPositions[index]! : (flowPositions.at(-1) ?? -1) + 1
+  const flow = flowChildIds(doc, parent.id)
+  const anchor = flow[index]
+  const last = flow.at(-1)
+  const position = anchor ? children.indexOf(anchor) : last ? children.indexOf(last) + 1 : 0
   children.splice(position, 0, node.id)
 }
 
@@ -76,6 +76,10 @@ export const insertNode = (
   index?: number,
 ) => insertSubtree(doc, rules, [node], parentId, index)
 
+/**
+ * `index` is a flow index counted while the node is still in place, which is what a drop
+ * target between two items reports.
+ */
 export function moveNode(
   doc: CanvasDocument,
   rules: ContainmentRules,
@@ -89,8 +93,10 @@ export function moveNode(
     throw new CanvasOperationError('Cannot move a node into itself')
   }
   assertCanContain(rules, parent, node)
+  const current = node.parentId === parentId ? flowIndexOf(doc, id) : -1
+  const target = index !== undefined && current !== -1 && current < index ? index - 1 : index
   detach(doc, node)
-  attach(doc, parent, node, index)
+  attach(doc, parent, node, target)
 }
 
 export function removeNode(doc: CanvasDocument, id: NodeId) {
@@ -117,11 +123,7 @@ export function duplicateNode(doc: CanvasDocument, rules: ContainmentRules, id: 
   if (copy.placement.mode === 'absolute') {
     copy.placement = { ...copy.placement, x: copy.placement.x + 0.03, y: copy.placement.y + 0.03 }
   }
-  const parent = getNode(doc, node.parentId)
-  const flowIndex = parent
-    .children!.filter((childId) => doc.nodes[childId]?.placement.mode === 'flow')
-    .indexOf(id)
-  insertSubtree(doc, rules, subtree, parent.id, flowIndex + 1)
+  insertSubtree(doc, rules, subtree, node.parentId, flowIndexOf(doc, id) + 1)
   return copy.id
 }
 

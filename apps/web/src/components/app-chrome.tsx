@@ -175,7 +175,7 @@ export function ProjectActions() {
   const [copied, setCopied] = useState(false)
   const resetTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const share = async () => {
-    const { slug } = editor.getState().doc.meta
+    const { slug } = editor.getState().settings
     await navigator.clipboard?.writeText(`${GALLERY_SERVICE_URL}/${slug ?? ''}`)
     setCopied(true)
     clearTimeout(resetTimer.current)

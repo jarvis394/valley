@@ -2,7 +2,9 @@ import type { Draft } from 'immer'
 import type { ComponentType, ReactNode } from 'react'
 import type { z } from 'zod'
 import type { BlockProps, BlockType, CanvasDocument, CanvasNode } from '../core/document'
+import type { AssetId } from '../core/ids'
 import type { Placement, PlacementMode } from '../core/placement'
+import type { ThemeGroup } from '../core/theme'
 
 export type RenderMode = 'edit' | 'view'
 
@@ -68,6 +70,12 @@ export interface BlockDefinition<T extends BlockType> {
     initial: () => Placement
   }
   container?: ContainerSpec
+  /** Theme groups the node may override; the inspector shows a section for each. */
+  themeGroups?: readonly ThemeGroup[]
+  /** Builds props from freshly uploaded files. The first block with it receives file drops. */
+  fromAssets?: (assetIds: AssetId[], ctx: CreateBlockContext) => BlockProps<T>
+  /** The asset this block shows as the project cover, which is also the project thumbnail. */
+  coverAsset?: (props: BlockProps<T>) => AssetId | null
   /** Shown in the "add block" menu. Defaults to true. */
   insertable?: boolean
   experimental?: boolean
@@ -76,7 +84,6 @@ export interface BlockDefinition<T extends BlockType> {
   /** Secondary info for the outline (e.g. file count). */
   describe?: (
     node: CanvasNode<T>,
-    doc: CanvasDocument,
   ) => { meta?: string; metaIcon?: ComponentType<{ className?: string }> } | undefined
 }
 

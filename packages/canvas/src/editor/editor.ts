@@ -1,13 +1,30 @@
-import { applyPatches, enablePatches, produceWithPatches, type Draft, type Patch } from 'immer'
+import {
+  applyPatches,
+  enablePatches,
+  produce,
+  produceWithPatches,
+  type Draft,
+  type Patch,
+} from 'immer'
 import { createStore } from 'zustand/vanilla'
-import type { Asset, BlockProps, BlockType, CanvasDocument, DocumentMeta } from '../core/document'
+import type {
+  Asset,
+  BlockProps,
+  BlockType,
+  CanvasDocument,
+  CanvasNode,
+  DocumentMeta,
+} from '../core/document'
+import { CanvasOperationError } from '../core/errors'
 import { createAssetId, type AssetId, type NodeId } from '../core/ids'
 import * as ops from '../core/operations'
 import type { Placement } from '../core/placement'
-import type { Theme } from '../core/theme'
-import { findNode, getNode } from '../core/tree'
+import type { ProjectSettings } from '../core/settings'
+import type { Theme, ThemeGroup, ThemeOverrides } from '../core/theme'
+import { findNode, flowIndexOf, getNode } from '../core/tree'
 import type { BlockRegistry } from '../registry/registry'
 import type { UpdateOptions } from '../registry/types'
+import { readLocalAsset, type ReadAsset } from './assets'
 
 enablePatches()
 
@@ -22,6 +39,8 @@ interface HistoryEntry {
 
 export interface EditorState {
   doc: CanvasDocument
+  /** Publishing settings. Kept out of `doc` and out of history. */
+  settings: ProjectSettings
   selectedId: NodeId | null
   /** Where a dragged block would land. Transient UI state, never part of history. */
   drop: DropTarget | null
@@ -32,7 +51,7 @@ export interface EditorState {
 
 export interface DropTarget {
   parentId: NodeId
-  /** Insertion index among the parent's flow children, counted before the source is removed. */
+  /** Flow index of the gap, counted with the dragged node still in place. */
   index: number
 }
 
@@ -50,10 +69,13 @@ export type ChangeListener = (change: {
 
 export interface CreateEditorOptions {
   doc: CanvasDocument
+  settings?: ProjectSettings
   registry: BlockRegistry
   readOnly?: boolean
   /** Origin of published galleries; a project lives at `${galleryUrl}/${slug}`. */
   galleryUrl?: string
+  /** Stores a picked file and describes it. Defaults to a tab-local object URL. */
+  uploadAsset?: ReadAsset
 }
 
 const MERGE_WINDOW_MS = 1000
@@ -61,12 +83,15 @@ const HISTORY_LIMIT = 200
 
 export function createEditor({
   doc: initialDoc,
+  settings = {},
   registry,
   readOnly = false,
   galleryUrl,
+  uploadAsset = readLocalAsset,
 }: CreateEditorOptions) {
   const store = createStore<EditorState>(() => ({
     doc: initialDoc,
+    settings,
     selectedId: null,
     drop: null,
     mode: readOnly ? 'preview' : 'edit',
@@ -89,7 +114,7 @@ export function createEditor({
         recipe(draft as CanvasDocument),
       )
     } catch (error) {
-      if (error instanceof ops.CanvasOperationError) {
+      if (error instanceof CanvasOperationError) {
         console.warn(`[canvas] ${error.message}`)
         return false
       }
@@ -155,29 +180,42 @@ export function createEditor({
     const { doc, selectedId } = store.getState()
     const selected = findNode(doc, selectedId)
     if (selected?.parentId && selected.placement.mode === 'flow') {
-      const siblings = getNode(doc, selected.parentId).children!.filter(
-        (id) => doc.nodes[id]?.placement.mode === 'flow',
-      )
-      return { parentId: selected.parentId, index: siblings.indexOf(selected.id) + 1 }
+      return { parentId: selected.parentId, index: flowIndexOf(doc, selected.id) + 1 }
     }
     return { parentId: doc.rootId }
+  }
+
+  type InsertTarget = { parentId?: NodeId; index?: number }
+
+  function insert(node: CanvasNode, target: InsertTarget): NodeId | null {
+    const fallback = defaultInsertTarget()
+    const parentId = target.parentId ?? fallback.parentId
+    const index = target.parentId ? target.index : (target.index ?? fallback.index)
+    const ok = transact((draft) => ops.insertNode(draft, registry, node, parentId, index))
+    if (!ok) return null
+    select(node.id)
+    return node.id
+  }
+
+  function addAssets(assets: Omit<Asset, 'id'>[]): AssetId[] {
+    const withIds = assets.map((asset) => ({ ...asset, id: createAssetId() }))
+    const ok = transact((draft) => {
+      for (const asset of withIds) draft.assets[asset.id] = asset
+    })
+    return ok ? withIds.map((asset) => asset.id) : []
   }
 
   const commands = {
     insertBlock<T extends BlockType>(
       type: T,
-      target: { parentId?: NodeId; index?: number; placement?: Placement } = {},
-      init?: (props: BlockProps<T>) => void,
+      target: InsertTarget & { placement?: Placement } = {},
     ): NodeId | null {
-      const fallback = defaultInsertTarget()
-      const parentId = target.parentId ?? fallback.parentId
-      const index = target.parentId ? target.index : (target.index ?? fallback.index)
-      const node = registry.createNode(type, { doc: store.getState().doc }, target)
-      init?.(node.props as BlockProps<T>)
-      const ok = transact((draft) => ops.insertNode(draft, registry, node, parentId, index))
-      if (!ok) return null
-      select(node.id)
-      return node.id
+      return insert(registry.createNode(type, { doc: store.getState().doc }, target), target)
+    },
+    /** Inserts the block that takes file drops, holding `assetIds`. */
+    insertFromAssets(assetIds: AssetId[], target: InsertTarget = {}): NodeId | null {
+      const node = registry.createNodeFromAssets(assetIds, { doc: store.getState().doc })
+      return node && insert(node, target)
     },
     moveNode: (id: NodeId, parentId: NodeId, index?: number) =>
       transact((draft) => ops.moveNode(draft, registry, id, parentId, index)),
@@ -197,25 +235,42 @@ export function createEditor({
     updateProps<T extends BlockType>(
       id: NodeId,
       recipe: (props: Draft<BlockProps<T>>) => void,
-      options?: UpdateOptions,
+      { mergeKey }: UpdateOptions = {},
     ) {
-      return transact((draft) => recipe(getNode(draft, id).props as Draft<BlockProps<T>>), options)
+      return transact((draft) => recipe(getNode(draft, id).props as Draft<BlockProps<T>>), {
+        mergeKey: mergeKey && `${id}:${mergeKey}`,
+      })
+    },
+    setOverride<K extends ThemeGroup>(id: NodeId, group: K, value: ThemeOverrides[K]) {
+      return transact((draft) => {
+        const node = getNode(draft, id)
+        node.overrides = { ...node.overrides, [group]: value }
+      })
     },
     rename: (id: NodeId, name: string) =>
-      transact((draft) => {
-        getNode(draft, id).name = name || undefined
-      }),
+      transact(
+        (draft) => {
+          getNode(draft, id).name = name || undefined
+        },
+        { mergeKey: `${id}:name` },
+      ),
     updateTheme: (recipe: (theme: Theme) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.theme), options),
     updateMeta: (recipe: (meta: DocumentMeta) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.meta), options),
-    addAssets(assets: Omit<Asset, 'id'>[]): AssetId[] {
-      const withIds = assets.map((asset) => ({ ...asset, id: createAssetId() }))
-      transact((draft) => {
-        for (const asset of withIds) draft.assets[asset.id] = asset
-      })
-      return withIds.map((asset) => asset.id)
+    addAssets,
+    /** Stores the image and video files among `files` and adds them to the project. */
+    async uploadAssets(files: File[]): Promise<AssetId[]> {
+      if (readOnly) return []
+      const media = files.filter((file) => /^(image|video)\//.test(file.type))
+      return addAssets(await Promise.all(media.map(uploadAsset)))
     },
+  }
+
+  /** Not part of the document, so it bypasses history and change listeners. */
+  const updateSettings = (recipe: (settings: ProjectSettings) => void) => {
+    if (readOnly) return
+    store.setState({ settings: produce(store.getState().settings, recipe) })
   }
 
   return {
@@ -224,6 +279,7 @@ export function createEditor({
     readOnly,
     galleryUrl,
     commands,
+    updateSettings,
     transact,
     undo,
     redo,

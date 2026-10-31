@@ -2,8 +2,8 @@ import { useDraggable } from '@dnd-kit/react'
 import { Upload } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
 import type { NodeId } from '../core/ids'
-import { useUploadAssets } from '../blocks/shared/media'
-import { useChildIds, useEditor, useEditorState } from './context'
+import { useChildIds, useDocumentState, useNode } from '../render/context'
+import { useEditor, useEditorState } from './context'
 import {
   BlockDragProvider,
   DRAG_TYPE,
@@ -27,7 +27,7 @@ const scrollToNode = (id: NodeId) =>
  */
 export function Outline({ onNavigate }: { onNavigate?: () => void }) {
   const editor = useEditor()
-  const rootId = useEditorState((state) => state.doc.rootId)
+  const rootId = useDocumentState((state) => state.doc.rootId)
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(rootId)
   const navigate = (id: NodeId) => {
     editor.select(id)
@@ -120,13 +120,12 @@ function OutlineItem({
   ref?: (element: Element | null) => void
 }) {
   const editor = useEditor()
-  const node = useEditorState((state) => state.doc.nodes[id])
-  const doc = useEditorState((state) => state.doc)
+  const node = useNode(id)
   const selected = useEditorState((state) => state.selectedId === id)
   if (!node) return null
   const definition = editor.registry.get(node.type)
   const Icon = definition.icon
-  const described = definition.describe?.(node as never, doc)
+  const described = definition.describe?.(node as never)
   const MetaIcon = described?.metaIcon
 
   return (
@@ -189,21 +188,14 @@ export function AddBlockMenu({
   )
 }
 
-/** "Add block or upload files": opens the block menu; dropping files creates a collection. */
+/** "Add block or upload files": opens the block menu; dropped files go into a new block. */
 function AddBlockDropzone() {
   const editor = useEditor()
-  const upload = useUploadAssets()
   const inputRef = useRef<HTMLInputElement>(null)
-  const createCollection = async (files: FileList) => {
-    const ids = await upload(files)
+  const insertFiles = async (files: FileList) => {
+    const ids = await editor.commands.uploadAssets([...files])
     if (ids.length === 0) return
-    editor.commands.insertBlock(
-      'collection',
-      { parentId: editor.getState().doc.rootId },
-      (props) => {
-        props.assetIds = ids
-      },
-    )
+    editor.commands.insertFromAssets(ids, { parentId: editor.getState().doc.rootId })
   }
   return (
     <div className="py-1.5">
@@ -213,7 +205,7 @@ function AddBlockDropzone() {
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
-              void createCollection(event.dataTransfer.files)
+              void insertFiles(event.dataTransfer.files)
             }}
             className="flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/7 p-3 text-[15px] leading-5 font-medium text-fg/63 outline-none hover:border-white/12 hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-popup-open:border-white/12"
           >
@@ -237,7 +229,7 @@ function AddBlockDropzone() {
         tabIndex={-1}
         onChange={(event) => {
           const { files } = event.currentTarget
-          if (files?.length) void createCollection(files)
+          if (files?.length) void insertFiles(files)
           event.currentTarget.value = ''
         }}
       />

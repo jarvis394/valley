@@ -1,7 +1,8 @@
-import type { BlockType, CanvasNode } from '../core/document'
-import { createNodeId } from '../core/ids'
+import type { BlockType, CanvasDocument, CanvasNode } from '../core/document'
+import { createNodeId, type AssetId } from '../core/ids'
 import type { ContainmentRules } from '../core/operations'
 import type { Placement, PlacementMode } from '../core/placement'
+import { walk } from '../core/tree'
 import type { AnyBlockDefinition, BlockDefinition, CreateBlockContext } from './types'
 
 /**
@@ -52,14 +53,39 @@ export class BlockRegistry implements ContainmentRules {
     overrides: { placement?: Placement } = {},
   ): CanvasNode<T> {
     const definition = this.get(type)
+    return this.#node(definition, definition.create(context), overrides) as CanvasNode<T>
+  }
+
+  /** A node for the block that takes file drops, holding `assetIds`; null if none does. */
+  createNodeFromAssets(assetIds: AssetId[], context: CreateBlockContext): CanvasNode | null {
+    const definition = this.list().find((item) => item.fromAssets)
+    if (!definition?.fromAssets) return null
+    return this.#node(definition, definition.fromAssets(assetIds, context))
+  }
+
+  /** The project cover asset: the first cover-providing block in document order. */
+  coverAssetId(doc: CanvasDocument): AssetId | null {
+    for (const node of walk(doc, doc.rootId)) {
+      const definition = this.#definitions.get(node.type) as BlockDefinition<BlockType> | undefined
+      const assetId = definition?.coverAsset?.(node.props)
+      if (assetId) return assetId
+    }
+    return null
+  }
+
+  #node(
+    definition: Pick<AnyBlockDefinition, 'type' | 'container' | 'placement' | 'version'>,
+    props: unknown,
+    overrides: { placement?: Placement } = {},
+  ): CanvasNode {
     return {
       id: createNodeId(),
-      type,
+      type: definition.type,
       parentId: null,
       children: definition.container ? [] : undefined,
       placement: overrides.placement ?? definition.placement.initial(),
       v: definition.version,
-      props: definition.create(context),
-    } as CanvasNode<T>
+      props,
+    } as CanvasNode
   }
 }

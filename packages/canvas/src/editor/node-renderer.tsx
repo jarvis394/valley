@@ -2,8 +2,10 @@ import { useDraggable } from '@dnd-kit/react'
 import { ArrowDown, ArrowUp, Copy, Trash2 } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import type { NodeId } from '../core/ids'
-import type { RenderMode } from '../registry/types'
-import { useChildIds, useEditor, useEditorState, useNode, useUpdateProps } from './context'
+import { flowIndexOf, flowChildIds } from '../core/tree'
+import { useChildIds, useNode } from '../render/context'
+import { absolutePlacementStyle } from '../render/document-view'
+import { useEditor, useEditorState, useUpdateProps } from './context'
 import {
   DRAG_TYPE,
   DropLine,
@@ -14,14 +16,13 @@ import {
 } from './dnd'
 import { cn } from '@valley/ui'
 
-const useRenderMode = (): RenderMode =>
-  useEditorState((state) => (state.mode === 'edit' ? 'edit' : 'view'))
-
-/** Renders any node by looking up its block definition. Containers get their children slot. */
+/**
+ * Renders any node in edit mode by looking up its block definition. Containers get their
+ * children slot. Read-only rendering lives in `render/document-view`.
+ */
 export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
   const editor = useEditor()
   const node = useNode(id)
-  const mode = useRenderMode()
   const selected = useEditorState((state) => state.selectedId === id)
   const update = useUpdateProps(id)
   if (!node || node.hidden) return null
@@ -33,7 +34,7 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
       node={node as never}
       props={node.props as never}
       update={update}
-      mode={mode}
+      mode="edit"
       selected={selected}
     >
       {definition.container ? <NodeChildren parentId={id} /> : undefined}
@@ -47,24 +48,17 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
  * Container layouts other than `stack` would branch here on `definition.container.layout`.
  */
 function NodeChildren({ parentId }: { parentId: NodeId }) {
-  const mode = useRenderMode()
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(parentId)
   return (
     <div
-      className={cn('relative', mode === 'edit' && 'flex flex-col gap-4')}
+      className="relative flex flex-col gap-4"
       data-canvas-container={parentId}
       {...dropContainerProps(parentId)}
     >
-      {flowIds.map((id, index) =>
-        mode === 'edit' ? (
-          <FlowItem key={id} id={id} index={index} count={flowIds.length} parentId={parentId} />
-        ) : (
-          <div key={id} data-node-id={id} {...dropItemProps}>
-            <NodeRenderer id={id} />
-          </div>
-        ),
-      )}
-      {mode === 'edit' && flowIds.length === 0 && (
+      {flowIds.map((id, index) => (
+        <FlowItem key={id} id={id} index={index} count={flowIds.length} parentId={parentId} />
+      ))}
+      {flowIds.length === 0 && (
         <div className="p-12 text-center text-[13px] text-fg/32">Empty. Add a block</div>
       )}
       {absoluteIds.length > 0 && (
@@ -145,22 +139,22 @@ function FlowItem({
 
 function BlockToolbar({ id }: { id: NodeId }) {
   const editor = useEditor()
-  const move = (delta: number) => {
+  /** `gap` is the flow index to drop into, counted with this node still in place. */
+  const moveToGap = (offset: number) => {
     const { doc } = editor.getState()
-    const node = doc.nodes[id]
-    if (!node?.parentId) return
-    const siblings = (doc.nodes[node.parentId]?.children ?? []).filter(
-      (childId) => doc.nodes[childId]?.placement.mode === 'flow',
-    )
-    const index = siblings.indexOf(id) + delta
-    if (index >= 0 && index < siblings.length) editor.commands.moveNode(id, node.parentId, index)
+    const parentId = doc.nodes[id]?.parentId
+    if (!parentId) return
+    const gap = flowIndexOf(doc, id) + offset
+    if (gap >= 0 && gap <= flowChildIds(doc, parentId).length) {
+      editor.commands.moveNode(id, parentId, gap)
+    }
   }
   return (
     <div className="flex items-center gap-0.5">
-      <ToolbarButton label="Move up" onClick={() => move(-1)}>
+      <ToolbarButton label="Move up" onClick={() => moveToGap(-1)}>
         <ArrowUp className="size-3" />
       </ToolbarButton>
-      <ToolbarButton label="Move down" onClick={() => move(1)}>
+      <ToolbarButton label="Move down" onClick={() => moveToGap(2)}>
         <ArrowDown className="size-3" />
       </ToolbarButton>
       <ToolbarButton label="Duplicate" onClick={() => editor.commands.duplicateNode(id)}>
@@ -197,39 +191,29 @@ function ToolbarButton({
 function AbsoluteItem({ id, parentId }: { id: NodeId; parentId: NodeId }) {
   const editor = useEditor()
   const node = useNode(id)
-  const mode = useRenderMode()
   const selected = useEditorState((state) => state.selectedId === id)
   const { ref, isDragging } = useDraggable<DragData>({
     id,
     type: DRAG_TYPE.absolute,
-    disabled: mode !== 'edit' || node?.locked,
+    disabled: node?.locked,
     data: { kind: 'absolute-node', nodeId: id, parentId },
   })
   if (!node || node.placement.mode !== 'absolute') return null
-  const { x, y, width, rotation, z } = node.placement
 
   return (
     <div
       ref={ref}
       data-node-id={id}
       onPointerDown={(event) => {
-        if (mode !== 'edit') return
         event.stopPropagation()
         editor.select(id)
       }}
       className={cn(
-        'pointer-events-auto absolute',
-        mode === 'edit' && 'cursor-move touch-none',
+        'pointer-events-auto absolute cursor-move touch-none',
         selected && 'outline-2 outline-offset-4 outline-focus',
         isDragging && 'opacity-80',
       )}
-      style={{
-        left: `${x * 100}%`,
-        top: `${y * 100}%`,
-        width: `${width * 100}%`,
-        zIndex: 20 + z,
-        rotate: `${rotation}deg`,
-      }}
+      style={absolutePlacementStyle(node.placement)}
     >
       <NodeRenderer id={id} />
     </div>

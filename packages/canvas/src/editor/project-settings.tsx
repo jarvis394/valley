@@ -2,8 +2,10 @@ import { Archive, CalendarDays, RefreshCw, Trash2, UserLock } from 'lucide-react
 import { useRef, useState } from 'react'
 import type { DocumentMeta } from '../core/document'
 import { formatBytes, formatShortDate, formatUsDate } from '../core/format'
-import { GalleryControls, TypographyControls } from '../blocks/shared/theme'
-import { useEditor, useEditorState, useMeta, useTheme } from './context'
+import type { ProjectSettings as Settings } from '../core/settings'
+import { useAssets, useMeta, useTheme } from '../render/context'
+import { useEditor, useSettings } from './context'
+import { GalleryControls, TypographyControls } from './theme-controls'
 import {
   Button,
   EyeIcon,
@@ -42,15 +44,17 @@ const randomPassword = () =>
 export function ProjectSettings() {
   const editor = useEditor()
   const meta = useMeta()
+  const settings = useSettings()
   const { galleryUrl } = editor
   const theme = useTheme()
-  const assets = useEditorState((state) => state.doc.assets)
   const set = <K extends keyof DocumentMeta>(key: K, value: DocumentMeta[K]) =>
     editor.commands.updateMeta((m) => void (m[key] = value), { mergeKey: `meta.${key}` })
+  const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
+    editor.updateSettings((s) => void (s[key] = value))
 
-  const files = Object.values(assets)
+  const files = Object.values(useAssets())
   const bytes = files.reduce((sum, asset) => sum + (asset.size ?? 0), 0)
-  const visibility = meta.visibility ?? 'private'
+  const visibility = settings.visibility ?? 'private'
 
   return (
     <div className="flex flex-col">
@@ -61,9 +65,9 @@ export function ProjectSettings() {
         <Field label="Short URL">
           <TextField
             prefix={galleryUrl && `${galleryUrl.replace(/^https?:\/\//, '')}/`}
-            value={meta.slug ?? ''}
+            value={settings.slug ?? ''}
             placeholder="my-project"
-            onChange={(slug) => set('slug', slug.replace(/[^a-z0-9-]/gi, '-').toLowerCase())}
+            onChange={(slug) => setSetting('slug', slug.replace(/[^a-z0-9-]/gi, '-').toLowerCase())}
           />
         </Field>
         <div className="flex gap-2">
@@ -72,9 +76,9 @@ export function ProjectSettings() {
           </Field>
           <Field label="Store until" className="flex-1">
             <SelectField
-              value={meta.storeUntil ?? 'month'}
+              value={settings.storeUntil ?? 'month'}
               options={storeUntilOptions}
-              onChange={(storeUntil) => set('storeUntil', storeUntil)}
+              onChange={(storeUntil) => setSetting('storeUntil', storeUntil)}
             />
           </Field>
         </div>
@@ -93,15 +97,15 @@ export function ProjectSettings() {
             value={visibility}
             options={visibilityOptions}
             icon={visibility === 'private' ? <EyeOffIcon /> : <EyeIcon />}
-            onChange={(next) => set('visibility', next)}
+            onChange={(next) => setSetting('visibility', next)}
           />
         </Field>
         <Field label="Password">
           <PasswordControl
-            enabled={meta.usePassword ?? false}
-            password={meta.password ?? ''}
-            onEnabledChange={(usePassword) => set('usePassword', usePassword)}
-            onPasswordChange={(password) => set('password', password)}
+            enabled={settings.usePassword ?? false}
+            password={settings.password ?? ''}
+            onEnabledChange={(usePassword) => setSetting('usePassword', usePassword)}
+            onPasswordChange={(password) => setSetting('password', password)}
           />
         </Field>
       </Section>

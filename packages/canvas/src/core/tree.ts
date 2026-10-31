@@ -1,12 +1,12 @@
 import type { BlockType, CanvasDocument, CanvasNode } from './document'
 import type { NodeId } from './ids'
-import type { AbsolutePlacement } from './placement'
+import { CanvasOperationError } from './errors'
 
 /** Read-only queries over the node tree. Safe to call on immer drafts too. */
 
 export function getNode(doc: CanvasDocument, id: NodeId): CanvasNode {
   const node = doc.nodes[id]
-  if (!node) throw new Error(`Node ${id} does not exist`)
+  if (!node) throw new CanvasOperationError(`Node ${id} does not exist`)
   return node
 }
 
@@ -23,13 +23,19 @@ export function isNodeOfType<T extends BlockType>(
 export const getChildren = (doc: CanvasDocument, id: NodeId): CanvasNode[] =>
   (doc.nodes[id]?.children ?? []).map((childId) => getNode(doc, childId))
 
-export const getFlowChildren = (doc: CanvasDocument, id: NodeId) =>
-  getChildren(doc, id).filter((child) => child.placement.mode === 'flow')
+/** Ids of the flow children of `id`, in order. Indexes into this list are "flow indexes". */
+export const flowChildIds = (doc: CanvasDocument, id: NodeId): NodeId[] =>
+  (doc.nodes[id]?.children ?? []).filter((childId) => doc.nodes[childId]?.placement.mode === 'flow')
 
-export const getAbsoluteChildren = (doc: CanvasDocument, id: NodeId) =>
-  getChildren(doc, id).filter(
-    (child): child is CanvasNode & { placement: AbsolutePlacement } =>
-      child.placement.mode === 'absolute',
+/** Position of `id` among its parent's flow children, or -1. */
+export function flowIndexOf(doc: CanvasDocument, id: NodeId): number {
+  const parentId = doc.nodes[id]?.parentId
+  return parentId ? flowChildIds(doc, parentId).indexOf(id) : -1
+}
+
+export const absoluteChildIds = (doc: CanvasDocument, id: NodeId): NodeId[] =>
+  (doc.nodes[id]?.children ?? []).filter(
+    (childId) => doc.nodes[childId]?.placement.mode === 'absolute',
   )
 
 export function getAncestors(doc: CanvasDocument, id: NodeId): NodeId[] {

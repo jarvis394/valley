@@ -9,18 +9,13 @@ import { middleTruncate } from '../../core/format'
 import { assetIdSchema, type AssetId } from '../../core/ids'
 import { FLOW } from '../../core/placement'
 import { SPACING_PX, type GalleryStyle } from '../../core/theme'
-import { useAsset, useAssets, useEditorState } from '../../editor/context'
+import { useAsset, useAssets, useCoverAssetId } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { Media, UploadButton } from '../shared/media'
+import { typographyStyle, useResolvedTheme } from '../shared/theme'
 import {
-  GalleryControls,
-  overridesSchema,
-  ThemeGroupSection,
-  typographyStyle,
-  useResolvedTheme,
-} from '../shared/theme'
-import {
+  Button,
   cn,
   Field,
   FileIcon,
@@ -35,7 +30,6 @@ const collectionSchema = z.object({
   title: z.string(),
   showTitle: z.boolean(),
   assetIds: z.array(assetIdSchema),
-  overrides: overridesSchema.pick({ gallery: true }).optional(),
 })
 export type CollectionProps = z.infer<typeof collectionSchema>
 
@@ -75,14 +69,6 @@ const LAYOUTS: Record<
   },
 }
 
-/** The project's cover image, so the editor can flag it inside collections. */
-const useCoverAssetId = (enabled: boolean) =>
-  useEditorState((state) => {
-    if (!enabled) return null
-    const cover = Object.values(state.doc.nodes).find((node) => node.type === 'cover')
-    return cover?.type === 'cover' ? cover.props.assetId : null
-  })
-
 function CoverBadge({ className }: { className?: string }) {
   return (
     <span
@@ -116,10 +102,12 @@ function FileCard({ asset, isCover }: { asset: Asset; isCover: boolean }) {
   )
 }
 
-function CollectionRender({ props, update, mode }: BlockRenderProps<'collection'>) {
+function CollectionRender({ node, props, update, mode }: BlockRenderProps<'collection'>) {
   const assets = useAssets()
-  const { gallery, typography } = useResolvedTheme(props.overrides)
-  const coverAssetId = useCoverAssetId(mode === 'edit')
+  const { gallery, typography } = useResolvedTheme(node.overrides)
+  // The editor flags the project cover inside collections; viewers don't see the badge.
+  const projectCover = useCoverAssetId()
+  const coverAssetId = mode === 'edit' ? projectCover : null
   const gap = SPACING_PX[gallery.spacing]
   const items = props.assetIds.map((id) => assets[id]).filter((a): a is Asset => !!a)
 
@@ -240,16 +228,6 @@ function CollectionInspector({ props, update }: BlockInspectorProps<'collection'
           onChange={(showTitle) => update((d) => void (d.showTitle = showTitle))}
         />
       </Section>
-      <ThemeGroupSection
-        group="gallery"
-        title="Gallery Style"
-        override={props.overrides?.gallery}
-        onOverrideChange={(gallery) =>
-          update((d) => void (d.overrides = { ...d.overrides, gallery }))
-        }
-      >
-        {(value, set) => <GalleryControls value={value} onChange={set} />}
-      </ThemeGroupSection>
       <Section title={`Files · ${props.assetIds.length}`}>
         <DragDropProvider
           onDragEnd={(event) => {
@@ -275,13 +253,14 @@ function CollectionInspector({ props, update }: BlockInspectorProps<'collection'
             onUploaded={(ids) => update((d) => void d.assetIds.push(...ids))}
           />
           {missing.length > 0 && (
-            <button
-              type="button"
+            <Button
+              variant="control"
+              size="md"
+              className="flex-1"
               onClick={() => update((d) => void d.assetIds.push(...missing.map((a) => a.id)))}
-              className="flex h-10 flex-1 items-center justify-center rounded-xl bg-control text-sm text-neutral-200 hover:bg-control-hover"
             >
               Add all ({missing.length})
-            </button>
+            </Button>
           )}
         </div>
       </Section>
@@ -302,7 +281,9 @@ export const collectionBlock = defineBlock({
       .filter((a) => a.kind === 'image')
       .map((a) => a.id),
   }),
+  fromAssets: (assetIds) => ({ title: 'Collection', showTitle: false, assetIds }),
   placement: { allowed: ['flow'], initial: () => FLOW },
+  themeGroups: ['gallery'],
   Render: CollectionRender,
   Inspector: CollectionInspector,
   describe: (node) => ({ meta: String(node.props.assetIds.length), metaIcon: FileIcon }),

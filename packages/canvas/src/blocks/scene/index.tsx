@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { assetIdSchema } from '../../core/ids'
 import { FLOW } from '../../core/placement'
-import { useAsset } from '../../editor/context'
+import { useAsset } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { AssetPicker, CENTER, FocalPointPicker, focalPointSchema, Media } from '../shared/media'

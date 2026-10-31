@@ -24,11 +24,17 @@ export function parseDocument(input: unknown, registry: BlockRegistry): ParseRes
     }
     const definition = registry.get(node.type)
     let props = node.props
-    if (node.v < definition.version) {
+    if (node.v > definition.version) {
+      warnings.push(`Node ${node.id}: "${node.type}" v${node.v} is newer than this editor`)
+    } else if (node.v < definition.version) {
       if (!definition.migrate) {
         warnings.push(`Node ${node.id}: no migration from v${node.v} for "${node.type}"`)
       } else {
-        props = definition.migrate(props, node.v)
+        try {
+          props = definition.migrate(props, node.v)
+        } catch (error) {
+          warnings.push(`Node ${node.id}: migration from v${node.v} failed (${String(error)})`)
+        }
       }
     }
     const parsed = definition.schema.safeParse(props)
@@ -38,15 +44,38 @@ export function parseDocument(input: unknown, registry: BlockRegistry): ParseRes
     nodes[node.id] = {
       ...node,
       v: definition.version,
+      children: definition.container ? (node.children ?? []) : undefined,
       props: parsed.success ? parsed.data : definition.create({ doc: raw as never }),
     } as CanvasNode
   }
 
-  // Repair dangling references left by dropped nodes.
-  for (const node of Object.values(nodes)) {
-    node.children = node.children?.filter((childId) => childId in nodes)
+  const root = nodes[raw.rootId]
+  if (!root) throw new Error('Document root is missing or invalid')
+  root.parentId = null
+
+  // Rebuild parent links from the root down, so every kept node is reachable exactly once
+  // and sits in a parent that accepts it.
+  const reachable = new Set<NodeId>([root.id])
+  const queue = [root]
+  for (let parent = queue.shift(); parent; parent = queue.shift()) {
+    parent.children = parent.children?.filter((childId) => {
+      const child = nodes[childId]
+      if (!child || reachable.has(childId)) return false
+      if (!registry.canContain(parent, child.type, child.placement.mode)) {
+        warnings.push(`Dropped node ${childId}: ${parent.type} does not accept it`)
+        return false
+      }
+      reachable.add(childId)
+      child.parentId = parent.id
+      queue.push(child)
+      return true
+    })
   }
-  if (!(raw.rootId in nodes)) throw new Error('Document root is missing or invalid')
+  for (const id of Object.keys(nodes) as NodeId[]) {
+    if (reachable.has(id)) continue
+    warnings.push(`Dropped node ${id}: not reachable from the root`)
+    delete nodes[id]
+  }
 
   return {
     doc: { ...raw, nodes, assets: raw.assets as CanvasDocument['assets'] },

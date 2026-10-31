@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { assetIdSchema, nodeIdSchema, type AssetId, type NodeId } from './ids'
 import { placementSchema, type Placement } from './placement'
-import { themeSchema, type Theme } from './theme'
+import { themeOverridesSchema, themeSchema, type Theme, type ThemeOverrides } from './theme'
 
 /**
  * Block props keyed by block type. Each block adds its entry with module augmentation,
@@ -26,6 +26,8 @@ export interface NodeBase {
   name?: string
   hidden?: boolean
   locked?: boolean
+  /** Theme groups this node deviates on. Only groups in its definition's `themeGroups` apply. */
+  overrides?: ThemeOverrides
 }
 
 /** Distributes over `T`, so `CanvasNode` is a union narrowable by `node.type`. */
@@ -51,13 +53,7 @@ export const documentMetaSchema = z.object({
   /** ISO date the project was shot. */
   date: z.string(),
   authorAvatar: z.string().optional(),
-  /** Public URL path segment. */
-  slug: z.string().optional(),
   location: z.string().optional(),
-  storeUntil: z.enum(['week', 'month', 'year', 'forever']).optional(),
-  visibility: z.enum(['private', 'public']).optional(),
-  usePassword: z.boolean().optional(),
-  password: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 })
@@ -86,6 +82,7 @@ export const rawNodeSchema = z.object({
   name: z.string().optional(),
   hidden: z.boolean().optional(),
   locked: z.boolean().optional(),
+  overrides: themeOverridesSchema.optional(),
 })
 
 export const rawDocumentSchema = z.object({

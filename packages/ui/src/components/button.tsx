@@ -11,6 +11,8 @@ const VARIANTS = {
   /** Full-width panel action (Archive). */
   secondary: 'bg-white/3 text-fg hover:bg-white/7',
   danger: 'bg-danger/12 text-danger hover:bg-danger/18',
+  /** Inspector action that sits beside form controls (Upload). */
+  control: 'justify-center bg-control text-neutral-200 hover:bg-control-hover',
 } as const
 
 const SIZES = {
@@ -48,16 +50,24 @@ export function Button({
   )
 }
 
+const ICON_VARIANTS = {
+  default: 'text-fg/63 hover:bg-white/7 hover:text-fg',
+  /** Destructive action (Delete). */
+  danger: 'text-danger hover:bg-danger/12',
+} as const
+
 export function IconButton({
   className,
   size = 'md',
+  variant = 'default',
   ...props
-}: ComponentProps<'button'> & { size?: 'sm' | 'md' }) {
+}: ComponentProps<'button'> & { size?: 'sm' | 'md'; variant?: keyof typeof ICON_VARIANTS }) {
   return (
     <button
       type="button"
       className={cn(
-        'inline-flex shrink-0 items-center justify-center text-fg/63 transition-colors hover:bg-white/7 hover:text-fg disabled:pointer-events-none disabled:opacity-40',
+        'inline-flex shrink-0 items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40',
+        ICON_VARIANTS[variant],
         size === 'md' ? 'size-8 rounded-[10px]' : 'size-7 rounded-lg',
         className,
       )}

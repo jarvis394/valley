@@ -1,22 +1,15 @@
 import { Eye, EyeOff, Layers, Plus, Redo2, SlidersHorizontal, Undo2 } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import type { CanvasDocument } from '../core/document'
 import { formatBytes } from '../core/format'
-import type { BlockRegistry } from '../registry/registry'
+import { useAssets, useCoverAssetId, useDocumentState, useMeta } from '../render/context'
 import { Canvas } from './canvas'
-import {
-  EditorProvider,
-  useEditor,
-  useEditorState,
-  useMeta,
-  useMode,
-  useSelectedId,
-} from './context'
-import { createEditor, type Editor } from './editor'
+import { EditorProvider, useEditor, useEditorState, useMode, useSelectedId } from './context'
+import type { Editor } from './editor'
 import { useEditorHotkeys } from './hotkeys'
-import { Inspector } from './inspector'
+import { Inspector, type InspectorTab } from './inspector'
 import { AddBlockMenu, Outline } from './outline'
 import {
+  Button,
   cn,
   Divider,
   IconButton,
@@ -45,20 +38,7 @@ export function CanvasEditor({ editor, ...slots }: { editor: Editor } & CanvasEd
   )
 }
 
-/** Read-only rendering of a document with the same block renderers (published page). */
-export function CanvasViewer({ doc, registry }: { doc: CanvasDocument; registry: BlockRegistry }) {
-  const [editor] = useState(() => createEditor({ doc, registry, readOnly: true }))
-  // oxlint-disable-next-line valley/no-unreasoned-state-sync -- loads the doc prop into the editor store, which lives outside React
-  useEffect(() => editor.load(doc), [editor, doc])
-  return (
-    <EditorProvider editor={editor}>
-      <Canvas />
-    </EditorProvider>
-  )
-}
-
 type Panel = 'outline' | 'inspector'
-type InspectorTab = 'component' | 'project'
 
 function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
   const editor = useEditor()
@@ -81,13 +61,16 @@ function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
     return (
       <div className="isolate min-h-dvh bg-neutral-950 text-white">
         <Canvas />
-        <button
-          type="button"
-          onClick={() => editor.setMode('edit')}
-          className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-fg px-4 py-2.5 text-sm font-medium text-black shadow-2xl"
-        >
-          <EyeOff className="size-4" /> Exit preview
-        </button>
+        <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2">
+          <Button
+            variant="primary"
+            size="md"
+            icon={<EyeOff className="size-4" />}
+            onClick={() => editor.setMode('edit')}
+          >
+            Exit preview
+          </Button>
+        </div>
       </div>
     )
   }
@@ -162,10 +145,8 @@ function ProjectTitle() {
 
 /** The cover image is also the project's thumbnail. */
 function useProjectThumbnail() {
-  return useEditorState((state) => {
-    const { nodes, assets } = state.doc
-    const cover = Object.values(nodes).find((node) => node.type === 'cover')
-    const coverAssetId = cover?.type === 'cover' ? cover.props.assetId : null
+  const coverAssetId = useCoverAssetId()
+  return useDocumentState(({ doc: { assets } }) => {
     const asset =
       (coverAssetId && assets[coverAssetId]) ||
       Object.values(assets).find((a) => a.kind === 'image')
@@ -188,7 +169,7 @@ function ProjectHeader() {
         <span className="size-7 shrink-0 rounded-md bg-white/7" />
       )}
       <span className="min-w-0 flex-1 truncate text-base leading-6 font-medium">{meta.title}</span>
-      <IconButton size="sm" aria-label="Switch project" className="text-[#ededed]/63">
+      <IconButton size="sm" aria-label="Switch project">
         <MenuExpandIcon />
       </IconButton>
     </div>
@@ -196,8 +177,7 @@ function ProjectHeader() {
 }
 
 function ProjectRow() {
-  const assets = useEditorState((state) => state.doc.assets)
-  const files = Object.values(assets)
+  const files = Object.values(useAssets())
   const bytes = files.reduce((sum, asset) => sum + (asset.size ?? 0), 0)
   return (
     <div className="flex h-10 items-center gap-1 rounded-xl bg-white/3 px-3 text-[15px] leading-5">

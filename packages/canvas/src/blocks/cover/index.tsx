@@ -3,20 +3,15 @@ import { z } from 'zod'
 import { formatLongDate } from '../../core/format'
 import { assetIdSchema } from '../../core/ids'
 import { FLOW } from '../../core/placement'
-import { useAsset, useMeta } from '../../editor/context'
+import { useAsset, useMeta } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { AssetPicker, CENTER, FocalPointPicker, focalPointSchema, Media } from '../shared/media'
-import {
-  overridesSchema,
-  ThemeGroupSection,
-  TypographyControls,
-  typographyStyle,
-  useResolvedTheme,
-} from '../shared/theme'
+import { typographyStyle, useResolvedTheme } from '../shared/theme'
 import { COVER_VARIANT_IDS, COVER_VARIANTS, type CoverVariant } from './variants'
 import {
   Field,
+  IconButton,
   Section,
   Segmented,
   SwitchField,
@@ -33,7 +28,6 @@ const coverSchema = z.object({
   variant: z.enum(COVER_VARIANT_IDS),
   align: z.enum(['left', 'center', 'right']),
   showMeta: z.boolean(),
-  overrides: overridesSchema.pick({ typography: true }).optional(),
 })
 export type CoverProps = z.infer<typeof coverSchema>
 
@@ -43,10 +37,10 @@ declare module '../../core/document' {
   }
 }
 
-function CoverRender({ props, update, mode, selected }: BlockRenderProps<'cover'>) {
+function CoverRender({ node, props, update, mode, selected }: BlockRenderProps<'cover'>) {
   const asset = useAsset(props.assetId)
   const project = useMeta()
-  const theme = useResolvedTheme(props.overrides)
+  const theme = useResolvedTheme(node.overrides)
   const { Layout, title: titleLook } = COVER_VARIANTS[props.variant] as CoverVariant
   const editable = mode === 'edit'
 
@@ -151,14 +145,13 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
             }
           />
           {asset && (
-            <button
-              type="button"
+            <IconButton
+              variant="danger"
               aria-label="Remove image"
               onClick={() => update((d) => void (d.assetId = null))}
-              className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-control text-red-400 hover:bg-control-hover"
             >
               <Trash2 className="size-4" />
-            </button>
+            </IconButton>
           )}
         </div>
         <Segmented
@@ -189,16 +182,6 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
           onChange={(showMeta) => update((d) => void (d.showMeta = showMeta))}
         />
       </Section>
-      <ThemeGroupSection
-        group="typography"
-        title="Typography"
-        override={props.overrides?.typography}
-        onOverrideChange={(typography) =>
-          update((d) => void (d.overrides = { ...d.overrides, typography }))
-        }
-      >
-        {(value, set) => <TypographyControls value={value} onChange={set} />}
-      </ThemeGroupSection>
       <Section title="Cover Style">
         <Field label="Variant">
           <TilePicker
@@ -228,6 +211,8 @@ export const coverBlock = defineBlock({
     showMeta: true,
   }),
   placement: { allowed: ['flow'], initial: () => FLOW },
+  themeGroups: ['typography'],
+  coverAsset: (props) => props.assetId,
   Render: CoverRender,
   Inspector: CoverInspector,
 })

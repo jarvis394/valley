@@ -37,7 +37,12 @@ export type Theme = z.infer<typeof themeSchema>
 
 /** Every theme group a block may override. Add a group here and it becomes overridable. */
 export type ThemeGroup = keyof Theme
-export type ThemeOverrides = { [K in ThemeGroup]?: Partial<Theme[K]> }
+
+export const themeOverridesSchema = z.object({
+  typography: typographySchema.partial().optional(),
+  gallery: gallerySchema.partial().optional(),
+})
+export type ThemeOverrides = z.infer<typeof themeOverridesSchema>
 
 export const defaultTheme: Theme = {
   typography: { headingFont: 'google-sans-flex', bodyFont: 'geist', scale: 'medium' },

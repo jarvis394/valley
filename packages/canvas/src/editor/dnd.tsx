@@ -3,6 +3,7 @@ import { GripVertical } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
 import type { NodeId } from '../core/ids'
 import { clamp } from '../core/placement'
+import { flowIndexOf, isAncestor } from '../core/tree'
 import { useEditor, useEditorState } from './context'
 import type { DropTarget, Editor } from './editor'
 
@@ -48,17 +49,20 @@ function computeDrop(
   })
   if (index === -1) index = items.length
 
-  // Dropping right before or after itself is a no-op: show nothing.
   const { doc } = editor.getState()
   const node = doc.nodes[nodeId]
-  if (node?.parentId === parentId) {
-    const flow = (doc.nodes[parentId]?.children ?? []).filter(
-      (id) => doc.nodes[id]?.placement.mode === 'flow',
-    )
-    const current = flow.indexOf(nodeId)
+  const parent = doc.nodes[parentId]
+  if (!node || !parent) return { target: null, container: hit }
+  // Dropping right before or after itself is a no-op: show nothing.
+  if (node.parentId === parentId) {
+    const current = flowIndexOf(doc, nodeId)
     if (index === current || index === current + 1) return { target: null, container: hit }
   }
-  if (!editor.registry.canContain(doc.nodes[parentId]!, node!.type, 'flow')) {
+  if (
+    nodeId === parentId ||
+    isAncestor(doc, nodeId, parentId) ||
+    !editor.registry.canContain(parent, node.type, 'flow')
+  ) {
     return { target: null, container: hit }
   }
   return { target: { parentId, index } satisfies DropTarget, container: hit }
@@ -73,18 +77,7 @@ function handleDragEnd(editor: Editor, event: DragEndEvent) {
 
   switch (data.kind) {
     case 'flow-node': {
-      if (!drop) return
-      const { doc } = editor.getState()
-      const node = doc.nodes[data.nodeId]
-      // `drop.index` counts the source itself; moveNode expects the index after removal.
-      let index = drop.index
-      if (node?.parentId === drop.parentId) {
-        const flow = (doc.nodes[drop.parentId]?.children ?? []).filter(
-          (id) => doc.nodes[id]?.placement.mode === 'flow',
-        )
-        if (flow.indexOf(data.nodeId) < index) index -= 1
-      }
-      editor.commands.moveNode(data.nodeId, drop.parentId, index)
+      if (drop) editor.commands.moveNode(data.nodeId, drop.parentId, drop.index)
       return
     }
     case 'absolute-node': {

@@ -4,13 +4,7 @@ import { FLOW } from '../../core/placement'
 import { sizeScaleSchema } from '../../core/theme'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
-import {
-  overridesSchema,
-  ThemeGroupSection,
-  TypographyControls,
-  typographyStyle,
-  useResolvedTheme,
-} from '../shared/theme'
+import { typographyStyle, useResolvedTheme } from '../shared/theme'
 import { cn, Field, Section, Segmented, TextField, TextFormatIcon } from '@valley/ui'
 
 const textSchema = z.object({
@@ -18,7 +12,6 @@ const textSchema = z.object({
   align: z.enum(['left', 'center', 'right']),
   padding: z.enum(['none', ...sizeScaleSchema.options]),
   width: z.enum(['narrow', 'wide', 'full']),
-  overrides: overridesSchema.pick({ typography: true }).optional(),
 })
 export type TextProps = z.infer<typeof textSchema>
 
@@ -32,8 +25,8 @@ const PADDING = { none: 'py-0', small: 'py-2', medium: 'py-10', large: 'py-20' }
 const WIDTH = { narrow: 'max-w-2xl', wide: 'max-w-[800px]', full: 'max-w-none' } as const
 const ALIGN = { left: 'text-left', center: 'text-center', right: 'text-right' } as const
 
-function TextRender({ props, update, mode }: BlockRenderProps<'text'>) {
-  const theme = useResolvedTheme(props.overrides)
+function TextRender({ node, props, update, mode }: BlockRenderProps<'text'>) {
+  const theme = useResolvedTheme(node.overrides)
   return (
     <div className={cn('px-4', PADDING[props.padding])} style={typographyStyle(theme.typography)}>
       <InlineText
@@ -55,59 +48,47 @@ function TextRender({ props, update, mode }: BlockRenderProps<'text'>) {
 
 function TextInspector({ props, update }: BlockInspectorProps<'text'>) {
   return (
-    <>
-      <Section title="Text">
-        <TextField
-          multiline
-          value={props.value}
-          onChange={(value) => update((d) => void (d.value = value), { mergeKey: 'text.value' })}
+    <Section title="Text">
+      <TextField
+        multiline
+        value={props.value}
+        onChange={(value) => update((d) => void (d.value = value), { mergeKey: 'text.value' })}
+      />
+      <Field label="Alignment">
+        <Segmented
+          value={props.align}
+          onChange={(align) => update((d) => void (d.align = align))}
+          options={[
+            { value: 'left', label: <AlignLeft className="size-4" /> },
+            { value: 'center', label: <AlignCenter className="size-4" /> },
+            { value: 'right', label: <AlignRight className="size-4" /> },
+          ]}
         />
-        <Field label="Alignment">
-          <Segmented
-            value={props.align}
-            onChange={(align) => update((d) => void (d.align = align))}
-            options={[
-              { value: 'left', label: <AlignLeft className="size-4" /> },
-              { value: 'center', label: <AlignCenter className="size-4" /> },
-              { value: 'right', label: <AlignRight className="size-4" /> },
-            ]}
-          />
-        </Field>
-        <Field label="Width">
-          <Segmented
-            value={props.width}
-            onChange={(width) => update((d) => void (d.width = width))}
-            options={[
-              { value: 'narrow', label: 'Narrow' },
-              { value: 'wide', label: 'Wide' },
-              { value: 'full', label: 'Full' },
-            ]}
-          />
-        </Field>
-        <Field label="Padding">
-          <Segmented
-            value={props.padding}
-            onChange={(padding) => update((d) => void (d.padding = padding))}
-            options={[
-              { value: 'none', label: 'None' },
-              { value: 'small', label: 'S' },
-              { value: 'medium', label: 'M' },
-              { value: 'large', label: 'L' },
-            ]}
-          />
-        </Field>
-      </Section>
-      <ThemeGroupSection
-        group="typography"
-        title="Typography"
-        override={props.overrides?.typography}
-        onOverrideChange={(typography) =>
-          update((d) => void (d.overrides = { ...d.overrides, typography }))
-        }
-      >
-        {(value, set) => <TypographyControls value={value} onChange={set} />}
-      </ThemeGroupSection>
-    </>
+      </Field>
+      <Field label="Width">
+        <Segmented
+          value={props.width}
+          onChange={(width) => update((d) => void (d.width = width))}
+          options={[
+            { value: 'narrow', label: 'Narrow' },
+            { value: 'wide', label: 'Wide' },
+            { value: 'full', label: 'Full' },
+          ]}
+        />
+      </Field>
+      <Field label="Padding">
+        <Segmented
+          value={props.padding}
+          onChange={(padding) => update((d) => void (d.padding = padding))}
+          options={[
+            { value: 'none', label: 'None' },
+            { value: 'small', label: 'S' },
+            { value: 'medium', label: 'M' },
+            { value: 'large', label: 'L' },
+          ]}
+        />
+      </Field>
+    </Section>
   )
 }
 
@@ -119,6 +100,7 @@ export const textBlock = defineBlock({
   schema: textSchema,
   create: () => ({ value: '', align: 'center', padding: 'medium', width: 'wide' }),
   placement: { allowed: ['flow'], initial: () => FLOW },
+  themeGroups: ['typography'],
   Render: TextRender,
   Inspector: TextInspector,
 })

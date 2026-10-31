@@ -1,11 +1,11 @@
 import { ImagePlus, Upload } from 'lucide-react'
-import { useRef, type CSSProperties, type PointerEvent } from 'react'
+import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { z } from 'zod'
 import type { Asset } from '../../core/document'
 import type { AssetId } from '../../core/ids'
 import { clamp } from '../../core/placement'
-import { useAssets, useEditor } from '../../editor/context'
-import { cn, Popover } from '@valley/ui'
+import { useAssets, useRenderContext } from '../../render/context'
+import { Button, cn, Popover } from '@valley/ui'
 
 export const focalPointSchema = z.object({
   x: z.number().min(0).max(1),
@@ -111,38 +111,6 @@ export function FocalPointPicker({
   )
 }
 
-export async function readAssetFile(file: File): Promise<Omit<Asset, 'id'>> {
-  // Object URLs only live as long as the tab. A real implementation uploads first.
-  const src = URL.createObjectURL(file)
-  const kind = file.type.startsWith('video/') ? 'video' : 'image'
-  const { width, height } = await new Promise<{ width: number; height: number }>((resolve) => {
-    if (kind === 'video') {
-      const video = document.createElement('video')
-      video.addEventListener('loadedmetadata', () =>
-        resolve({ width: video.videoWidth, height: video.videoHeight }),
-      )
-      video.addEventListener('error', () => resolve({ width: 16, height: 9 }))
-      video.src = src
-    } else {
-      const image = new Image()
-      image.addEventListener('load', () =>
-        resolve({ width: image.naturalWidth, height: image.naturalHeight }),
-      )
-      image.addEventListener('error', () => resolve({ width: 1, height: 1 }))
-      image.src = src
-    }
-  })
-  return { kind, name: file.name, src, width, height, size: file.size }
-}
-
-export function useUploadAssets() {
-  const editor = useEditor()
-  return async (files: FileList | File[]) => {
-    const media = [...files].filter((f) => /^(image|video)\//.test(f.type))
-    return editor.commands.addAssets(await Promise.all(media.map(readAssetFile)))
-  }
-}
-
 export function UploadButton({
   onUploaded,
   multiple,
@@ -152,30 +120,37 @@ export function UploadButton({
   onUploaded: (ids: AssetId[]) => void
   multiple?: boolean
   className?: string
-  children?: React.ReactNode
+  children?: ReactNode
 }) {
-  const upload = useUploadAssets()
+  const { uploadAssets } = useRenderContext()
+  const inputRef = useRef<HTMLInputElement>(null)
+  if (!uploadAssets) return null
   return (
-    <label
-      className={cn(
-        'flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-control px-3 text-sm text-neutral-200 hover:bg-control-hover',
-        className,
-      )}
-    >
-      <Upload className="size-4" />
-      {children ?? 'Upload'}
+    <>
+      <Button
+        variant="control"
+        size="md"
+        icon={<Upload className="size-4" />}
+        className={className}
+        onClick={() => inputRef.current?.click()}
+      >
+        {children ?? 'Upload'}
+      </Button>
       <input
+        ref={inputRef}
         type="file"
         accept="image/*,video/*"
         multiple={multiple}
+        tabIndex={-1}
         className="sr-only"
         onChange={async (event) => {
-          const files = event.currentTarget.files
-          if (files?.length) onUploaded(await upload(files))
-          event.currentTarget.value = ''
+          const input = event.currentTarget
+          const files = [...(input.files ?? [])]
+          input.value = ''
+          if (files.length) onUploaded(await uploadAssets(files))
         }}
       />
-    </label>
+    </>
   )
 }
 
