@@ -1,7 +1,10 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '../cn'
 
-/** 40px panel row: icon, label and trailing meta (outline blocks, project navigation). */
+/**
+ * 40px panel row: icon, label and trailing meta (outline blocks, project navigation).
+ * Lists space rows with `gap-1`; the `before` hit area spans half that gap on each side.
+ */
 export function ListItem({
   icon,
   label,
@@ -20,7 +23,7 @@ export function ListItem({
       type="button"
       data-selected={selected || undefined}
       className={cn(
-        'group/item flex h-10 w-full shrink-0 items-center gap-1 rounded-xl px-3 text-left text-[15px] leading-5 font-medium text-fg outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60',
+        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl px-3 text-left text-[15px] leading-5 font-medium text-fg transition-colors outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
         selected && 'bg-selected text-selected-fg hover:bg-selected',
         className,
       )}

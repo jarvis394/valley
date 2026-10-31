@@ -136,6 +136,7 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
         ) : null}
         <div className="flex gap-2">
           <AssetPicker
+            className="flex-1"
             value={props.assetId}
             onChange={(assetId) =>
               update((d) => {
@@ -146,6 +147,7 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
           />
           {asset && (
             <IconButton
+              size="lg"
               variant="danger"
               aria-label="Remove image"
               onClick={() => update((d) => void (d.assetId = null))}

@@ -1,6 +1,7 @@
 import { History } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '../cn'
+import { IconButton } from './button'
 
 export function Section({
   title,
@@ -24,14 +25,9 @@ export function Section({
           {title}
         </h3>
         {onReset && (
-          <button
-            type="button"
-            onClick={onReset}
-            aria-label="Reset to project style"
-            className="flex size-7 items-center justify-center rounded-lg text-fg/63 hover:bg-white/7 hover:text-fg"
-          >
+          <IconButton size="sm" onClick={onReset} aria-label="Reset to project style">
             <History className="size-4" />
-          </button>
+          </IconButton>
         )}
         {action}
       </header>

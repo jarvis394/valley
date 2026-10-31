@@ -286,5 +286,6 @@ export const collectionBlock = defineBlock({
   themeGroups: ['gallery'],
   Render: CollectionRender,
   Inspector: CollectionInspector,
+  title: (props) => props.title,
   describe: (node) => ({ meta: String(node.props.assetIds.length), metaIcon: FileIcon }),
 })

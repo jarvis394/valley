@@ -72,12 +72,9 @@ function NodeInspector({ id }: { id: NodeId }) {
     <div className="flex flex-col">
       <div className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
         <Icon className="size-4 shrink-0 text-fg/63" />
-        <input
-          value={node.name ?? ''}
-          placeholder={definition.label}
-          onChange={(event) => editor.commands.rename(id, event.target.value)}
-          className="h-7 min-w-0 flex-1 bg-transparent text-[15px] leading-5 font-medium text-fg outline-none placeholder:text-fg"
-        />
+        <h3 className="flex h-7 min-w-0 flex-1 items-center truncate text-[15px] leading-5 font-medium text-fg">
+          {editor.registry.titleOf(node)}
+        </h3>
         <IconButton size="sm" title="Duplicate" onClick={() => editor.commands.duplicateNode(id)}>
           <Copy className="size-4" />
         </IconButton>

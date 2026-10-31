@@ -25,6 +25,7 @@
   --color-info-fg: #51a2ff;
   --color-danger: #d93036;
 
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -55,7 +56,8 @@
     0 8px 32px rgb(0 0 0 / 0.4),
     0 0 4px rgb(0 0 0 / 0.24);
   transition-property: scale, opacity;
-  transition-duration: 100ms;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
 
   &[data-starting-style],
   &[data-ending-style] {

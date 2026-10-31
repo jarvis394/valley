@@ -165,19 +165,13 @@ export function SliderField({
   )
 }
 
-/**
- * Pill switch. `md` is the inspector size; `lg` is the panel-footer size
- * (Preview), which also has a wider pill-shaped thumb.
- */
 export function Switch({
   checked,
   onChange,
-  size = 'md',
   'aria-label': ariaLabel,
 }: {
   checked: boolean
   onChange: (checked: boolean) => void
-  size?: 'md' | 'lg'
   'aria-label'?: string
 }) {
   return (
@@ -185,19 +179,9 @@ export function Switch({
       checked={checked}
       onCheckedChange={onChange}
       aria-label={ariaLabel}
-      className={cn(
-        'flex shrink-0 items-center rounded-full border border-white/12 bg-[#212122] px-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/60 data-checked:border-transparent data-checked:bg-accent',
-        size === 'md' ? 'h-6 w-10' : 'h-7 w-14',
-      )}
+      className="flex h-6 w-10 shrink-0 items-center rounded-full border border-white/12 bg-[#212122] px-1 transition-[background-color,border-color] duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent/60 data-checked:border-transparent data-checked:bg-accent"
     >
-      <BaseSwitch.Thumb
-        className={cn(
-          'h-4 rounded-full bg-fg shadow-[0_0_0_1px_rgba(0,0,0,0.5)] transition-transform duration-200 ease-out data-checked:bg-[#0f1c2e] data-checked:shadow-none',
-          size === 'md'
-            ? '-ml-px w-4 data-checked:translate-x-4'
-            : 'ml-px w-6 data-checked:translate-x-5',
-        )}
-      />
+      <BaseSwitch.Thumb className="-ml-px size-4 rounded-full bg-fg shadow-[0_0_0_1px_rgba(0,0,0,0.5)] transition-[translate,background-color] duration-200 ease-out data-checked:translate-x-4 data-checked:bg-[#0f1c2e] data-checked:shadow-none" />
     </BaseSwitch.Root>
   )
 }
@@ -217,7 +201,7 @@ export function SwitchField({
   return (
     <label
       className={cn(
-        'flex min-h-11 items-center justify-between gap-3 rounded-xl bg-control py-2.5 pr-2 pl-3.5 text-[13px] leading-5 text-[#ededed]',
+        'flex min-h-10 items-center justify-between gap-3 rounded-xl bg-control py-2 pr-2 pl-3 text-[13px] leading-5 text-fg',
         className,
       )}
     >

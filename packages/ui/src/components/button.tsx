@@ -1,23 +1,29 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '../cn'
 
+const pressable =
+  'inline-flex shrink-0 items-center outline-none transition-[color,background-color,border-color,scale] duration-150 ease-out select-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-97 disabled:pointer-events-none disabled:opacity-40'
+
 const VARIANTS = {
   /** Toolbar button with a hairline border (Share). */
-  outline: 'border-[0.5px] border-white/7 text-fg hover:bg-white/5',
+  outline: 'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7',
   /** Bright call to action (Visit). */
   primary:
     'border-[0.5px] border-white/24 bg-linear-to-b from-white to-[#e1e1e1] text-[#1b1b1b] shadow-[0_2px_16px_rgba(255,255,255,0.07),0_0_4px_rgba(255,255,255,0.07)] hover:to-white',
-  ghost: 'text-fg hover:bg-white/5',
+  ghost: 'text-fg hover:bg-white/5 data-popup-open:bg-white/7',
   /** Full-width panel action (Archive). */
   secondary: 'bg-white/3 text-fg hover:bg-white/7',
   danger: 'bg-danger/12 text-danger hover:bg-danger/18',
   /** Inspector action that sits beside form controls (Upload). */
-  control: 'justify-center bg-control text-neutral-200 hover:bg-control-hover',
+  control:
+    'justify-center bg-control text-neutral-200 hover:bg-control-hover data-popup-open:bg-control-hover',
 } as const
 
 const SIZES = {
   sm: 'h-8 gap-2 rounded-[10px] px-3',
   md: 'h-10 gap-2.5 rounded-xl px-4',
+  /** `sm` height for icon-only content, e.g. an icon with a dropdown chevron (Language). */
+  compact: 'h-8 gap-1 rounded-[10px] px-2',
 } as const
 
 export function Button({
@@ -37,7 +43,8 @@ export function Button({
     <button
       type="button"
       className={cn(
-        'inline-flex shrink-0 items-center overflow-hidden text-[15px] leading-5 font-medium whitespace-nowrap transition-colors select-none disabled:pointer-events-none disabled:opacity-40',
+        pressable,
+        'overflow-hidden text-[15px] leading-5 font-medium whitespace-nowrap',
         VARIANTS[variant],
         SIZES[size],
         className,
@@ -51,9 +58,17 @@ export function Button({
 }
 
 const ICON_VARIANTS = {
-  default: 'text-fg/63 hover:bg-white/7 hover:text-fg',
+  default:
+    'text-fg/63 hover:bg-white/5 hover:text-fg data-popup-open:bg-white/7 data-popup-open:text-fg',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
+} as const
+
+/** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */
+const ICON_SIZES = {
+  sm: 'size-7 rounded-lg',
+  md: 'size-8 rounded-[10px]',
+  lg: 'size-10 rounded-xl',
 } as const
 
 export function IconButton({
@@ -61,14 +76,18 @@ export function IconButton({
   size = 'md',
   variant = 'default',
   ...props
-}: ComponentProps<'button'> & { size?: 'sm' | 'md'; variant?: keyof typeof ICON_VARIANTS }) {
+}: ComponentProps<'button'> & {
+  size?: keyof typeof ICON_SIZES
+  variant?: keyof typeof ICON_VARIANTS
+}) {
   return (
     <button
       type="button"
       className={cn(
-        'inline-flex shrink-0 items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40',
+        pressable,
+        'justify-center',
         ICON_VARIANTS[variant],
-        size === 'md' ? 'size-8 rounded-[10px]' : 'size-7 rounded-lg',
+        ICON_SIZES[size],
         className,
       )}
       {...props}

@@ -22,8 +22,6 @@ export interface NodeBase {
   placement: Placement
   /** Version of the `props` schema the node was written with. Migrations read it. */
   v: number
-  /** User-facing label (outline). Falls back to the block's label. */
-  name?: string
   hidden?: boolean
   locked?: boolean
   /** Theme groups this node deviates on. Only groups in its definition's `themeGroups` apply. */

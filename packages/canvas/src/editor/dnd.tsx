@@ -177,7 +177,7 @@ function DragChip({ data }: { data: DragData }) {
     <div className="pointer-events-none flex w-fit items-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-white shadow-2xl">
       <GripVertical className="size-4" />
       <Icon className="size-4" />
-      {node.name ?? definition.label}
+      {editor.registry.titleOf(node)}
     </div>
   )
 }
@@ -196,13 +196,22 @@ export function useDropEdge(parentId: NodeId, index: number, count: number) {
   })
 }
 
-export function DropLine({ edge, inset = 0 }: { edge: 'top' | 'bottom' | null; inset?: number }) {
+/** `gap` is the parent's row gap in px; the 2px line is centered in it. */
+export function DropLine({
+  edge,
+  inset = 0,
+  gap = 0,
+}: {
+  edge: 'top' | 'bottom' | null
+  inset?: number
+  gap?: number
+}) {
   if (!edge) return null
   return (
     <div
       aria-hidden
       className="pointer-events-none absolute z-30 h-0.5 rounded-full bg-focus shadow-[0_0_0_2px_rgb(0_0_0/0.4)]"
-      style={{ left: inset, right: inset, [edge]: -1 }}
+      style={{ left: inset, right: inset, [edge]: -(gap / 2 + 1) }}
     >
       <span className="absolute -top-[3px] -left-1 size-2 rounded-full bg-focus" />
     </div>

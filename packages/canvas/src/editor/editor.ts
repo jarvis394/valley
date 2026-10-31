@@ -247,13 +247,6 @@ export function createEditor({
         node.overrides = { ...node.overrides, [group]: value }
       })
     },
-    rename: (id: NodeId, name: string) =>
-      transact(
-        (draft) => {
-          getNode(draft, id).name = name || undefined
-        },
-        { mergeKey: `${id}:name` },
-      ),
     updateTheme: (recipe: (theme: Theme) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.theme), options),
     updateMeta: (recipe: (meta: DocumentMeta) => void, options?: UpdateOptions) =>

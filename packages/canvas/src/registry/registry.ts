@@ -31,6 +31,11 @@ export class BlockRegistry implements ContainmentRules {
     return definition as unknown as BlockDefinition<T>
   }
 
+  titleOf(node: CanvasNode): string {
+    const definition = this.get(node.type) as BlockDefinition<BlockType>
+    return definition.title?.(node.props).trim() || definition.label
+  }
+
   list(): AnyBlockDefinition[] {
     return [...this.#definitions.values()]
   }

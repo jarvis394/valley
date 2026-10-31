@@ -40,41 +40,50 @@ const PROJECTS = [
   { label: 'Saint-Petersburg', thumbnail: '/demo/project-saint-petersburg.jpg' },
 ]
 
+const RAIL_VARIANTS = {
+  section: {
+    item: 'gap-0.5 pt-2 pb-1',
+    tile: 'size-8 rounded-lg transition-colors group-hover:bg-white/5 group-data-current:bg-white/7',
+    label: 'truncate px-1',
+  },
+  project: {
+    item: 'gap-1.5 p-2',
+    tile: 'size-10 overflow-hidden rounded-[10px] border-[0.5px] border-white/3 bg-canvas shadow-[0_1px_4px_rgba(0,0,0,0.24)] group-data-current:ring-1 group-data-current:ring-fg',
+    label: 'line-clamp-2 break-words',
+  },
+} as const
+
 function RailItem({
   label,
   current,
-  tile,
-  className,
-  tileClassName,
-  labelClassName,
+  variant,
+  children,
 }: {
   label: string
   current?: boolean
-  tile: ReactNode
-  className: string
-  tileClassName: string
-  labelClassName: string
+  variant: keyof typeof RAIL_VARIANTS
+  children: ReactNode
 }) {
+  const styles = RAIL_VARIANTS[variant]
   return (
     <button
       type="button"
       aria-current={current ? 'page' : undefined}
-      className={cn('group flex shrink-0 flex-col items-center outline-none', className)}
+      data-current={current || undefined}
+      className={cn(
+        'group flex shrink-0 flex-col items-center text-fg/63 transition-colors outline-none hover:text-fg data-current:text-fg',
+        styles.item,
+      )}
     >
       <span
         className={cn(
-          'flex items-center justify-center text-fg/63 group-focus-visible:ring-2 group-focus-visible:ring-accent/60',
-          tileClassName,
+          'flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-accent/60',
+          styles.tile,
         )}
       >
-        {tile}
+        {children}
       </span>
-      <span
-        className={cn(
-          'w-full text-center text-[11px] leading-4 font-medium text-fg/63',
-          labelClassName,
-        )}
-      >
+      <span className={cn('w-full text-center text-[11px] leading-4 font-medium', styles.label)}>
         {label}
       </span>
     </button>
@@ -94,44 +103,21 @@ export function AppSidebar() {
       <Divider className="mx-3" />
       <div className="flex shrink-0 flex-col pb-2">
         {SECTIONS.map(({ label, icon: Icon, current }) => (
-          <RailItem
-            key={label}
-            label={label}
-            current={current}
-            tile={<Icon />}
-            className="gap-0.5 pt-2 pb-1"
-            tileClassName={cn(
-              'size-8 rounded-lg transition-colors group-hover:bg-white/3 group-hover:text-fg',
-              current && 'bg-white/3',
-            )}
-            labelClassName="truncate px-1"
-          />
+          <RailItem key={label} label={label} current={current} variant="section">
+            <Icon />
+          </RailItem>
         ))}
       </div>
       <Divider className="mx-3" />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-1 [scrollbar-width:none]">
         {PROJECTS.map(({ label, thumbnail, current }) => (
-          <RailItem
-            key={label}
-            label={label}
-            current={current}
-            tile={
-              thumbnail ? (
-                <img src={thumbnail} alt="" className="size-full object-cover" />
-              ) : (
-                <FolderIcon />
-              )
-            }
-            className="gap-1.5 p-2"
-            tileClassName={cn(
-              'size-10 overflow-hidden rounded-[10px] border-[0.5px] border-white/3 bg-canvas shadow-[0_1px_4px_rgba(0,0,0,0.24)]',
-              current && 'border border-fg',
+          <RailItem key={label} label={label} current={current} variant="project">
+            {thumbnail ? (
+              <img src={thumbnail} alt="" className="size-full object-cover" />
+            ) : (
+              <FolderIcon />
             )}
-            labelClassName={cn(
-              'line-clamp-2 break-words group-hover:text-fg',
-              current && 'text-fg',
-            )}
-          />
+          </RailItem>
         ))}
       </div>
       <Divider className="mx-3" />
@@ -184,14 +170,10 @@ export function ProjectActions() {
   return (
     <>
       <div className="flex min-w-0 flex-1 items-center">
-        <button
-          type="button"
-          aria-label="Language"
-          className="flex h-8 items-center gap-1 rounded-[10px] p-2 text-fg outline-none hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-accent/60"
-        >
+        <Button variant="ghost" size="compact" aria-label="Language">
           <GlobeIcon />
           <ChevronDownSmallIcon />
-        </button>
+        </Button>
       </div>
       <Button variant="outline" icon={<ShareIcon />} onClick={share}>
         {copied ? 'Copied' : 'Share'}

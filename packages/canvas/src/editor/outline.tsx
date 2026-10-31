@@ -13,7 +13,7 @@ import {
   useDropEdge,
   type DragData,
 } from './dnd'
-import { cn, ListItem, ListItemMeta, Menu, PlusIcon } from '@valley/ui'
+import { cn, IconButton, ListItem, ListItemMeta, Menu, PlusIcon } from '@valley/ui'
 
 const scrollToNode = (id: NodeId) =>
   document
@@ -37,16 +37,13 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex flex-col pb-2">
-      <div className="flex items-center gap-2 pt-2.5 pr-3 pb-1 pl-4">
+      <div className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
         <span className="flex h-7 flex-1 items-center text-[15px] leading-5 text-fg/32">
           Blocks
         </span>
         <AddBlockMenu
           trigger={
-            <Menu.Trigger
-              aria-label="Add block"
-              className="flex items-center justify-center rounded-md p-1.5 text-fg/60 outline-none hover:bg-white/7 hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60"
-            >
+            <Menu.Trigger render={<IconButton size="sm" aria-label="Add block" />}>
               <PlusIcon />
             </Menu.Trigger>
           }
@@ -103,7 +100,7 @@ function SortableOutlineItem({
   return (
     <div className="relative" {...dropItemProps}>
       <OutlineItem ref={ref} id={id} onClick={onClick} dimmed={isDragSource} />
-      <DropLine edge={dropEdge} inset={8} />
+      <DropLine edge={dropEdge} inset={8} gap={4} />
     </div>
   )
 }
@@ -135,7 +132,7 @@ function OutlineItem({
       selected={selected}
       className={cn(dimmed && 'opacity-50')}
       icon={<Icon className="size-4" />}
-      label={node.name ?? definition.label}
+      label={editor.registry.titleOf(node)}
       end={
         described?.meta && (
           <ListItemMeta>

@@ -95,7 +95,6 @@ const children: CanvasNode[] = [
   node<CanvasNode<'collection'>>({
     id: nodeId('n_strip'),
     type: 'collection',
-    name: 'A very long name for a collection',
     placement: FLOW,
     props: {
       title: 'A very long name for a collection',

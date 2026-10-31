@@ -160,17 +160,28 @@ export function AssetPicker({
   onChange,
   kinds = ['image', 'video'],
   label = 'Replace',
+  className,
 }: {
   value: AssetId | null
   onChange: (id: AssetId) => void
   kinds?: Asset['kind'][]
   label?: string
+  className?: string
 }) {
   const assets = Object.values(useAssets()).filter((asset) => kinds.includes(asset.kind))
   return (
     <Popover.Root>
-      <Popover.Trigger className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-control text-sm text-neutral-200 hover:bg-control-hover">
-        <ImagePlus className="size-4" /> {label}
+      <Popover.Trigger
+        render={
+          <Button
+            variant="control"
+            size="md"
+            icon={<ImagePlus className="size-4" />}
+            className={className}
+          />
+        }
+      >
+        {label}
       </Popover.Trigger>
       <Popover.Popup>
         <div className="grid max-h-72 grid-cols-3 gap-1 overflow-y-auto">

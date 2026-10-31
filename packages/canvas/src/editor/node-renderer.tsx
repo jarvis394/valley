@@ -93,7 +93,7 @@ function FlowItem({
     data: { kind: 'flow-node', nodeId: id },
   })
   if (!node) return null
-  const label = node.name ?? editor.registry.get(node.type).label
+  const label = editor.registry.titleOf(node)
 
   return (
     <div
@@ -132,7 +132,7 @@ function FlowItem({
       >
         <NodeRenderer id={id} />
       </div>
-      <DropLine edge={dropEdge} />
+      <DropLine edge={dropEdge} gap={16} />
     </div>
   )
 }

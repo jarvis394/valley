@@ -200,7 +200,6 @@ function PasswordControl({
           onEnabledChange(next)
           if (next && !password) onPasswordChange(randomPassword())
         }}
-        className="rounded-none"
       />
       {enabled && (
         <>

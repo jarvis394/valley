@@ -208,12 +208,7 @@ function PreviewFooter() {
         <SlashBackIcon />
       </kbd>
       <span className="min-w-0 flex-1 text-base leading-6 font-medium">Preview</span>
-      <Switch
-        size="lg"
-        aria-label="Preview"
-        checked={false}
-        onChange={() => editor.setMode('preview')}
-      />
+      <Switch aria-label="Preview" checked={false} onChange={() => editor.setMode('preview')} />
     </div>
   )
 }
