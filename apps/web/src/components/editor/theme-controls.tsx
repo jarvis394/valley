@@ -1,16 +1,17 @@
-import type { ReactNode } from 'react'
-import { FONTS, getFont } from '../core/fonts'
 import {
+  FONTS,
+  getFont,
   hasOverride,
   resolveThemeGroup,
   ROUNDNESS,
+  useTheme,
   type GalleryStyle,
   type Theme,
   type ThemeGroup,
   type Typography,
-} from '../core/theme'
-import { useTheme } from '../render/context'
+} from '@valley/canvas'
 import { Field, type Option, Section, Segmented, SelectField } from '@valley/ui'
+import type { ReactNode } from 'react'
 
 /**
  * A section editing one theme group. With `override` semantics (inside a block) it shows the

@@ -41,7 +41,7 @@ render. When handlers in one component change at different times, each keeps an 
 holds older handlers, and old renders, with their server config and thread data, stay in memory
 for as long as the component is mounted. React Compiler's memoized closures do the same.
 
-In large, long-lived components such as `CanvasEditor`, write handlers as plain
+In large, long-lived components such as `ProjectEditor`, write handlers as plain
 functions and wrap them with [`useStableCallback`](../../packages/ui/src/hooks/useStableCallback.ts)
 only where they leave the component: props, hook dependency arrays, and effect or memo bodies.
 Calls inside the component keep the plain function, so work that resumes after an `await` still

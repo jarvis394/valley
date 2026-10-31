@@ -1,46 +1,57 @@
-import { Eye, EyeOff, Layers, Plus, Redo2, SlidersHorizontal, Undo2 } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
-import { formatBytes } from '../core/format'
-import { useAssets, useCoverAssetId, useDocumentState, useMeta } from '../render/context'
-import { Canvas } from './canvas'
-import { EditorProvider, useEditor, useEditorState, useMode, useSelectedId } from './context'
-import type { Editor } from './editor'
-import { useEditorHotkeys } from './hotkeys'
-import { Inspector, type InspectorTab } from './inspector'
-import { AddBlockMenu, Outline } from './outline'
+import {
+  Canvas,
+  EditorProvider,
+  formatBytes,
+  summarizeAssets,
+  useAssets,
+  useThumbnailSrc,
+  useEditor,
+  useEditorHotkeys,
+  useEditorState,
+  useMeta,
+  useMode,
+  useSelectedId,
+  type Editor,
+} from '@valley/canvas'
 import {
   Button,
   cn,
   Divider,
   IconButton,
-  MenuExpandIcon,
   Menu,
   Sheet,
   SlashBackIcon,
   Switch,
+  SwitcherBar,
+  SwitcherMenu,
 } from '@valley/ui'
+import { Eye, EyeOff, Layers, Plus, Redo2, SlidersHorizontal, Undo2 } from 'lucide-react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Inspector, type InspectorTab } from './inspector'
+import { AddBlockMenu, Outline } from './outline'
 
-export interface CanvasEditorSlots {
-  /** App navigation rail, left of the editor panels (desktop). */
-  sidebar?: ReactNode
+export interface ProjectEditorSlots {
   /** Project-level links under the "Project" row (retouch, analytics…). */
   nav?: ReactNode
   /** Toolbar above the inspector tabs (share, visit…). */
   actions?: ReactNode
+  /** `Menu.Item`s of the project switcher in the header. */
+  switcher?: ReactNode
 }
 
-export function CanvasEditor({ editor, ...slots }: { editor: Editor } & CanvasEditorSlots) {
+/** The panels around the canvas: project outline on the left, inspector on the right. */
+export function ProjectEditor({ editor, ...slots }: { editor: Editor } & ProjectEditorSlots) {
   useEditorHotkeys(editor)
   return (
     <EditorProvider editor={editor}>
-      <EditorShell {...slots} />
+      <EditorLayout {...slots} />
     </EditorProvider>
   )
 }
 
 type Panel = 'outline' | 'inspector'
 
-function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
+function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
   const editor = useEditor()
   const mode = useMode()
   const selectedId = useSelectedId()
@@ -58,8 +69,9 @@ function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
   )
 
   if (mode === 'preview') {
+    // Covers the app shell, so the preview reads like the published page.
     return (
-      <div className="isolate min-h-dvh bg-neutral-950 text-white">
+      <div className="fixed inset-0 isolate z-50 overflow-y-auto bg-neutral-950 text-white">
         <Canvas />
         <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2">
           <Button
@@ -76,11 +88,9 @@ function EditorShell({ sidebar, nav, actions }: CanvasEditorSlots) {
   }
 
   return (
-    <div className="isolate flex h-dvh overflow-hidden bg-canvas text-fg">
-      {sidebar && <div className="hidden xl:contents">{sidebar}</div>}
-
+    <div className="isolate flex h-full min-w-0 flex-1 overflow-hidden bg-canvas text-fg">
       <aside className="hidden w-80 shrink-0 flex-col border-r border-line bg-surface lg:flex">
-        <ProjectHeader />
+        <ProjectHeader switcher={switcher} />
         <div className="min-h-0 flex-1 overflow-x-clip overflow-y-auto overscroll-contain">
           <div className="flex flex-col gap-1 px-1.5 py-2">
             <ProjectRow />
@@ -143,53 +153,32 @@ function ProjectTitle() {
   return <span className="truncate text-[15px] font-medium">{meta.title}</span>
 }
 
-/** The cover image is also the project's thumbnail. */
-function useProjectThumbnail() {
-  const coverAssetId = useCoverAssetId()
-  return useDocumentState(({ doc: { assets } }) => {
-    const asset =
-      (coverAssetId && assets[coverAssetId]) ||
-      Object.values(assets).find((a) => a.kind === 'image')
-    return asset?.kind === 'image' ? asset.src : asset?.poster
-  })
-}
-
-function ProjectHeader() {
+function ProjectHeader({ switcher }: { switcher?: ReactNode }) {
   const meta = useMeta()
-  const thumbnail = useProjectThumbnail()
   return (
-    <div className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line px-3 py-1.5">
-      {thumbnail ? (
-        <img
-          src={thumbnail}
-          alt=""
-          className="size-7 shrink-0 rounded-md border-[0.5px] border-white/4 object-cover"
-        />
-      ) : (
-        <span className="size-7 shrink-0 rounded-md bg-white/7" />
-      )}
-      <span className="min-w-0 flex-1 truncate text-base leading-6 font-medium">{meta.title}</span>
-      <IconButton size="sm" aria-label="Switch project">
-        <MenuExpandIcon />
-      </IconButton>
+    <div className="border-b border-line">
+      <SwitcherBar
+        image={useThumbnailSrc()}
+        label={meta.title}
+        after={switcher && <SwitcherMenu label="Switch project">{switcher}</SwitcherMenu>}
+      />
     </div>
   )
 }
 
 function ProjectRow() {
-  const files = Object.values(useAssets())
-  const bytes = files.reduce((sum, asset) => sum + (asset.size ?? 0), 0)
+  const files = summarizeAssets(useAssets())
   return (
     <div className="flex h-10 items-center gap-1 rounded-xl bg-white/3 px-3 text-[15px] leading-5">
       <span className="min-w-0 flex-1 truncate font-medium">Project</span>
       <span className="flex shrink-0 items-center gap-1 tabular-nums">
         <span className="opacity-64">
-          {files.length} {files.length === 1 ? 'file' : 'files'}
+          {files.count} {files.count === 1 ? 'file' : 'files'}
         </span>
-        {bytes > 0 && (
+        {files.bytes > 0 && (
           <>
             <span className="opacity-24">•</span>
-            <span className="opacity-64">{formatBytes(bytes)}</span>
+            <span className="opacity-64">{formatBytes(files.bytes)}</span>
           </>
         )}
       </span>
@@ -219,10 +208,10 @@ function HistoryButtons() {
   const canRedo = useEditorState((state) => state.future.length > 0)
   return (
     <div className="flex gap-1">
-      <IconButton title="Undo (⌘Z)" disabled={!canUndo} onClick={editor.undo}>
+      <IconButton aria-label="Undo (⌘Z)" disabled={!canUndo} onClick={editor.undo}>
         <Undo2 className="size-4" />
       </IconButton>
-      <IconButton title="Redo (⇧⌘Z)" disabled={!canRedo} onClick={editor.redo}>
+      <IconButton aria-label="Redo (⇧⌘Z)" disabled={!canRedo} onClick={editor.redo}>
         <Redo2 className="size-4" />
       </IconButton>
     </div>

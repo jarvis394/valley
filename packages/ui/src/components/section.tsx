@@ -3,18 +3,30 @@ import type { ReactNode } from 'react'
 import { cn } from '../cn'
 import { IconButton } from './button'
 
+const BODY = {
+  /** Inspector fields. */
+  form: 'gap-2.5 px-2',
+  /** `ListItem` rows (recent projects). */
+  list: 'gap-1 px-1.5',
+} as const
+
 export function Section({
   title,
+  count,
   onReset,
   action,
+  body = 'form',
   children,
   className,
 }: {
   title: string
+  /** Secondary number after the title, e.g. how many items the section holds. */
+  count?: number
   /** When provided, a reset button is shown (e.g. "this overrides the project style"). */
   onReset?: () => void
   /** Extra control at the end of the header. */
   action?: ReactNode
+  body?: keyof typeof BODY
   children: ReactNode
   className?: string
 }) {
@@ -22,7 +34,10 @@ export function Section({
     <section className={cn('flex flex-col', className)}>
       <header className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
         <h3 className="flex h-7 min-w-0 flex-1 items-center text-[15px] leading-5 font-medium text-fg">
-          {title}
+          <span className="truncate">{title}</span>
+          {count !== undefined && (
+            <span className="ml-2 shrink-0 text-fg/32 tabular-nums">{count}</span>
+          )}
         </h3>
         {onReset && (
           <IconButton size="sm" onClick={onReset} aria-label="Reset to project style">
@@ -31,7 +46,7 @@ export function Section({
         )}
         {action}
       </header>
-      <div className="flex flex-col gap-2.5 px-2">{children}</div>
+      <div className={cn('flex flex-col', BODY[body])}>{children}</div>
     </section>
   )
 }

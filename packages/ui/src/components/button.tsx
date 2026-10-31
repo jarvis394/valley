@@ -1,4 +1,5 @@
-import type { ComponentProps, ReactNode } from 'react'
+import { useRender } from '@base-ui/react/use-render'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import { cn } from '../cn'
 
 const pressable =
@@ -61,6 +62,9 @@ const ICON_VARIANTS = {
   /** Fades the icon element rather than its color, so overlapping strokes stay even. */
   default:
     'text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+  /** Hairline-bordered counterpart of `Button`'s `outline` (copy link, card menus). */
+  outline:
+    'border-[0.5px] border-white/7 text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
 } as const
@@ -68,29 +72,54 @@ const ICON_VARIANTS = {
 /** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */
 const ICON_SIZES = {
   sm: 'size-7 rounded-lg',
-  /** `sm` look with a 44px square hit area, for the trailing action of a panel header bar. */
-  bar: 'relative size-7 rounded-lg before:absolute before:-inset-2',
+  /**
+   * `sm` look with a square hit area for a header bar's trailing action. The area is `--hit-area`
+   * (44px by default) and centred on the button, so it survives the press scale.
+   */
+  bar: 'relative size-7 rounded-lg before:absolute before:top-1/2 before:left-1/2 before:size-(--hit-area,44px) before:-translate-1/2',
   md: 'size-8 rounded-[10px]',
   lg: 'size-10 rounded-xl',
 } as const
 
+/** `render` swaps the button for another element, such as an external link. */
 export function IconButton({
   className,
   size = 'md',
   variant = 'default',
+  render,
   ...props
 }: ComponentProps<'button'> & {
   size?: keyof typeof ICON_SIZES
   variant?: keyof typeof ICON_VARIANTS
+  render?: ReactElement
 }) {
-  return (
-    <button
-      type="button"
-      className={cn(
+  return useRender({
+    render,
+    defaultTagName: 'button',
+    props: {
+      ...(render ? {} : { type: 'button' }),
+      ...props,
+      className: cn(
         pressable,
         'justify-center',
         ICON_VARIANTS[variant],
         ICON_SIZES[size],
+        className,
+      ),
+    },
+  })
+}
+
+/**
+ * Joins adjacent buttons: inner corners tighten, outer ones keep the button radius.
+ * It overrides the radius of its own children, hence the important modifiers.
+ */
+export function ButtonGroup({ className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div
+      role="group"
+      className={cn(
+        'flex items-center gap-1 *:rounded-md! *:first:rounded-l-[10px]! *:last:rounded-r-[10px]!',
         className,
       )}
       {...props}

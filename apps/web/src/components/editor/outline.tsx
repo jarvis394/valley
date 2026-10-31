@@ -1,24 +1,21 @@
-import { useDraggable } from '@dnd-kit/react'
-import { Upload } from 'lucide-react'
-import { useRef } from 'react'
-import type { NodeId } from '../core/ids'
-import { useChildIds, useDocumentState, useNode } from '../render/context'
-import { useEditor, useEditorState } from './context'
 import {
   BlockDragProvider,
-  DRAG_TYPE,
   DropLine,
   dropContainerProps,
   dropItemProps,
+  scrollToNode,
+  useChildIds,
+  useDocumentState,
   useDropEdge,
-  type DragData,
-} from './dnd'
+  useEditor,
+  useEditorState,
+  useFlowDraggable,
+  useNode,
+  type NodeId,
+} from '@valley/canvas'
 import { cn, IconButton, ListItem, ListItemMeta, Menu, PlusIcon } from '@valley/ui'
-
-const scrollToNode = (id: NodeId) =>
-  document
-    .querySelector(`[data-node-id="${id}"]`)
-    ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+import { Upload } from 'lucide-react'
+import { useRef, useState, type ReactElement } from 'react'
 
 /**
  * Left-hand block list, a second view of the same tree with its own DnD context. It shows
@@ -90,11 +87,7 @@ function SortableOutlineItem({
   onClick: () => void
 }) {
   const dropEdge = useDropEdge(parentId, index, count)
-  const { ref, isDragSource } = useDraggable<DragData>({
-    id,
-    type: DRAG_TYPE.flow,
-    data: { kind: 'flow-node', nodeId: id },
-  })
+  const { ref, isDragSource } = useFlowDraggable(id)
   return (
     <div className="relative" {...dropItemProps}>
       <OutlineItem ref={ref} id={id} onClick={onClick} dimmed={isDragSource} />
@@ -143,20 +136,9 @@ function OutlineItem({
   )
 }
 
-/** Uploads files and inserts them as a new block at the end of the document. */
-function useInsertFiles() {
-  const editor = useEditor()
-  return async (files: FileList) => {
-    const ids = await editor.commands.uploadAssets([...files])
-    if (ids.length === 0) return
-    editor.commands.insertFromAssets(ids, { parentId: editor.getState().doc.rootId })
-  }
-}
-
 /** Menu of insertable blocks, built from the registry, followed by an upload action. */
-export function AddBlockMenu({ trigger }: { trigger: React.ReactElement }) {
+export function AddBlockMenu({ trigger }: { trigger: ReactElement }) {
   const editor = useEditor()
-  const insertFiles = useInsertFiles()
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <Menu.Root>
@@ -197,7 +179,7 @@ export function AddBlockMenu({ trigger }: { trigger: React.ReactElement }) {
         tabIndex={-1}
         onChange={(event) => {
           const { files } = event.currentTarget
-          if (files?.length) void insertFiles(files)
+          if (files?.length) void editor.commands.insertFiles([...files])
           event.currentTarget.value = ''
         }}
       />
@@ -207,18 +189,28 @@ export function AddBlockMenu({ trigger }: { trigger: React.ReactElement }) {
 
 /** "Add block or upload files": opens the block menu; dropped files go into a new block. */
 function AddBlockDropzone() {
-  const insertFiles = useInsertFiles()
+  const editor = useEditor()
+  const [dragging, setDragging] = useState(false)
   return (
     <div className="py-1.5">
       <AddBlockMenu
         trigger={
           <Menu.Trigger
-            onDragOver={(event) => event.preventDefault()}
+            onDragOver={(event) => {
+              if (!event.dataTransfer.types.includes('Files')) return
+              event.preventDefault()
+              setDragging(true)
+            }}
+            onDragLeave={() => setDragging(false)}
             onDrop={(event) => {
               event.preventDefault()
-              void insertFiles(event.dataTransfer.files)
+              setDragging(false)
+              void editor.commands.insertFiles([...event.dataTransfer.files])
             }}
-            className="flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/7 p-3 text-[15px] leading-5 font-medium text-fg/63 outline-none hover:border-white/12 hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-popup-open:border-white/12"
+            className={cn(
+              'flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/7 p-3 text-[15px] leading-5 font-medium text-fg/63 transition-[background-color,border-color,color,scale] duration-150 ease-out outline-none select-none hover:border-white/12 hover:bg-white/3 hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-99 data-popup-open:border-white/12 data-popup-open:bg-white/3 data-popup-open:text-fg',
+              dragging && 'border-white/24 bg-white/5 text-fg',
+            )}
           >
             <PlusIcon />
             Add block or upload files

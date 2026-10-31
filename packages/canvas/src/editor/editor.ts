@@ -205,6 +205,18 @@ export function createEditor({
     return ok ? withIds.map((asset) => asset.id) : []
   }
 
+  /** Stores the image and video files among `files` and adds them to the project. */
+  async function uploadAssets(files: File[]): Promise<AssetId[]> {
+    if (readOnly) return []
+    const media = files.filter((file) => /^(image|video)\//.test(file.type))
+    return addAssets(await Promise.all(media.map(uploadAsset)))
+  }
+
+  function insertFromAssets(assetIds: AssetId[], target: InsertTarget = {}): NodeId | null {
+    const node = registry.createNodeFromAssets(assetIds, { doc: store.getState().doc })
+    return node && insert(node, target)
+  }
+
   const commands = {
     insertBlock<T extends BlockType>(
       type: T,
@@ -213,10 +225,7 @@ export function createEditor({
       return insert(registry.createNode(type, { doc: store.getState().doc }, target), target)
     },
     /** Inserts the block that takes file drops, holding `assetIds`. */
-    insertFromAssets(assetIds: AssetId[], target: InsertTarget = {}): NodeId | null {
-      const node = registry.createNodeFromAssets(assetIds, { doc: store.getState().doc })
-      return node && insert(node, target)
-    },
+    insertFromAssets,
     moveNode: (id: NodeId, parentId: NodeId, index?: number) =>
       transact((draft) => ops.moveNode(draft, registry, id, parentId, index)),
     removeNode(id: NodeId) {
@@ -252,11 +261,12 @@ export function createEditor({
     updateMeta: (recipe: (meta: DocumentMeta) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.meta), options),
     addAssets,
-    /** Stores the image and video files among `files` and adds them to the project. */
-    async uploadAssets(files: File[]): Promise<AssetId[]> {
-      if (readOnly) return []
-      const media = files.filter((file) => /^(image|video)\//.test(file.type))
-      return addAssets(await Promise.all(media.map(uploadAsset)))
+    uploadAssets,
+    /** Uploads `files` and inserts them as one new block, at the end of the page by default. */
+    async insertFiles(files: File[], target: InsertTarget = {}): Promise<NodeId | null> {
+      const ids = await uploadAssets(files)
+      if (ids.length === 0) return null
+      return insertFromAssets(ids, { parentId: store.getState().doc.rootId, ...target })
     },
   }
 

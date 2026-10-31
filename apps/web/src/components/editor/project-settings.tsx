@@ -1,10 +1,15 @@
-import { Archive, CalendarDays, RefreshCw, Trash2, UserLock } from 'lucide-react'
-import { useRef, useState } from 'react'
-import type { DocumentMeta } from '../core/document'
-import { formatBytes, formatShortDate, formatUsDate } from '../core/format'
-import type { ProjectSettings as Settings } from '../core/settings'
-import { useAssets, useMeta } from '../render/context'
-import { useEditor, useSettings } from './context'
+import {
+  formatBytes,
+  formatShortDate,
+  formatUsDate,
+  summarizeAssets,
+  useAssets,
+  useEditor,
+  useMeta,
+  useSettings,
+  type DocumentMeta,
+  type ProjectSettings as Settings,
+} from '@valley/canvas'
 import {
   Button,
   EyeIcon,
@@ -17,6 +22,8 @@ import {
   SwitchField,
   TextField,
 } from '@valley/ui'
+import { Archive, CalendarDays, RefreshCw, Trash2, UserLock } from 'lucide-react'
+import { useRef, useState } from 'react'
 
 const storeUntilOptions = [
   { value: 'week', label: '1 week' },
@@ -50,8 +57,7 @@ export function ProjectSettings() {
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     editor.updateSettings((s) => void (s[key] = value))
 
-  const files = Object.values(useAssets())
-  const bytes = files.reduce((sum, asset) => sum + (asset.size ?? 0), 0)
+  const files = summarizeAssets(useAssets())
   const visibility = settings.visibility ?? 'private'
 
   return (
@@ -114,9 +120,9 @@ export function ProjectSettings() {
 
       <Section title="Content">
         <div className="flex flex-col gap-2">
-          <StatRow label="Photos" value={files.filter((a) => a.kind === 'image').length} />
-          <StatRow label="Videos" value={files.filter((a) => a.kind === 'video').length} />
-          <StatRow label="Size" value={formatBytes(bytes)} />
+          <StatRow label="Photos" value={files.images} />
+          <StatRow label="Videos" value={files.videos} />
+          <StatRow label="Size" value={formatBytes(files.bytes)} />
           {meta.createdAt && <StatRow label="Created at" value={formatUsDate(meta.createdAt)} />}
           {meta.updatedAt && <StatRow label="Updated at" value={formatUsDate(meta.updatedAt)} />}
         </div>

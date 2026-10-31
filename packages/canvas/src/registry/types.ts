@@ -81,6 +81,8 @@ export interface BlockDefinition<T extends BlockType> {
   experimental?: boolean
   Render: ComponentType<BlockRenderProps<T>>
   Inspector?: ComponentType<BlockInspectorProps<T>>
+  /** Inspector sections placed after the theme controls. */
+  InspectorFooter?: ComponentType<BlockInspectorProps<T>>
   /** Name shown in the outline and inspector, derived from content. Blank falls back to `label`. */
   title?: (props: BlockProps<T>) => string
   /** Secondary info for the outline (e.g. file count). */

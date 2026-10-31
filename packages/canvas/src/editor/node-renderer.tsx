@@ -127,7 +127,7 @@ function FlowItem({
       <div
         className={cn(
           'border-y border-dashed border-white/7',
-          selected && 'border-solid border-focus bg-focus/2',
+          selected && 'border-solid border-focus bg-focus-wash/4',
         )}
       >
         <NodeRenderer id={id} />
@@ -181,7 +181,7 @@ function ToolbarButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex size-[18px] items-center justify-center rounded text-focus-fg *:opacity-63 hover:bg-white/7 hover:*:opacity-100"
+      className="flex size-[18px] items-center justify-center rounded text-fg transition-colors *:opacity-32 *:transition-opacity hover:bg-white/7 hover:*:opacity-100"
     >
       {children}
     </button>

@@ -82,6 +82,15 @@ export class BlockRegistry implements ContainmentRules {
     return null
   }
 
+  /** Thumbnail source: the cover image, else the first image, else a video poster. */
+  thumbnailOf(doc: CanvasDocument): string | undefined {
+    const coverAssetId = this.coverAssetId(doc)
+    const asset =
+      (coverAssetId && doc.assets[coverAssetId]) ||
+      Object.values(doc.assets).find((a) => a.kind === 'image')
+    return asset?.kind === 'image' ? asset.src : asset?.poster
+  }
+
   #node(
     definition: Pick<AnyBlockDefinition, 'type' | 'container' | 'placement' | 'version'>,
     props: unknown,

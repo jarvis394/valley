@@ -19,6 +19,8 @@
   /* Canvas selection */
   --color-focus: #0b8ce9;
   --color-focus-fg: #3eaeff;
+  /* Selected node fill; bluer than focus, whose cyan cast reads green at low alpha */
+  --color-focus-wash: #1d4ed8;
   /* Selected list rows and "new" badges */
   --color-selected: #022248;
   --color-selected-fg: #dbeafe;

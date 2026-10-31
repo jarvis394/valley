@@ -3,18 +3,24 @@ import { cn } from '../cn'
 import analytics from './analytics.svg'
 import chevronDownSmall from './chevron-down-small.svg'
 import chevronDown from './chevron-down.svg'
+import chevronRight from './chevron-right.svg'
+import copy from './copy.svg'
 import external from './external.svg'
 import eyeOff from './eye-off.svg'
 import eye from './eye.svg'
 import file from './file.svg'
 import folderClosed from './folder-closed.svg'
 import footer from './footer.svg'
+import github from './github.svg'
 import globe from './globe.svg'
 import heart from './heart.svg'
 import image from './image.svg'
 import kv from './kv.svg'
+import link from './link.svg'
+import lockClosed from './lock-closed.svg'
 import logo from './logo.svg'
 import menuExpand from './menu-expand.svg'
+import more from './more.svg'
 import plus from './plus.svg'
 import portfolio from './portfolio.svg'
 import projects from './projects.svg'
@@ -50,18 +56,24 @@ const createIcon = (src: string, name: string): IconComponent => {
 export const AnalyticsIcon = createIcon(analytics, 'analytics')
 export const ChevronDownIcon = createIcon(chevronDown, 'chevron-down')
 export const ChevronDownSmallIcon = createIcon(chevronDownSmall, 'chevron-down-small')
+export const ChevronRightIcon = createIcon(chevronRight, 'chevron-right')
+export const CopyIcon = createIcon(copy, 'copy')
 export const ExternalIcon = createIcon(external, 'external')
 export const EyeIcon = createIcon(eye, 'eye')
 export const EyeOffIcon = createIcon(eyeOff, 'eye-off')
 export const FileIcon = createIcon(file, 'file')
 export const FolderIcon = createIcon(folderClosed, 'folder-closed')
 export const FooterIcon = createIcon(footer, 'footer')
+export const GithubIcon = createIcon(github, 'github')
 export const GlobeIcon = createIcon(globe, 'globe')
 export const HeartIcon = createIcon(heart, 'heart')
 export const ImageIcon = createIcon(image, 'image')
 export const KvIcon = createIcon(kv, 'kv')
+export const LinkIcon = createIcon(link, 'link')
+export const LockClosedIcon = createIcon(lockClosed, 'lock-closed')
 export const LogoIcon = createIcon(logo, 'logo')
 export const MenuExpandIcon = createIcon(menuExpand, 'menu-expand')
+export const MoreIcon = createIcon(more, 'more')
 export const PlusIcon = createIcon(plus, 'plus')
 export const PortfolioIcon = createIcon(portfolio, 'portfolio')
 export const ProjectsIcon = createIcon(projects, 'projects')

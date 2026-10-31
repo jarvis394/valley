@@ -1,27 +1,24 @@
-import { move } from '@dnd-kit/helpers'
-import { DragDropProvider } from '@dnd-kit/react'
-import { useSortable } from '@dnd-kit/react/sortable'
-import { X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { z } from 'zod'
 import type { Asset } from '../../core/document'
-import { middleTruncate } from '../../core/format'
-import { assetIdSchema, type AssetId } from '../../core/ids'
+import { summarizeAssets } from '../../core/assets'
+import { formatBytes, middleTruncate } from '../../core/format'
+import { assetIdSchema } from '../../core/ids'
 import { FLOW } from '../../core/placement'
 import { SPACING_PX, type GalleryStyle } from '../../core/theme'
-import { useAsset, useAssets, useCoverAssetId } from '../../render/context'
+import { useAssets, useCoverAssetId } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { Media, UploadButton } from '../shared/media'
 import { typographyStyle, useResolvedTheme } from '../shared/theme'
 import {
-  Button,
   cn,
   Field,
   FileIcon,
   FolderIcon,
   FooterIcon,
   Section,
+  StatRow,
   SwitchField,
   TextField,
 } from '@valley/ui'
@@ -176,95 +173,49 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
   )
 }
 
-function SortableThumb({
-  id,
-  index,
-  onRemove,
-}: {
-  id: AssetId
-  index: number
-  onRemove: () => void
-}) {
-  const asset = useAsset(id)
-  const { ref, isDragSource } = useSortable({ id, index })
+function CollectionInspector({ props, update }: BlockInspectorProps<'collection'>) {
   return (
-    <div
-      ref={ref}
-      className={cn(
-        'group relative aspect-square cursor-grab touch-manipulation overflow-hidden rounded-lg bg-neutral-800',
-        isDragSource && 'opacity-40',
-      )}
-    >
-      <Media asset={asset} className="pointer-events-none size-full" />
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label="Remove from collection"
-        className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5 text-white opacity-0 group-hover:opacity-100 max-sm:opacity-100"
-      >
-        <X className="size-3" />
-      </button>
-    </div>
+    <Section title="Collection">
+      <Field label="Title">
+        <TextField
+          value={props.title}
+          onChange={(title) =>
+            update((d) => void (d.title = title), { mergeKey: 'collection.title' })
+          }
+        />
+      </Field>
+      <SwitchField
+        label="Show title"
+        checked={props.showTitle}
+        onChange={(showTitle) => update((d) => void (d.showTitle = showTitle))}
+      />
+    </Section>
   )
 }
 
-function CollectionInspector({ props, update }: BlockInspectorProps<'collection'>) {
+function CollectionFiles({ props, update }: BlockInspectorProps<'collection'>) {
   const assets = useAssets()
-  const missing = Object.values(assets).filter((a) => !props.assetIds.includes(a.id))
+  const files = summarizeAssets(props.assetIds.flatMap((id) => assets[id] ?? []))
   return (
-    <>
-      <Section title="Collection">
-        <Field label="Title">
-          <TextField
-            value={props.title}
-            onChange={(title) =>
-              update((d) => void (d.title = title), { mergeKey: 'collection.title' })
-            }
-          />
-        </Field>
-        <SwitchField
-          label="Show title"
-          checked={props.showTitle}
-          onChange={(showTitle) => update((d) => void (d.showTitle = showTitle))}
-        />
-      </Section>
-      <Section title={`Files · ${props.assetIds.length}`}>
-        <DragDropProvider
-          onDragEnd={(event) => {
-            if (event.canceled) return
-            update((d) => void (d.assetIds = move(props.assetIds, event)))
-          }}
+    <Section
+      title="Files"
+      count={props.assetIds.length}
+      action={
+        <UploadButton
+          multiple
+          iconOnly
+          onUploaded={(ids) => update((d) => void d.assetIds.push(...ids))}
         >
-          <div className="grid grid-cols-4 gap-1.5">
-            {props.assetIds.map((id, index) => (
-              <SortableThumb
-                key={id}
-                id={id}
-                index={index}
-                onRemove={() => update((d) => void d.assetIds.splice(index, 1))}
-              />
-            ))}
-          </div>
-        </DragDropProvider>
-        <div className="flex gap-2">
-          <UploadButton
-            multiple
-            className="flex-1"
-            onUploaded={(ids) => update((d) => void d.assetIds.push(...ids))}
-          />
-          {missing.length > 0 && (
-            <Button
-              variant="control"
-              size="md"
-              className="flex-1"
-              onClick={() => update((d) => void d.assetIds.push(...missing.map((a) => a.id)))}
-            >
-              Add all ({missing.length})
-            </Button>
-          )}
-        </div>
-      </Section>
-    </>
+          Upload files
+        </UploadButton>
+      }
+    >
+      <div className="flex flex-col gap-2 py-1">
+        <StatRow label="Photos" value={files.images} />
+        <StatRow label="Videos" value={files.videos} />
+        <StatRow label="Size" value={formatBytes(files.bytes)} />
+      </div>
+    </Section>
   )
 }
 
@@ -286,6 +237,7 @@ export const collectionBlock = defineBlock({
   themeGroups: ['gallery'],
   Render: CollectionRender,
   Inspector: CollectionInspector,
+  InspectorFooter: CollectionFiles,
   title: (props) => props.title,
   describe: (node) => ({ meta: String(node.props.assetIds.length), metaIcon: FileIcon }),
 })

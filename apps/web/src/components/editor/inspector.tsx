@@ -1,12 +1,16 @@
+import {
+  useEditor,
+  useNode,
+  useSelectedId,
+  useUpdateProps,
+  type AbsolutePlacement,
+  type NodeId,
+} from '@valley/canvas'
+import { Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
 import { MousePointerClick, X } from 'lucide-react'
-import type { NodeId } from '../core/ids'
-import type { AbsolutePlacement } from '../core/placement'
 import type { ReactNode } from 'react'
-import { useNode } from '../render/context'
-import { useEditor, useSelectedId, useUpdateProps } from './context'
 import { ProjectSettings } from './project-settings'
 import { GalleryControls, ThemeGroupSection, TypographyControls } from './theme-controls'
-import { Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
 
 export type InspectorTab = 'component' | 'project'
 
@@ -66,6 +70,7 @@ function NodeInspector({ id }: { id: NodeId }) {
   if (!node) return null
   const definition = editor.registry.get(node.type)
   const BlockInspector = definition.Inspector
+  const BlockInspectorFooter = definition.InspectorFooter
   const Icon = definition.icon
 
   return (
@@ -95,12 +100,15 @@ function NodeInspector({ id }: { id: NodeId }) {
       {definition.themeGroups?.includes('gallery') && (
         <ThemeGroupSection
           group="gallery"
-          title="Gallery Style"
+          title="Styling"
           override={node.overrides?.gallery}
           onOverrideChange={(value) => editor.commands.setOverride(id, 'gallery', value)}
         >
           {(value, set) => <GalleryControls value={value} onChange={set} />}
         </ThemeGroupSection>
+      )}
+      {BlockInspectorFooter && (
+        <BlockInspectorFooter node={node as never} props={node.props as never} update={update} />
       )}
       {node.placement.mode === 'absolute' && (
         <PlacementSection id={id} placement={node.placement} />

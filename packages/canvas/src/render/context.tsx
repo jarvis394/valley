@@ -62,6 +62,11 @@ export function useCoverAssetId() {
   return useDocumentState((state) => registry.coverAssetId(state.doc))
 }
 
+export function useThumbnailSrc() {
+  const { registry } = useRenderContext()
+  return useDocumentState((state) => registry.thumbnailOf(state.doc))
+}
+
 /** Child ids of a container split by placement mode. Each list is shallow-compared. */
 export function useChildIds(parentId: NodeId) {
   const { store } = useRenderContext()

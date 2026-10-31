@@ -5,7 +5,7 @@ import type { Asset } from '../../core/document'
 import type { AssetId } from '../../core/ids'
 import { clamp } from '../../core/placement'
 import { useAssets, useRenderContext } from '../../render/context'
-import { Button, cn, Popover } from '@valley/ui'
+import { Button, cn, IconButton, Popover } from '@valley/ui'
 
 export const focalPointSchema = z.object({
   x: z.number().min(0).max(1),
@@ -114,28 +114,42 @@ export function FocalPointPicker({
 export function UploadButton({
   onUploaded,
   multiple,
+  iconOnly,
   className,
   children,
 }: {
   onUploaded: (ids: AssetId[]) => void
   multiple?: boolean
+  /** Icon button for a section header. */
+  iconOnly?: boolean
   className?: string
   children?: ReactNode
 }) {
   const { uploadAssets } = useRenderContext()
   const inputRef = useRef<HTMLInputElement>(null)
   if (!uploadAssets) return null
+  const open = () => inputRef.current?.click()
   return (
     <>
-      <Button
-        variant="control"
-        size="md"
-        icon={<Upload className="size-4" />}
-        className={className}
-        onClick={() => inputRef.current?.click()}
-      >
-        {children ?? 'Upload'}
-      </Button>
+      {iconOnly ? (
+        <IconButton
+          size="sm"
+          aria-label={typeof children === 'string' ? children : 'Upload'}
+          onClick={open}
+        >
+          <Upload className="size-4" />
+        </IconButton>
+      ) : (
+        <Button
+          variant="control"
+          size="md"
+          icon={<Upload className="size-4" />}
+          className={className}
+          onClick={open}
+        >
+          {children ?? 'Upload'}
+        </Button>
+      )}
       <input
         ref={inputRef}
         type="file"

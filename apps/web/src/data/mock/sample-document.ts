@@ -1,8 +1,13 @@
-import type { Asset, CanvasDocument, CanvasNode } from '../core/document'
-import { assetId, nodeId } from '../core/ids'
-import { FLOW } from '../core/placement'
-import type { ProjectSettings } from '../core/settings'
-import { defaultTheme } from '../core/theme'
+import {
+  assetId,
+  defaultTheme,
+  FLOW,
+  nodeId,
+  type Asset,
+  type CanvasDocument,
+  type CanvasNode,
+  type ProjectSettings,
+} from '@valley/canvas'
 
 /** Deterministic ids so the server- and client-rendered demo match. Files live in the app's /demo. */
 const photo = (id: string, name: string, width: number, height: number, mb: number): Asset => ({

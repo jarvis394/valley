@@ -1,4 +1,4 @@
-import { DragDropProvider, DragOverlay, type DragEndEvent } from '@dnd-kit/react'
+import { DragDropProvider, DragOverlay, useDraggable, type DragEndEvent } from '@dnd-kit/react'
 import { GripVertical } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
 import type { NodeId } from '../core/ids'
@@ -180,6 +180,16 @@ function DragChip({ data }: { data: DragData }) {
       {editor.registry.titleOf(node)}
     </div>
   )
+}
+
+/** Makes an element drag the flow node `id`, for surfaces outside the canvas (outline). */
+export function useFlowDraggable(id: NodeId) {
+  const { ref, isDragSource } = useDraggable<DragData>({
+    id,
+    type: DRAG_TYPE.flow,
+    data: { kind: 'flow-node', nodeId: id },
+  })
+  return { ref, isDragSource }
 }
 
 /**
