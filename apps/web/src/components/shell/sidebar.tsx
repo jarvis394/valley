@@ -207,7 +207,7 @@ function Footer({ version, repositoryUrl }: { version: string; repositoryUrl: st
                   aria-label="Valley on GitHub"
                   render={<a href={repositoryUrl} target="_blank" rel="noreferrer" />}
                 >
-                  <GithubIcon opacity={0.32} />
+                  <GithubIcon />
                 </IconButton>
               </span>
             </span>

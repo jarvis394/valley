@@ -37,9 +37,9 @@ export function ProjectCard({
         {formatLongDate(project.date)}
       </p>
       {project.thumbnail ? (
-        <img src={project.thumbnail} alt="" className="h-[220px] w-full object-cover" />
+        <img src={project.thumbnail} alt="" className="h-53 w-full object-cover" />
       ) : (
-        <div className="flex h-[220px] flex-col items-center justify-center gap-0.5 border-y-[0.5px] border-white/3 text-white">
+        <div className="flex h-53 flex-col items-center justify-center gap-0.5 border-y-[0.5px] border-white/3 text-white">
           <p className="text-base leading-6 font-medium">Seems empty, doesn’t it?</p>
           <p className="text-[13px] opacity-63">Add more files inside the project</p>
         </div>
@@ -82,10 +82,10 @@ export function ProjectCard({
       </div>
 
       <ButtonGroup className="relative z-10 px-3 pb-3">
-        <Button variant="outline" icon={<FileIcon opacity={0.63} />} className="flex-1">
+        <Button variant="outline" icon={<FileIcon />} className="flex-1">
           {project.files} {project.files === 1 ? 'file' : 'files'}
         </Button>
-        <Button variant="outline" icon={<EyeIcon opacity={0.63} />} aria-label="Views">
+        <Button variant="outline" icon={<EyeIcon />} aria-label="Views">
           {formatGrouped(project.views)}
         </Button>
         <Menu.Root>

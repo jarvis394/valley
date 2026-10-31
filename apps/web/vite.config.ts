@@ -1,7 +1,8 @@
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { defineConfig } from 'vite'
-import viteReact from '@vitejs/plugin-react'
+import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
 import { nitro } from 'nitro/vite'
 
 export default defineConfig(() => ({
@@ -16,6 +17,8 @@ export default defineConfig(() => ({
       srcDirectory: 'src',
     }),
     viteReact(),
+    // Fails the build on any function the compiler would otherwise skip silently.
+    babel({ presets: [reactCompilerPreset({ panicThreshold: 'all_errors' })] }),
     nitro(),
   ],
 }))

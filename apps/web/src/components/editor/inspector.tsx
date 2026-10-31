@@ -6,7 +6,7 @@ import {
   type AbsolutePlacement,
   type NodeId,
 } from '@valley/canvas'
-import { Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
+import { cn, Field, IconButton, Section, SliderField, Tabs } from '@valley/ui'
 import { MousePointerClick, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ProjectSettings } from './project-settings'
@@ -30,9 +30,9 @@ export function Inspector({
       onValueChange={(value) => onTabChange(value as InspectorTab)}
       className="flex min-h-0 flex-1 flex-col"
     >
-      <div className="shrink-0 border-b border-line">
+      <div className={cn('shrink-0 border-b border-line', !header && 'pt-2')}>
         {header}
-        <Tabs.List className={header ? undefined : 'pt-2'}>
+        <Tabs.List>
           <Tabs.Tab value="component">Component</Tabs.Tab>
           <Tabs.Tab value="project">Project</Tabs.Tab>
         </Tabs.List>

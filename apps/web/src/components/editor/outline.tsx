@@ -13,9 +13,18 @@ import {
   useNode,
   type NodeId,
 } from '@valley/canvas'
-import { cn, IconButton, ListItem, ListItemMeta, Menu, PlusIcon } from '@valley/ui'
+import {
+  Badge,
+  Dropzone,
+  FileInput,
+  IconButton,
+  ListItem,
+  ListItemMeta,
+  Menu,
+  PlusIcon,
+} from '@valley/ui'
 import { Upload } from 'lucide-react'
-import { useRef, useState, type ReactElement } from 'react'
+import { useRef, type ReactElement } from 'react'
 
 /**
  * Left-hand block list, a second view of the same tree with its own DnD context. It shows
@@ -121,7 +130,7 @@ function OutlineItem({
       ref={ref}
       onClick={onClick}
       selected={selected}
-      className={cn(dimmed && 'opacity-50')}
+      dimmed={dimmed}
       icon={<Icon className="size-4" />}
       label={editor.registry.titleOf(node)}
       end={
@@ -149,39 +158,27 @@ export function AddBlockMenu({ trigger }: { trigger: ReactElement }) {
           return (
             <Menu.Item
               key={definition.type}
+              icon={<Icon className="size-4" />}
               onClick={() => {
                 const id = editor.commands.insertBlock(definition.type)
                 if (id) requestAnimationFrame(() => scrollToNode(id))
               }}
             >
-              <Icon className="size-4" opacity={0.63} />
               <span className="flex-1">{definition.label}</span>
-              {definition.experimental && (
-                <span className="rounded bg-amber-400/15 px-1.5 py-0.5 text-[10px] text-amber-300 uppercase">
-                  beta
-                </span>
-              )}
+              {definition.experimental && <Badge variant="warning">beta</Badge>}
             </Menu.Item>
           )
         })}
         <Menu.Separator />
-        <Menu.Item onClick={() => inputRef.current?.click()}>
-          <Upload className="size-4" opacity={0.63} />
+        <Menu.Item icon={<Upload className="size-4" />} onClick={() => inputRef.current?.click()}>
           Upload images
         </Menu.Item>
       </Menu.Popup>
-      <input
+      <FileInput
         ref={inputRef}
-        type="file"
         multiple
         accept="image/*,video/*"
-        className="sr-only"
-        tabIndex={-1}
-        onChange={(event) => {
-          const { files } = event.currentTarget
-          if (files?.length) void editor.commands.insertFiles([...files])
-          event.currentTarget.value = ''
-        }}
+        onFiles={(files) => void editor.commands.insertFiles(files)}
       />
     </Menu.Root>
   )
@@ -190,31 +187,18 @@ export function AddBlockMenu({ trigger }: { trigger: ReactElement }) {
 /** "Add block or upload files": opens the block menu; dropped files go into a new block. */
 function AddBlockDropzone() {
   const editor = useEditor()
-  const [dragging, setDragging] = useState(false)
   return (
     <div className="py-1.5">
       <AddBlockMenu
         trigger={
           <Menu.Trigger
-            onDragOver={(event) => {
-              if (!event.dataTransfer.types.includes('Files')) return
-              event.preventDefault()
-              setDragging(true)
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(event) => {
-              event.preventDefault()
-              setDragging(false)
-              void editor.commands.insertFiles([...event.dataTransfer.files])
-            }}
-            className={cn(
-              'flex h-[140px] w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/7 p-3 text-[15px] leading-5 font-medium text-fg/63 transition-[background-color,border-color,color,scale] duration-150 ease-out outline-none select-none hover:border-white/12 hover:bg-white/3 hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-99 data-popup-open:border-white/12 data-popup-open:bg-white/3 data-popup-open:text-fg',
-              dragging && 'border-white/24 bg-white/5 text-fg',
-            )}
-          >
-            <PlusIcon />
-            Add block or upload files
-          </Menu.Trigger>
+            render={
+              <Dropzone
+                label="Add block or upload files"
+                onFiles={(files) => void editor.commands.insertFiles(files)}
+              />
+            }
+          />
         }
       />
     </div>

@@ -21,6 +21,8 @@ import {
   StatRow,
   SwitchField,
   TextField,
+  FieldButton,
+  FieldGroup,
 } from '@valley/ui'
 import { Archive, CalendarDays, RefreshCw, Trash2, UserLock } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -144,19 +146,17 @@ export function ProjectSettings() {
   )
 }
 
-/** Shows the formatted date; clicking opens the native date picker. */
+/** Shows the formatted date; clicking opens the native date picker anchored under it. */
 function DateField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
-    <button
-      type="button"
-      onClick={() => inputRef.current?.showPicker()}
-      className="relative flex h-10 w-full min-w-0 items-center rounded-xl bg-control p-1 text-left text-[13px] leading-5 text-fg outline-none hover:bg-control-hover focus-visible:ring-2 focus-visible:ring-accent/60"
-    >
-      <span className="-mr-2 flex size-8 shrink-0 items-center justify-center">
-        <CalendarDays className="size-4" opacity={0.63} />
-      </span>
-      <span className="truncate px-2">{formatShortDate(value)}</span>
+    <div className="relative">
+      <FieldButton
+        icon={<CalendarDays className="size-4" />}
+        onClick={() => inputRef.current?.showPicker()}
+      >
+        {formatShortDate(value)}
+      </FieldButton>
       <input
         ref={inputRef}
         type="date"
@@ -166,7 +166,7 @@ function DateField({ value, onChange }: { value: string; onChange: (value: strin
         onChange={(event) => event.target.value && onChange(event.target.value)}
         className="pointer-events-none absolute inset-0 opacity-0"
       />
-    </button>
+    </div>
   )
 }
 
@@ -183,7 +183,7 @@ function PasswordControl({
 }) {
   const [visible, setVisible] = useState(false)
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl bg-control">
+    <FieldGroup.Root>
       <SwitchField
         label="Use password"
         checked={enabled}
@@ -194,33 +194,31 @@ function PasswordControl({
       />
       {enabled && (
         <>
-          <div className="mx-0.5 border-t border-dashed border-white/7" />
-          <div className="py-0.5">
-            <TextField
-              type={visible ? 'text' : 'password'}
-              value={password}
-              onChange={onPasswordChange}
-              icon={<UserLock className="size-4" />}
-              end={
-                <>
-                  <IconButton
-                    aria-label={visible ? 'Hide password' : 'Show password'}
-                    onClick={() => setVisible((v) => !v)}
-                  >
-                    {visible ? <EyeIcon /> : <EyeOffIcon />}
-                  </IconButton>
-                  <IconButton
-                    aria-label="Generate new password"
-                    onClick={() => onPasswordChange(randomPassword())}
-                  >
-                    <RefreshCw className="size-4" />
-                  </IconButton>
-                </>
-              }
-            />
-          </div>
+          <FieldGroup.Separator />
+          <TextField
+            type={visible ? 'text' : 'password'}
+            value={password}
+            onChange={onPasswordChange}
+            icon={<UserLock className="size-4" />}
+            end={
+              <>
+                <IconButton
+                  aria-label={visible ? 'Hide password' : 'Show password'}
+                  onClick={() => setVisible((v) => !v)}
+                >
+                  {visible ? <EyeIcon /> : <EyeOffIcon />}
+                </IconButton>
+                <IconButton
+                  aria-label="Generate new password"
+                  onClick={() => onPasswordChange(randomPassword())}
+                >
+                  <RefreshCw className="size-4" />
+                </IconButton>
+              </>
+            }
+          />
         </>
       )}
-    </div>
+    </FieldGroup.Root>
   )
 }

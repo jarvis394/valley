@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/react'
 import { ArrowDown, ArrowUp, Copy, Trash2 } from 'lucide-react'
-import { memo, type ReactNode } from 'react'
+import { memo } from 'react'
 import type { NodeId } from '../core/ids'
 import { flowIndexOf, flowChildIds } from '../core/tree'
 import { useChildIds, useNode } from '../render/context'
@@ -14,7 +14,7 @@ import {
   useDropEdge,
   type DragData,
 } from './dnd'
-import { cn } from '@valley/ui'
+import { cn, IconButton } from '@valley/ui'
 
 /**
  * Renders any node in edit mode by looking up its block definition. Containers get their
@@ -151,40 +151,29 @@ function BlockToolbar({ id }: { id: NodeId }) {
   }
   return (
     <div className="flex items-center gap-0.5 pt-4 pb-1.5">
-      <ToolbarButton label="Move up" onClick={() => moveToGap(-1)}>
+      <IconButton size="xs" variant="dimmed" aria-label="Move up" onClick={() => moveToGap(-1)}>
         <ArrowUp className="size-3" />
-      </ToolbarButton>
-      <ToolbarButton label="Move down" onClick={() => moveToGap(2)}>
+      </IconButton>
+      <IconButton size="xs" variant="dimmed" aria-label="Move down" onClick={() => moveToGap(2)}>
         <ArrowDown className="size-3" />
-      </ToolbarButton>
-      <ToolbarButton label="Duplicate" onClick={() => editor.commands.duplicateNode(id)}>
+      </IconButton>
+      <IconButton
+        size="xs"
+        variant="dimmed"
+        aria-label="Duplicate"
+        onClick={() => editor.commands.duplicateNode(id)}
+      >
         <Copy className="size-3" />
-      </ToolbarButton>
-      <ToolbarButton label="Delete" onClick={() => editor.commands.removeNode(id)}>
+      </IconButton>
+      <IconButton
+        size="xs"
+        variant="dimmed"
+        aria-label="Delete"
+        onClick={() => editor.commands.removeNode(id)}
+      >
         <Trash2 className="size-3" />
-      </ToolbarButton>
+      </IconButton>
     </div>
-  )
-}
-
-function ToolbarButton({
-  label,
-  onClick,
-  children,
-}: {
-  label: string
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className="flex size-[18px] items-center justify-center rounded text-fg transition-colors *:opacity-32 *:transition-opacity hover:bg-white/7 hover:*:opacity-100"
-    >
-      {children}
-    </button>
   )
 }
 

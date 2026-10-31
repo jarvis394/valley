@@ -28,7 +28,15 @@ function MenuPopup({ children, className, align = 'start', sideOffset = 6 }: Pop
   )
 }
 
-function MenuItem({ className, ...props }: ComponentProps<typeof BaseMenu.Item>) {
+function MenuItem({
+  className,
+  icon,
+  children,
+  ...props
+}: ComponentProps<typeof BaseMenu.Item> & {
+  /** Leading 16px icon, muted like `ListItem`'s. */
+  icon?: ReactNode
+}) {
   return (
     <BaseMenu.Item
       className={cn(
@@ -36,7 +44,10 @@ function MenuItem({ className, ...props }: ComponentProps<typeof BaseMenu.Item>)
         className as string,
       )}
       {...props}
-    />
+    >
+      {icon && <span className="flex shrink-0 opacity-63">{icon}</span>}
+      {children}
+    </BaseMenu.Item>
   )
 }
 

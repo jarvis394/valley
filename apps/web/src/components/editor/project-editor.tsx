@@ -1,3 +1,4 @@
+import { useRender } from '@base-ui/react/use-render'
 import {
   Canvas,
   EditorProvider,
@@ -18,6 +19,8 @@ import {
   cn,
   Divider,
   IconButton,
+  ListItem,
+  ListItemMeta,
   Menu,
   Sheet,
   SlashBackIcon,
@@ -26,7 +29,7 @@ import {
   SwitcherMenu,
 } from '@valley/ui'
 import { Eye, EyeOff, Layers, Plus, Redo2, SlidersHorizontal, Undo2 } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ComponentProps, type ReactElement, type ReactNode } from 'react'
 import { Inspector, type InspectorTab } from './inspector'
 import { AddBlockMenu, Outline } from './outline'
 
@@ -169,20 +172,22 @@ function ProjectHeader({ switcher }: { switcher?: ReactNode }) {
 function ProjectRow() {
   const files = summarizeAssets(useAssets())
   return (
-    <div className="flex h-10 items-center gap-1 rounded-xl bg-white/3 px-3 text-[15px] leading-5">
-      <span className="min-w-0 flex-1 truncate font-medium">Project</span>
-      <span className="flex shrink-0 items-center gap-1 tabular-nums">
-        <span className="opacity-64">
+    <ListItem
+      render={<div />}
+      filled
+      label="Project"
+      end={
+        <ListItemMeta>
           {files.count} {files.count === 1 ? 'file' : 'files'}
-        </span>
-        {files.bytes > 0 && (
-          <>
-            <span className="opacity-24">•</span>
-            <span className="opacity-64">{formatBytes(files.bytes)}</span>
-          </>
-        )}
-      </span>
-    </div>
+          {files.bytes > 0 && (
+            <>
+              <span className="text-fg/24">•</span>
+              {formatBytes(files.bytes)}
+            </>
+          )}
+        </ListItemMeta>
+      }
+    />
   )
 }
 
@@ -227,30 +232,59 @@ function MobileDock({
   hasSelection: boolean
   onPreview: () => void
 }) {
-  const item =
-    'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] text-fg/63 active:bg-white/7 disabled:opacity-30'
   return (
     <nav className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 flex gap-1 rounded-2xl border-[0.5px] border-white/7 bg-surface/95 p-1 shadow-2xl backdrop-blur lg:hidden">
-      <button type="button" className={item} onClick={() => onOpen('outline')}>
-        <Layers className="size-5 text-fg" opacity={0.63} /> Blocks
-      </button>
+      <DockItem
+        icon={<Layers className="size-5" />}
+        label="Blocks"
+        onClick={() => onOpen('outline')}
+      />
       <AddBlockMenu
         trigger={
-          <Menu.Trigger className={item}>
-            <Plus className="size-5 text-fg" opacity={0.63} /> Add
-          </Menu.Trigger>
+          <Menu.Trigger render={<DockItem icon={<Plus className="size-5" />} label="Add" />} />
         }
       />
-      <button type="button" className={item} onClick={() => onOpen('inspector')}>
-        <SlidersHorizontal
-          className={cn('size-5 text-fg', hasSelection && 'text-focus-fg')}
-          opacity={hasSelection ? 1 : 0.63}
-        />{' '}
-        Edit
-      </button>
-      <button type="button" className={item} onClick={onPreview}>
-        <Eye className="size-5 text-fg" opacity={0.63} /> Preview
-      </button>
+      <DockItem
+        icon={<SlidersHorizontal className="size-5" />}
+        label="Edit"
+        highlighted={hasSelection}
+        onClick={() => onOpen('inspector')}
+      />
+      <DockItem icon={<Eye className="size-5" />} label="Preview" onClick={onPreview} />
     </nav>
   )
+}
+
+/** Icon over a caption. `render` swaps the button, e.g. for a menu trigger. */
+function DockItem({
+  icon,
+  label,
+  highlighted,
+  render,
+  ...props
+}: Omit<ComponentProps<'button'>, 'children' | 'className'> & {
+  icon: ReactNode
+  label: string
+  /** Lights the icon up, e.g. when there is a selection to edit. */
+  highlighted?: boolean
+  render?: ReactElement
+}) {
+  return useRender({
+    render,
+    defaultTagName: 'button',
+    props: {
+      ...(render ? {} : { type: 'button' }),
+      ...props,
+      className:
+        'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] text-fg/63 active:bg-white/7 disabled:opacity-30',
+      children: (
+        <>
+          <span className={cn('flex', highlighted ? 'text-focus-fg' : 'text-fg opacity-63')}>
+            {icon}
+          </span>
+          {label}
+        </>
+      ),
+    },
+  })
 }

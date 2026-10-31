@@ -1,7 +1,7 @@
 import { Sticker } from 'lucide-react'
 import { z } from 'zod'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
-import { Field, Section, Segmented, TextField } from '@valley/ui'
+import { ColorField, Field, Section, Segmented, TextField } from '@valley/ui'
 
 /**
  * Experimental `absolute` block that tests free placement, rotation and z-order.
@@ -63,13 +63,11 @@ function StickerInspector({ props, update }: BlockInspectorProps<'sticker'>) {
       </Field>
       {props.style === 'label' && (
         <Field label="Color">
-          <input
-            type="color"
+          <ColorField
             value={props.color}
-            onChange={(e) =>
-              update((d) => void (d.color = e.target.value), { mergeKey: 'sticker.color' })
+            onChange={(color) =>
+              update((d) => void (d.color = color), { mergeKey: 'sticker.color' })
             }
-            className="h-10 w-full cursor-pointer rounded-xl bg-control p-1"
           />
         </Field>
       )}

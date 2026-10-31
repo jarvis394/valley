@@ -5,7 +5,7 @@ import type { Asset } from '../../core/document'
 import type { AssetId } from '../../core/ids'
 import { clamp } from '../../core/placement'
 import { useAssets, useRenderContext } from '../../render/context'
-import { Button, cn, IconButton, Popover } from '@valley/ui'
+import { Button, cn, FileInput, IconButton, Popover } from '@valley/ui'
 
 export const focalPointSchema = z.object({
   x: z.number().min(0).max(1),
@@ -150,19 +150,11 @@ export function UploadButton({
           {children ?? 'Upload'}
         </Button>
       )}
-      <input
+      <FileInput
         ref={inputRef}
-        type="file"
         accept="image/*,video/*"
         multiple={multiple}
-        tabIndex={-1}
-        className="sr-only"
-        onChange={async (event) => {
-          const input = event.currentTarget
-          const files = [...(input.files ?? [])]
-          input.value = ''
-          if (files.length) onUploaded(await uploadAssets(files))
-        }}
+        onFiles={async (files) => onUploaded(await uploadAssets(files))}
       />
     </>
   )

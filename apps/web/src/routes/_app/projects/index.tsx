@@ -24,15 +24,16 @@ function Projects() {
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
 
-  const createProject = async (files: File[]) => {
+  // A promise chain, not try/finally, which React Compiler can't compile.
+  const createProject = (files: File[]) => {
     setCreating(true)
-    try {
-      const project = await api.createProject(files)
-      await router.invalidate()
-      await navigate({ to: '/projects/$projectId', params: { projectId: project.id } })
-    } finally {
-      setCreating(false)
-    }
+    void api
+      .createProject(files)
+      .then(async (project) => {
+        await router.invalidate()
+        await navigate({ to: '/projects/$projectId', params: { projectId: project.id } })
+      })
+      .finally(() => setCreating(false))
   }
 
   return (
@@ -42,7 +43,7 @@ function Projects() {
       hero={
         <>
           <Greeting name={account.name} />
-          <UploadDropzone disabled={creating} onFiles={(files) => void createProject(files)} />
+          <UploadDropzone disabled={creating} onFiles={createProject} />
         </>
       }
     />

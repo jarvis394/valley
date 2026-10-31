@@ -19,6 +19,8 @@ export function ListItem({
   label,
   end,
   selected,
+  filled,
+  dimmed,
   leading = 'icon',
   render,
   className,
@@ -28,6 +30,10 @@ export function ListItem({
   label: ReactNode
   end?: ReactNode
   selected?: boolean
+  /** Static tint, e.g. a summary row above the links it heads. */
+  filled?: boolean
+  /** Placeholder look for a row that is elsewhere for now, e.g. being dragged. */
+  dimmed?: boolean
   leading?: keyof typeof LEADING
   render?: ReactElement
 }) {
@@ -42,7 +48,9 @@ export function ListItem({
       className: cn(
         'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-[15px] leading-5 font-medium text-fg transition-colors outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
         styles.row,
+        filled && 'bg-white/3',
         selected && 'bg-selected text-selected-fg hover:bg-selected',
+        dimmed && 'opacity-50',
         className,
       ),
       children: (
@@ -73,11 +81,19 @@ export function ListItemMeta({ children, className }: { children: ReactNode; cla
   )
 }
 
-/** Small pill, e.g. "2 new". */
-export function Badge({ children }: { children: ReactNode }) {
-  return (
-    <span className="shrink-0 rounded-full bg-selected px-2 py-0.75 text-[13px] leading-4.25 font-medium text-info-fg">
-      {children}
-    </span>
-  )
+const BADGE_VARIANTS = {
+  /** Count of something new ("2 new"). */
+  info: 'rounded-full bg-selected px-2 py-0.75 text-[13px] leading-4.25 font-medium text-info-fg',
+  /** Small caps tag for unfinished features ("beta"). */
+  warning: 'rounded bg-amber-400/15 px-1.5 py-0.5 text-[10px] text-amber-300 uppercase',
+} as const
+
+export function Badge({
+  variant = 'info',
+  children,
+}: {
+  variant?: keyof typeof BADGE_VARIANTS
+  children: ReactNode
+}) {
+  return <span className={cn('shrink-0', BADGE_VARIANTS[variant])}>{children}</span>
 }

@@ -6,8 +6,9 @@ const pressable =
   'inline-flex shrink-0 items-center outline-none transition-[color,background-color,border-color,scale] duration-150 ease-out select-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-97 disabled:pointer-events-none disabled:opacity-40'
 
 const VARIANTS = {
-  /** Toolbar button with a hairline border (Share). */
-  outline: 'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7',
+  /** Toolbar button with a hairline border (Share); its icon is muted until hovered. */
+  outline:
+    'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7 *:data-icon:opacity-63 *:data-icon:transition-opacity hover:*:data-icon:opacity-100 data-popup-open:*:data-icon:opacity-100',
   /** Bright call to action (Visit). */
   primary:
     'border-[0.5px] border-white/24 bg-linear-to-b from-white to-[#e1e1e1] text-[#1b1b1b] shadow-[0_2px_16px_rgba(255,255,255,0.07),0_0_4px_rgba(255,255,255,0.07)] hover:to-white',
@@ -52,7 +53,11 @@ export function Button({
       )}
       {...props}
     >
-      {icon && <span className="-ml-0.5 flex h-4 w-3.5 items-center">{icon}</span>}
+      {icon && (
+        <span data-icon className="-ml-0.5 flex h-4 w-3.5 items-center">
+          {icon}
+        </span>
+      )}
       {children}
     </button>
   )
@@ -67,10 +72,15 @@ const ICON_VARIANTS = {
     'border-[0.5px] border-white/7 text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
+  /** Tertiary action that stays out of the way until hovered (block toolbar). */
+  dimmed:
+    'text-fg *:opacity-32 *:transition-opacity hover:bg-white/7 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
 } as const
 
 /** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */
 const ICON_SIZES = {
+  /** For a 12px icon in a dense toolbar. */
+  xs: 'size-[18px] rounded',
   sm: 'size-7 rounded-lg',
   /**
    * `sm` look with a square hit area for a header bar's trailing action. The area is `--hit-area`

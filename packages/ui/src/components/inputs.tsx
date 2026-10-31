@@ -3,7 +3,7 @@ import { Select } from '@base-ui/react/select'
 import { Slider } from '@base-ui/react/slider'
 import { Switch as BaseSwitch } from '@base-ui/react/switch'
 import { Check } from 'lucide-react'
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '../cn'
 import { ChevronDownIcon } from '../icons'
 import type { Option } from './segmented'
@@ -11,6 +11,11 @@ import type { Option } from './segmented'
 const controlClass =
   'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-[13px] leading-5 text-fg focus-within:ring-2 focus-within:ring-accent/60'
 const inputClass = 'min-w-0 flex-1 bg-transparent px-3 py-2.5 outline-none placeholder:text-fg/32'
+/** A control that opens something on press (select, picker). */
+const triggerClass = cn(
+  controlClass,
+  'p-1 text-left outline-none hover:bg-control-hover focus-visible:ring-2 data-popup-open:bg-control-hover',
+)
 
 /** 32px slot for a 16px icon inside a control. */
 const Adornment = ({ children, className }: { children: ReactNode; className?: string }) => (
@@ -59,13 +64,25 @@ export function TextField({
         </span>
       )}
       {icon && <Adornment className="-mr-2 ml-1">{icon}</Adornment>}
-      <Input
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onValueChange={(next) => onChange(next)}
-        className={inputClass}
-      />
+      {/* An input clips text to its content box, so it is sized to its text by a hidden mirror
+          and this padded wrapper scrolls instead: text runs to the edges, with an inset at either end. */}
+      <span className="flex min-w-0 flex-1 self-stretch overflow-x-auto overscroll-x-contain pl-3 [scrollbar-width:none]">
+        <span className="grid w-max min-w-full shrink-0 pr-3">
+          <span
+            aria-hidden
+            className="invisible col-start-1 row-start-1 py-2.5 pr-0.5 whitespace-pre"
+          >
+            {(type === 'password' ? '•'.repeat(value.length) : value) || placeholder}
+          </span>
+          <Input
+            type={type}
+            value={value}
+            placeholder={placeholder}
+            onValueChange={(next) => onChange(next)}
+            className="col-start-1 row-start-1 w-full min-w-0 bg-transparent py-2.5 outline-none placeholder:text-fg/32"
+          />
+        </span>
+      </span>
       {end}
     </label>
   )
@@ -90,12 +107,7 @@ export function SelectField<T extends string>({
       value={value}
       onValueChange={(next) => next && onChange(next)}
     >
-      <Select.Trigger
-        className={cn(
-          controlClass,
-          'p-1 text-left outline-none hover:bg-control-hover focus-visible:ring-2 data-popup-open:bg-control-hover',
-        )}
-      >
+      <Select.Trigger className={triggerClass}>
         {icon && <Adornment className="-mr-2">{icon}</Adornment>}
         <Select.Value className="min-w-0 flex-1 truncate px-2" />
         <Select.Icon className="flex size-8 shrink-0 items-center justify-center opacity-63">
@@ -125,6 +137,37 @@ export function SelectField<T extends string>({
         </Select.Positioner>
       </Select.Portal>
     </Select.Root>
+  )
+}
+
+/** Shows a value in a field; pressing it opens a picker the caller owns (e.g. a native date input). */
+export function FieldButton({
+  icon,
+  children,
+  ...props
+}: Omit<ComponentProps<'button'>, 'className'> & { icon?: ReactNode }) {
+  return (
+    <button type="button" className={triggerClass} {...props}>
+      {icon && <Adornment className="-mr-2">{icon}</Adornment>}
+      <span className="min-w-0 flex-1 truncate px-2">{children}</span>
+    </button>
+  )
+}
+
+export function ColorField({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <input
+      type="color"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className={cn(controlClass, 'cursor-pointer p-1 outline-none hover:bg-control-hover')}
+    />
   )
 }
 
@@ -210,3 +253,19 @@ export function SwitchField({
     </label>
   )
 }
+
+function FieldGroupRoot({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl bg-control has-[>[data-separator]]:pb-0.5">
+      {children}
+    </div>
+  )
+}
+
+/** The spacing it adds keeps the focus ring of the control below clear of the group's clip. */
+function FieldGroupSeparator() {
+  return <div data-separator className="mx-0.5 mb-0.5 border-t border-dashed border-white/7" />
+}
+
+/** Controls on one surface, e.g. a switch and the field it enables ("Use password"). */
+export const FieldGroup = { Root: FieldGroupRoot, Separator: FieldGroupSeparator }
