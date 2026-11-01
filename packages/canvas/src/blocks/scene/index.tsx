@@ -47,7 +47,7 @@ function SceneRender({ props, update, mode }: BlockRenderProps<'scene'>) {
           onChange={(caption) =>
             update((d) => void (d.caption = caption), { mergeKey: 'scene.caption' })
           }
-          className="px-6 py-3 text-center text-sm text-neutral-400"
+          className="px-6 py-3 text-center text-small text-neutral-400"
         />
       )}
     </figure>

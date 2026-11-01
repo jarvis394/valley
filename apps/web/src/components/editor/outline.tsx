@@ -46,7 +46,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex h-11 shrink-0 items-center gap-2 pr-2 pl-4">
-        <span className="flex-1 text-[15px] leading-5 text-fg/32">Blocks</span>
+        <span className="flex-1 text-body text-fg/32">Blocks</span>
         <AddBlockMenu
           trigger={
             <Menu.Trigger render={<IconButton size="bar" aria-label="Add block" />}>
@@ -72,7 +72,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
         </BlockDragProvider>
         {absoluteIds.length > 0 && (
           <>
-            <div className="px-3 pt-2 text-[13px] text-fg/32">Floating</div>
+            <div className="px-3 pt-2 text-small text-fg/32">Floating</div>
             {absoluteIds.map((id) => (
               <OutlineItem key={id} id={id} onClick={() => navigate(id)} />
             ))}

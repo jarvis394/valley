@@ -10,6 +10,7 @@ import noRawResizeObserver from './rules/no-raw-resize-observer.ts'
 import noUnscopedHas from './rules/no-unscoped-has.ts'
 import requireCenteredScrollGutter from './rules/require-centered-scroll-gutter.ts'
 import statementPadding from './rules/statement-padding.ts'
+import tailwindScale from './rules/tailwind-scale.ts'
 
 export default definePlugin({
   meta: {
@@ -26,5 +27,6 @@ export default definePlugin({
     'no-unscoped-has': noUnscopedHas,
     'require-centered-scroll-gutter': requireCenteredScrollGutter,
     'statement-padding': statementPadding,
+    'tailwind-scale': tailwindScale,
   },
 })

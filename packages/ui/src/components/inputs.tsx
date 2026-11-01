@@ -9,9 +9,9 @@ import { ChevronDownIcon } from '../icons'
 import type { Option } from './segmented'
 
 const controlClass =
-  'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-[13px] leading-5 text-fg focus-within:ring-2 focus-within:ring-accent/60'
+  'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-small text-fg focus-within:ring-2 focus-within:ring-accent/60'
 
-const inputClass = 'min-w-0 flex-1 bg-transparent px-3 py-2.5 outline-none placeholder:text-fg/32'
+const inputClass = 'min-w-0 flex-1 px-3 py-2.5 outline-none placeholder:text-fg/32'
 
 /** A control that opens something on press (select, picker). */
 const triggerClass = cn(
@@ -119,7 +119,7 @@ export function SelectField<T extends string>({
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner className="z-50 outline-none" sideOffset={4}>
-          <Select.Popup className="popup-surface min-w-(--anchor-width) rounded-xl p-1 text-[13px]">
+          <Select.Popup className="popup-surface min-w-(--anchor-width) rounded-xl p-1 text-small">
             <Select.List className="max-h-(--available-height) overflow-y-auto">
               {options.map((option) => (
                 <Select.Item
@@ -206,7 +206,7 @@ export function SliderField({
           </Slider.Track>
         </Slider.Control>
       </Slider.Root>
-      <span className="w-12 text-right text-[13px] text-fg/63 tabular-nums">{format(value)}</span>
+      <span className="w-12 text-right text-small text-fg/63 tabular-nums">{format(value)}</span>
     </div>
   )
 }
@@ -247,7 +247,7 @@ export function SwitchField({
   return (
     <label
       className={cn(
-        'flex min-h-10 items-center justify-between gap-3 rounded-xl bg-control py-2 pr-2 pl-3 text-[13px] leading-5 text-fg',
+        'flex min-h-10 items-center justify-between gap-3 rounded-xl bg-control py-2 pr-2 pl-3 text-small text-fg',
         className,
       )}
     >

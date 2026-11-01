@@ -6,14 +6,14 @@ import { PlusIcon } from '../icons'
 const VARIANTS = {
   /** Page-level upload target (projects page). */
   hero: {
-    root: 'h-[228px] gap-4 rounded-[40px] border-white/7 bg-canvas/80 px-6 py-4 text-white backdrop-blur-[16px]',
+    root: 'h-57 gap-4 rounded-[40px] border-white/7 bg-canvas/80 px-6 py-4 text-white backdrop-blur-lg',
     icon: 'size-5',
-    label: 'text-xl opacity-63',
+    label: 'text-heading opacity-63',
     dragging: 'scale-101 border-white/24 bg-white/5',
   },
   /** Dashed slot at the end of a list (outline). */
   inline: {
-    root: 'h-[140px] gap-2 rounded-2xl border-dashed border-white/7 p-3 text-[15px] leading-5 font-medium text-fg/63 hover:border-white/12 hover:text-fg data-popup-open:border-white/12 data-popup-open:bg-white/3 data-popup-open:text-fg',
+    root: 'h-35 gap-2 rounded-2xl border-dashed border-white/7 p-3 text-body font-medium text-fg/63 hover:border-white/12 hover:text-fg data-popup-open:border-white/12 data-popup-open:bg-white/3 data-popup-open:text-fg',
     icon: undefined,
     label: undefined,
     dragging: 'border-white/24 bg-white/5 text-fg',

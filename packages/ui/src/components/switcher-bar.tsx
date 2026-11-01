@@ -44,7 +44,7 @@ export function SwitcherBar({
             <span className="size-7 shrink-0 rounded-md bg-white/7" />
           )}
           {!compact && (
-            <span className="min-w-0 flex-1 truncate text-base leading-6 font-medium">{label}</span>
+            <span className="min-w-0 flex-1 truncate text-title font-medium">{label}</span>
           )}
         </>
       ),
@@ -54,7 +54,7 @@ export function SwitcherBar({
   return (
     <div
       className={cn(
-        'relative flex h-[51px] shrink-0 items-center [--hit-area:51px]',
+        'relative flex h-12.75 shrink-0 items-center [--hit-area:51px]',
         !compact && 'px-3',
       )}
     >

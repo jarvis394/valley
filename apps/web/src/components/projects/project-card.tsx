@@ -34,20 +34,20 @@ export function ProjectCard({
 
   return (
     <article className="relative flex flex-col overflow-hidden rounded-[22px] border-[0.5px] border-white/3 bg-linear-to-b from-white/3 to-white/7 backdrop-blur-2xl">
-      <p className="px-3 py-2.5 text-[13px] font-medium text-fg/32">
+      <p className="px-3 py-2.5 text-small font-medium text-fg/32">
         {formatLongDate(project.date)}
       </p>
       {project.thumbnail ? (
         <img src={project.thumbnail} alt="" className="h-53 w-full object-cover" />
       ) : (
         <div className="flex h-53 flex-col items-center justify-center gap-0.5 border-y-[0.5px] border-white/3 text-white">
-          <p className="text-base leading-6 font-medium">Seems empty, doesn’t it?</p>
-          <p className="text-[13px] opacity-63">Add more files inside the project</p>
+          <p className="text-title font-medium">Seems empty, doesn’t it?</p>
+          <p className="text-small opacity-63">Add more files inside the project</p>
         </div>
       )}
 
       <div className="flex flex-col gap-1.5 px-3 pt-3 pb-2.5">
-        <h2 className="truncate text-xl leading-7 font-medium">
+        <h2 className="truncate text-heading font-medium">
           <Link
             to="/projects/$projectId"
             params={{ projectId: project.id }}
@@ -59,9 +59,7 @@ export function ProjectCard({
         {project.visibility === 'public' && shareUrl ? (
           <div className="flex h-8 items-center gap-2.5">
             <LinkIcon opacity={0.63} />
-            <span className="min-w-0 flex-1 truncate text-base leading-6 font-medium">
-              /{project.slug}
-            </span>
+            <span className="min-w-0 flex-1 truncate text-title font-medium">/{project.slug}</span>
             <span className="relative z-10 flex">
               <IconButton
                 variant="outline"
@@ -75,7 +73,7 @@ export function ProjectCard({
         ) : (
           <div className="flex h-8 items-center gap-2.5 text-fg/63">
             <LockClosedIcon />
-            <span className="min-w-0 flex-1 truncate text-base leading-6 font-medium">
+            <span className="min-w-0 flex-1 truncate text-title font-medium">
               Project is private
             </span>
           </div>

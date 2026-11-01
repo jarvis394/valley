@@ -30,7 +30,7 @@ function Root({ collapsed = false, children }: { collapsed?: boolean; children: 
         aria-label="App"
         className={cn(
           'flex h-full shrink-0 flex-col overflow-hidden border-r border-line bg-canvas',
-          collapsed ? 'w-[73px]' : 'w-[321px]',
+          collapsed ? 'w-18.25' : 'w-80.25',
         )}
       >
         {children}
@@ -46,7 +46,7 @@ function Bar({ children, className }: { children: ReactNode; className?: string 
   return (
     <div
       className={cn(
-        'flex h-[51px] shrink-0 items-center',
+        'flex h-12.75 shrink-0 items-center',
         collapsed ? 'justify-center' : 'gap-3',
         className,
       )}
@@ -205,9 +205,9 @@ function Footer({ version, repositoryUrl }: { version: string; repositoryUrl: st
         </span>
         {!collapsed && (
           <>
-            <span className="min-w-0 flex-1 text-base leading-6 font-medium">Valley</span>
+            <span className="min-w-0 flex-1 text-title font-medium">Valley</span>
             <span className="flex items-center gap-1">
-              <span className="text-[15px] text-fg/32 tabular-nums">{version}</span>
+              <span className="text-body text-fg/32 tabular-nums">{version}</span>
               <span className="flex p-1.5">
                 <IconButton
                   variant="outline"
@@ -270,9 +270,7 @@ function RailItem({
           >
             {children}
           </span>
-          <span
-            className={cn('w-full text-center text-[11px] leading-4 font-medium', styles.label)}
-          >
+          <span className={cn('w-full text-center text-caption font-medium', styles.label)}>
             {label}
           </span>
         </>

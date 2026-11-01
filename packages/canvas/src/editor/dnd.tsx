@@ -178,7 +178,7 @@ function DragChip({ data }: { data: DragData }) {
   const Icon = definition.icon
 
   return (
-    <div className="pointer-events-none flex w-fit items-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-white shadow-2xl">
+    <div className="pointer-events-none flex w-fit items-center gap-2 rounded-xl bg-accent px-3 py-2 text-small text-white shadow-2xl">
       <GripVertical className="size-4" />
       <Icon className="size-4" />
       {editor.registry.titleOf(node)}
@@ -230,7 +230,7 @@ export function DropLine({
       className="pointer-events-none absolute z-30 h-0.5 rounded-full bg-focus shadow-[0_0_0_2px_rgb(0_0_0/0.4)]"
       style={{ left: inset, right: inset, [edge]: -(gap / 2 + 1) }}
     >
-      <span className="absolute -top-[3px] -left-1 size-2 rounded-full bg-focus" />
+      <span className="absolute -top-0.75 -left-1 size-2 rounded-full bg-focus" />
     </div>
   )
 }

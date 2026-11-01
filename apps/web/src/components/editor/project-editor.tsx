@@ -159,7 +159,7 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
 function ProjectTitle() {
   const meta = useMeta()
 
-  return <span className="truncate text-[15px] font-medium">{meta.title}</span>
+  return <span className="truncate text-body font-medium">{meta.title}</span>
 }
 
 function ProjectHeader({ switcher }: { switcher?: ReactNode }) {
@@ -203,14 +203,14 @@ function PreviewFooter() {
   const editor = useEditor()
 
   return (
-    <div className="flex h-[52px] shrink-0 items-center gap-3 border-t border-line px-3 py-1.5">
+    <div className="flex h-13 shrink-0 items-center gap-3 border-t border-line px-3 py-1.5">
       <kbd
         aria-hidden
         className="flex size-7 shrink-0 items-center justify-center rounded-md border border-white/7"
       >
         <SlashBackIcon />
       </kbd>
-      <span className="min-w-0 flex-1 text-base leading-6 font-medium">Preview</span>
+      <span className="min-w-0 flex-1 text-title font-medium">Preview</span>
       <Switch aria-label="Preview" checked={false} onChange={() => editor.setMode('preview')} />
     </div>
   )
@@ -286,7 +286,7 @@ function DockItem({
       ...(render ? {} : { type: 'button' }),
       ...props,
       className:
-        'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] text-fg/63 active:bg-white/7 disabled:opacity-30',
+        'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-caption text-fg/63 active:bg-white/7 disabled:opacity-30',
       children: (
         <>
           <span className={cn('flex', highlighted ? 'text-focus-fg' : 'text-fg opacity-63')}>

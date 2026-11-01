@@ -47,7 +47,7 @@ export function ListItem({
       ...props,
       'data-selected': selected || undefined,
       className: cn(
-        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-[15px] leading-5 font-medium text-fg transition-colors outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
+        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-body font-medium text-fg transition-colors outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
         styles.row,
         filled && 'bg-white/3',
         selected && 'bg-selected text-selected-fg hover:bg-selected',
@@ -84,9 +84,9 @@ export function ListItemMeta({ children, className }: { children: ReactNode; cla
 
 const BADGE_VARIANTS = {
   /** Count of something new ("2 new"). */
-  info: 'rounded-full bg-selected px-2 py-0.75 text-[13px] leading-4.25 font-medium text-info-fg',
+  info: 'rounded-full bg-selected px-2 py-0.75 text-small leading-4.25 font-medium text-info-fg',
   /** Small caps tag for unfinished features ("beta"). */
-  warning: 'rounded bg-amber-400/15 px-1.5 py-0.5 text-[10px] text-amber-300 uppercase',
+  warning: 'rounded bg-amber-400/15 px-1.5 py-0.5 text-caption text-amber-300 uppercase',
 } as const
 
 export function Badge({

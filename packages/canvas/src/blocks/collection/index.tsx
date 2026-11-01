@@ -71,7 +71,7 @@ function CoverBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        'absolute flex items-center gap-1.5 overflow-hidden rounded-lg border-[0.5px] border-white/7 bg-surface/80 px-2 py-[5px] text-xs leading-4 font-medium text-[#ededed] shadow-[0_0_0_0.5px_rgba(0,0,0,0.5),inset_0_0_4px_rgba(255,255,255,0.07)] backdrop-blur-[8px]',
+        'absolute flex items-center gap-1.5 overflow-hidden rounded-lg border-[0.5px] border-white/7 bg-surface/80 px-2 py-1.25 text-caption font-medium text-[#ededed] shadow-[0_0_0_0.5px_rgba(0,0,0,0.5),inset_0_0_4px_rgba(255,255,255,0.07)] backdrop-blur-sm',
         className,
       )}
     >
@@ -92,7 +92,7 @@ function FileCard({ asset, isCover }: { asset: Asset; isCover: boolean }) {
           style={{ aspectRatio: `${asset.width} / ${asset.height}` }}
         />
       </div>
-      <figcaption className="-mx-1.5 max-w-[calc(100%+12px)] truncate text-[13px] text-fg/63">
+      <figcaption className="-mx-1.5 max-w-[calc(100%+12px)] truncate text-small text-fg/63">
         {middleTruncate(asset.name)}
       </figcaption>
       {isCover && <CoverBadge className="top-0.5 left-0.5" />}
@@ -135,7 +135,7 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
           >
             <Media asset={asset} className="size-full" />
             {mode === 'edit' && (
-              <figcaption className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 px-2 pt-6 pb-1.5 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+              <figcaption className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 px-2 pt-6 pb-1.5 text-caption text-white opacity-0 transition-opacity group-hover:opacity-100">
                 {asset.name}
               </figcaption>
             )}
@@ -165,7 +165,7 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
         />
       )}
       {items.length === 0 ? (
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-white/7 text-[13px] text-fg/63">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-white/7 text-small text-fg/63">
           No files yet. Add some in the inspector
         </div>
       ) : (

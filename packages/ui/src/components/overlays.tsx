@@ -21,7 +21,7 @@ function MenuPopup({ children, className, align = 'start', sideOffset = 6 }: Pop
   return (
     <BaseMenu.Portal>
       <BaseMenu.Positioner className="z-50 outline-none" sideOffset={sideOffset} align={align}>
-        <BaseMenu.Popup className={cn('popup-surface w-60 p-1 text-[13px]', className)}>
+        <BaseMenu.Popup className={cn('popup-surface w-60 p-1 text-small', className)}>
           {children}
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
@@ -101,7 +101,7 @@ export function Sheet({
       <Drawer.Portal>
         <Drawer.Backdrop className="fixed inset-0 z-50 bg-black opacity-[calc(0.6*(1-var(--drawer-swipe-progress)))] transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Drawer.Viewport className="fixed inset-0 z-50 flex items-end justify-center">
-          <Drawer.Popup className="flex max-h-[85dvh] w-full flex-col rounded-t-3xl border-t border-white/10 bg-surface pb-[env(safe-area-inset-bottom)] text-white outline-none [transform:translateY(var(--drawer-swipe-movement-y))] transition-transform duration-[400ms] ease-sheet data-ending-style:[transform:translateY(100%)] data-starting-style:[transform:translateY(100%)]">
+          <Drawer.Popup className="flex max-h-[85dvh] w-full flex-col rounded-t-3xl border-t border-white/10 bg-surface pb-[env(safe-area-inset-bottom)] text-white outline-none [transform:translateY(var(--drawer-swipe-movement-y))] transition-transform duration-400 ease-sheet data-ending-style:[transform:translateY(100%)] data-starting-style:[transform:translateY(100%)]">
             <div className="shrink-0 pt-3">
               <div className="mx-auto h-1 w-10 rounded-full bg-white/20" />
               <Drawer.Title className="sr-only">{title}</Drawer.Title>

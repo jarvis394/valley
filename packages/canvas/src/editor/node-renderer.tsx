@@ -61,7 +61,7 @@ function NodeChildren({ parentId }: { parentId: NodeId }) {
         <FlowItem key={id} id={id} index={index} count={flowIds.length} parentId={parentId} />
       ))}
       {flowIds.length === 0 && (
-        <div className="p-12 text-center text-[13px] text-fg/32">Empty. Add a block</div>
+        <div className="p-12 text-center text-small text-fg/32">Empty. Add a block</div>
       )}
       {absoluteIds.length > 0 && (
         <div className="pointer-events-none absolute inset-0">
@@ -118,7 +118,7 @@ function FlowItem({
           type="button"
           aria-label={`Drag ${label}`}
           className={cn(
-            'max-w-full cursor-grab touch-none truncate bg-canvas px-4 pt-4 pb-1.5 text-left text-[13px] leading-[18px] font-medium text-fg/32 outline-none hover:text-fg/63 active:cursor-grabbing',
+            'max-w-full cursor-grab touch-none truncate bg-canvas px-4 pt-4 pb-1.5 text-left text-small leading-4.5 font-medium text-fg/32 outline-none hover:text-fg/63 active:cursor-grabbing',
             selected && 'text-focus-fg hover:text-focus-fg',
           )}
         >

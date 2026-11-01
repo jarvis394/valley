@@ -42,7 +42,7 @@ const Scrim = ({ className }: { className?: string }) => (
 const T = ({ className }: { className?: string }) => (
   <span className={cn('flex flex-col items-center leading-none', className)}>
     TEXT
-    <span className="text-[6px]">⌄</span>
+    <span className="text-[0.85em]">⌄</span>
   </span>
 )
 
@@ -74,7 +74,7 @@ export const COVER_VARIANTS = {
     ),
     Layout: ({ media, text, meta, align }) => (
       <div className="p-2">
-        <div className="mx-auto grid max-w-[704px] overflow-hidden rounded-2xl bg-black text-white sm:aspect-[704/396] sm:grid-cols-2">
+        <div className="mx-auto grid max-w-176 overflow-hidden rounded-2xl bg-black text-white sm:aspect-[704/396] sm:grid-cols-2">
           <div className="aspect-[4/5] sm:aspect-auto">{media}</div>
           <div className={cn('flex flex-col justify-between gap-6 p-6', alignItems[align])}>
             <div className="h-7 max-sm:hidden" />

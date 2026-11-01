@@ -53,7 +53,7 @@ function ComponentPanel() {
   const selectedId = useSelectedId()
   if (!selectedId) {
     return (
-      <div className="flex flex-col items-center gap-2 px-6 py-16 text-center text-[13px] text-fg/32">
+      <div className="flex flex-col items-center gap-2 px-6 py-16 text-center text-small text-fg/32">
         <MousePointerClick className="size-6" />
         Select a block on the canvas to edit it
       </div>
@@ -78,7 +78,7 @@ function NodeInspector({ id }: { id: NodeId }) {
     <div className="flex flex-col">
       <div className="flex h-11 items-center gap-2 border-b border-line pr-2 pl-4">
         <Icon className="size-4 shrink-0" opacity={0.63} />
-        <h3 className="min-w-0 flex-1 truncate text-[15px] leading-5 font-medium text-fg">
+        <h3 className="min-w-0 flex-1 truncate text-body font-medium text-fg">
           {editor.registry.titleOf(node)}
         </h3>
         <IconButton size="bar" aria-label="Deselect" onClick={() => editor.select(null)}>

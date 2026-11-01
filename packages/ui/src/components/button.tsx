@@ -46,7 +46,7 @@ export function Button({
       type="button"
       className={cn(
         pressable,
-        'overflow-hidden text-[15px] leading-5 font-medium whitespace-nowrap',
+        'overflow-hidden text-body font-medium whitespace-nowrap',
         VARIANTS[variant],
         SIZES[size],
         className,
@@ -80,7 +80,7 @@ const ICON_VARIANTS = {
 /** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */
 const ICON_SIZES = {
   /** For a 12px icon in a dense toolbar. */
-  xs: 'size-[18px] rounded',
+  xs: 'size-4.5 rounded',
   sm: 'size-7 rounded-lg',
   /**
    * `sm` look with a square hit area for a header bar's trailing action. The area is `--hit-area`

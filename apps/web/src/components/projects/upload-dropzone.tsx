@@ -11,7 +11,7 @@ export function UploadDropzone({
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <div className="w-full max-w-[500px]">
+    <div className="w-full max-w-125">
       <Dropzone
         variant="hero"
         label="Drop or upload files here"

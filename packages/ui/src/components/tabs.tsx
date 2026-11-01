@@ -15,7 +15,7 @@ function Tab({ className, ...props }: ComponentProps<typeof BaseTabs.Tab>) {
   return (
     <BaseTabs.Tab
       className={cn(
-        'h-8 rounded-[10px] px-3 text-[15px] leading-5 font-medium text-fg/63 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-active:bg-white/7 data-active:text-fg',
+        'h-8 rounded-[10px] px-3 text-body font-medium text-fg/63 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-active:bg-white/7 data-active:text-fg',
         className as string,
       )}
       {...props}

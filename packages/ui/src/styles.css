@@ -7,6 +7,24 @@
 @theme {
   --font-sans: 'Geist Variable', system-ui, sans-serif;
 
+  /* Type scale. Replaces Tailwind's text-xs..9xl so every size comes from here. */
+  --text-*: initial;
+  /* Pictograms inside layout previews, not readable copy */
+  --text-micro: 7px;
+  --text-micro--line-height: 1;
+  --text-caption: 11px;
+  --text-caption--line-height: 16px;
+  --text-small: 13px;
+  --text-small--line-height: 20px;
+  --text-body: 15px;
+  --text-body--line-height: 20px;
+  --text-title: 16px;
+  --text-title--line-height: 24px;
+  --text-heading: 20px;
+  --text-heading--line-height: 28px;
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+
   /* App chrome */
   --color-canvas: #131314;
   --color-surface: #1a1a1b;

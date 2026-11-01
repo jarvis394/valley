@@ -40,7 +40,7 @@ export function Segmented<T extends string | number>({
           key={keyOf(option.value)}
           value={keyOf(option.value)}
           title={option.title}
-          className="group flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-[13px] text-fg transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7"
+          className="group flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-small text-fg transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7"
         >
           <span className="flex min-w-0 items-center opacity-63 transition-opacity group-hover:opacity-100 group-data-pressed:opacity-100">
             {option.label}
@@ -74,9 +74,9 @@ export function TilePicker<T extends string>({
         <Toggle
           key={option.value}
           value={option.value}
-          className="group flex flex-col items-center gap-1.5 rounded-[10px] p-2 text-[11px] text-fg/63 transition-colors outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7 data-pressed:text-fg"
+          className="group flex flex-col items-center gap-1.5 rounded-[10px] p-2 text-caption text-fg/63 transition-colors outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7 data-pressed:text-fg"
         >
-          <span className="flex aspect-[8/5] w-full items-center justify-center rounded-md border border-current p-1 text-[7px] tracking-wider">
+          <span className="flex aspect-[8/5] w-full items-center justify-center rounded-md border border-current p-1 text-micro tracking-wider">
             {option.preview}
           </span>
           {option.label}

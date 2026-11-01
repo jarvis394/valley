@@ -23,7 +23,7 @@ declare module '../../core/document' {
 }
 
 const PADDING = { none: 'py-0', small: 'py-2', medium: 'py-10', large: 'py-20' } as const
-const WIDTH = { narrow: 'max-w-2xl', wide: 'max-w-[800px]', full: 'max-w-none' } as const
+const WIDTH = { narrow: 'max-w-2xl', wide: 'max-w-200', full: 'max-w-none' } as const
 const ALIGN = { left: 'text-left', center: 'text-center', right: 'text-right' } as const
 
 function TextRender({ node, props, update, mode }: BlockRenderProps<'text'>) {

@@ -33,7 +33,7 @@ export function Section({
   return (
     <section className={cn('flex flex-col', className)}>
       <header className="flex items-center gap-2 pt-2.5 pr-3 pb-1.5 pl-4">
-        <h3 className="flex h-7 min-w-0 flex-1 items-center text-[15px] leading-5 font-medium text-fg">
+        <h3 className="flex h-7 min-w-0 flex-1 items-center text-body font-medium text-fg">
           <span className="truncate">{title}</span>
           {count !== undefined && (
             <span className="ml-2 shrink-0 text-fg/32 tabular-nums">{count}</span>
@@ -64,11 +64,9 @@ export function Field({
 }) {
   return (
     <div className={cn('flex min-w-0 flex-col gap-1.5', className)}>
-      {label && <span className="truncate px-2 text-[11px] leading-3.5 text-fg/63">{label}</span>}
+      {label && <span className="truncate px-2 text-caption leading-3.5 text-fg/63">{label}</span>}
       {children}
-      {description && (
-        <p className="px-2 text-[11px] leading-4 text-pretty text-fg/63">{description}</p>
-      )}
+      {description && <p className="px-2 text-caption text-pretty text-fg/63">{description}</p>}
     </div>
   )
 }
@@ -76,7 +74,7 @@ export function Field({
 /** Label/value line, e.g. project statistics. */
 export function StatRow({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
-    <div className="flex items-center gap-2 px-2 text-[13px] leading-5 text-fg">
+    <div className="flex items-center gap-2 px-2 text-small text-fg">
       <span className="min-w-0 flex-1 truncate text-fg/63">{label}</span>
       <span className="shrink-0 truncate tabular-nums">{value}</span>
     </div>
