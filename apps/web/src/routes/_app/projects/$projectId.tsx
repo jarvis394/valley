@@ -14,6 +14,7 @@ export const Route = createFileRoute('/_app/projects/$projectId')({
   loader: async ({ params }) => {
     const project = await api.getProject(params.projectId)
     if (!project) throw notFound()
+
     return project
   },
   head: ({ loaderData }) => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute('/_app/projects/$projectId')({
 
 function ProjectRoute() {
   const project = Route.useLoaderData()
+
   return <ProjectWorkspace key={project.id} project={project} />
 }
 

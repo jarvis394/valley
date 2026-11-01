@@ -16,6 +16,7 @@ export default defineRule({
     const check = (node: ESTree.Node, text: string | null | undefined) => {
       if (text?.includes(EM_DASH)) context.report({ node, message: MESSAGE })
     }
+
     return {
       Literal(node) {
         if (typeof node.value === 'string') check(node, node.value)

@@ -15,6 +15,7 @@ export function EditorProvider({ editor, children }: { editor: Editor; children:
     registry: editor.registry,
     uploadAssets: editor.readOnly ? undefined : editor.commands.uploadAssets,
   }))
+
   return (
     <EditorContext value={editor}>
       <RenderProvider value={render}>{children}</RenderProvider>
@@ -25,6 +26,7 @@ export function EditorProvider({ editor, children }: { editor: Editor; children:
 export function useEditor(): Editor {
   const editor = use(EditorContext)
   if (!editor) throw new Error('useEditor must be used inside <EditorProvider>')
+
   return editor
 }
 
@@ -39,6 +41,7 @@ export const useSettings = () => useEditorState((state) => state.settings)
 /** A props updater scoped to one node, passed to blocks as `update`. */
 export function useUpdateProps<T extends BlockType>(id: NodeId): UpdateProps<BlockProps<T>> {
   const editor = useEditor()
+
   return useCallback(
     (recipe, options) => void editor.commands.updateProps<T>(id, recipe, options),
     [editor, id],

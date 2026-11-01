@@ -13,6 +13,7 @@ export const typographySchema = z.object({
   bodyFont: z.string(),
   scale: sizeScaleSchema,
 })
+
 export type Typography = z.infer<typeof typographySchema>
 
 export const galleryLayoutSchema = z.enum(['grid', 'masonry', 'horizontal', 'files'])
@@ -27,12 +28,14 @@ export const gallerySchema = z.object({
   spacing: sizeScaleSchema,
   roundness: roundnessSchema,
 })
+
 export type GalleryStyle = z.infer<typeof gallerySchema>
 
 export const themeSchema = z.object({
   typography: typographySchema,
   gallery: gallerySchema,
 })
+
 export type Theme = z.infer<typeof themeSchema>
 
 /** Every theme group a block may override. Add a group here and it becomes overridable. */
@@ -42,6 +45,7 @@ export const themeOverridesSchema = z.object({
   typography: typographySchema.partial().optional(),
   gallery: gallerySchema.partial().optional(),
 })
+
 export type ThemeOverrides = z.infer<typeof themeOverridesSchema>
 
 export const defaultTheme: Theme = {
@@ -58,6 +62,7 @@ export function resolveThemeGroup<K extends ThemeGroup>(
   const defined = Object.fromEntries(
     Object.entries(override).filter(([, value]) => value !== undefined),
   ) as Partial<Theme[K]>
+
   return { ...theme[group], ...defined }
 }
 

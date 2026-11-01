@@ -31,6 +31,7 @@ function variantGroups(token: string): { prefix: string; group: string }[] {
       }
     }
   }
+
   return groups
 }
 
@@ -40,6 +41,7 @@ function closingParen(selector: string, open: number): number {
     if (selector[index] === '(') depth++
     else if (selector[index] === ')' && --depth === 0) return index
   }
+
   return selector.length
 }
 
@@ -56,9 +58,11 @@ function isWrapperSubject(selector: string, from: number): boolean {
     else if (COMBINATOR_PATTERN.test(char)) {
       const next = selector.slice(index).trimStart()[0]
       if (/\s/u.test(char) && (next === undefined || next === ')' || next === ',')) continue
+
       return false
     }
   }
+
   return true
 }
 
@@ -93,6 +97,7 @@ function hasCompounds(selector: string): string[] {
     compounds.push(compound)
     index = selector.indexOf(':has(', index + 1)
   }
+
   return compounds
 }
 
@@ -112,6 +117,7 @@ function withoutNegations(compound: string): string {
     }
     index++
   }
+
   return result
 }
 
@@ -132,11 +138,13 @@ function findUnscopedHasVariants(text: string): string[] {
           : `${owner}:is(${relative})`
       const unscoped = hasCompounds(selector).some((compound) => {
         const anchor = withoutNegations(compound)
+
         return !NARROWING_PATTERN.test(anchor) || ROOT_COMPOUND_PATTERN.test(anchor)
       })
       if (unscoped) offenders.push(`[${group}]`)
     }
   }
+
   return offenders
 }
 

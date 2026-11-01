@@ -7,6 +7,7 @@ import { CanvasOperationError } from './errors'
 export function getNode(doc: CanvasDocument, id: NodeId): CanvasNode {
   const node = doc.nodes[id]
   if (!node) throw new CanvasOperationError(`Node ${id} does not exist`)
+
   return node
 }
 
@@ -30,6 +31,7 @@ export const flowChildIds = (doc: CanvasDocument, id: NodeId): NodeId[] =>
 /** Position of `id` among its parent's flow children, or -1. */
 export function flowIndexOf(doc: CanvasDocument, id: NodeId): number {
   const parentId = doc.nodes[id]?.parentId
+
   return parentId ? flowChildIds(doc, parentId).indexOf(id) : -1
 }
 
@@ -45,6 +47,7 @@ export function getAncestors(doc: CanvasDocument, id: NodeId): NodeId[] {
     result.push(current)
     current = doc.nodes[current]?.parentId ?? null
   }
+
   return result
 }
 

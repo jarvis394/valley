@@ -11,6 +11,7 @@ import { useTheme } from '../../render/context'
 
 export function useResolvedTheme(overrides: ThemeOverrides | undefined): Theme {
   const theme = useTheme()
+
   return useMemo(
     () => ({
       typography: resolveThemeGroup(theme, 'typography', overrides?.typography),

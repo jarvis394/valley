@@ -15,6 +15,7 @@ export function useEditorHotkeys(editor: Editor) {
       if (key === '\\' && !mod && !isEditingText(event.target)) {
         event.preventDefault()
         editor.setMode(mode === 'edit' ? 'preview' : 'edit')
+
         return
       }
       if (mode !== 'edit') return
@@ -24,11 +25,13 @@ export function useEditorHotkeys(editor: Editor) {
         event.preventDefault()
         if (event.shiftKey) editor.redo()
         else editor.undo()
+
         return
       }
       if (mod && key === 'y') {
         event.preventDefault()
         editor.redo()
+
         return
       }
       if (isEditingText(event.target)) return
@@ -44,7 +47,9 @@ export function useEditorHotkeys(editor: Editor) {
         editor.commands.duplicateNode(selectedId)
       }
     }
+
     window.addEventListener('keydown', onKeyDown)
+
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [editor])
 }

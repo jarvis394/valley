@@ -29,6 +29,7 @@ export function ProjectCard({
 }) {
   const { copied, copy } = useCopyText()
   const shareUrl = project.slug && `${galleryUrl}/${project.slug}`
+
   const copyLink = () => shareUrl && void copy(shareUrl)
 
   return (

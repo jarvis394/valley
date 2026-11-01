@@ -12,4 +12,5 @@ export const projectSettingsSchema = z.object({
   usePassword: z.boolean().optional(),
   password: z.string().optional(),
 })
+
 export type ProjectSettings = z.infer<typeof projectSettingsSchema>

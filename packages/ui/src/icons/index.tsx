@@ -42,6 +42,7 @@ const createIcon = (src: string, name: string): IconComponent => {
     maskSize: '100% 100%',
     maskRepeat: 'no-repeat',
   }
+
   const Icon: IconComponent = ({ className, opacity }) => (
     <span
       aria-hidden
@@ -50,6 +51,7 @@ const createIcon = (src: string, name: string): IconComponent => {
       style={opacity === undefined ? style : { ...style, opacity }}
     />
   )
+
   return Icon
 }
 

@@ -7,6 +7,7 @@ const MEMO_DIRECTIVES = new Set(['use memo', 'use no memo', 'use no forget'])
 
 const readAllowMemoHooks = (options: ReadonlyArray<unknown>): boolean => {
   const [first] = options
+
   return (
     typeof first === 'object' &&
     first !== null &&
@@ -29,6 +30,7 @@ function manualMemoHookName(callee: ESTree.Node): string | null {
   ) {
     return callee.property.name
   }
+
   return null
 }
 
@@ -56,6 +58,7 @@ export default defineRule({
   },
   create(context) {
     const allowMemoHooks = readAllowMemoHooks(context.options)
+
     return {
       // A "use memo" helper only exists to force a cache scope the compiler withheld,
       // which hides the ordering or structure problem that withheld it.

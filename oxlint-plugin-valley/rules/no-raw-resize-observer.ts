@@ -8,6 +8,7 @@ function isResizeObserverConstructor(node: ESTree.Node): boolean {
   if (!GLOBAL_OBJECTS.has(node.object.name)) return false
   const { property } = node
   if (!node.computed && property.type === 'Identifier') return property.name === 'ResizeObserver'
+
   return property.type === 'Literal' && property.value === 'ResizeObserver'
 }
 

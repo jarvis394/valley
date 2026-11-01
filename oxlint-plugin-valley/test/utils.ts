@@ -10,6 +10,7 @@ const oxlintBin = join(
   'bin',
   'oxlint',
 )
+
 const pluginPath = join(import.meta.dirname, '..', 'index.ts')
 const repoRoot = join(import.meta.dirname, '..', '..')
 
@@ -36,6 +37,7 @@ function lint(ruleName: string, source: string, options: RuleHarnessOptions) {
       cwd: repoRoot,
       encoding: 'utf8',
     })
+
     return { exitCode: result.status, output: `${result.stdout}${result.stderr}` }
   } finally {
     rmSync(fixtureDir, { recursive: true, force: true })

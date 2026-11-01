@@ -23,6 +23,7 @@ export function AppSidebar({
   collapsed: boolean
 }) {
   const navigate = useNavigate()
+
   return (
     <Sidebar.Root collapsed={collapsed}>
       <Sidebar.Account

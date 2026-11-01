@@ -11,6 +11,7 @@ export const focalPointSchema = z.object({
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
 })
+
 export type FocalPoint = z.infer<typeof focalPointSchema>
 export const CENTER: FocalPoint = { x: 0.5, y: 0.5 }
 
@@ -59,6 +60,7 @@ export function Media({
       />
     )
   }
+
   return (
     <img
       src={asset.src}
@@ -82,6 +84,7 @@ export function FocalPointPicker({
   onChange: (value: FocalPoint) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
+
   const setFromEvent = (event: PointerEvent) => {
     const rect = ref.current!.getBoundingClientRect()
     onChange({
@@ -89,6 +92,7 @@ export function FocalPointPicker({
       y: clamp((event.clientY - rect.top) / rect.height, 0, 1),
     })
   }
+
   return (
     <div
       ref={ref}
@@ -128,7 +132,9 @@ export function UploadButton({
   const { uploadAssets } = useRenderContext()
   const inputRef = useRef<HTMLInputElement>(null)
   if (!uploadAssets) return null
+
   const open = () => inputRef.current?.click()
+
   return (
     <>
       {iconOnly ? (
@@ -175,6 +181,7 @@ export function AssetPicker({
   className?: string
 }) {
   const assets = Object.values(useAssets()).filter((asset) => kinds.includes(asset.kind))
+
   return (
     <Popover.Root>
       <Popover.Trigger

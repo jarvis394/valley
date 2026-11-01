@@ -77,6 +77,7 @@ export function observeResize(
     shared.unobserve(element)
     shared.observe(element)
   }
+
   return () => {
     if (!subscription.active) return
     subscription.active = false
@@ -84,6 +85,7 @@ export function observeResize(
       const target = targets.get(element)
       if (!target?.subscriptions.delete(subscription)) return false
       target.waiting?.delete(subscription)
+
       return target.subscriptions.size === 0 && targets.delete(element)
     })
     if (targets.size > 0) {

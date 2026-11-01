@@ -1,16 +1,19 @@
 import { defineRule, type ESTree } from '@oxlint/plugins'
 
 const SCROLLS_VERTICALLY = /(?:^|:)overflow-(?:y-)?auto$/u
+
 // Both exemptions must be unprefixed: a variant such as lg: leaves every other state
 // unprotected.
 const RESERVES_GUTTER =
   /^(?:scrollbar-gutter-(?:stable|both)|\[scrollbar-gutter:stable(?:_both-edges)?\])$/u
+
 const HIDES_SCROLLBAR = /^\[scrollbar-width:none\]$/u
 const CENTERED_BY_MARGIN = /(?:^|:)mx?-auto$/u
 const COLUMN = /(?:^|:)flex-col(?:-reverse)?$/u
 const ALWAYS_COLUMN = /^flex-col(?:-reverse)?$/u
 const ROW = /(?:^|:)flex-row(?:-reverse)?$/u
 const CENTERS_COLUMN_ITEMS = /(?:^|:)(?:items-center(?:-safe)?|place-items-center)$/u
+
 const CENTERS_ROW_ITEMS =
   /(?:^|:)(?:justify-center(?:-safe)?|\[justify-content:safe_center\]|place-items-center|place-content-center)$/u
 
@@ -34,6 +37,7 @@ function unwrapExpression(node: unknown): ESTree.Node | null {
   ) {
     current = isNode(current.expression) ? current.expression : null
   }
+
   return current
 }
 
@@ -94,6 +98,7 @@ function classNamesOf(element: ESTree.JSXElement): ClassNames {
       collectClassNames(attribute.value, classNames, true)
     }
   }
+
   return classNames
 }
 
@@ -145,6 +150,7 @@ export default defineRule({
           const ancestorClassNames = classNamesOf(ancestor)
           if (!hasClass(ancestorClassNames.possible, SCROLLS_VERTICALLY)) continue
           report(ancestor, ancestorClassNames)
+
           return
         }
       },

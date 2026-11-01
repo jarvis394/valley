@@ -36,6 +36,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
   const editor = useEditor()
   const rootId = useDocumentState((state) => state.doc.rootId)
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(rootId)
+
   const navigate = (id: NodeId) => {
     editor.select(id)
     scrollToNode(id)
@@ -98,6 +99,7 @@ function SortableOutlineItem({
 }) {
   const dropEdge = useDropEdge(parentId, index, count)
   const { ref, isDragSource } = useFlowDraggable(id)
+
   return (
     <div className="relative" {...dropItemProps}>
       <OutlineItem ref={ref} id={id} onClick={onClick} dimmed={isDragSource} />
@@ -150,12 +152,14 @@ function OutlineItem({
 export function AddBlockMenu({ trigger }: { trigger: ReactElement }) {
   const editor = useEditor()
   const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <Menu.Root>
       {trigger}
       <Menu.Popup>
         {editor.registry.insertable().map((definition) => {
           const Icon = definition.icon
+
           return (
             <Menu.Item
               key={definition.type}
@@ -188,6 +192,7 @@ export function AddBlockMenu({ trigger }: { trigger: ReactElement }) {
 /** "Add block or upload files": opens the block menu; dropped files go into a new block. */
 function AddBlockDropzone() {
   const editor = useEditor()
+
   return (
     <div className="py-1.5">
       <AddBlockMenu

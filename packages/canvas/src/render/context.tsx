@@ -42,6 +42,7 @@ export function RenderProvider({
 export function useRenderContext(): RenderContextValue {
   const context = use(RenderContext)
   if (!context) throw new Error('Canvas blocks must render inside <RenderProvider>')
+
   return context
 }
 
@@ -54,16 +55,19 @@ export const useNode = (id: NodeId) => useDocumentState((state) => state.doc.nod
 export const useTheme = () => useDocumentState((state) => state.doc.theme)
 export const useMeta = () => useDocumentState((state) => state.doc.meta)
 export const useAssets = () => useDocumentState((state) => state.doc.assets)
+
 export const useAsset = (id: AssetId | null | undefined) =>
   useDocumentState((state) => (id ? state.doc.assets[id] : undefined))
 
 export function useCoverAssetId() {
   const { registry } = useRenderContext()
+
   return useDocumentState((state) => registry.coverAssetId(state.doc))
 }
 
 export function useThumbnailSrc() {
   const { registry } = useRenderContext()
+
   return useDocumentState((state) => registry.thumbnailOf(state.doc))
 }
 
@@ -78,5 +82,6 @@ export function useChildIds(parentId: NodeId) {
     store,
     useShallow((state) => absoluteChildIds(state.doc, parentId)),
   )
+
   return { flow, absolute }
 }

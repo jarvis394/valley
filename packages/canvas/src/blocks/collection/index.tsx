@@ -28,6 +28,7 @@ const collectionSchema = z.object({
   showTitle: z.boolean(),
   assetIds: z.array(assetIdSchema),
 })
+
 export type CollectionProps = z.infer<typeof collectionSchema>
 
 declare module '../../core/document' {
@@ -119,6 +120,7 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
       )
     }
     const layout = LAYOUTS[gallery.layout]
+
     return (
       <div className={layout.containerClass} style={layout.container(gap)}>
         {items.map((asset) => (
@@ -196,6 +198,7 @@ function CollectionInspector({ props, update }: BlockInspectorProps<'collection'
 function CollectionFiles({ props, update }: BlockInspectorProps<'collection'>) {
   const assets = useAssets()
   const files = summarizeAssets(props.assetIds.flatMap((id) => assets[id] ?? []))
+
   return (
     <Section
       title="Files"

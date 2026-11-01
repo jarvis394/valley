@@ -31,6 +31,7 @@ export const mockApi: ValleyApi = {
   async getProject(id) {
     const record = records.find((item) => item.id === id)
     if (!record) return null
+
     return {
       ...summarize(record),
       doc: record.doc,
@@ -55,6 +56,7 @@ export const mockApi: ValleyApi = {
       newFavorites: 0,
     }
     records.push(record)
+
     return summarize(record)
   },
 
@@ -64,6 +66,7 @@ export const mockApi: ValleyApi = {
       if (record) Object.assign(record, { doc, settings })
     })
     const stopPersist = persistEditor(editor, `valley.project.${id}`)
+
     return () => {
       stopPersist()
       stopMirror()

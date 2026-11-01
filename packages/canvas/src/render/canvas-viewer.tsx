@@ -13,6 +13,7 @@ export function CanvasViewer({ doc, registry }: { doc: CanvasDocument; registry:
   }))
   // oxlint-disable-next-line valley/no-unreasoned-state-sync -- pushes the doc prop into the store blocks read from, which lives outside React
   useEffect(() => context.store.setState({ doc }), [context, doc])
+
   return (
     <RenderProvider value={context}>
       <DocumentView />

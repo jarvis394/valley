@@ -3,6 +3,7 @@ import { describe, expect } from 'bun:test'
 import { createOxlintRuleHarness } from '../test/utils.ts'
 
 const reports = (output: string) => output.match(/valley\(no-unreasoned-state-sync\)/g)?.length ?? 0
+
 const lint = (filename: string) =>
   createOxlintRuleHarness('valley/no-unreasoned-state-sync', { filename })
 

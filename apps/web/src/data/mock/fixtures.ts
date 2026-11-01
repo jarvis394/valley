@@ -62,6 +62,7 @@ const coverPhoto = (file: string, width: number, height: number): Asset => ({
 function sampleWithCover(meta: Pick<DocumentMeta, 'title' | 'date'>, cover: Asset): CanvasDocument {
   const coverNode = sampleDocument.nodes[COVER]
   if (coverNode?.type !== 'cover') throw new Error('The sample document has no cover block')
+
   return {
     ...sampleDocument,
     meta: { ...sampleDocument.meta, ...meta },

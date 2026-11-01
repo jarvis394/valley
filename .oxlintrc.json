@@ -19,7 +19,8 @@
     "valley/no-raw-resize-observer": "error",
     "valley/no-unreasoned-state-sync": "error",
     "valley/no-unscoped-has": "error",
-    "valley/require-centered-scroll-gutter": "error"
+    "valley/require-centered-scroll-gutter": "error",
+    "valley/statement-padding": "error"
   },
   "ignorePatterns": ["**/.output/**", "**/.nitro/**", "**/dist/**", "**/routeTree.gen.ts"],
   "jsPlugins": [

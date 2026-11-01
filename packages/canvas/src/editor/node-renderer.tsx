@@ -29,6 +29,7 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
 
   const definition = editor.registry.get(node.type)
   const { Render } = definition
+
   return (
     <Render
       node={node as never}
@@ -49,6 +50,7 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
  */
 function NodeChildren({ parentId }: { parentId: NodeId }) {
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(parentId)
+
   return (
     <div
       className="relative flex flex-col"
@@ -139,6 +141,7 @@ function FlowItem({
 
 function BlockToolbar({ id }: { id: NodeId }) {
   const editor = useEditor()
+
   /** `gap` is the flow index to drop into, counted with this node still in place. */
   const moveToGap = (offset: number) => {
     const { doc } = editor.getState()
@@ -149,6 +152,7 @@ function BlockToolbar({ id }: { id: NodeId }) {
       editor.commands.moveNode(id, parentId, gap)
     }
   }
+
   return (
     <div className="flex items-center gap-0.5 pt-4 pb-1.5">
       <IconButton size="xs" variant="dimmed" aria-label="Move up" onClick={() => moveToGap(-1)}>

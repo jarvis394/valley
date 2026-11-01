@@ -54,13 +54,13 @@ export function ProjectSettings() {
   const meta = useMeta()
   const settings = useSettings()
   const { galleryUrl } = editor
+  const files = summarizeAssets(useAssets())
+  const visibility = settings.visibility ?? 'private'
+
   const set = <K extends keyof DocumentMeta>(key: K, value: DocumentMeta[K]) =>
     editor.commands.updateMeta((m) => void (m[key] = value), { mergeKey: `meta.${key}` })
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     editor.updateSettings((s) => void (s[key] = value))
-
-  const files = summarizeAssets(useAssets())
-  const visibility = settings.visibility ?? 'private'
 
   return (
     <div className="flex flex-col">
@@ -149,6 +149,7 @@ export function ProjectSettings() {
 /** Shows the formatted date; clicking opens the native date picker anchored under it. */
 function DateField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <div className="relative">
       <FieldButton
@@ -182,6 +183,7 @@ function PasswordControl({
   onPasswordChange: (password: string) => void
 }) {
   const [visible, setVisible] = useState(false)
+
   return (
     <FieldGroup.Root>
       <SwitchField

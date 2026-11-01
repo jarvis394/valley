@@ -1,8 +1,10 @@
 import { defineRule, type ESTree } from '@oxlint/plugins'
 
 const TS_FILE_PATTERN = /\.[cm]?tsx?$/u
+
 const DIRECTIVE_PATTERN =
   /^\s*(?:(?:oxlint|eslint)-|@ts-|prettier-ignore|biome-ignore|c8 |istanbul |#(?:end)?region)/u
+
 const DIVIDER_LINE_PATTERN = /^(?:[-=*#~_/+]{3,}.*|.*[-=*#~_]{3,})$/u
 const TEST_STEP_PATTERN = /^(?:arrange|act|assert|given|when|then)\s*[:.]?$/iu
 const TASK_MARKER_PATTERN = /\b(?:TODO|FIXME|XXX|HACK)\b/u
@@ -17,10 +19,13 @@ const MAX_COMMENT_LINES = 4
 const LICENSE_PATTERN = /^!|@license|\bcopyright\b|\bSPDX-License-Identifier\b/iu
 const JSDOC_TYPE_PATTERN = /^@(?:param|returns?|type|typedef)\s+\{/u
 const EMPTY_JSDOC_TAG_PATTERN = /^@(?:param(?:\s+\[?[\w$.]+\]?)?|returns?)$/u
+
 const COMMENTED_CODE_PATTERN =
   /^(?:(?:(?:const|let|var)\s+[\w${}[\], ]+=.*|import\s.+\sfrom\s+["'].+["']|(?:await\s+|return\s+)?[\w$.]+\(.*\)|[\w$.[\]]+\s*=\s*.+);|(?:if|for|while|switch)\s*\(.*\)\s*\{|\}(?:\s*else\s*\{)?)$/u
+
 const DECLARATION_PATTERN =
   /^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:async\s+)?(?:static\s+)?(?:readonly\s+)?(?:(?:const|let|var|function\*?|class|interface|type|enum)\s+)?([A-Za-z_$][\w$]*)\s*[?!]?\s*[:=(<{]/u
+
 const FILLER_WORDS = new Set(
   'a an the of for to in on at by with from and or is are be this that it its as get set return create new current value given whether'.split(
     ' ',
@@ -28,11 +33,13 @@ const FILLER_WORDS = new Set(
 )
 
 const stem = (word: string) => (word.length > 3 ? word.replace(/([^s])s$/u, '$1') : word)
+
 const words = (text: string) =>
   (text.toLowerCase().match(/[a-z0-9]+/gu) ?? [])
     .filter((word) => !FILLER_WORDS.has(word))
     .map(stem)
     .filter((word) => !FILLER_WORDS.has(word))
+
 const identifierWords = (name: string) =>
   words(name.replace(/([a-z0-9])([A-Z])/gu, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/gu, '$1 $2'))
 
@@ -77,6 +84,7 @@ export default defineRule({
       const content = words(lines.join(' '))
       if (content.length === 0 || content.length > 6) return false
       const nameWords = new Set(identifierWords(name))
+
       return content.every((word) => nameWords.has(word))
     }
 
@@ -117,6 +125,7 @@ export default defineRule({
       if (lines.length > MAX_COMMENT_LINES && !LICENSE_PATTERN.test(text)) {
         return `Cut this to ${MAX_COMMENT_LINES} lines or fewer: keep the constraint, drop the background.`
       }
+
       return undefined
     }
 

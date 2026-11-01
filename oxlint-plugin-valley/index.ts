@@ -9,6 +9,7 @@ import noUnreasonedStateSync from './rules/no-unreasoned-state-sync.ts'
 import noRawResizeObserver from './rules/no-raw-resize-observer.ts'
 import noUnscopedHas from './rules/no-unscoped-has.ts'
 import requireCenteredScrollGutter from './rules/require-centered-scroll-gutter.ts'
+import statementPadding from './rules/statement-padding.ts'
 
 export default definePlugin({
   meta: {
@@ -24,5 +25,6 @@ export default definePlugin({
     'no-unreasoned-state-sync': noUnreasonedStateSync,
     'no-unscoped-has': noUnscopedHas,
     'require-centered-scroll-gutter': requireCenteredScrollGutter,
+    'statement-padding': statementPadding,
   },
 })

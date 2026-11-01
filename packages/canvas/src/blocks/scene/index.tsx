@@ -14,6 +14,7 @@ const sceneSchema = z.object({
   fit: z.enum(['cover', 'contain']),
   caption: z.string(),
 })
+
 export type SceneProps = z.infer<typeof sceneSchema>
 
 declare module '../../core/document' {
@@ -24,6 +25,7 @@ declare module '../../core/document' {
 
 function SceneRender({ props, update, mode }: BlockRenderProps<'scene'>) {
   const asset = useAsset(props.assetId)
+
   return (
     <figure className="bg-black">
       <div
@@ -54,6 +56,7 @@ function SceneRender({ props, update, mode }: BlockRenderProps<'scene'>) {
 
 function SceneInspector({ props, update }: BlockInspectorProps<'scene'>) {
   const asset = useAsset(props.assetId)
+
   return (
     <Section title="Scene">
       {asset?.kind === 'image' && (

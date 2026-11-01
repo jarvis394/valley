@@ -12,6 +12,7 @@ const stickerSchema = z.object({
   style: z.enum(['emoji', 'label']),
   color: z.string(),
 })
+
 export type StickerProps = z.infer<typeof stickerSchema>
 
 declare module '../../core/document' {
@@ -30,6 +31,7 @@ function StickerRender({ props }: BlockRenderProps<'sticker'>) {
       </div>
     )
   }
+
   return (
     <div className="@container w-full select-none">
       <div

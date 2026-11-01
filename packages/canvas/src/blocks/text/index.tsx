@@ -13,6 +13,7 @@ const textSchema = z.object({
   padding: z.enum(['none', ...sizeScaleSchema.options]),
   width: z.enum(['narrow', 'wide', 'full']),
 })
+
 export type TextProps = z.infer<typeof textSchema>
 
 declare module '../../core/document' {
@@ -27,6 +28,7 @@ const ALIGN = { left: 'text-left', center: 'text-center', right: 'text-right' } 
 
 function TextRender({ node, props, update, mode }: BlockRenderProps<'text'>) {
   const theme = useResolvedTheme(node.overrides)
+
   return (
     <div className={cn('px-4', PADDING[props.padding])} style={typographyStyle(theme.typography)}>
       <InlineText

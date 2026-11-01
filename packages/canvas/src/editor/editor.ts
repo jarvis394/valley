@@ -99,6 +99,7 @@ export function createEditor({
     future: [],
   }))
   const listeners = new Set<ChangeListener>()
+
   const emit: ChangeListener = (change) => listeners.forEach((listener) => listener(change))
 
   /** The single write path for the document. Returns false if the recipe threw. */
@@ -116,6 +117,7 @@ export function createEditor({
     } catch (error) {
       if (error instanceof CanvasOperationError) {
         console.warn(`[canvas] ${error.message}`)
+
         return false
       }
       throw error
@@ -140,6 +142,7 @@ export function createEditor({
 
     store.setState({ doc: next, past, future: [] })
     emit({ doc: next, patches, origin: 'local' })
+
     return true
   }
 
@@ -182,6 +185,7 @@ export function createEditor({
     if (selected?.parentId && selected.placement.mode === 'flow') {
       return { parentId: selected.parentId, index: flowIndexOf(doc, selected.id) + 1 }
     }
+
     return { parentId: doc.rootId }
   }
 
@@ -194,6 +198,7 @@ export function createEditor({
     const ok = transact((draft) => ops.insertNode(draft, registry, node, parentId, index))
     if (!ok) return null
     select(node.id)
+
     return node.id
   }
 
@@ -202,6 +207,7 @@ export function createEditor({
     const ok = transact((draft) => {
       for (const asset of withIds) draft.assets[asset.id] = asset
     })
+
     return ok ? withIds.map((asset) => asset.id) : []
   }
 
@@ -209,11 +215,13 @@ export function createEditor({
   async function uploadAssets(files: File[]): Promise<AssetId[]> {
     if (readOnly) return []
     const media = files.filter((file) => /^(image|video)\//.test(file.type))
+
     return addAssets(await Promise.all(media.map(uploadAsset)))
   }
 
   function insertFromAssets(assetIds: AssetId[], target: InsertTarget = {}): NodeId | null {
     const node = registry.createNodeFromAssets(assetIds, { doc: store.getState().doc })
+
     return node && insert(node, target)
   }
 
@@ -237,6 +245,7 @@ export function createEditor({
         copyId = ops.duplicateNode(draft, registry, id)
       })
       if (copyId) select(copyId)
+
       return copyId
     },
     setPlacement: (id: NodeId, placement: Placement, options?: UpdateOptions) =>
@@ -266,6 +275,7 @@ export function createEditor({
     async insertFiles(files: File[], target: InsertTarget = {}): Promise<NodeId | null> {
       const ids = await uploadAssets(files)
       if (ids.length === 0) return null
+
       return insertFromAssets(ids, { parentId: store.getState().doc.rootId, ...target })
     },
   }
@@ -297,6 +307,7 @@ export function createEditor({
     },
     subscribe(listener: ChangeListener) {
       listeners.add(listener)
+
       return () => void listeners.delete(listener)
     },
   }

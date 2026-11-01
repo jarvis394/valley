@@ -45,6 +45,7 @@ function computeDrop(
   const items = [...hit.querySelectorAll(':scope > [data-drop-item]')]
   let index = items.findIndex((item) => {
     const rect = item.getBoundingClientRect()
+
     return y < rect.top + rect.height / 2
   })
   if (index === -1) index = items.length
@@ -65,6 +66,7 @@ function computeDrop(
   ) {
     return { target: null, container: hit }
   }
+
   return { target: { parentId, index } satisfies DropTarget, container: hit }
 }
 
@@ -78,6 +80,7 @@ function handleDragEnd(editor: Editor, event: DragEndEvent) {
   switch (data.kind) {
     case 'flow-node': {
       if (drop) editor.commands.moveNode(data.nodeId, drop.parentId, drop.index)
+
       return
     }
     case 'absolute-node': {
@@ -173,6 +176,7 @@ function DragChip({ data }: { data: DragData }) {
   if (!node || data.kind !== 'flow-node') return null
   const definition = editor.registry.get(node.type)
   const Icon = definition.icon
+
   return (
     <div className="pointer-events-none flex w-fit items-center gap-2 rounded-xl bg-accent px-3 py-2 text-sm text-white shadow-2xl">
       <GripVertical className="size-4" />
@@ -189,6 +193,7 @@ export function useFlowDraggable(id: NodeId) {
     type: DRAG_TYPE.flow,
     data: { kind: 'flow-node', nodeId: id },
   })
+
   return { ref, isDragSource }
 }
 
@@ -202,6 +207,7 @@ export function useDropEdge(parentId: NodeId, index: number, count: number) {
     if (drop?.parentId !== parentId) return null
     if (drop.index === index) return 'top'
     if (index === count - 1 && drop.index === count) return 'bottom'
+
     return null
   })
 }
@@ -217,6 +223,7 @@ export function DropLine({
   gap?: number
 }) {
   if (!edge) return null
+
   return (
     <div
       aria-hidden

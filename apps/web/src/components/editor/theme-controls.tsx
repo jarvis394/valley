@@ -32,6 +32,7 @@ export function ThemeGroupSection<K extends ThemeGroup>({
 }) {
   const theme = useTheme()
   const value = resolveThemeGroup(theme, group, override)
+
   return (
     <Section
       title={title}
@@ -43,6 +44,7 @@ export function ThemeGroupSection<K extends ThemeGroup>({
 }
 
 const fontOptions: Option<string>[] = FONTS.map((font) => ({ value: font.id, label: font.label }))
+
 const scaleOptions = [
   { value: 'small', label: 'Small' },
   { value: 'medium', label: 'Medium' },
@@ -97,6 +99,7 @@ const layoutOptions = [
   { value: 'horizontal', label: 'Row' },
   { value: 'files', label: 'Files' },
 ] as const
+
 const roundnessOptions = ROUNDNESS.map((r) => ({ value: r, label: r === 0 ? 'None' : `${r}px` }))
 
 export function GalleryControls({

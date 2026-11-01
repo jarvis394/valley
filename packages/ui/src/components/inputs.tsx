@@ -10,7 +10,9 @@ import type { Option } from './segmented'
 
 const controlClass =
   'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-[13px] leading-5 text-fg focus-within:ring-2 focus-within:ring-accent/60'
+
 const inputClass = 'min-w-0 flex-1 bg-transparent px-3 py-2.5 outline-none placeholder:text-fg/32'
+
 /** A control that opens something on press (select, picker). */
 const triggerClass = cn(
   controlClass,
@@ -56,6 +58,7 @@ export function TextField({
       />
     )
   }
+
   return (
     <label className={cn(controlClass, 'overflow-hidden', end && 'pr-1')}>
       {prefix && (

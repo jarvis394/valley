@@ -9,6 +9,7 @@ export function UploadDropzone({
   disabled?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <div className="w-full max-w-[500px]">
       <Dropzone

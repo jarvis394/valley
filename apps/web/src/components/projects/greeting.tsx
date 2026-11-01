@@ -24,6 +24,7 @@ function useHour() {
 export function Greeting({ name }: { name: string }) {
   const hour = useHour()
   const part = partOfDay(hour ?? 0)
+
   return (
     <hgroup
       className={cn(

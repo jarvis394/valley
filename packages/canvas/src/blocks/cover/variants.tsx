@@ -204,6 +204,7 @@ export const COVER_VARIANTS = {
 } satisfies Record<string, CoverVariant>
 
 export type CoverVariantId = keyof typeof COVER_VARIANTS
+
 export const COVER_VARIANT_IDS = Object.keys(COVER_VARIANTS) as [
   CoverVariantId,
   ...CoverVariantId[],

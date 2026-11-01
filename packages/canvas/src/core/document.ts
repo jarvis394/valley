@@ -43,6 +43,7 @@ export const assetSchema = z.object({
   height: z.number().positive(),
   size: z.number().nonnegative().optional(),
 })
+
 export type Asset = z.infer<typeof assetSchema>
 
 export const documentMetaSchema = z.object({
@@ -55,6 +56,7 @@ export const documentMetaSchema = z.object({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 })
+
 export type DocumentMeta = z.infer<typeof documentMetaSchema>
 
 export const DOCUMENT_SCHEMA_VERSION = 1

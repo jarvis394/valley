@@ -29,6 +29,7 @@ const coverSchema = z.object({
   align: z.enum(['left', 'center', 'right']),
   showMeta: z.boolean(),
 })
+
 export type CoverProps = z.infer<typeof coverSchema>
 
 declare module '../../core/document' {
@@ -122,6 +123,7 @@ const variantOptions = COVER_VARIANT_IDS.map((id) => ({
 
 function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
   const asset = useAsset(props.assetId)
+
   return (
     <>
       <Section title="Cover Image">

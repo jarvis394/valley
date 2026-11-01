@@ -46,6 +46,7 @@ export interface ProjectEditorSlots {
 /** The panels around the canvas: project outline on the left, inspector on the right. */
 export function ProjectEditor({ editor, ...slots }: { editor: Editor } & ProjectEditorSlots) {
   useEditorHotkeys(editor)
+
   return (
     <EditorProvider editor={editor}>
       <EditorLayout {...slots} />
@@ -157,11 +158,13 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
 
 function ProjectTitle() {
   const meta = useMeta()
+
   return <span className="truncate text-[15px] font-medium">{meta.title}</span>
 }
 
 function ProjectHeader({ switcher }: { switcher?: ReactNode }) {
   const meta = useMeta()
+
   return (
     <div className="border-b border-line">
       <SwitcherBar
@@ -175,6 +178,7 @@ function ProjectHeader({ switcher }: { switcher?: ReactNode }) {
 
 function ProjectRow() {
   const files = summarizeAssets(useAssets())
+
   return (
     <ListItem
       render={<div />}
@@ -197,6 +201,7 @@ function ProjectRow() {
 
 function PreviewFooter() {
   const editor = useEditor()
+
   return (
     <div className="flex h-[52px] shrink-0 items-center gap-3 border-t border-line px-3 py-1.5">
       <kbd
@@ -215,6 +220,7 @@ function HistoryButtons() {
   const editor = useEditor()
   const canUndo = useEditorState((state) => state.past.length > 0)
   const canRedo = useEditorState((state) => state.future.length > 0)
+
   return (
     <div className="flex gap-1">
       <IconButton aria-label="Undo (⌘Z)" disabled={!canUndo} onClick={editor.undo}>

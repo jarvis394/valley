@@ -24,5 +24,6 @@ export async function readLocalAsset(file: File): Promise<Omit<Asset, 'id'>> {
       image.src = src
     }
   })
+
   return { kind, name: file.name, src, width, height, size: file.size }
 }

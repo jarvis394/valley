@@ -7,6 +7,7 @@ import { NodeRenderer } from './node-renderer'
 export function Canvas() {
   const rootId = useDocumentState((state) => state.doc.rootId)
   if (useMode() !== 'edit') return <DocumentView />
+
   return (
     <BlockDragProvider>
       <FontLoader />

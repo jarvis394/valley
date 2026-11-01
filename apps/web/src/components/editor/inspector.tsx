@@ -59,6 +59,7 @@ function ComponentPanel() {
       </div>
     )
   }
+
   // Keyed so local state inside block inspectors resets between nodes.
   return <NodeInspector key={selectedId} id={selectedId} />
 }
@@ -120,8 +121,10 @@ function NodeInspector({ id }: { id: NodeId }) {
 /** Generic for every absolutely placed node, whatever its type. */
 function PlacementSection({ id, placement }: { id: NodeId; placement: AbsolutePlacement }) {
   const editor = useEditor()
+
   const set = (patch: Partial<AbsolutePlacement>) =>
     editor.commands.setPlacement(id, { ...placement, ...patch }, { mergeKey: `placement.${id}` })
+
   return (
     <Section title="Placement">
       <Field label="Size">

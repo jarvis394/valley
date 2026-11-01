@@ -31,6 +31,7 @@ export function persistEditor(editor: Editor, key: string, storage: Storage = lo
   }
 
   let timer: ReturnType<typeof setTimeout> | undefined
+
   const flush = () => {
     if (timer === undefined) return
     clearTimeout(timer)
@@ -47,6 +48,7 @@ export function persistEditor(editor: Editor, key: string, storage: Storage = lo
     clearTimeout(timer)
     timer = setTimeout(flush, SAVE_DELAY_MS)
   }
+
   const unsubscribeDoc = editor.subscribe(schedule)
   const unsubscribeSettings = editor.store.subscribe((state, prev) => {
     if (state.settings !== prev.settings) schedule()

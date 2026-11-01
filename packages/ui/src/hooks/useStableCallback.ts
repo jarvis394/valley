@@ -16,5 +16,6 @@ export function useStableCallback<Args extends ReadonlyArray<unknown>, Result>(
       (...args: Args) =>
         latest.current(...args),
   )
+
   return stable
 }

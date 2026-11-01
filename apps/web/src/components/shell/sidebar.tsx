@@ -42,6 +42,7 @@ function Root({ collapsed = false, children }: { collapsed?: boolean; children: 
 /** 51px plus the divider lines up with the 52px bordered bars of the editor panels. */
 function Bar({ children, className }: { children: ReactNode; className?: string }) {
   const collapsed = useCollapsed()
+
   return (
     <div
       className={cn(
@@ -86,6 +87,7 @@ function Account({
 
 function Nav({ children }: { children: ReactNode }) {
   const collapsed = useCollapsed()
+
   return (
     <>
       <div className={cn('flex shrink-0 flex-col', collapsed ? 'pb-2' : 'gap-1 px-1.5 py-2')}>
@@ -115,6 +117,7 @@ function NavItem({
       </RailItem>
     )
   }
+
   return <ListItem icon={<Icon />} label={label} end={end} render={render} />
 }
 
@@ -135,6 +138,7 @@ function Projects({
       </ScrollArea>
     )
   }
+
   return (
     <ScrollArea scrollbar="hidden" className="flex-1" contentClassName="pb-2">
       <Section title={title} action={action} body="list">
@@ -174,6 +178,7 @@ function ProjectItem({
       </RailItem>
     )
   }
+
   return (
     <ListItem
       leading="media"
@@ -190,6 +195,7 @@ function ProjectItem({
 
 function Footer({ version, repositoryUrl }: { version: string; repositoryUrl: string }) {
   const collapsed = useCollapsed()
+
   return (
     <>
       <SidebarDivider />
@@ -244,6 +250,7 @@ function RailItem({
   children: ReactNode
 }) {
   const styles = RAIL_VARIANTS[variant]
+
   return useRender({
     render,
     defaultTagName: 'button',

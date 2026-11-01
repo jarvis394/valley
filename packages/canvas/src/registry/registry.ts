@@ -30,6 +30,7 @@ export class BlockRegistry implements ContainmentRules {
   get<T extends BlockType>(type: T): BlockDefinition<T> {
     const definition = this.#definitions.get(type)
     if (!definition) throw new Error(`Unknown block type "${type}"`)
+
     return definition as unknown as BlockDefinition<T>
   }
 
@@ -37,6 +38,7 @@ export class BlockRegistry implements ContainmentRules {
     const definition = this.get(node.type) as BlockDefinition<BlockType>
     const title = definition.title?.(node.props).trim()
     if (!title) return definition.label
+
     return title.length > TITLE_LENGTH ? `${title.slice(0, TITLE_LENGTH).trimEnd()}…` : title
   }
 
@@ -53,6 +55,7 @@ export class BlockRegistry implements ContainmentRules {
     const child = this.#definitions.get(childType)
     if (!container || !child || !child.placement.allowed.includes(mode)) return false
     if (mode === 'absolute') return !!container.allowsAbsolute
+
     return container.accepts?.(childType) ?? true
   }
 
@@ -62,6 +65,7 @@ export class BlockRegistry implements ContainmentRules {
     overrides: { placement?: Placement } = {},
   ): CanvasNode<T> {
     const definition = this.get(type)
+
     return this.#node(definition, definition.create(context), overrides) as CanvasNode<T>
   }
 
@@ -69,6 +73,7 @@ export class BlockRegistry implements ContainmentRules {
   createNodeFromAssets(assetIds: AssetId[], context: CreateBlockContext): CanvasNode | null {
     const definition = this.list().find((item) => item.fromAssets)
     if (!definition?.fromAssets) return null
+
     return this.#node(definition, definition.fromAssets(assetIds, context))
   }
 
@@ -79,6 +84,7 @@ export class BlockRegistry implements ContainmentRules {
       const assetId = definition?.coverAsset?.(node.props)
       if (assetId) return assetId
     }
+
     return null
   }
 
@@ -88,6 +94,7 @@ export class BlockRegistry implements ContainmentRules {
     const asset =
       (coverAssetId && doc.assets[coverAssetId]) ||
       Object.values(doc.assets).find((a) => a.kind === 'image')
+
     return asset?.kind === 'image' ? asset.src : asset?.poster
   }
 

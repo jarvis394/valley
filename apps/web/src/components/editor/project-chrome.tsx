@@ -47,7 +47,9 @@ export function ProjectNav({ views, newFavorites }: { views: number; newFavorite
 export function ProjectActions() {
   const editor = useEditor()
   const { copied, copy } = useCopyText()
+
   const share = () => copy(`${editor.galleryUrl}/${editor.getState().settings.slug ?? ''}`)
+
   return (
     <>
       <div className="flex min-w-0 flex-1 items-center">

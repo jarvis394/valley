@@ -51,5 +51,6 @@ export const getFont = (id: string): FontDefinition =>
 export const googleFontsHref = (ids: Iterable<string>): string | null => {
   const families = [...new Set(ids)].map((id) => getFont(id).google).filter(Boolean)
   if (families.length === 0) return null
+
   return `https://fonts.googleapis.com/css2?${families.map((f) => `family=${f}`).join('&')}&display=swap`
 }

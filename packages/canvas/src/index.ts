@@ -32,11 +32,13 @@ export {
   type EditorMode,
   type EditorState,
 } from './editor/editor'
+
 export { readLocalAsset, type ReadAsset } from './editor/assets'
 export * from './editor/context'
 export { useEditorHotkeys } from './editor/hotkeys'
 export { persistEditor } from './editor/persistence'
 export { scrollToNode } from './editor/dom'
+
 export {
   BlockDragProvider,
   DropLine,

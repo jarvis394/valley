@@ -19,6 +19,7 @@ const selectFontIds = ({ doc }: DocumentState) => {
     if (typography?.headingFont) ids.add(typography.headingFont)
     if (typography?.bodyFont) ids.add(typography.bodyFont)
   }
+
   return [...ids].toSorted()
 }
 
@@ -26,6 +27,7 @@ const selectFontIds = ({ doc }: DocumentState) => {
 export function FontLoader() {
   const fontIds = useStore(useRenderContext().store, useShallow(selectFontIds))
   const href = googleFontsHref(fontIds)
+
   // React 19 hoists <link precedence> into <head> and dedupes it.
   return href ? <link rel="stylesheet" href={href} precedence="default" /> : null
 }
@@ -50,6 +52,7 @@ const noUpdate = () => {}
 /** Read-only rendering of the whole document (published page, editor preview). */
 export function DocumentView() {
   const rootId = useDocumentState((state) => state.doc.rootId)
+
   return (
     <>
       <FontLoader />
@@ -64,6 +67,7 @@ const ViewNode = memo(function ViewNode({ id }: { id: NodeId }) {
   if (!node || node.hidden) return null
   const definition = registry.get(node.type)
   const { Render } = definition
+
   return (
     <Render
       node={node as never}
@@ -79,6 +83,7 @@ const ViewNode = memo(function ViewNode({ id }: { id: NodeId }) {
 
 function ViewChildren({ parentId }: { parentId: NodeId }) {
   const { flow, absolute } = useChildIds(parentId)
+
   return (
     <div className="relative">
       {flow.map((id) => (
@@ -100,6 +105,7 @@ function ViewChildren({ parentId }: { parentId: NodeId }) {
 function ViewAbsoluteItem({ id }: { id: NodeId }) {
   const node = useNode(id)
   if (!node || node.placement.mode !== 'absolute') return null
+
   return (
     <div className="pointer-events-auto absolute" style={absolutePlacementStyle(node.placement)}>
       <ViewNode id={id} />

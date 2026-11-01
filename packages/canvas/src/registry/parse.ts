@@ -63,11 +63,13 @@ export function parseDocument(input: unknown, registry: BlockRegistry): ParseRes
       if (!child || reachable.has(childId)) return false
       if (!registry.canContain(parent, child.type, child.placement.mode)) {
         warnings.push(`Dropped node ${childId}: ${parent.type} does not accept it`)
+
         return false
       }
       reachable.add(childId)
       child.parentId = parent.id
       queue.push(child)
+
       return true
     })
   }

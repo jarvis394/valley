@@ -38,6 +38,7 @@ export function ListItem({
   render?: ReactElement
 }) {
   const styles = LEADING[leading]
+
   return useRender({
     render,
     defaultTagName: 'button',

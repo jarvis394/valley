@@ -19,6 +19,7 @@ function isHookCallee(callee: ESTree.Node): boolean {
   if (callee.type === 'MemberExpression' && !callee.computed) {
     return callee.property.type === 'Identifier' && HOOK_CALLEE.test(callee.property.name)
   }
+
   return false
 }
 
@@ -35,6 +36,7 @@ function callsHook(node: unknown, root: unknown): boolean {
     if (key === 'parent') continue
     if (callsHook(value, root)) return true
   }
+
   return false
 }
 
@@ -56,6 +58,7 @@ export default defineRule({
         message: `"${name}" calls no hooks, so the React Compiler skips it and whatever it returns is rebuilt on every render. Rename it to a plain function, or read the hook it depends on inside it.`,
       })
     }
+
     return {
       FunctionDeclaration(node) {
         if (node.id) check(node.id.name, node, node.id)

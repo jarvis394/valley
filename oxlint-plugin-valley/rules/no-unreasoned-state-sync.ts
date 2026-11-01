@@ -16,6 +16,7 @@ const isEffectHookCall = (node: ESTree.CallExpression): boolean => {
     callee = callee.expression
   }
   if (callee.type === 'Identifier') return EFFECT_HOOKS.has(callee.name)
+
   return (
     callee.type === 'MemberExpression' &&
     !callee.computed &&
@@ -51,6 +52,7 @@ export default defineRule({
     if (TEST_FILE.test(context.filename) || !EFFECT_HOOK_TEXT.test(context.sourceCode.text)) {
       return {}
     }
+
     return {
       CallExpression(node) {
         if (!isEffectHookCall(node)) return

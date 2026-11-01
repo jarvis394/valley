@@ -36,6 +36,7 @@ function attach(doc: CanvasDocument, parent: CanvasNode, node: CanvasNode, index
   node.parentId = parent.id
   if (node.placement.mode !== 'flow' || index === undefined) {
     children.push(node.id)
+
     return
   }
   const flow = flowChildIds(doc, parent.id)
@@ -124,6 +125,7 @@ export function duplicateNode(doc: CanvasDocument, rules: ContainmentRules, id: 
     copy.placement = { ...copy.placement, x: copy.placement.x + 0.03, y: copy.placement.y + 0.03 }
   }
   insertSubtree(doc, rules, subtree, node.parentId, flowIndexOf(doc, id) + 1)
+
   return copy.id
 }
 
