@@ -88,6 +88,31 @@ export class BlockRegistry implements ContainmentRules {
     return null
   }
 
+  /** Points the first cover-holding block at `assetId`. False when the document has none. */
+  setCoverAsset(doc: CanvasDocument, assetId: AssetId): boolean {
+    for (const node of walk(doc, doc.rootId)) {
+      const definition = this.#definitions.get(node.type) as BlockDefinition<BlockType> | undefined
+      if (!definition?.setCoverAsset) continue
+      definition.setCoverAsset(node.props, assetId)
+
+      return true
+    }
+
+    return false
+  }
+
+  /** A node for the first block that can hold a cover, showing `assetId`; null if none can. */
+  createCoverNode(assetId: AssetId, context: CreateBlockContext): CanvasNode | null {
+    const definition = this.list().find((item) => item.setCoverAsset) as
+      | BlockDefinition<BlockType>
+      | undefined
+    if (!definition?.setCoverAsset) return null
+    const props = definition.create(context)
+    definition.setCoverAsset(props, assetId)
+
+    return this.#node(definition, props)
+  }
+
   /** Thumbnail source: the cover image, else the first image, else a video poster. */
   thumbnailOf(doc: CanvasDocument): string | undefined {
     const coverAssetId = this.coverAssetId(doc)

@@ -76,6 +76,8 @@ export interface BlockDefinition<T extends BlockType> {
   fromAssets?: (assetIds: AssetId[], ctx: CreateBlockContext) => BlockProps<T>
   /** The asset this block shows as the project cover, which is also the project thumbnail. */
   coverAsset?: (props: BlockProps<T>) => AssetId | null
+  /** Points the block at a new cover asset. Blocks with it can be inserted to hold a cover. */
+  setCoverAsset?: (props: BlockProps<T>, assetId: AssetId) => void
   /** Shown in the "add block" menu. Defaults to true. */
   insertable?: boolean
   experimental?: boolean

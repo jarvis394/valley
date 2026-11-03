@@ -1,8 +1,10 @@
+import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu'
 import { Drawer } from '@base-ui/react/drawer'
 import { Menu as BaseMenu } from '@base-ui/react/menu'
 import { Popover as BasePopover } from '@base-ui/react/popover'
-import type { ComponentProps, ReactNode } from 'react'
+import { Fragment, type ComponentProps, type ReactNode } from 'react'
 import { cn } from '../cn'
+import { ChevronRightIcon } from '../icons'
 import { ScrollArea } from './scroll-area'
 
 /**
@@ -17,51 +19,141 @@ type PopupProps = {
   sideOffset?: number
 }
 
+const menuPopupClass = 'menu-surface flex min-w-60 flex-col gap-1 p-1.5 text-body font-medium'
+
 function MenuPopup({ children, className, align = 'start', sideOffset = 6 }: PopupProps) {
   return (
     <BaseMenu.Portal>
       <BaseMenu.Positioner className="z-50 outline-none" sideOffset={sideOffset} align={align}>
-        <BaseMenu.Popup className={cn('popup-surface w-60 p-1 text-small', className)}>
-          {children}
-        </BaseMenu.Popup>
+        <BaseMenu.Popup className={cn(menuPopupClass, className)}>{children}</BaseMenu.Popup>
       </BaseMenu.Positioner>
     </BaseMenu.Portal>
   )
 }
 
+const ITEM_VARIANTS = {
+  default: 'text-fg not-data-disabled:data-highlighted:bg-white/7',
+  danger: 'text-danger not-data-disabled:data-highlighted:bg-danger/12',
+} as const
+
+const menuItemClass =
+  'flex h-9 shrink-0 cursor-default items-center gap-2.5 rounded-[10px] px-3.5 outline-none select-none data-disabled:opacity-40 data-popup-open:bg-white/7'
+
+function MenuItemIcon({ icon }: { icon: ReactNode }) {
+  return <span className="-ml-0.5 flex h-4 w-3.5 shrink-0 items-center">{icon}</span>
+}
+
 function MenuItem({
   className,
   icon,
+  variant = 'default',
   children,
   ...props
 }: ComponentProps<typeof BaseMenu.Item> & {
-  /** Leading 16px icon, muted like `ListItem`'s. */
+  /** Leading 16px icon, in a 14px slot like `Button`'s. */
   icon?: ReactNode
+  variant?: keyof typeof ITEM_VARIANTS
 }) {
   return (
     <BaseMenu.Item
-      className={cn(
-        'flex cursor-default items-center gap-2.5 rounded-[10px] px-3 py-2 text-fg outline-none select-none data-highlighted:bg-white/7',
-        className as string,
-      )}
+      className={cn(menuItemClass, ITEM_VARIANTS[variant], className as string)}
       {...props}
     >
-      {icon && <span className="flex shrink-0 opacity-63">{icon}</span>}
+      {icon && <MenuItemIcon icon={icon} />}
       {children}
     </BaseMenu.Item>
   )
 }
 
+/** Item that opens a nested `Menu.Popup`; wrap both in `Menu.SubmenuRoot`. */
+function MenuSubmenuTrigger({
+  className,
+  icon,
+  children,
+  ...props
+}: ComponentProps<typeof BaseMenu.SubmenuTrigger> & { icon?: ReactNode }) {
+  return (
+    <BaseMenu.SubmenuTrigger
+      className={cn(menuItemClass, ITEM_VARIANTS.default, className as string)}
+      {...props}
+    >
+      {icon && <MenuItemIcon icon={icon} />}
+      <span className="min-w-0 flex-1">{children}</span>
+      <ChevronRightIcon className="-mr-0.5" />
+    </BaseMenu.SubmenuTrigger>
+  )
+}
+
+/** Full-bleed separator; cancels the popup's padding. */
 function MenuSeparator() {
-  return <BaseMenu.Separator className="mx-2 my-1 h-px bg-white/7" />
+  return <BaseMenu.Separator className="-mx-1.5 my-0.5 h-px bg-white/10" />
+}
+
+/** Summary of what the menu acts on (a file), above the items. */
+function MenuHeader({
+  media,
+  title,
+  meta = [],
+}: {
+  /** 48px thumbnail, cropped to a square. */
+  media: ReactNode
+  title: ReactNode
+  /** Secondary facts, joined with dots. */
+  meta?: ReactNode[]
+}) {
+  return (
+    <>
+      <div className="-mx-1.5 -mt-1.5 flex items-center gap-3 pt-3 pr-2.5 pb-2.5 pl-3">
+        <div className="size-12 shrink-0 overflow-hidden rounded-lg border-[0.5px] border-white/4 shadow-[0_4px_8px_rgba(0,0,0,0.24),0_0_2px_rgba(0,0,0,0.24)] *:size-full *:object-cover">
+          {media}
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate">{title}</span>
+          {meta.length > 0 && (
+            <span className="flex items-center gap-1 font-normal whitespace-nowrap">
+              {meta.map((item, index) => (
+                <Fragment key={index}>
+                  {index > 0 && <span className="opacity-24">•</span>}
+                  <span className="opacity-63">{item}</span>
+                </Fragment>
+              ))}
+            </span>
+          )}
+        </div>
+      </div>
+      <BaseMenu.Separator className="-mx-1.5 mb-0.5 h-px bg-white/10" />
+    </>
+  )
 }
 
 export const Menu = {
   Root: BaseMenu.Root,
   Trigger: BaseMenu.Trigger,
   Popup: MenuPopup,
+  Header: MenuHeader,
   Item: MenuItem,
+  SubmenuRoot: BaseMenu.SubmenuRoot,
+  SubmenuTrigger: MenuSubmenuTrigger,
   Separator: MenuSeparator,
+}
+
+function ContextMenuPopup({ children, className }: Pick<PopupProps, 'children' | 'className'>) {
+  return (
+    <BaseContextMenu.Portal>
+      <BaseContextMenu.Positioner className="z-50 outline-none">
+        <BaseContextMenu.Popup className={cn(menuPopupClass, className)}>
+          {children}
+        </BaseContextMenu.Popup>
+      </BaseContextMenu.Positioner>
+    </BaseContextMenu.Portal>
+  )
+}
+
+/** Right-click menu. Fill its popup with `Menu` parts. */
+export const ContextMenu = {
+  Root: BaseContextMenu.Root,
+  Trigger: BaseContextMenu.Trigger,
+  Popup: ContextMenuPopup,
 }
 
 function PopoverPopup({ children, className, align = 'center', sideOffset = 6 }: PopupProps) {

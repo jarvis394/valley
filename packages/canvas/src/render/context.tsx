@@ -25,6 +25,8 @@ export interface RenderContextValue {
   registry: BlockRegistry
   /** Adds files to the project. Absent on read-only surfaces. */
   uploadAssets?: (files: File[]) => Promise<AssetId[]>
+  /** Makes an asset the project cover. Absent on read-only surfaces. */
+  setCover?: (assetId: AssetId) => void
 }
 
 const RenderContext = createContext<RenderContextValue | null>(null)

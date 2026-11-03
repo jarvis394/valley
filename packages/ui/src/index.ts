@@ -20,7 +20,7 @@ export {
   TextField,
 } from './components/inputs'
 
-export { Menu, Popover, Sheet } from './components/overlays'
+export { ContextMenu, Menu, Popover, Sheet } from './components/overlays'
 export { Tabs } from './components/tabs'
 export * from './icons'
 export * from './lib'

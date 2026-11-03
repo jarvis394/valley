@@ -14,6 +14,8 @@
   --text-micro--line-height: 1;
   --text-caption: 11px;
   --text-caption--line-height: 16px;
+  --text-label: 12px;
+  --text-label--line-height: 16px;
   --text-small: 13px;
   --text-small--line-height: 20px;
   --text-body: 15px;
@@ -65,7 +67,7 @@
   }
 }
 
-/* Shared popup look for menus, selects and popovers. */
+/* Shared popup look for selects and popovers. */
 @utility popup-surface {
   transform-origin: var(--transform-origin);
   border-radius: var(--radius-2xl);
@@ -75,6 +77,29 @@
   box-shadow:
     0 8px 32px rgb(0 0 0 / 0.4),
     0 0 4px rgb(0 0 0 / 0.24);
+  transition-property: scale, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    scale: 0.95;
+    opacity: 0;
+  }
+}
+
+/* Translucent blurred look for menus and context menus. */
+@utility menu-surface {
+  transform-origin: var(--transform-origin);
+  border-radius: var(--radius-2xl);
+  border: 1px solid --alpha(var(--color-white) / 10%);
+  background: --alpha(var(--color-black) / 50%);
+  backdrop-filter: blur(16px);
+  color: var(--color-fg);
+  box-shadow:
+    0 0 0 0.5px var(--color-black),
+    0 4px 16px rgb(0 0 0 / 0.24),
+    0 4px 4px rgb(0 0 0 / 0.24);
   transition-property: scale, opacity;
   transition-duration: 150ms;
   transition-timing-function: var(--ease-out);

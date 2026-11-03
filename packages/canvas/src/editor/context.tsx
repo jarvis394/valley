@@ -14,6 +14,7 @@ export function EditorProvider({ editor, children }: { editor: Editor; children:
     store: editor.store,
     registry: editor.registry,
     uploadAssets: editor.readOnly ? undefined : editor.commands.uploadAssets,
+    setCover: editor.readOnly ? undefined : (assetId) => void editor.commands.setCover(assetId),
   }))
 
   return (

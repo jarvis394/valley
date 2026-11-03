@@ -1,6 +1,7 @@
 import { defineRule, type ESTree } from '@oxlint/plugins'
 
-const TYPE_STYLES = 'text-caption, text-small, text-body, text-title, text-heading or text-display'
+const TYPE_STYLES =
+  'text-caption, text-label, text-small, text-body, text-title, text-heading or text-display'
 
 // Utilities whose bare number means `n * --spacing` (4px) in Tailwind v4.
 const SPACING_PX =

@@ -219,6 +219,10 @@ export const coverBlock = defineBlock({
   placement: { allowed: ['flow'], initial: () => FLOW },
   themeGroups: ['typography'],
   coverAsset: (props) => props.assetId,
+  setCoverAsset: (props, assetId) => {
+    props.assetId = assetId
+    props.focalPoint = CENTER
+  },
   Render: CoverRender,
   Inspector: CoverInspector,
 })

@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import type { ComponentProps, CSSProperties, ReactElement } from 'react'
 import { z } from 'zod'
 import type { Asset } from '../../core/document'
 import { summarizeAssets } from '../../core/assets'
@@ -11,6 +11,7 @@ import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '..
 import { InlineText } from '../shared/inline-text'
 import { Media, UploadButton } from '../shared/media'
 import { typographyStyle, useResolvedTheme } from '../shared/theme'
+import { FileMenu } from './file-menu'
 import {
   cn,
   Field,
@@ -71,7 +72,7 @@ function CoverBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        'absolute flex items-center gap-1.5 overflow-hidden rounded-lg border-[0.5px] border-white/7 bg-surface/80 px-2 py-1.25 text-caption font-medium text-[#ededed] shadow-[0_0_0_0.5px_rgba(0,0,0,0.5),inset_0_0_4px_rgba(255,255,255,0.07)] backdrop-blur-sm',
+        'absolute flex items-center gap-1.5 overflow-hidden rounded-lg border-[0.5px] border-white/7 bg-surface/80 px-2 py-1.25 text-label font-medium text-[#ededed] shadow-[0_0_0_0.5px_rgba(0,0,0,0.5),inset_0_0_4px_rgba(255,255,255,0.07)] backdrop-blur-sm',
         className,
       )}
     >
@@ -82,9 +83,20 @@ function CoverBadge({ className }: { className?: string }) {
 }
 
 /** File-browser card: the image at its natural ratio above the file name. */
-function FileCard({ asset, isCover }: { asset: Asset; isCover: boolean }) {
+function FileCard({
+  asset,
+  isCover,
+  className,
+  ...props
+}: ComponentProps<'figure'> & { asset: Asset; isCover: boolean }) {
   return (
-    <figure className="relative flex aspect-square min-w-0 flex-col items-center gap-2 rounded-2xl px-2 pt-2 pb-1.5 hover:bg-white/3">
+    <figure
+      className={cn(
+        'relative flex aspect-square min-w-0 flex-col items-center gap-2 rounded-2xl px-2 pt-2 pb-1.5 hover:bg-white/3 data-popup-open:bg-white/7',
+        className,
+      )}
+      {...props}
+    >
       <div className="relative min-h-0 w-full flex-1">
         <Media
           asset={asset}
@@ -109,13 +121,32 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
   const gap = SPACING_PX[gallery.spacing]
   const items = props.assetIds.map((id) => assets[id]).filter((a): a is Asset => !!a)
 
+  const withMenu = (asset: Asset, element: ReactElement) =>
+    mode === 'edit' ? (
+      <FileMenu
+        key={asset.id}
+        asset={asset}
+        isCover={asset.id === projectCover}
+        onRemove={() =>
+          update((d) => void (d.assetIds = d.assetIds.filter((id) => id !== asset.id)))
+        }
+      >
+        {element}
+      </FileMenu>
+    ) : (
+      element
+    )
+
   const renderItems = () => {
     if (gallery.layout === 'files') {
       return (
         <div className="grid grid-cols-2 gap-2 @lg:grid-cols-4 @4xl:grid-cols-8">
-          {items.map((asset) => (
-            <FileCard key={asset.id} asset={asset} isCover={asset.id === coverAssetId} />
-          ))}
+          {items.map((asset) =>
+            withMenu(
+              asset,
+              <FileCard key={asset.id} asset={asset} isCover={asset.id === coverAssetId} />,
+            ),
+          )}
         </div>
       )
     }
@@ -123,25 +154,28 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
 
     return (
       <div className={layout.containerClass} style={layout.container(gap)}>
-        {items.map((asset) => (
-          <figure
-            key={asset.id}
-            className={cn('group relative overflow-hidden', layout.itemClass)}
-            style={{
-              ...layout.item(asset),
-              borderRadius: gallery.roundness,
-              marginBottom: gallery.layout === 'masonry' ? gap : undefined,
-            }}
-          >
-            <Media asset={asset} className="size-full" />
-            {mode === 'edit' && (
-              <figcaption className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 px-2 pt-6 pb-1.5 text-caption text-white opacity-0 transition-opacity group-hover:opacity-100">
-                {asset.name}
-              </figcaption>
-            )}
-            {asset.id === coverAssetId && <CoverBadge className="top-0.5 right-0.5" />}
-          </figure>
-        ))}
+        {items.map((asset) =>
+          withMenu(
+            asset,
+            <figure
+              key={asset.id}
+              className={cn('group relative overflow-hidden', layout.itemClass)}
+              style={{
+                ...layout.item(asset),
+                borderRadius: gallery.roundness,
+                marginBottom: gallery.layout === 'masonry' ? gap : undefined,
+              }}
+            >
+              <Media asset={asset} className="size-full" />
+              {mode === 'edit' && (
+                <figcaption className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 px-2 pt-6 pb-1.5 text-caption text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  {asset.name}
+                </figcaption>
+              )}
+              {asset.id === coverAssetId && <CoverBadge className="top-0.5 right-0.5" />}
+            </figure>,
+          ),
+        )}
       </div>
     )
   }

@@ -269,6 +269,14 @@ export function createEditor({
       transact((draft) => recipe(draft.theme), options),
     updateMeta: (recipe: (meta: DocumentMeta) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.meta), options),
+    /** Makes `assetId` the project cover, adding a cover block at the top if there is none. */
+    setCover: (assetId: AssetId) =>
+      transact((draft) => {
+        if (registry.setCoverAsset(draft, assetId)) return
+        const node = registry.createCoverNode(assetId, { doc: draft })
+        if (!node) throw new CanvasOperationError('No block can hold a cover')
+        ops.insertNode(draft, registry, node, draft.rootId, 0)
+      }),
     addAssets,
     uploadAssets,
     /** Uploads `files` and inserts them as one new block, at the end of the page by default. */
