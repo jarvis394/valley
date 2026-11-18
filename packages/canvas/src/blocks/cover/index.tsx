@@ -1,32 +1,21 @@
-import { AlignCenter, AlignLeft, AlignRight, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { z } from 'zod'
 import { formatLongDate } from '../../core/format'
 import { assetIdSchema } from '../../core/ids'
 import { FLOW } from '../../core/placement'
 import { useAsset, useMeta } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
-import { InlineText } from '../shared/inline-text'
 import { AssetPicker, CENTER, FocalPointPicker, focalPointSchema, Media } from '../shared/media'
+import { textAlignSchema, TextAlignControl } from '../shared/text-align'
 import { typographyStyle, useResolvedTheme } from '../shared/theme'
 import { COVER_VARIANT_IDS, COVER_VARIANTS, type CoverVariant } from './variants'
-import {
-  Field,
-  IconButton,
-  Section,
-  Segmented,
-  SwitchField,
-  TextField,
-  TilePicker,
-  ToolbarIcon,
-} from '@valley/ui'
+import { cn, Field, IconButton, Section, SwitchField, TilePicker, ToolbarIcon } from '@valley/ui'
 
 const coverSchema = z.object({
-  title: z.string(),
-  subtitle: z.string(),
   assetId: assetIdSchema.nullable(),
   focalPoint: focalPointSchema,
   variant: z.enum(COVER_VARIANT_IDS),
-  align: z.enum(['left', 'center', 'right']),
+  align: textAlignSchema,
   showMeta: z.boolean(),
 })
 
@@ -38,63 +27,62 @@ declare module '../../core/document' {
   }
 }
 
-function CoverRender({ node, props, update, mode, selected }: BlockRenderProps<'cover'>) {
+const META_ALIGN = {
+  left: 'items-start @xs:justify-start',
+  center: 'items-center @xs:justify-center',
+  right: 'items-end @xs:justify-end',
+} as const
+
+const fromProps = (from: unknown) => (from ?? {}) as { title?: unknown; subtitle?: unknown }
+
+function CoverRender({ node, props, mode, slots }: BlockRenderProps<'cover'>) {
   const asset = useAsset(props.assetId)
   const project = useMeta()
   const theme = useResolvedTheme(node.overrides)
   const { Layout, title: titleLook } = COVER_VARIANTS[props.variant] as CoverVariant
-  const editable = mode === 'edit'
 
+  // The layout sizes the card; text longer than its room is cut off rather than growing it.
   const text = (
-    <>
-      <InlineText
-        as="h1"
-        value={props.title}
-        editable={editable}
-        placeholder="Title"
-        onChange={(title) => update((d) => void (d.title = title), { mergeKey: 'cover.title' })}
-        className={
-          titleLook?.className ?? 'max-w-[16ch] leading-[1.05] font-semibold tracking-tight'
-        }
-        style={{
-          fontFamily: 'var(--font-heading)',
-          fontSize: 'calc(var(--type-scale) * clamp(2.25rem, 5vw, 3.75rem))',
-          ...titleLook?.style,
-        }}
-      />
-      {/* Empty subtitle only gets a placeholder while the block is being edited. */}
-      {(props.subtitle || (editable && selected)) && (
-        <InlineText
-          as="p"
-          value={props.subtitle}
-          editable={editable}
-          placeholder="Subtitle"
-          onChange={(subtitle) =>
-            update((d) => void (d.subtitle = subtitle), { mergeKey: 'cover.subtitle' })
-          }
-          className="mt-3 max-w-prose opacity-80"
-          style={{ fontSize: 'calc(var(--type-scale) * 1.05rem)' }}
-        />
+    <div className="flex min-h-0 w-full flex-col overflow-hidden">
+      {slots?.title && (
+        <div className={cn('w-full min-w-0', titleLook?.className)} style={titleLook?.style}>
+          {slots.title}
+        </div>
       )}
-    </>
+      {slots?.subtitle && <div className="mt-3 w-full min-w-0 opacity-80">{slots.subtitle}</div>}
+    </div>
   )
 
+  // Avatar beside the author; the date shares their row when it fits and goes below when
+  // the text column is narrow (split cards, phones).
   const metaLine = props.showMeta && (
-    <p
-      className="flex items-center gap-3 font-light whitespace-nowrap"
-      style={{ fontFamily: 'var(--font-heading)', fontSize: 'calc(var(--type-scale) * .9375rem)' }}
-    >
-      {project.authorAvatar && (
-        <img
-          src={project.authorAvatar}
-          alt=""
-          className="size-7 rounded-md border-[0.5px] border-white/7 object-cover"
-        />
-      )}
-      <span>{project.author}</span>
-      <span className="size-1 rounded-full bg-white/12" />
-      <time dateTime={project.date}>{formatLongDate(project.date)}</time>
-    </p>
+    <div className="@container w-full">
+      <p
+        className={cn(
+          'flex flex-col gap-1 font-light whitespace-nowrap @xs:flex-row @xs:items-center @xs:gap-3',
+          META_ALIGN[props.align],
+        )}
+        style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: 'calc(var(--type-scale) * .9375rem)',
+        }}
+      >
+        <span className="flex max-w-full min-w-0 items-center gap-3">
+          {project.authorAvatar && (
+            <img
+              src={project.authorAvatar}
+              alt=""
+              className="size-7 shrink-0 rounded-md border-[0.5px] border-white/7 object-cover"
+            />
+          )}
+          <span className="truncate">{project.author}</span>
+        </span>
+        <span className="hidden size-1 shrink-0 rounded-full bg-white/12 @xs:block" />
+        <time dateTime={project.date} className="max-w-full truncate">
+          {formatLongDate(project.date)}
+        </time>
+      </p>
+    </div>
   )
 
   return (
@@ -109,12 +97,6 @@ function CoverRender({ node, props, update, mode, selected }: BlockRenderProps<'
     </div>
   )
 }
-
-const alignOptions = [
-  { value: 'left', label: <AlignLeft className="size-4" />, title: 'Align left' },
-  { value: 'center', label: <AlignCenter className="size-4" />, title: 'Align center' },
-  { value: 'right', label: <AlignRight className="size-4" />, title: 'Align right' },
-] as const
 
 const variantOptions = COVER_VARIANT_IDS.map((id) => ({
   value: id,
@@ -159,30 +141,12 @@ function CoverInspector({ props, update }: BlockInspectorProps<'cover'>) {
             </IconButton>
           )}
         </div>
-        <Segmented
-          aria-label="Text alignment"
+        <TextAlignControl
           value={props.align}
-          options={alignOptions}
           onChange={(align) => update((d) => void (d.align = align))}
         />
       </Section>
       <Section title="Content">
-        <Field label="Title">
-          <TextField
-            value={props.title}
-            placeholder="Japan Trip"
-            onChange={(title) => update((d) => void (d.title = title), { mergeKey: 'cover.title' })}
-          />
-        </Field>
-        <Field label="Subtitle">
-          <TextField
-            value={props.subtitle}
-            placeholder="Two weeks between Tokyo and Kyoto"
-            onChange={(subtitle) =>
-              update((d) => void (d.subtitle = subtitle), { mergeKey: 'cover.subtitle' })
-            }
-          />
-        </Field>
         <SwitchField
           label="Show author and date"
           checked={props.showMeta}
@@ -206,11 +170,59 @@ export const coverBlock = defineBlock({
   type: 'cover',
   label: 'Cover',
   icon: ToolbarIcon,
-  version: 1,
+  // v2 moved the title and subtitle into slot children; `fillSlots` hands them over.
+  version: 2,
+  migrate: (props) => props,
   schema: coverSchema,
+  container: {
+    layout: 'slots',
+    slots: [
+      {
+        name: 'title',
+        label: 'Title',
+        type: 'text',
+        noLineBreaks: true,
+        create: ({ doc, from }) => {
+          const { title } = fromProps(from)
+
+          return {
+            value: typeof title === 'string' ? title : doc.meta.title,
+            role: 'heading',
+            style: { fontSize: 40, lineHeight: 1.05, letterSpacing: -0.02 },
+            align: 'left',
+            padding: 0,
+            truncate: false,
+            maxLines: 1,
+            color: null,
+            width: 'full',
+          }
+        },
+      },
+      {
+        name: 'subtitle',
+        label: 'Subtitle',
+        type: 'text',
+        noLineBreaks: true,
+        create: ({ from }) => {
+          const { subtitle } = fromProps(from)
+
+          return {
+            value: typeof subtitle === 'string' ? subtitle : '',
+            role: 'body',
+            style: { fontSize: 17 },
+            align: 'left',
+            padding: 0,
+            truncate: false,
+            maxLines: 1,
+            color: null,
+            width: 'full',
+          }
+        },
+        hidden: ({ from }) => !fromProps(from).subtitle,
+      },
+    ],
+  },
   create: ({ doc }) => ({
-    title: doc.meta.title,
-    subtitle: '',
     assetId: Object.values(doc.assets).find((a) => a.kind === 'image')?.id ?? null,
     focalPoint: CENTER,
     variant: 'split',
@@ -218,7 +230,6 @@ export const coverBlock = defineBlock({
     showMeta: true,
   }),
   placement: { allowed: ['flow'], initial: () => FLOW },
-  themeGroups: ['typography'],
   coverAsset: (props) => props.assetId,
   setCoverAsset: (props, assetId) => {
     props.assetId = assetId

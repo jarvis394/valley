@@ -61,7 +61,7 @@ export function Dropzone({
       onDragLeave: () => setDragging(false),
       onDrop,
       className: cn(
-        'flex w-full flex-col items-center justify-center border transition-[background-color,border-color,color,scale] duration-150 ease-out outline-none select-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-99 disabled:opacity-40',
+        'flex w-full flex-col items-center justify-center border outline-none select-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-99 disabled:opacity-40',
         styles.root,
         dragging && styles.dragging,
       ),

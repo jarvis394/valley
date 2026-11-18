@@ -7,6 +7,10 @@ import {
   useEditor,
   useMeta,
   useSettings,
+  useTheme,
+  ROLE_LABELS,
+  TEXT_ROLES,
+  TextStyleFields,
   type DocumentMeta,
   type ProjectSettings as Settings,
 } from '@valley/canvas'
@@ -53,6 +57,7 @@ export function ProjectSettings() {
   const editor = useEditor()
   const meta = useMeta()
   const settings = useSettings()
+  const theme = useTheme()
   const { galleryUrl } = editor
   const files = summarizeAssets(useAssets())
   const visibility = settings.visibility ?? 'private'
@@ -100,6 +105,20 @@ export function ProjectSettings() {
           />
         </Field>
       </Section>
+
+      {TEXT_ROLES.map((role) => (
+        <Section key={role} title={`${ROLE_LABELS[role]} style`}>
+          <TextStyleFields
+            value={theme.typography[role]}
+            onChange={(patch, options) =>
+              editor.commands.updateTheme(
+                (t) => void Object.assign(t.typography[role], patch),
+                options && { mergeKey: `theme.${role}.${options.mergeKey}` },
+              )
+            }
+          />
+        </Section>
+      ))}
 
       <Section title="Access">
         <Field label="Visibility" description={VISIBILITY_DESCRIPTION[visibility]}>

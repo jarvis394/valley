@@ -66,6 +66,7 @@ function StickerInspector({ props, update }: BlockInspectorProps<'sticker'>) {
       {props.style === 'label' && (
         <Field label="Color">
           <ColorField
+            label="Sticker color"
             value={props.color}
             onChange={(color) =>
               update((d) => void (d.color = color), { mergeKey: 'sticker.color' })

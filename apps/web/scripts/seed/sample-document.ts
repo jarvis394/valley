@@ -52,9 +52,9 @@ const children: CanvasNode[] = [
     id: nodeId('n_cover'),
     type: 'cover',
     placement: FLOW,
+    // Its Title and Subtitle slots are filled from the project title when the seed is saved.
+    children: [],
     props: {
-      title: 'Stockholm 2026',
-      subtitle: '',
       assetId: assetId('a_stockholm-34'),
       focalPoint: { x: 0.5, y: 0.6 },
       variant: 'split',
@@ -69,8 +69,13 @@ const children: CanvasNode[] = [
     props: {
       value:
         'The Industrial Revolution and its consequences have been a disaster for the human race. They have greatly increased the life-expectancy of those of us who live in “advanced” countries, but they have destabilized society, have made life unfulfilling, have subjected human beings to indignities, have led to widespread psychological suffering and have inflicted severe damage on the natural world.',
+      role: 'body',
+      style: {},
       align: 'center',
-      padding: 'small',
+      padding: 8,
+      truncate: false,
+      maxLines: 1,
+      color: null,
       width: 'wide',
     },
   }),
@@ -83,7 +88,6 @@ const children: CanvasNode[] = [
       showTitle: false,
       assetIds: [...images.slice(1, 2), images[0]!, ...images.slice(2)],
     },
-    overrides: { gallery: { layout: 'files' } },
   }),
   node<CanvasNode<'scene'>>({
     id: nodeId('n_scene'),
@@ -106,7 +110,7 @@ const children: CanvasNode[] = [
       showTitle: false,
       assetIds: images,
     },
-    overrides: { gallery: { layout: 'grid', spacing: 'small', roundness: 0 } },
+    overrides: { gallery: { size: 160, spacing: 2, roundness: 0 } },
   }),
 ]
 

@@ -6,6 +6,19 @@
 /* Scan this package's components; packages built on ui import this file and add their own. */
 @source '.';
 
+/* web.css underlines every bare <a>; links here look like whatever component renders them.
+   This sits outside web.css's sub-layer, so it wins; revert-layer would land back on web.css. */
+@layer components {
+  a:not([data-slot]) {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  a:not([data-slot]):focus-visible {
+    outline: revert;
+  }
+}
+
 @theme {
   --font-sans: 'Geist Variable', system-ui, sans-serif;
 

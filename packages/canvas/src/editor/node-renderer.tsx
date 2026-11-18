@@ -1,10 +1,10 @@
 import { useDraggable } from '@dnd-kit/react'
-import { ArrowDown, ArrowUp, Copy, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Copy, EyeOff, Trash2 } from 'lucide-react'
 import { memo } from 'react'
 import type { NodeId } from '../core/ids'
 import { flowIndexOf, flowChildIds } from '../core/tree'
-import { useChildIds, useNode } from '../render/context'
-import { absolutePlacementStyle } from '../render/document-view'
+import { useChildIds, useNode, useSlotIds } from '../render/context'
+import { absolutePlacementStyle, mapSlots } from '../render/document-view'
 import { useEditor, useEditorState, useUpdateProps } from './context'
 import {
   DRAG_TYPE,
@@ -25,10 +25,13 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
   const node = useNode(id)
   const selected = useEditorState((state) => state.selectedId === id)
   const update = useUpdateProps(id)
+  const slotIds = useSlotIds(id)
   if (!node || node.hidden) return null
 
   const definition = editor.registry.get(node.type)
   const { Render } = definition
+  const layout = definition.container?.layout
+  const slots = mapSlots(slotIds, renderSlotItem)
 
   return (
     <Render
@@ -37,16 +40,40 @@ export const NodeRenderer = memo(function NodeRenderer({ id }: { id: NodeId }) {
       update={update}
       mode="edit"
       selected={selected}
+      slots={layout === 'slots' ? slots : undefined}
     >
-      {definition.container ? <NodeChildren parentId={id} /> : undefined}
+      {layout === 'stack' ? <NodeChildren parentId={id} /> : undefined}
     </Render>
   )
 })
 
+const renderSlotItem = (id: NodeId) => <SlotItem id={id} />
+
+/** A slot child in place: its parent's layout positions it, a click selects it. */
+function SlotItem({ id }: { id: NodeId }) {
+  const editor = useEditor()
+  const selected = useEditorState((state) => state.selectedId === id)
+
+  return (
+    <div
+      data-node-id={id}
+      onPointerDown={(event) => {
+        event.stopPropagation()
+        if (!selected) editor.select(id)
+      }}
+      className={cn(
+        'rounded-sm outline-1 -outline-offset-1 outline-transparent hover:outline-dashed hover:outline-white/32',
+        selected && 'outline-2 outline-focus hover:outline-solid hover:outline-focus',
+      )}
+    >
+      <NodeRenderer id={id} />
+    </div>
+  )
+}
+
 /**
- * Lays out a container's children. Flow children go in a stack, and absolute children go
- * in an overlay whose box is the coordinate space for their fractional placement.
- * Container layouts other than `stack` would branch here on `definition.container.layout`.
+ * Lays out a `stack` container's children. Flow children go in a stack, and absolute
+ * children go in an overlay whose box is the coordinate space for their fractional placement.
  */
 function NodeChildren({ parentId }: { parentId: NodeId }) {
   const { flow: flowIds, absolute: absoluteIds } = useChildIds(parentId)
@@ -132,7 +159,14 @@ function FlowItem({
           selected && 'border-solid border-focus bg-focus-wash/4',
         )}
       >
-        <NodeRenderer id={id} />
+        {node.hidden ? (
+          <div className="flex items-center gap-2 px-4 py-3 text-small text-fg/32">
+            <EyeOff className="size-4" />
+            Hidden in preview and on the published page
+          </div>
+        ) : (
+          <NodeRenderer id={id} />
+        )}
       </div>
       <DropLine edge={dropEdge} />
     </div>

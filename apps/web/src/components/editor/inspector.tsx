@@ -6,11 +6,11 @@ import {
   type AbsolutePlacement,
   type NodeId,
 } from '@valley/canvas'
-import { cn, Field, IconButton, ScrollArea, Section, SliderField, Tabs } from '@valley/ui'
-import { MousePointerClick, X } from 'lucide-react'
+import { cn, Field, IconButton, NumberField, ScrollArea, Section, Tabs } from '@valley/ui'
+import { Eye, EyeOff, Layers2, Maximize2, MousePointerClick, RotateCw, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ProjectSettings } from './project-settings'
-import { GalleryControls, ThemeGroupSection, TypographyControls } from './theme-controls'
+import { GalleryControls, ThemeGroupSection } from './theme-controls'
 
 export type InspectorTab = 'component' | 'project'
 
@@ -81,6 +81,14 @@ function NodeInspector({ id }: { id: NodeId }) {
         <h3 className="min-w-0 flex-1 truncate text-body font-medium text-fg">
           {editor.registry.titleOf(node)}
         </h3>
+        <IconButton
+          size="bar"
+          aria-label={node.hidden ? 'Show' : 'Hide'}
+          aria-pressed={!!node.hidden}
+          onClick={() => editor.commands.setHidden(id, !node.hidden)}
+        >
+          {node.hidden ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+        </IconButton>
         <IconButton size="bar" aria-label="Deselect" onClick={() => editor.select(null)}>
           <X className="size-4" />
         </IconButton>
@@ -88,22 +96,14 @@ function NodeInspector({ id }: { id: NodeId }) {
       {BlockInspector && (
         <BlockInspector node={node as never} props={node.props as never} update={update} />
       )}
-      {definition.themeGroups?.includes('typography') && (
-        <ThemeGroupSection
-          group="typography"
-          title="Typography"
-          override={node.overrides?.typography}
-          onOverrideChange={(value) => editor.commands.setOverride(id, 'typography', value)}
-        >
-          {(value, set) => <TypographyControls value={value} onChange={set} />}
-        </ThemeGroupSection>
-      )}
       {definition.themeGroups?.includes('gallery') && (
         <ThemeGroupSection
           group="gallery"
           title="Styling"
           override={node.overrides?.gallery}
-          onOverrideChange={(value) => editor.commands.setOverride(id, 'gallery', value)}
+          onOverrideChange={(value, options) =>
+            editor.commands.setOverride(id, 'gallery', value, options)
+          }
         >
           {(value, set) => <GalleryControls value={value} onChange={set} />}
         </ThemeGroupSection>
@@ -128,27 +128,40 @@ function PlacementSection({ id, placement }: { id: NodeId; placement: AbsolutePl
   return (
     <Section title="Placement">
       <Field label="Size">
-        <SliderField
+        <NumberField
+          label="Size"
+          icon={<Maximize2 />}
           value={placement.width}
           min={0.03}
           max={0.6}
           step={0.01}
-          format={(v) => `${Math.round(v * 100)}%`}
+          format={{ style: 'percent' }}
           onChange={(width) => set({ width })}
         />
       </Field>
-      <Field label="Rotation">
-        <SliderField
-          value={placement.rotation}
-          min={-180}
-          max={180}
-          format={(v) => `${v}°`}
-          onChange={(rotation) => set({ rotation })}
-        />
-      </Field>
-      <Field label="Layer">
-        <SliderField value={placement.z} min={0} max={10} onChange={(z) => set({ z })} />
-      </Field>
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Rotation">
+          <NumberField
+            label="Rotation"
+            icon={<RotateCw />}
+            value={placement.rotation}
+            min={-180}
+            max={180}
+            format={{ style: 'unit', unit: 'degree' }}
+            onChange={(rotation) => set({ rotation })}
+          />
+        </Field>
+        <Field label="Layer">
+          <NumberField
+            label="Layer"
+            icon={<Layers2 />}
+            value={placement.z}
+            min={0}
+            max={10}
+            onChange={(z) => set({ z })}
+          />
+        </Field>
+      </div>
     </Section>
   )
 }

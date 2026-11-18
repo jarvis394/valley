@@ -3,12 +3,12 @@ import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import { cn } from '../cn'
 
 const pressable =
-  'inline-flex shrink-0 items-center outline-none transition-[color,background-color,border-color,scale] duration-150 ease-out select-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-97 disabled:pointer-events-none disabled:opacity-40'
+  'inline-flex shrink-0 items-center outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-97 disabled:pointer-events-none disabled:opacity-40'
 
 const VARIANTS = {
   /** Toolbar button with a hairline border (Share); its icon is muted until hovered. */
   outline:
-    'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7 *:data-icon:opacity-63 *:data-icon:transition-opacity hover:*:data-icon:opacity-100 data-popup-open:*:data-icon:opacity-100',
+    'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7 *:data-icon:opacity-63 hover:*:data-icon:opacity-100 data-popup-open:*:data-icon:opacity-100',
   /** Bright call to action (Visit). */
   primary:
     'border-[0.5px] border-white/24 bg-linear-to-b from-white to-[#e1e1e1] text-[#1b1b1b] shadow-[0_2px_16px_rgba(255,255,255,0.07),0_0_4px_rgba(255,255,255,0.07)] hover:to-white',
@@ -66,15 +66,15 @@ export function Button({
 const ICON_VARIANTS = {
   /** Fades the icon element rather than its color, so overlapping strokes stay even. */
   default:
-    'text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+    'text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Hairline-bordered counterpart of `Button`'s `outline` (copy link, card menus). */
   outline:
-    'border-[0.5px] border-white/7 text-fg *:opacity-63 *:transition-opacity hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+    'border-[0.5px] border-white/7 text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
   /** Tertiary action that stays out of the way until hovered (block toolbar). */
   dimmed:
-    'text-fg *:opacity-32 *:transition-opacity hover:bg-white/7 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+    'text-fg *:opacity-32 hover:bg-white/7 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
 } as const
 
 /** Square counterparts of `Button` sizes; `lg` sits beside 40px form controls. */

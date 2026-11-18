@@ -2,7 +2,7 @@ import { createContext, use, type ReactNode } from 'react'
 import { useStore } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 import type { StoreApi } from 'zustand/vanilla'
-import type { CanvasDocument } from '../core/document'
+import type { CanvasDocument, CanvasNode } from '../core/document'
 import type { AssetId, NodeId } from '../core/ids'
 import { absoluteChildIds, flowChildIds } from '../core/tree'
 import type { BlockRegistry } from '../registry/registry'
@@ -86,4 +86,34 @@ export function useChildIds(parentId: NodeId) {
   )
 
   return { flow, absolute }
+}
+
+/** Visible slot children of a slot container, by slot name. Shallow-compared. */
+export function useSlotIds(parentId: NodeId): Record<string, NodeId> {
+  const { store } = useRenderContext()
+
+  return useStore(
+    store,
+    useShallow((state) => {
+      const entries = (state.doc.nodes[parentId]?.children ?? []).flatMap((id) => {
+        const child = state.doc.nodes[id]
+
+        return child?.slot && !child.hidden ? [[child.slot, id] as const] : []
+      })
+
+      return Object.fromEntries(entries)
+    }),
+  )
+}
+
+/** The slot spec `node` fills, if it is a slot child. */
+export function useSlotSpec(node: CanvasNode) {
+  const { registry } = useRenderContext()
+  const parent = useDocumentState((state) =>
+    node.parentId ? state.doc.nodes[node.parentId] : undefined,
+  )
+
+  return node.slot && parent
+    ? registry.slotsOf(parent).find((slot) => slot.name === node.slot)
+    : undefined
 }

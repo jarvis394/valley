@@ -5,7 +5,12 @@ export interface FontDefinition {
   family: string
   /** Google Fonts `family=` query value. Omit for system / self-hosted fonts. */
   google?: string
+  /** Weights the loaded files can draw, so pickers never offer a synthesized one. */
+  weights: readonly number[]
 }
+
+const range = (from: number, to: number) =>
+  [300, 400, 500, 600, 700, 800].filter((weight) => weight >= from && weight <= to)
 
 /**
  * Font catalogue. Documents store only the font id, and an unknown id falls back
@@ -17,32 +22,37 @@ export const FONTS: readonly FontDefinition[] = [
     label: 'Google Sans Flex',
     family: '"Google Sans Flex", system-ui, sans-serif',
     google: 'Google+Sans+Flex:wdth,wght,ROND@100..125,300..800,0..100',
+    weights: range(300, 800),
   },
   {
     id: 'geist',
     label: 'Geist',
     family: 'Geist, system-ui, sans-serif',
     google: 'Geist:wght@300..700',
+    weights: range(300, 700),
   },
   {
     id: 'inter',
     label: 'Inter',
     family: 'Inter, system-ui, sans-serif',
     google: 'Inter:wght@300..700',
+    weights: range(300, 700),
   },
   {
     id: 'instrument-serif',
     label: 'Instrument Serif',
     family: '"Instrument Serif", Georgia, serif',
     google: 'Instrument+Serif',
+    weights: [400],
   },
   {
     id: 'space-grotesk',
     label: 'Space Grotesk',
     family: '"Space Grotesk", system-ui, sans-serif',
     google: 'Space+Grotesk:wght@400..700',
+    weights: range(400, 700),
   },
-  { id: 'system', label: 'System', family: 'system-ui, sans-serif' },
+  { id: 'system', label: 'System', family: 'system-ui, sans-serif', weights: range(300, 800) },
 ]
 
 export const getFont = (id: string): FontDefinition =>

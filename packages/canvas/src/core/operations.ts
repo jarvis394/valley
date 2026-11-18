@@ -46,6 +46,11 @@ function attach(doc: CanvasDocument, parent: CanvasNode, node: CanvasNode, index
   children.splice(position, 0, node.id)
 }
 
+/** A slot child belongs to its parent's layout: it can be hidden, never taken out. */
+function assertNotSlot(node: CanvasNode, action: string) {
+  if (node.slot) throw new CanvasOperationError(`Cannot ${action} the ${node.slot} slot`)
+}
+
 function detach(doc: CanvasDocument, node: CanvasNode) {
   if (!node.parentId) return
   const parent = getNode(doc, node.parentId)
@@ -90,6 +95,7 @@ export function moveNode(
 ) {
   const node = getNode(doc, id)
   const parent = getNode(doc, parentId)
+  assertNotSlot(node, 'move')
   if (id === parentId || isAncestor(doc, id, parentId)) {
     throw new CanvasOperationError('Cannot move a node into itself')
   }
@@ -103,6 +109,7 @@ export function moveNode(
 export function removeNode(doc: CanvasDocument, id: NodeId) {
   if (id === doc.rootId) throw new CanvasOperationError('Cannot remove the root node')
   const node = getNode(doc, id)
+  assertNotSlot(node, 'remove')
   const subtree = collectSubtree(doc, id)
   detach(doc, node)
   for (const item of subtree) delete doc.nodes[item.id]
@@ -112,6 +119,7 @@ export function removeNode(doc: CanvasDocument, id: NodeId) {
 export function duplicateNode(doc: CanvasDocument, rules: ContainmentRules, id: NodeId): NodeId {
   const node = getNode(doc, id)
   if (!node.parentId) throw new CanvasOperationError('Cannot duplicate the root node')
+  assertNotSlot(node, 'duplicate')
   // JSON round-trip rather than structuredClone: `doc` may be an immer draft (a Proxy).
   const subtree: CanvasNode[] = JSON.parse(JSON.stringify(collectSubtree(doc, id)))
   const idMap = new Map<NodeId, NodeId>(subtree.map((item) => [item.id, createNodeId()]))

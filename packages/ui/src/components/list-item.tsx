@@ -21,6 +21,7 @@ export function ListItem({
   selected,
   filled,
   dimmed,
+  muted,
   leading = 'icon',
   render,
   className,
@@ -34,6 +35,8 @@ export function ListItem({
   filled?: boolean
   /** Placeholder look for a row that is elsewhere for now, e.g. being dragged. */
   dimmed?: boolean
+  /** Fades the content but not the row, e.g. a hidden layer that can still be selected. */
+  muted?: boolean
   leading?: keyof typeof LEADING
   render?: ReactElement
 }) {
@@ -47,11 +50,13 @@ export function ListItem({
       ...props,
       'data-selected': selected || undefined,
       className: cn(
-        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-body font-medium text-fg transition-colors outline-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
+        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-body font-medium text-fg outline-none hover:bg-white/3 group-hover/list-row:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
         styles.row,
         filled && 'bg-white/3',
-        selected && 'bg-selected text-selected-fg hover:bg-selected',
+        selected &&
+          'bg-selected text-selected-fg hover:bg-selected group-hover/list-row:bg-selected',
         dimmed && 'opacity-50',
+        muted && '*:opacity-50',
         className,
       ),
       children: (
@@ -65,6 +70,14 @@ export function ListItem({
       ),
     },
   })
+}
+
+/**
+ * Holds a `ListItem` and the buttons overlaid on it, which can't nest inside it. The row
+ * stays hovered while one of them is.
+ */
+export function ListItemRow({ children }: { children: ReactNode }) {
+  return <div className="group/list-row relative">{children}</div>
 }
 
 /** Muted trailing text for a `ListItem` (counts, sizes). */

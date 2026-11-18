@@ -228,7 +228,7 @@ function Footer({ version, repositoryUrl }: { version: string; repositoryUrl: st
 const RAIL_VARIANTS = {
   section: {
     item: 'gap-0.5 pt-2 pb-1',
-    tile: 'size-8 rounded-lg text-fg transition-[background-color] *:opacity-63 *:transition-opacity group-hover:bg-white/5 group-hover:*:opacity-100 group-aria-[current=page]:*:opacity-100 group-aria-[current=page]:bg-white/7',
+    tile: 'size-8 rounded-lg text-fg *:opacity-63 group-hover:bg-white/5 group-hover:*:opacity-100 group-aria-[current=page]:*:opacity-100 group-aria-[current=page]:bg-white/7',
     label: 'truncate px-1',
   },
   project: {
@@ -257,7 +257,7 @@ function RailItem({
     props: {
       ...(render ? {} : { type: 'button' }),
       className: cn(
-        'group flex shrink-0 flex-col items-center text-fg/63 transition-colors outline-none hover:text-fg aria-[current=page]:text-fg',
+        'group flex shrink-0 flex-col items-center text-fg/63 outline-none hover:text-fg aria-[current=page]:text-fg',
         styles.item,
       ),
       children: (

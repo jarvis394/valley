@@ -1,9 +1,15 @@
 import type { BlockType, CanvasDocument, CanvasNode } from '../core/document'
-import { createNodeId, type AssetId } from '../core/ids'
+import { createNodeId, type AssetId, type NodeId } from '../core/ids'
 import type { ContainmentRules } from '../core/operations'
 import type { Placement, PlacementMode } from '../core/placement'
 import { walk } from '../core/tree'
-import type { AnyBlockDefinition, BlockDefinition, CreateBlockContext } from './types'
+import type {
+  AnyBlockDefinition,
+  BlockDefinition,
+  CreateBlockContext,
+  SlotContext,
+  SlotSpec,
+} from './types'
 
 const TITLE_LENGTH = 64
 
@@ -35,6 +41,7 @@ export class BlockRegistry implements ContainmentRules {
   }
 
   titleOf(node: CanvasNode): string {
+    if (node.name) return node.name
     const definition = this.get(node.type) as BlockDefinition<BlockType>
     const title = definition.title?.(node.props).trim()
     if (!title) return definition.label
@@ -54,27 +61,63 @@ export class BlockRegistry implements ContainmentRules {
     const container = this.#definitions.get(parent.type)?.container
     const child = this.#definitions.get(childType)
     if (!container || !child || !child.placement.allowed.includes(mode)) return false
+    if (container.layout === 'slots') {
+      return mode === 'flow' && container.slots.some((slot) => slot.type === childType)
+    }
     if (mode === 'absolute') return !!container.allowsAbsolute
 
     return container.accepts?.(childType) ?? true
   }
 
-  createNode<T extends BlockType>(
+  /** Slots `parent`'s block declares; empty for blocks that aren't slot containers. */
+  slotsOf(parent: CanvasNode): readonly SlotSpec[] {
+    const container = this.#definitions.get(parent.type)?.container
+
+    return container?.layout === 'slots' ? container.slots : []
+  }
+
+  /** The child that fills `slot`, built from `context`. `id` pins it for migrations. */
+  createSlotNode(parent: CanvasNode, slot: SlotSpec, context: SlotContext, id?: NodeId) {
+    const definition = this.get(slot.type) as BlockDefinition<BlockType>
+    const node = this.#node(definition, slot.create(context as never))
+
+    return {
+      ...node,
+      id: id ?? node.id,
+      parentId: parent.id,
+      name: slot.label,
+      slot: slot.name,
+      hidden: slot.hidden?.(context) || undefined,
+    } as CanvasNode
+  }
+
+  /**
+   * A new block and, for slot containers, its slot children: the subtree to insert,
+   * root first.
+   */
+  createNodes<T extends BlockType>(
     type: T,
     context: CreateBlockContext,
     overrides: { placement?: Placement } = {},
-  ): CanvasNode<T> {
+  ): [CanvasNode<T>, ...CanvasNode[]] {
     const definition = this.get(type)
+    const props = definition.create(context)
 
-    return this.#node(definition, definition.create(context), overrides) as CanvasNode<T>
+    return this.#withSlots(this.#node(definition, props, overrides), context) as [
+      CanvasNode<T>,
+      ...CanvasNode[],
+    ]
   }
 
-  /** A node for the block that takes file drops, holding `assetIds`; null if none does. */
-  createNodeFromAssets(assetIds: AssetId[], context: CreateBlockContext): CanvasNode | null {
+  /** The block that takes file drops, holding `assetIds`; null if none does. */
+  createNodesFromAssets(assetIds: AssetId[], context: CreateBlockContext): CanvasNode[] | null {
     const definition = this.list().find((item) => item.fromAssets)
     if (!definition?.fromAssets) return null
 
-    return this.#node(definition, definition.fromAssets(assetIds, context))
+    return this.#withSlots(
+      this.#node(definition, definition.fromAssets(assetIds, context)),
+      context,
+    )
   }
 
   /** The project cover asset: the first cover-providing block in document order. */
@@ -101,8 +144,8 @@ export class BlockRegistry implements ContainmentRules {
     return false
   }
 
-  /** A node for the first block that can hold a cover, showing `assetId`; null if none can. */
-  createCoverNode(assetId: AssetId, context: CreateBlockContext): CanvasNode | null {
+  /** The first block that can hold a cover, showing `assetId`; null if none can. */
+  createCoverNodes(assetId: AssetId, context: CreateBlockContext): CanvasNode[] | null {
     const definition = this.list().find((item) => item.setCoverAsset) as
       | BlockDefinition<BlockType>
       | undefined
@@ -110,7 +153,7 @@ export class BlockRegistry implements ContainmentRules {
     const props = definition.create(context)
     definition.setCoverAsset(props, assetId)
 
-    return this.#node(definition, props)
+    return this.#withSlots(this.#node(definition, props), context)
   }
 
   /** Thumbnail source: the cover image, else the first image, else a video poster. */
@@ -121,6 +164,15 @@ export class BlockRegistry implements ContainmentRules {
       Object.values(doc.assets).find((a) => a.kind === 'image')
 
     return asset?.kind === 'image' ? asset.src : asset?.poster
+  }
+
+  #withSlots(root: CanvasNode, context: CreateBlockContext): [CanvasNode, ...CanvasNode[]] {
+    const children = this.slotsOf(root).map((slot) =>
+      this.createSlotNode(root, slot, { ...context, from: root.props }),
+    )
+    if (children.length > 0) root.children = children.map((child) => child.id)
+
+    return [root, ...children]
   }
 
   #node(

@@ -1,6 +1,9 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { cn } from '@valley/ui'
 
+/** Folds line breaks (and the space around them) into single spaces. */
+export const toSingleLine = (value: string) => value.replace(/\s*\n\s*/g, ' ')
+
 /**
  * Plain-text inline editing via `contentEditable="plaintext-only"`.
  * The DOM is uncontrolled while focused, so the caret never jumps. External changes
@@ -14,6 +17,8 @@ export function InlineText({
   className,
   style,
   as: Tag = 'div',
+  noLineBreaks,
+  maxLines,
 }: {
   value: string
   onChange: (value: string) => void
@@ -22,6 +27,10 @@ export function InlineText({
   className?: string
   style?: CSSProperties
   as?: 'div' | 'h1' | 'h2' | 'p' | 'span'
+  /** Enter does nothing and pasted line breaks become spaces. */
+  noLineBreaks?: boolean
+  /** Lines shown before an ellipsis, even while editing. */
+  maxLines?: number
 }) {
   const ref = useRef<HTMLElement>(null)
   // Rendered once as children (SSR-friendly); React never updates it afterwards.
@@ -33,9 +42,12 @@ export function InlineText({
     if (element && element.innerText !== value) element.innerText = value
   }, [value])
 
+  const lines = cn('whitespace-pre-wrap', maxLines && 'line-clamp-(--max-lines)')
+  const clampedStyle = maxLines ? { ...style, '--max-lines': maxLines } : style
+
   if (!editable) {
     return (
-      <Tag className={cn('whitespace-pre-wrap', className)} style={style}>
+      <Tag className={cn(lines, className)} style={clampedStyle as CSSProperties}>
         {value}
       </Tag>
     )
@@ -48,12 +60,20 @@ export function InlineText({
       suppressContentEditableWarning
       spellCheck
       data-placeholder={placeholder}
-      onInput={(event) => onChange(event.currentTarget.innerText)}
+      onKeyDown={(event) => noLineBreaks && event.key === 'Enter' && event.preventDefault()}
+      onInput={(event) => {
+        const element = event.currentTarget
+        if (noLineBreaks && element.innerText.includes('\n')) {
+          element.innerText = toSingleLine(element.innerText)
+        }
+        onChange(element.innerText)
+      }}
       className={cn(
-        'cursor-text whitespace-pre-wrap outline-none empty:before:text-current/40 empty:before:content-[attr(data-placeholder)]',
+        lines,
+        'cursor-text outline-none empty:before:text-current/40 empty:before:content-[attr(data-placeholder)]',
         className,
       )}
-      style={style}
+      style={clampedStyle as CSSProperties}
     >
       {initial}
     </Tag>

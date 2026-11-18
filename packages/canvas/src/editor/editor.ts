@@ -191,11 +191,14 @@ export function createEditor({
 
   type InsertTarget = { parentId?: NodeId; index?: number }
 
-  function insert(node: CanvasNode, target: InsertTarget): NodeId | null {
+  /** Inserts a subtree, root first, and selects its root. */
+  function insert(nodes: CanvasNode[], target: InsertTarget): NodeId | null {
+    const [node] = nodes
+    if (!node) return null
     const fallback = defaultInsertTarget()
     const parentId = target.parentId ?? fallback.parentId
     const index = target.parentId ? target.index : (target.index ?? fallback.index)
-    const ok = transact((draft) => ops.insertNode(draft, registry, node, parentId, index))
+    const ok = transact((draft) => ops.insertSubtree(draft, registry, nodes, parentId, index))
     if (!ok) return null
     select(node.id)
 
@@ -220,9 +223,9 @@ export function createEditor({
   }
 
   function insertFromAssets(assetIds: AssetId[], target: InsertTarget = {}): NodeId | null {
-    const node = registry.createNodeFromAssets(assetIds, { doc: store.getState().doc })
+    const nodes = registry.createNodesFromAssets(assetIds, { doc: store.getState().doc })
 
-    return node && insert(node, target)
+    return nodes && insert(nodes, target)
   }
 
   const commands = {
@@ -230,8 +233,14 @@ export function createEditor({
       type: T,
       target: InsertTarget & { placement?: Placement } = {},
     ): NodeId | null {
-      return insert(registry.createNode(type, { doc: store.getState().doc }, target), target)
+      return insert(registry.createNodes(type, { doc: store.getState().doc }, target), target)
     },
+    setHidden: (id: NodeId, hidden: boolean) =>
+      transact((draft) => {
+        const node = getNode(draft, id)
+        if (hidden) node.hidden = true
+        else delete node.hidden
+      }),
     /** Inserts the block that takes file drops, holding `assetIds`. */
     insertFromAssets,
     moveNode: (id: NodeId, parentId: NodeId, index?: number) =>
@@ -259,11 +268,19 @@ export function createEditor({
         mergeKey: mergeKey && `${id}:${mergeKey}`,
       })
     },
-    setOverride<K extends ThemeGroup>(id: NodeId, group: K, value: ThemeOverrides[K]) {
-      return transact((draft) => {
-        const node = getNode(draft, id)
-        node.overrides = { ...node.overrides, [group]: value }
-      })
+    setOverride<K extends ThemeGroup>(
+      id: NodeId,
+      group: K,
+      value: ThemeOverrides[K],
+      { mergeKey }: UpdateOptions = {},
+    ) {
+      return transact(
+        (draft) => {
+          const node = getNode(draft, id)
+          node.overrides = { ...node.overrides, [group]: value }
+        },
+        { mergeKey: mergeKey && `${id}:${mergeKey}` },
+      )
     },
     updateTheme: (recipe: (theme: Theme) => void, options?: UpdateOptions) =>
       transact((draft) => recipe(draft.theme), options),
@@ -273,9 +290,9 @@ export function createEditor({
     setCover: (assetId: AssetId) =>
       transact((draft) => {
         if (registry.setCoverAsset(draft, assetId)) return
-        const node = registry.createCoverNode(assetId, { doc: draft })
-        if (!node) throw new CanvasOperationError('No block can hold a cover')
-        ops.insertNode(draft, registry, node, draft.rootId, 0)
+        const nodes = registry.createCoverNodes(assetId, { doc: draft })
+        if (!nodes) throw new CanvasOperationError('No block can hold a cover')
+        ops.insertSubtree(draft, registry, nodes, draft.rootId, 0)
       }),
     addAssets,
     uploadAssets,

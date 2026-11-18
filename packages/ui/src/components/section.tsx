@@ -1,7 +1,5 @@
-import { History } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '../cn'
-import { IconButton } from './button'
 
 const BODY = {
   /** Inspector fields. */
@@ -13,7 +11,6 @@ const BODY = {
 export function Section({
   title,
   count,
-  onReset,
   action,
   body = 'form',
   children,
@@ -22,8 +19,6 @@ export function Section({
   title: string
   /** Secondary number after the title, e.g. how many items the section holds. */
   count?: number
-  /** When provided, a reset button is shown (e.g. "this overrides the project style"). */
-  onReset?: () => void
   /** Extra control at the end of the header. */
   action?: ReactNode
   body?: keyof typeof BODY
@@ -39,11 +34,6 @@ export function Section({
             <span className="ml-2 shrink-0 text-fg/32 tabular-nums">{count}</span>
           )}
         </h3>
-        {onReset && (
-          <IconButton size="sm" onClick={onReset} aria-label="Reset to project style">
-            <History className="size-4" />
-          </IconButton>
-        )}
         {action}
       </header>
       <div className={cn('flex flex-col', BODY[body])}>{children}</div>

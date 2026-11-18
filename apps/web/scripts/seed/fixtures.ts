@@ -71,7 +71,7 @@ function sampleWithCover(meta: Pick<DocumentMeta, 'title' | 'date'>, cover: Asse
       ...sampleDocument.nodes,
       [COVER]: {
         ...coverNode,
-        props: { ...coverNode.props, title: meta.title, assetId: cover.id },
+        props: { ...coverNode.props, assetId: cover.id },
       },
     },
   }

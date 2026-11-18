@@ -1,17 +1,23 @@
 import {
-  FONTS,
-  getFont,
-  hasOverride,
+  ITEM_SIZE_PRESETS,
+  MAX_ITEM_SIZE,
+  MAX_ROUNDNESS,
+  MAX_SPACING,
+  MIN_ITEM_SIZE,
   resolveThemeGroup,
-  ROUNDNESS,
+  ROUNDNESS_PRESETS,
+  SPACING_PRESETS,
   useTheme,
   type GalleryStyle,
   type Theme,
   type ThemeGroup,
-  type Typography,
 } from '@valley/canvas'
-import { Field, type Option, Section, Segmented, SelectField } from '@valley/ui'
+import { cn, Field, NumberField, Section, TilePicker } from '@valley/ui'
+import { Maximize2, SquareRoundCorner, UnfoldHorizontal } from 'lucide-react'
 import type { ReactNode } from 'react'
+
+/** Passed with edits that arrive in a stream (a scrub), so undo takes them back as one. */
+export type ChangeOptions = { mergeKey?: string }
 
 /**
  * A section editing one theme group. With `override` semantics (inside a block) it shows the
@@ -27,111 +33,142 @@ export function ThemeGroupSection<K extends ThemeGroup>({
   group: K
   title: string
   override: Partial<Theme[K]> | undefined
-  onOverrideChange: (next: Partial<Theme[K]> | undefined) => void
-  children: (value: Theme[K], set: (patch: Partial<Theme[K]>) => void) => ReactNode
+  onOverrideChange: (next: Partial<Theme[K]> | undefined, options?: ChangeOptions) => void
+  children: (
+    value: Theme[K],
+    set: (patch: Partial<Theme[K]>, options?: ChangeOptions) => void,
+  ) => ReactNode
 }) {
   const theme = useTheme()
   const value = resolveThemeGroup(theme, group, override)
 
   return (
-    <Section
-      title={title}
-      onReset={hasOverride(override) ? () => onOverrideChange(undefined) : undefined}
-    >
-      {children(value, (patch) => onOverrideChange({ ...override, ...patch }))}
+    <Section title={title}>
+      {children(value, (patch, options) => onOverrideChange({ ...override, ...patch }, options))}
     </Section>
   )
 }
 
-const fontOptions: Option<string>[] = FONTS.map((font) => ({ value: font.id, label: font.label }))
+const Tile = ({ className }: { className?: string }) => (
+  <span className={cn('min-h-0 min-w-0 rounded-[1px] bg-current/40', className)} />
+)
 
-const scaleOptions = [
-  { value: 'small', label: 'Small' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'large', label: 'Large' },
-] as const
+const TileRow = ({ grows }: { grows: string[] }) => (
+  <span className="flex flex-1 gap-0.5">
+    {grows.map((grow, index) => (
+      <Tile key={index} className={grow} />
+    ))}
+  </span>
+)
 
-export function TypographyControls({
-  value,
-  onChange,
-}: {
-  value: Typography
-  onChange: (patch: Partial<Typography>) => void
-}) {
-  return (
-    <>
-      <div className="grid grid-cols-2 gap-2">
-        <Field label="Header font">
-          <SelectField
-            value={value.headingFont}
-            options={fontOptions}
-            onChange={(headingFont) => onChange({ headingFont })}
-            renderItem={(o) => (
-              <span style={{ fontFamily: getFont(o.value).family }}>{o.label}</span>
-            )}
-          />
-        </Field>
-        <Field label="Content font">
-          <SelectField
-            value={value.bodyFont}
-            options={fontOptions}
-            onChange={(bodyFont) => onChange({ bodyFont })}
-            renderItem={(o) => (
-              <span style={{ fontFamily: getFont(o.value).family }}>{o.label}</span>
-            )}
-          />
-        </Field>
-      </div>
-      <Field label="Scaling">
-        <Segmented
-          value={value.scale}
-          options={scaleOptions}
-          onChange={(scale) => onChange({ scale })}
-        />
-      </Field>
-    </>
-  )
-}
+const TileColumn = ({ grows }: { grows: string[] }) => (
+  <span className="flex flex-1 flex-col gap-0.5">
+    {grows.map((grow, index) => (
+      <Tile key={index} className={grow} />
+    ))}
+  </span>
+)
 
 const layoutOptions = [
-  { value: 'grid', label: 'Grid' },
-  { value: 'masonry', label: 'Masonry' },
-  { value: 'horizontal', label: 'Row' },
-  { value: 'files', label: 'Files' },
+  {
+    value: 'justified',
+    label: 'Justified',
+    preview: (
+      <span className="flex size-full flex-col gap-0.5">
+        <TileRow grows={['grow-3', 'grow-2', 'grow-4']} />
+        <TileRow grows={['grow-2', 'grow-4', 'grow-2']} />
+      </span>
+    ),
+  },
+  {
+    value: 'grid',
+    label: 'Grid',
+    preview: (
+      <span className="grid size-full grid-cols-3 grid-rows-2 gap-0.5">
+        {['a', 'b', 'c', 'd', 'e', 'f'].map((key) => (
+          <Tile key={key} />
+        ))}
+      </span>
+    ),
+  },
+  {
+    value: 'masonry',
+    label: 'Masonry',
+    preview: (
+      <span className="flex size-full gap-0.5">
+        <TileColumn grows={['grow-3', 'grow-2']} />
+        <TileColumn grows={['grow-2', 'grow-3', 'grow-2']} />
+        <TileColumn grows={['grow-2', 'grow-3']} />
+      </span>
+    ),
+  },
+  {
+    value: 'horizontal',
+    label: 'Row',
+    preview: (
+      <span className="flex size-full items-center gap-0.5 overflow-hidden">
+        <Tile className="h-full w-1/3 shrink-0" />
+        <Tile className="h-full w-1/4 shrink-0" />
+        <Tile className="h-full w-1/3 shrink-0" />
+      </span>
+    ),
+  },
 ] as const
-
-const roundnessOptions = ROUNDNESS.map((r) => ({ value: r, label: r === 0 ? 'None' : `${r}px` }))
 
 export function GalleryControls({
   value,
   onChange,
 }: {
   value: GalleryStyle
-  onChange: (patch: Partial<GalleryStyle>) => void
+  onChange: (patch: Partial<GalleryStyle>, options?: ChangeOptions) => void
 }) {
   return (
     <>
       <Field label="Grid">
-        <Segmented
+        <TilePicker
           value={value.layout}
           options={layoutOptions}
+          columns={2}
+          size="sm"
           onChange={(layout) => onChange({ layout })}
         />
       </Field>
-      <Field label="Spacing">
-        <Segmented
-          value={value.spacing}
-          options={scaleOptions}
-          onChange={(spacing) => onChange({ spacing })}
+      <Field label="Item size">
+        <NumberField
+          label="Item size"
+          icon={<Maximize2 />}
+          value={value.size}
+          min={MIN_ITEM_SIZE}
+          max={MAX_ITEM_SIZE}
+          step={4}
+          presets={ITEM_SIZE_PRESETS}
+          onChange={(size) => onChange({ size }, { mergeKey: 'gallery.size' })}
         />
       </Field>
-      <Field label="Roundness">
-        <Segmented
-          value={value.roundness}
-          options={roundnessOptions}
-          onChange={(roundness) => onChange({ roundness })}
-        />
-      </Field>
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Spacing">
+          <NumberField
+            label="Spacing"
+            icon={<UnfoldHorizontal />}
+            value={value.spacing}
+            min={0}
+            max={MAX_SPACING}
+            presets={SPACING_PRESETS}
+            onChange={(spacing) => onChange({ spacing }, { mergeKey: 'gallery.spacing' })}
+          />
+        </Field>
+        <Field label="Roundness">
+          <NumberField
+            label="Roundness"
+            icon={<SquareRoundCorner />}
+            value={value.roundness}
+            min={0}
+            max={MAX_ROUNDNESS}
+            presets={ROUNDNESS_PRESETS}
+            onChange={(roundness) => onChange({ roundness }, { mergeKey: 'gallery.roundness' })}
+          />
+        </Field>
+      </div>
     </>
   )
 }

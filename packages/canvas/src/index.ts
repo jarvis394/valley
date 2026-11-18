@@ -16,6 +16,7 @@ export * from './registry/types'
 export { BlockRegistry } from './registry/registry'
 export { parseDocument } from './registry/parse'
 export * from './blocks'
+export { TextStyleFields, TextRoleMenu, ROLE_LABELS } from './blocks/shared/text-style-controls'
 
 // Block surfaces: read-only and editable
 export * from './render/context'

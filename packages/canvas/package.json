@@ -12,6 +12,7 @@
   "dependencies": {
     "@dnd-kit/dom": "^0.5.1",
     "@dnd-kit/react": "^0.5.1",
+    "@egjs/react-grid": "1.19.1",
     "@valley/ui": "workspace:*",
     "immer": "^11.2.9",
     "lucide-react": "^1.61.0",

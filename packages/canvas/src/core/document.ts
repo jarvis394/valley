@@ -22,6 +22,11 @@ export interface NodeBase {
   placement: Placement
   /** Version of the `props` schema the node was written with. Migrations read it. */
   v: number
+  /** Layer name shown in the outline in place of the block's own title. */
+  name?: string
+  /** Which of its parent's named slots this node fills; only children of slot containers have one. */
+  slot?: string
+  /** Not drawn in previews or the published page; the editor keeps it reachable from the outline. */
   hidden?: boolean
   locked?: boolean
   /** Theme groups this node deviates on. Only groups in its definition's `themeGroups` apply. */
@@ -80,6 +85,7 @@ export const rawNodeSchema = z.object({
   v: z.number().int().nonnegative(),
   props: z.unknown(),
   name: z.string().optional(),
+  slot: z.string().optional(),
   hidden: z.boolean().optional(),
   locked: z.boolean().optional(),
   overrides: themeOverridesSchema.optional(),

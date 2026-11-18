@@ -1,17 +1,17 @@
-import type { ComponentProps, CSSProperties, ReactElement } from 'react'
+import type { ComponentProps } from 'react'
 import { z } from 'zod'
 import type { Asset } from '../../core/document'
 import { summarizeAssets } from '../../core/assets'
 import { formatBytes, middleTruncate } from '../../core/format'
 import { assetIdSchema } from '../../core/ids'
 import { FLOW } from '../../core/placement'
-import { SPACING_PX, type GalleryStyle } from '../../core/theme'
 import { useAssets, useCoverAssetId } from '../../render/context'
 import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { Media, UploadButton } from '../shared/media'
-import { typographyStyle, useResolvedTheme } from '../shared/theme'
+import { textStyleCss, typographyStyle, useResolvedTheme } from '../shared/theme'
 import { FileMenu } from './file-menu'
+import { GalleryLayout } from './layouts'
 import {
   cn,
   Field,
@@ -36,36 +36,6 @@ declare module '../../core/document' {
   interface BlockPropsMap {
     collection: CollectionProps
   }
-}
-
-/** Image layouts, keyed by `GalleryStyle['layout']`. To add a layout, add an entry. */
-const LAYOUTS: Record<
-  Exclude<GalleryStyle['layout'], 'files'>,
-  {
-    container: (gap: number) => CSSProperties
-    containerClass: string
-    item: (asset: Asset) => CSSProperties
-    itemClass: string
-  }
-> = {
-  grid: {
-    containerClass: 'grid grid-cols-2 @lg:grid-cols-4 @4xl:grid-cols-8',
-    container: (gap) => ({ gap }),
-    itemClass: 'aspect-square',
-    item: () => ({}),
-  },
-  masonry: {
-    containerClass: 'columns-2 @lg:columns-3 @4xl:columns-4',
-    container: (gap) => ({ columnGap: gap }),
-    itemClass: 'break-inside-avoid',
-    item: (asset) => ({ aspectRatio: `${asset.width} / ${asset.height}` }),
-  },
-  horizontal: {
-    containerClass: 'flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain',
-    container: (gap) => ({ gap, scrollbarWidth: 'none' }),
-    itemClass: 'h-64 shrink-0 snap-start sm:h-80',
-    item: (asset) => ({ aspectRatio: `${asset.width} / ${asset.height}` }),
-  },
 }
 
 function CoverBadge({ className }: { className?: string }) {
@@ -115,70 +85,29 @@ function FileCard({
 function CollectionRender({ node, props, update, mode }: BlockRenderProps<'collection'>) {
   const assets = useAssets()
   const { gallery, typography } = useResolvedTheme(node.overrides)
-  // The editor flags the project cover inside collections; viewers don't see the badge.
-  const projectCover = useCoverAssetId()
-  const coverAssetId = mode === 'edit' ? projectCover : null
-  const gap = SPACING_PX[gallery.spacing]
+  const coverAssetId = useCoverAssetId()
   const items = props.assetIds.map((id) => assets[id]).filter((a): a is Asset => !!a)
 
-  const withMenu = (asset: Asset, element: ReactElement) =>
+  // The editor shows files to manage; the preview and published page show the real layout.
+  const renderItems = () =>
     mode === 'edit' ? (
-      <FileMenu
-        key={asset.id}
-        asset={asset}
-        isCover={asset.id === projectCover}
-        onRemove={() =>
-          update((d) => void (d.assetIds = d.assetIds.filter((id) => id !== asset.id)))
-        }
-      >
-        {element}
-      </FileMenu>
-    ) : (
-      element
-    )
-
-  const renderItems = () => {
-    if (gallery.layout === 'files') {
-      return (
-        <div className="grid grid-cols-2 gap-2 @lg:grid-cols-4 @4xl:grid-cols-8">
-          {items.map((asset) =>
-            withMenu(
-              asset,
-              <FileCard key={asset.id} asset={asset} isCover={asset.id === coverAssetId} />,
-            ),
-          )}
-        </div>
-      )
-    }
-    const layout = LAYOUTS[gallery.layout]
-
-    return (
-      <div className={layout.containerClass} style={layout.container(gap)}>
-        {items.map((asset) =>
-          withMenu(
-            asset,
-            <figure
-              key={asset.id}
-              className={cn('group relative overflow-hidden', layout.itemClass)}
-              style={{
-                ...layout.item(asset),
-                borderRadius: gallery.roundness,
-                marginBottom: gallery.layout === 'masonry' ? gap : undefined,
-              }}
-            >
-              <Media asset={asset} className="size-full" />
-              {mode === 'edit' && (
-                <figcaption className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/70 px-2 pt-6 pb-1.5 text-caption text-white opacity-0 transition-opacity group-hover:opacity-100">
-                  {asset.name}
-                </figcaption>
-              )}
-              {asset.id === coverAssetId && <CoverBadge className="top-0.5 right-0.5" />}
-            </figure>,
-          ),
-        )}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(--spacing(28),1fr))] gap-2">
+        {items.map((asset) => (
+          <FileMenu
+            key={asset.id}
+            asset={asset}
+            isCover={asset.id === coverAssetId}
+            onRemove={() =>
+              update((d) => void (d.assetIds = d.assetIds.filter((id) => id !== asset.id)))
+            }
+          >
+            <FileCard asset={asset} isCover={asset.id === coverAssetId} />
+          </FileMenu>
+        ))}
       </div>
+    ) : (
+      <GalleryLayout items={items} style={gallery} />
     )
-  }
 
   return (
     <div className="@container px-4 py-2" style={typographyStyle(typography)}>
@@ -191,11 +120,8 @@ function CollectionRender({ node, props, update, mode }: BlockRenderProps<'colle
           onChange={(title) =>
             update((d) => void (d.title = title), { mergeKey: 'collection.title' })
           }
-          className="mb-4 font-semibold"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: 'calc(var(--type-scale) * 1.5rem)',
-          }}
+          className="mb-4"
+          style={textStyleCss(typography.heading)}
         />
       )}
       {items.length === 0 ? (

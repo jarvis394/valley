@@ -15,22 +15,23 @@ import {
 } from '@valley/canvas'
 import {
   Badge,
+  cn,
   Dropzone,
   FileInput,
   IconButton,
   ListItem,
   ListItemMeta,
+  ListItemRow,
   Menu,
   PlusIcon,
   ScrollArea,
 } from '@valley/ui'
-import { Upload } from 'lucide-react'
-import { useRef, type ReactElement } from 'react'
+import { ChevronDown, Eye, EyeOff, Upload } from 'lucide-react'
+import { useRef, useState, type ReactElement } from 'react'
 
 /**
- * Left-hand block list, a second view of the same tree with its own DnD context. It shows
- * only the root level. The drag-end handler already moves nodes across sortable groups,
- * so nesting needs one group per container.
+ * Left-hand block list, a second view of the same tree with its own DnD context. Page blocks
+ * are sortable; the slot children of a slot container are listed, indented, under it.
  */
 export function Outline({ onNavigate }: { onNavigate?: () => void }) {
   const editor = useEditor()
@@ -66,6 +67,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
                 count={flowIds.length}
                 parentId={rootId}
                 onClick={() => navigate(id)}
+                onNavigate={navigate}
               />
             ))}
           </div>
@@ -74,7 +76,7 @@ export function Outline({ onNavigate }: { onNavigate?: () => void }) {
           <>
             <div className="px-3 pt-2 text-small text-fg/32">Floating</div>
             {absoluteIds.map((id) => (
-              <OutlineItem key={id} id={id} onClick={() => navigate(id)} />
+              <OutlineItem key={id} id={id} onClick={() => navigate(id)} onNavigate={navigate} />
             ))}
           </>
         )}
@@ -90,61 +92,140 @@ function SortableOutlineItem({
   count,
   parentId,
   onClick,
+  onNavigate,
 }: {
   id: NodeId
   index: number
   count: number
   parentId: NodeId
   onClick: () => void
+  onNavigate: (id: NodeId) => void
 }) {
   const dropEdge = useDropEdge(parentId, index, count)
   const { ref, isDragSource } = useFlowDraggable(id)
 
   return (
     <div className="relative" {...dropItemProps}>
-      <OutlineItem ref={ref} id={id} onClick={onClick} dimmed={isDragSource} />
+      <OutlineItem
+        ref={ref}
+        id={id}
+        onClick={onClick}
+        onNavigate={onNavigate}
+        dimmed={isDragSource}
+      />
       <DropLine edge={dropEdge} inset={8} gap={4} />
     </div>
   )
 }
 
+/** A row, its visibility toggle, and the slot children of a slot container below it. */
 function OutlineItem({
   id,
   onClick,
+  onNavigate,
   dimmed,
+  depth = 0,
   ref,
 }: {
   id: NodeId
   onClick: () => void
+  onNavigate?: (id: NodeId) => void
   dimmed?: boolean
+  depth?: number
   ref?: (element: Element | null) => void
 }) {
   const editor = useEditor()
   const node = useNode(id)
   const selected = useEditorState((state) => state.selectedId === id)
+  const [expanded, setExpanded] = useState(true)
   if (!node) return null
   const definition = editor.registry.get(node.type)
   const Icon = definition.icon
   const described = definition.describe?.(node as never)
   const MetaIcon = described?.metaIcon
+  const slotIds = editor.registry.slotsOf(node).length > 0 ? (node.children ?? []) : []
+  const title = editor.registry.titleOf(node)
 
   return (
-    <ListItem
-      ref={ref}
-      onClick={onClick}
-      selected={selected}
-      dimmed={dimmed}
-      icon={<Icon className="size-4" />}
-      label={editor.registry.titleOf(node)}
-      end={
-        described?.meta && (
-          <ListItemMeta>
-            {described.meta}
-            {MetaIcon && <MetaIcon className="size-3.5" />}
-          </ListItemMeta>
-        )
-      }
-    />
+    <>
+      <ListItemRow>
+        <ListItem
+          ref={ref}
+          onClick={onClick}
+          selected={selected}
+          dimmed={dimmed}
+          muted={node.hidden}
+          icon={
+            <Icon
+              className={cn(
+                'size-4',
+                slotIds.length > 0 &&
+                  'group-hover/list-row:invisible group-has-focus-visible/list-row:invisible',
+              )}
+            />
+          }
+          label={title}
+          className={cn(
+            node.hidden
+              ? 'pr-10'
+              : 'group-hover/list-row:pr-10 group-has-focus-visible/list-row:pr-10',
+            depth > 0 && 'pl-9',
+          )}
+          end={
+            !node.hidden &&
+            described?.meta && (
+              <ListItemMeta className="group-hover/list-row:hidden group-has-focus-visible/list-row:hidden">
+                {described.meta}
+                {MetaIcon && <MetaIcon className="size-3.5" />}
+              </ListItemMeta>
+            )
+          }
+        />
+        {slotIds.length > 0 && (
+          <span
+            className={cn(
+              'absolute top-1/2 flex -translate-y-1/2 opacity-0 group-hover/list-row:opacity-100 group-has-focus-visible/list-row:opacity-100',
+              depth > 0 ? 'left-7.5' : 'left-1.5',
+            )}
+          >
+            <IconButton
+              size="sm"
+              aria-label={`${expanded ? 'Collapse' : 'Expand'} ${title}`}
+              aria-expanded={expanded}
+              onClick={() => setExpanded(!expanded)}
+            >
+              <ChevronDown className={cn('size-4', !expanded && '-rotate-90')} />
+            </IconButton>
+          </span>
+        )}
+        <span
+          className={cn(
+            'absolute top-1/2 right-1.5 flex -translate-y-1/2',
+            !node.hidden &&
+              'opacity-0 group-hover/list-row:opacity-100 group-has-focus-visible/list-row:opacity-100',
+          )}
+        >
+          <IconButton
+            size="sm"
+            aria-label={`${node.hidden ? 'Show' : 'Hide'} ${title}`}
+            aria-pressed={!!node.hidden}
+            onClick={() => editor.commands.setHidden(id, !node.hidden)}
+          >
+            {node.hidden ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </IconButton>
+        </span>
+      </ListItemRow>
+      {expanded &&
+        slotIds.map((slotId) => (
+          <OutlineItem
+            key={slotId}
+            id={slotId}
+            depth={depth + 1}
+            onClick={() => onNavigate?.(slotId)}
+            onNavigate={onNavigate}
+          />
+        ))}
+    </>
   )
 }
 

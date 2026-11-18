@@ -1,5 +1,6 @@
-import type { CanvasDocument } from '@valley/canvas'
+import { parseDocument, type CanvasDocument } from '@valley/canvas'
 import { joinUrl } from '@valley/storage'
+import { getRegistry } from './registry'
 
 /**
  * Stored documents point at media with `store:<key>` instead of a URL, because the same
@@ -38,9 +39,12 @@ function mapSources(doc: CanvasDocument, map: (src: string) => string): CanvasDo
   return { ...doc, assets, meta: { ...doc.meta, authorAvatar } } as CanvasDocument
 }
 
-/** Turns stored references into URLs a surface can load. */
-export const resolveDocument = (doc: CanvasDocument, urlFor: UrlFor) =>
-  mapSources(doc, (src) => resolveRef(src, urlFor) ?? src)
+/**
+ * Turns stored references into URLs a surface can load. It parses first, so documents saved
+ * under an older schema reach every surface migrated.
+ */
+export const resolveDocument = (doc: unknown, urlFor: UrlFor) =>
+  mapSources(parseDocument(doc, getRegistry()).doc, (src) => resolveRef(src, urlFor) ?? src)
 
 /** Turns URLs under `base` back into stored references. Other URLs are kept as they are. */
 export function referenceDocument(doc: CanvasDocument, base: string) {

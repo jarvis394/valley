@@ -1,8 +1,7 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react'
 import type { RenderMode } from '../../registry/types'
+import type { TextAlign } from '../shared/text-align'
 import { cn } from '@valley/ui'
-
-export type TextAlign = 'left' | 'center' | 'right'
 
 export interface CoverLayoutProps {
   media: ReactNode
@@ -19,7 +18,7 @@ export interface CoverVariant {
   /** Tiny schematic shown in the variant picker. */
   preview: ReactNode
   Layout: ComponentType<CoverLayoutProps>
-  /** Replaces the default title look for this variant. */
+  /** Wraps the title slot (color, font variations); the title's own typography stays its own. */
   title?: { className: string; style: CSSProperties }
 }
 
@@ -27,7 +26,7 @@ export interface CoverVariant {
 const TextStack = ({ text, meta }: Pick<CoverLayoutProps, 'text' | 'meta'>) => (
   <>
     {text}
-    {meta && <div className="mt-8">{meta}</div>}
+    {meta && <div className="mt-8 w-full shrink-0">{meta}</div>}
   </>
 )
 
@@ -80,16 +79,16 @@ export const COVER_VARIANTS = {
       // Out of flow so a tall image can't grow the grid row past the cover's height.
       const mediaFill = <div className="absolute inset-0">{media}</div>
       const textColumn = (
-        <div className={cn('flex flex-col justify-between gap-6 p-6', alignItems[align])}>
-          <div className="h-7 max-sm:hidden" />
-          <div className={cn('flex w-full flex-col', alignItems[align])}>{text}</div>
-          <div className="h-7">{meta}</div>
+        <div className={cn('flex min-h-0 flex-col justify-between gap-6 p-4', alignItems[align])}>
+          <div className="h-7 shrink-0 max-sm:hidden" />
+          <div className={cn('flex min-h-0 w-full flex-col', alignItems[align])}>{text}</div>
+          <div className="min-h-7 w-full shrink-0">{meta}</div>
         </div>
       )
 
       return mode === 'edit' ? (
         <div className="p-2">
-          <div className="mx-auto grid max-w-200 overflow-hidden rounded-2xl bg-black text-white sm:aspect-video sm:grid-cols-2">
+          <div className="mx-auto grid max-w-200 overflow-hidden rounded-2xl bg-black text-white sm:aspect-video sm:grid-cols-2 sm:grid-rows-1">
             <div className="relative aspect-[4/5] sm:aspect-auto">{mediaFill}</div>
             {textColumn}
           </div>
@@ -102,11 +101,8 @@ export const COVER_VARIANTS = {
       )
     },
     title: {
-      className: 'max-w-[10ch] leading-[normal] font-extrabold text-[#dcffd2]',
-      style: {
-        fontSize: 'calc(var(--type-scale) * 2rem)',
-        fontVariationSettings: '"wdth" 115, "ROND" 100',
-      },
+      className: 'text-[#dcffd2]',
+      style: { fontVariationSettings: '"wdth" 115, "ROND" 100' },
     },
   },
   left: {

@@ -27,7 +27,11 @@ export default defineConfig(({ command, mode }) => {
     // Builds bundle every dependency: the output ships without node_modules, and CommonJS requires
     // such as use-sync-external-store's `react` would stay unresolved. Dev can't run inlined
     // CommonJS, so it keeps them external. Nitro ships sharp's native binary as a traced dependency.
-    ssr: command === 'build' ? { noExternal: true, external: ['sharp'] } : undefined,
+    // egjs ships CommonJS as `main`, which dev SSR can't import by name; transform its ESM build.
+    ssr:
+      command === 'build'
+        ? { noExternal: true, external: ['sharp'] }
+        : { noExternal: [/^@egjs\//, /^@cfcs\//] },
     plugins: [
       tailwindcss(),
       tanstackStart({

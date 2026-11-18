@@ -1,22 +1,27 @@
 import { Input } from '@base-ui/react/input'
 import { Select } from '@base-ui/react/select'
-import { Slider } from '@base-ui/react/slider'
 import { Switch as BaseSwitch } from '@base-ui/react/switch'
 import { Check } from 'lucide-react'
-import type { ComponentProps, ReactNode } from 'react'
+import { useState, type ComponentProps, type ReactNode } from 'react'
 import { cn } from '../cn'
 import { ChevronDownIcon } from '../icons'
 import type { Option } from './segmented'
 
-const controlClass =
-  'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-small text-fg focus-within:ring-2 focus-within:ring-accent/60'
+/** Inset rings, so a field's edge never shifts layout or spills past a clipping parent. */
+export const controlStates =
+  'inset-ring inset-ring-transparent hover:not-focus-within:inset-ring-white/7 focus-within:inset-ring-accent'
+
+const controlClass = cn(
+  'flex min-h-10 w-full min-w-0 items-center rounded-xl bg-control text-small text-fg',
+  controlStates,
+)
 
 const inputClass = 'min-w-0 flex-1 px-3 py-2.5 outline-none placeholder:text-fg/32'
 
 /** A control that opens something on press (select, picker). */
 const triggerClass = cn(
   controlClass,
-  'p-1 text-left outline-none hover:bg-control-hover focus-visible:ring-2 data-popup-open:bg-control-hover',
+  'p-1 text-left outline-none data-popup-open:inset-ring-accent',
 )
 
 /** 32px slot for a 16px icon inside a control. */
@@ -157,56 +162,68 @@ export function FieldButton({
   )
 }
 
+const HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i
+
+/** `#rrggbb` from a typed hex (with or without `#`, 3 or 6 digits), or null when it isn't one. */
+const parseHex = (input: string) => {
+  const digits = HEX.exec(input.trim())?.[1]
+  if (!digits) return null
+
+  const full = digits.length === 3 ? [...digits].map((d) => d + d).join('') : digits
+
+  return `#${full.toLowerCase()}`
+}
+
+/** A swatch that opens the system color picker, beside the color's hex code. */
 export function ColorField({
   value,
   onChange,
+  label,
+  end,
 }: {
+  /** `#rrggbb`. */
   value: string
   onChange: (value: string) => void
+  label: string
+  /** Trailing controls (icon buttons). */
+  end?: ReactNode
 }) {
-  return (
-    <input
-      type="color"
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className={cn(controlClass, 'cursor-pointer p-1 outline-none hover:bg-control-hover')}
-    />
-  )
-}
+  const [draft, setDraft] = useState<string | null>(null)
 
-export function SliderField({
-  value,
-  onChange,
-  min,
-  max,
-  step = 1,
-  format = String,
-}: {
-  value: number
-  onChange: (value: number) => void
-  min: number
-  max: number
-  step?: number
-  format?: (value: number) => string
-}) {
+  const commit = () => {
+    const next = draft === null ? null : parseHex(draft)
+    if (next && next !== value) onChange(next)
+    setDraft(null)
+  }
+
   return (
-    <div className="flex items-center gap-3 px-2">
-      <Slider.Root
-        value={value}
-        min={min}
-        max={max}
-        step={step}
-        onValueChange={(next) => onChange(next as number)}
-        className="flex-1"
-      >
-        <Slider.Control className="flex touch-none items-center py-3 select-none">
-          <Slider.Track className="h-1 w-full rounded-full bg-white/7">
-            <Slider.Indicator className="rounded-full bg-accent" />
-            <Slider.Thumb className="size-4 rounded-full bg-fg shadow-[0_0_0_1px_rgba(0,0,0,0.5)] has-focus-visible:outline-2 has-focus-visible:outline-accent" />
-          </Slider.Track>
-        </Slider.Control>
-      </Slider.Root>
-      <span className="w-12 text-right text-small text-fg/63 tabular-nums">{format(value)}</span>
+    <div className={cn(controlClass, 'pl-1', end && 'pr-1')}>
+      <span className="relative flex size-8 shrink-0 items-center justify-center">
+        <span
+          className="size-5 rounded-md inset-ring inset-ring-white/12"
+          style={{ backgroundColor: value }}
+        />
+        <input
+          type="color"
+          aria-label={label}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </span>
+      <Input
+        aria-label={`${label} hex`}
+        value={draft ?? value.slice(1).toUpperCase()}
+        onValueChange={setDraft}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') commit()
+          if (event.key === 'Escape') setDraft(null)
+        }}
+        spellCheck={false}
+        className="min-w-0 flex-1 bg-transparent py-2.5 pr-3 pl-1 uppercase outline-none"
+      />
+      {end}
     </div>
   )
 }
@@ -225,9 +242,9 @@ export function Switch({
       checked={checked}
       onCheckedChange={onChange}
       aria-label={ariaLabel}
-      className="flex h-6 w-10 shrink-0 items-center rounded-full border border-white/12 bg-[#212122] px-1 transition-[background-color,border-color] duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-accent/60 data-checked:border-transparent data-checked:bg-accent"
+      className="flex h-6 w-10 shrink-0 items-center rounded-full border border-white/12 bg-[#212122] px-1 outline-none focus-visible:ring-2 focus-visible:ring-accent/60 data-checked:border-transparent data-checked:bg-accent"
     >
-      <BaseSwitch.Thumb className="-ml-px size-4 rounded-full bg-fg shadow-[0_0_0_1px_rgba(0,0,0,0.5)] transition-[translate,background-color] duration-200 ease-out data-checked:translate-x-4 data-checked:bg-[#0f1c2e] data-checked:shadow-none" />
+      <BaseSwitch.Thumb className="-ml-px size-4 rounded-full bg-fg shadow-[0_0_0_1px_rgba(0,0,0,0.5)] data-checked:translate-x-4 data-checked:bg-[#0f1c2e] data-checked:shadow-none" />
     </BaseSwitch.Root>
   )
 }
