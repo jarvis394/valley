@@ -22,7 +22,7 @@ function Home() {
   const home = Route.useLoaderData()
 
   return home.kind === 'gallery' ? (
-    <GalleryView doc={home.gallery.doc} />
+    <GalleryView doc={home.gallery.doc} appBar={false} />
   ) : (
     <Portfolio {...home.portfolio} />
   )

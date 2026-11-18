@@ -4,9 +4,14 @@ import type { CanvasDocument } from '../core/document'
 import type { BlockRegistry } from '../registry/registry'
 import { RenderProvider, type DocumentState } from './context'
 import { DocumentView } from './document-view'
+import type { LightboxProps } from './lightbox'
 
 /** Read-only rendering of a document with the same block renderers (published page). */
-export function CanvasViewer({ doc, registry }: { doc: CanvasDocument; registry: BlockRegistry }) {
+export function CanvasViewer({
+  doc,
+  registry,
+  ...lightbox
+}: LightboxProps & { doc: CanvasDocument; registry: BlockRegistry }) {
   const [context] = useState(() => ({
     store: createStore<DocumentState>(() => ({ doc })),
     registry,
@@ -16,7 +21,7 @@ export function CanvasViewer({ doc, registry }: { doc: CanvasDocument; registry:
 
   return (
     <RenderProvider value={context}>
-      <DocumentView />
+      <DocumentView {...lightbox} />
     </RenderProvider>
   )
 }

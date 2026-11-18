@@ -3,10 +3,15 @@ import { z } from 'zod'
 import type { Asset } from '../../core/document'
 import { summarizeAssets } from '../../core/assets'
 import { formatBytes, middleTruncate } from '../../core/format'
-import { assetIdSchema } from '../../core/ids'
+import { assetIdSchema, type AssetId } from '../../core/ids'
 import { FLOW } from '../../core/placement'
 import { useAssets, useCoverAssetId } from '../../render/context'
-import { defineBlock, type BlockInspectorProps, type BlockRenderProps } from '../../registry/types'
+import {
+  defineBlock,
+  type BlockInspectorProps,
+  type BlockRenderProps,
+  type UpdateProps,
+} from '../../registry/types'
 import { InlineText } from '../shared/inline-text'
 import { Media, UploadButton } from '../shared/media'
 import { textStyleCss, typographyStyle, useResolvedTheme } from '../shared/theme'
@@ -155,7 +160,14 @@ function CollectionInspector({ props, update }: BlockInspectorProps<'collection'
   )
 }
 
-function CollectionFiles({ props, update }: BlockInspectorProps<'collection'>) {
+/** Inspector footer for any block that holds a list of files. */
+export function FilesSection({
+  props,
+  update,
+}: {
+  props: { assetIds: AssetId[] }
+  update: UpdateProps<{ assetIds: AssetId[] }>
+}) {
   const assets = useAssets()
   const files = summarizeAssets(props.assetIds.flatMap((id) => assets[id] ?? []))
 
@@ -196,11 +208,12 @@ export const collectionBlock = defineBlock({
       .map((a) => a.id),
   }),
   fromAssets: (assetIds) => ({ title: 'Collection', showTitle: false, assetIds }),
+  lightboxAssets: (props) => props.assetIds,
   placement: { allowed: ['flow'], initial: () => FLOW },
   themeGroups: ['gallery'],
   Render: CollectionRender,
   Inspector: CollectionInspector,
-  InspectorFooter: CollectionFiles,
+  InspectorFooter: FilesSection,
   title: (props) => props.title,
   describe: (node) => ({ meta: String(node.props.assetIds.length), metaIcon: FileIcon }),
 })

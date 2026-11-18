@@ -113,6 +113,7 @@
         "immer": "^11.2.9",
         "lucide-react": "^1.61.0",
         "nanoid": "^6.0.2",
+        "photoswipe": "5.4.4",
         "zod": "^4.6.7",
         "zustand": "^5.0.16",
       },
@@ -888,6 +889,8 @@
     "oxlint-plugin-valley": ["oxlint-plugin-valley@workspace:oxlint-plugin-valley"],
 
     "pathe": ["pathe@2.0.3", "", {}, "sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w=="],
+
+    "photoswipe": ["photoswipe@5.4.4", "", {}, "sha512-WNFHoKrkZNnvFFhbHL93WDkW3ifwVOXSW3w1UuZZelSmgXpIGiZSNlZJq37rR8YejqME2rHs9EhH9ZvlvFH2NA=="],
 
     "picocolors": ["picocolors@1.1.1", "", {}, "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="],
 

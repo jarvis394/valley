@@ -48,7 +48,9 @@ export function ProjectActions() {
   const editor = useEditor()
   const { copied, copy } = useCopyText()
 
-  const share = () => copy(`${editor.galleryUrl}/${editor.getState().settings.slug ?? ''}`)
+  const galleryPage = () => `${editor.galleryUrl}/${editor.getState().settings.slug ?? ''}`
+  const share = () => copy(galleryPage())
+  const visit = () => window.open(galleryPage(), '_blank', 'noopener')
 
   return (
     <>
@@ -61,7 +63,7 @@ export function ProjectActions() {
       <Button variant="outline" icon={<ShareIcon />} onClick={share}>
         {copied ? 'Copied' : 'Share'}
       </Button>
-      <Button variant="primary" icon={<ExternalIcon />} onClick={() => editor.setMode('preview')}>
+      <Button variant="primary" icon={<ExternalIcon />} onClick={visit}>
         Visit
       </Button>
     </>

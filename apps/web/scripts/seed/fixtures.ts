@@ -10,6 +10,7 @@ import {
 } from '@valley/canvas'
 import type { Account } from '../../src/data/types'
 import { sampleDocument, sampleSettings } from './sample-document'
+import { tripDocument } from './trips'
 
 export interface ProjectRecord {
   id: string
@@ -84,6 +85,20 @@ const publicAt = (slug: string): ProjectSettings => ({
 })
 
 export const projects: ProjectRecord[] = [
+  {
+    id: 'munich',
+    doc: tripDocument('munich', { title: 'Munich', date: '2026-08-01' }, 'islands'),
+    settings: publicAt('01-08-2026-munich'),
+    views: 0,
+    newFavorites: 0,
+  },
+  {
+    id: 'stockholm',
+    doc: tripDocument('stockholm', { title: 'Stockholm', date: '2026-05-02' }, 'justified'),
+    settings: publicAt('02-05-2026-stockholm'),
+    views: 0,
+    newFavorites: 0,
+  },
   {
     id: 'abc-band-shoot',
     doc: sampleWithCover(

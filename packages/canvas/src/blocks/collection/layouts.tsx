@@ -2,7 +2,7 @@ import { JustifiedGrid, MasonryGrid } from '@egjs/react-grid'
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import type { Asset } from '../../core/document'
 import type { GalleryStyle } from '../../core/theme'
-import { Media } from '../shared/media'
+import { Photo } from '../shared/photo'
 import { cn } from '@valley/ui'
 
 const ratio = (asset: Asset) => `${asset.width} / ${asset.height}`
@@ -18,14 +18,7 @@ function Item({
   className?: string
   style?: CSSProperties
 }) {
-  return (
-    <figure
-      className={cn('overflow-hidden bg-white/3', className)}
-      style={{ borderRadius: roundness, ...style }}
-    >
-      <Media asset={asset} className="size-full" />
-    </figure>
-  )
+  return <Photo asset={asset} className={className} style={{ borderRadius: roundness, ...style }} />
 }
 
 /**

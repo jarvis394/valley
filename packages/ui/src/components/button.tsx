@@ -72,6 +72,8 @@ const ICON_VARIANTS = {
     'border-[0.5px] border-white/7 text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
+  /** Sits on photos: a dark blurred fill keeps the icon legible over any image. */
+  overlay: 'bg-black/32 text-fg backdrop-blur-md hover:bg-black/48',
   /** Tertiary action that stays out of the way until hovered (block toolbar). */
   dimmed:
     'text-fg *:opacity-32 hover:bg-white/7 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',

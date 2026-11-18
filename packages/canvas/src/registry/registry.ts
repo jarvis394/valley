@@ -131,6 +131,23 @@ export class BlockRegistry implements ContainmentRules {
     return null
   }
 
+  /** Every photo the lightbox pages through: visible blocks in document order, each once. */
+  lightboxAssets(doc: CanvasDocument): AssetId[] {
+    const ids = new Set<AssetId>()
+
+    const visit = (id: NodeId) => {
+      const node = doc.nodes[id]
+      if (!node || node.hidden) return
+      const definition = this.#definitions.get(node.type) as BlockDefinition<BlockType> | undefined
+      for (const assetId of definition?.lightboxAssets?.(node.props) ?? []) ids.add(assetId)
+      for (const childId of node.children ?? []) visit(childId)
+    }
+
+    visit(doc.rootId)
+
+    return [...ids]
+  }
+
   /** Points the first cover-holding block at `assetId`. False when the document has none. */
   setCoverAsset(doc: CanvasDocument, assetId: AssetId): boolean {
     for (const node of walk(doc, doc.rootId)) {

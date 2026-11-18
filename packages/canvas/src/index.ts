@@ -21,6 +21,7 @@ export { TextStyleFields, TextRoleMenu, ROLE_LABELS } from './blocks/shared/text
 // Block surfaces: read-only and editable
 export * from './render/context'
 export { CanvasViewer } from './render/canvas-viewer'
+export type { LightboxProps } from './render/lightbox'
 export { Canvas } from './editor/canvas'
 
 // Editor store, hooks and utils

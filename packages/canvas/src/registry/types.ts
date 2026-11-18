@@ -101,6 +101,8 @@ export interface BlockDefinition<T extends BlockType> {
   coverAsset?: (props: BlockProps<T>) => AssetId | null
   /** Points the block at a new cover asset. Blocks with it can be inserted to hold a cover. */
   setCoverAsset?: (props: BlockProps<T>, assetId: AssetId) => void
+  /** Photos the block shows, in order, for the page-wide lightbox. */
+  lightboxAssets?: (props: BlockProps<T>) => AssetId[]
   /** Shown in the "add block" menu. Defaults to true. */
   insertable?: boolean
   experimental?: boolean

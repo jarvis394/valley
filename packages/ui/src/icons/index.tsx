@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { cn } from '../cn'
 import analytics from './analytics.svg'
+import arrowLeft from './arrow-left.svg'
 import chevronDownSmall from './chevron-down-small.svg'
 import chevronDown from './chevron-down.svg'
 import chevronRight from './chevron-right.svg'
@@ -56,6 +57,7 @@ const createIcon = (src: string, name: string): IconComponent => {
 }
 
 export const AnalyticsIcon = createIcon(analytics, 'analytics')
+export const ArrowLeftIcon = createIcon(arrowLeft, 'arrow-left')
 export const ChevronDownIcon = createIcon(chevronDown, 'chevron-down')
 export const ChevronDownSmallIcon = createIcon(chevronDownSmall, 'chevron-down-small')
 export const ChevronRightIcon = createIcon(chevronRight, 'chevron-right')

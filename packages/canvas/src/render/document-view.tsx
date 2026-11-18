@@ -12,6 +12,7 @@ import {
   useSlotIds,
   type DocumentState,
 } from './context'
+import { LightboxProvider, type LightboxProps } from './lightbox'
 
 const selectFontIds = ({ doc }: DocumentState) => {
   const ids = new Set([doc.theme.typography.heading.font, doc.theme.typography.body.font])
@@ -52,14 +53,14 @@ export const mapSlots = (slotIds: Record<string, NodeId>, render: (id: NodeId) =
   Object.fromEntries(Object.entries(slotIds).map(([slot, id]) => [slot, render(id)]))
 
 /** Read-only rendering of the whole document (published page, editor preview). */
-export function DocumentView() {
+export function DocumentView(lightbox: LightboxProps) {
   const rootId = useDocumentState((state) => state.doc.rootId)
 
   return (
-    <>
+    <LightboxProvider {...lightbox}>
       <FontLoader />
       <ViewNode id={rootId} />
-    </>
+    </LightboxProvider>
   )
 }
 
@@ -95,9 +96,7 @@ function ViewChildren({ parentId }: { parentId: NodeId }) {
   return (
     <div className="relative">
       {flow.map((id) => (
-        <div key={id}>
-          <ViewNode id={id} />
-        </div>
+        <ViewFlowItem key={id} id={id} />
       ))}
       {absolute.length > 0 && (
         <div className="pointer-events-none absolute inset-0">
@@ -106,6 +105,17 @@ function ViewChildren({ parentId }: { parentId: NodeId }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+/** `data-block` lets the host page find a block, such as the cover its app bar sits on. */
+function ViewFlowItem({ id }: { id: NodeId }) {
+  const type = useNode(id)?.type
+
+  return (
+    <div data-block={type}>
+      <ViewNode id={id} />
     </div>
   )
 }
