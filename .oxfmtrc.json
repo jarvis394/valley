@@ -8,6 +8,7 @@
     "**/.nitro/**",
     "**/dist/**",
     "**/routeTree.gen.ts",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
+    ".claude/skills/**"
   ]
 }

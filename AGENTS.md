@@ -9,6 +9,11 @@
 - React effects are for synchronizing with something outside React. Derive in render and act in handlers instead of syncing state, but don't hide real lifecycle work in refs or stores to dodge one. The `valley/no-unreasoned-state-sync` lint rule reports every effect; one that stays states its reason with `// oxlint-disable-next-line valley/no-unreasoned-state-sync -- <why>`.
 - If a rule here fights the task in front of you, say so loudly and get a human sign-off before breaking it.
 
+## ui-sdk
+
+- `@ui-sdk/react` and `@ui-sdk/core` are dependencies of `@valley/ui`, so kit components can build on them; apps use the kit, not ui-sdk directly. Its default styles load in `packages/ui/src/styles.css`.
+- Before using ui-sdk, follow the `ui-sdk` skill if it's installed, and read `packages/ui/node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `packages/ui/node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it.
+
 ## Additional tips
 
 - Don't verify with browsers or computer use unless the user explicitly agrees or requests it.
