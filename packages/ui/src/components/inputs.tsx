@@ -24,9 +24,9 @@ const triggerClass = cn(
   'p-1 text-left outline-none data-popup-open:inset-ring-accent',
 )
 
-/** 32px slot for a 16px icon inside a control. */
+/** 32px slot for a 16px icon inside a control. Callers mute the icon with its `opacity` prop. */
 const Adornment = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <span className={cn('flex size-8 shrink-0 items-center justify-center opacity-63', className)}>
+  <span className={cn('flex size-8 shrink-0 items-center justify-center', className)}>
     {children}
   </span>
 )
@@ -118,8 +118,8 @@ export function SelectField<T extends string>({
       <Select.Trigger className={triggerClass}>
         {icon && <Adornment className="-mr-2">{icon}</Adornment>}
         <Select.Value className="min-w-0 flex-1 truncate px-2" />
-        <Select.Icon className="flex size-8 shrink-0 items-center justify-center opacity-63">
-          <ChevronDownIcon />
+        <Select.Icon className="flex size-8 shrink-0 items-center justify-center">
+          <ChevronDownIcon opacity={0.63} />
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>

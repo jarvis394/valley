@@ -77,7 +77,7 @@ export function TextStyleFields({
       <div className="grid grid-cols-2 gap-2">
         <NumberField
           label="Line height"
-          icon={<MoveVertical />}
+          icon={<MoveVertical opacity={0.63} />}
           value={value.lineHeight}
           placeholder="Auto"
           min={0.5}
@@ -89,7 +89,7 @@ export function TextStyleFields({
         />
         <NumberField
           label="Letter spacing"
-          icon={<WholeWord />}
+          icon={<WholeWord opacity={0.63} />}
           value={value.letterSpacing}
           min={-0.2}
           max={0.5}

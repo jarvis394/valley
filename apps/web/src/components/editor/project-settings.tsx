@@ -125,7 +125,9 @@ export function ProjectSettings() {
           <SelectField
             value={visibility}
             options={visibilityOptions}
-            icon={visibility === 'private' ? <EyeOffIcon /> : <EyeIcon />}
+            icon={
+              visibility === 'private' ? <EyeOffIcon opacity={0.63} /> : <EyeIcon opacity={0.63} />
+            }
             onChange={(next) => setSetting('visibility', next)}
           />
         </Field>
@@ -172,7 +174,7 @@ function DateField({ value, onChange }: { value: string; onChange: (value: strin
   return (
     <div className="relative">
       <FieldButton
-        icon={<CalendarDays className="size-4" />}
+        icon={<CalendarDays className="size-4" opacity={0.63} />}
         onClick={() => inputRef.current?.showPicker()}
       >
         {formatShortDate(value)}
@@ -220,7 +222,7 @@ function PasswordControl({
             type={visible ? 'text' : 'password'}
             value={password}
             onChange={onPasswordChange}
-            icon={<UserLock className="size-4" />}
+            icon={<UserLock className="size-4" opacity={0.63} />}
             end={
               <>
                 <IconButton

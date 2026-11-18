@@ -136,7 +136,7 @@ export function GalleryControls({
       <Field label="Item size">
         <NumberField
           label="Item size"
-          icon={<Maximize2 />}
+          icon={<Maximize2 opacity={0.63} />}
           value={value.size}
           min={MIN_ITEM_SIZE}
           max={MAX_ITEM_SIZE}
@@ -149,7 +149,7 @@ export function GalleryControls({
         <Field label="Spacing">
           <NumberField
             label="Spacing"
-            icon={<UnfoldHorizontal />}
+            icon={<UnfoldHorizontal opacity={0.63} />}
             value={value.spacing}
             min={0}
             max={MAX_SPACING}
@@ -160,7 +160,7 @@ export function GalleryControls({
         <Field label="Roundness">
           <NumberField
             label="Roundness"
-            icon={<SquareRoundCorner />}
+            icon={<SquareRoundCorner opacity={0.63} />}
             value={value.roundness}
             min={0}
             max={MAX_ROUNDNESS}

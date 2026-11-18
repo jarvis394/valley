@@ -137,7 +137,7 @@ function TextInspector({ node, props, update }: BlockInspectorProps<'text'>) {
             <Field label="Max lines">
               <NumberField
                 label="Max lines"
-                icon={<WrapText />}
+                icon={<WrapText opacity={0.63} />}
                 value={props.maxLines}
                 min={1}
                 max={MAX_LINES}
@@ -164,7 +164,7 @@ function TextInspector({ node, props, update }: BlockInspectorProps<'text'>) {
             <Field label="Padding">
               <NumberField
                 label="Padding"
-                icon={<UnfoldVertical />}
+                icon={<UnfoldVertical opacity={0.63} />}
                 value={props.padding}
                 min={0}
                 max={MAX_PADDING}

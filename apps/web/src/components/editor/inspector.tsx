@@ -53,9 +53,9 @@ function ComponentPanel() {
   const selectedId = useSelectedId()
   if (!selectedId) {
     return (
-      <div className="flex flex-col items-center gap-2 px-6 py-16 text-center text-small text-fg/32">
-        <MousePointerClick className="size-6" />
-        Select a block on the canvas to edit it
+      <div className="flex flex-col items-center gap-2 px-6 py-16 text-center text-small">
+        <MousePointerClick className="size-6" opacity={0.32} />
+        <span className="text-fg/32">Select a block on the canvas to edit it</span>
       </div>
     )
   }
@@ -130,7 +130,7 @@ function PlacementSection({ id, placement }: { id: NodeId; placement: AbsolutePl
       <Field label="Size">
         <NumberField
           label="Size"
-          icon={<Maximize2 />}
+          icon={<Maximize2 opacity={0.63} />}
           value={placement.width}
           min={0.03}
           max={0.6}
@@ -143,7 +143,7 @@ function PlacementSection({ id, placement }: { id: NodeId; placement: AbsolutePl
         <Field label="Rotation">
           <NumberField
             label="Rotation"
-            icon={<RotateCw />}
+            icon={<RotateCw opacity={0.63} />}
             value={placement.rotation}
             min={-180}
             max={180}
@@ -154,7 +154,7 @@ function PlacementSection({ id, placement }: { id: NodeId; placement: AbsolutePl
         <Field label="Layer">
           <NumberField
             label="Layer"
-            icon={<Layers2 />}
+            icon={<Layers2 opacity={0.63} />}
             value={placement.z}
             min={0}
             max={10}

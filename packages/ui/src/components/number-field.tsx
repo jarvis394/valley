@@ -69,7 +69,7 @@ export function NumberField({
         {icon && (
           <NumberInputScrubArea
             pixelsPerStep={2}
-            className="flex h-full w-9 shrink-0 cursor-ew-resize items-center justify-center pl-1 text-fg/63 hover:text-fg data-scrubbing:text-fg [&_svg]:size-4"
+            className="flex h-full w-9 shrink-0 cursor-ew-resize items-center justify-center pl-1 [&_svg]:size-4"
           >
             <span aria-hidden className="flex">
               {icon}
@@ -92,9 +92,9 @@ export function NumberField({
         <Menu.Root>
           <Menu.Trigger
             aria-label={`${label} presets`}
-            className="flex h-full w-9 shrink-0 items-center justify-center border-l border-black/30 text-fg/63 outline-none hover:text-fg focus-visible:text-fg data-popup-open:text-fg"
+            className="flex h-full w-9 shrink-0 items-center justify-center border-l border-black/30 outline-none"
           >
-            <ChevronDownIcon />
+            <ChevronDownIcon opacity={0.63} />
           </Menu.Trigger>
           <Menu.Popup align="end" className="min-w-40">
             {presets.map((p) => (

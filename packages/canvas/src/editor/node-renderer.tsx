@@ -160,9 +160,9 @@ function FlowItem({
         )}
       >
         {node.hidden ? (
-          <div className="flex items-center gap-2 px-4 py-3 text-small text-fg/32">
-            <EyeOff className="size-4" />
-            Hidden in preview and on the published page
+          <div className="flex items-center gap-2 px-4 py-3 text-small">
+            <EyeOff className="size-4" opacity={0.32} />
+            <span className="text-fg/32">Hidden in preview and on the published page</span>
           </div>
         ) : (
           <NodeRenderer id={id} />
