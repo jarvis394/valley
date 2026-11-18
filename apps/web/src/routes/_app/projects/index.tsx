@@ -35,11 +35,13 @@ function Projects() {
       })
       .finally(() => setCreating(false))
   }
+  const deleteProject = (id: string) => api.deleteProject(id).then(() => router.invalidate())
 
   return (
     <ProjectsPage
       projects={projects}
       galleryUrl={GALLERY_SERVICE_URL}
+      onDelete={deleteProject}
       hero={
         <>
           <Greeting name={account.name} />

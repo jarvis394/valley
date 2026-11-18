@@ -44,6 +44,8 @@ export const api: ValleyApi = {
     }
   },
 
+  deleteProject: (id) => backend.deleteProject({ data: id }),
+
   uploadAsset: uploadAssetTo,
 
   syncProject(id, editor) {

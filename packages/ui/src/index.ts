@@ -21,7 +21,7 @@ export {
 } from './components/inputs'
 
 export { NumberField, type NumberPreset } from './components/number-field'
-export { ContextMenu, Menu, Popover, Sheet } from './components/overlays'
+export { AlertDialog, ContextMenu, Menu, Popover, Sheet } from './components/overlays'
 export { Tabs } from './components/tabs'
 export * from './icons'
 export * from './lib'

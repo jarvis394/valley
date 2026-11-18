@@ -1,8 +1,10 @@
 import {
   createProject,
+  deleteProject,
   getAccountViews,
   getDb,
   getProject,
+  getStorage,
   listProjects,
   resolveDocument,
   resolveRef,
@@ -67,6 +69,12 @@ export async function startProject(meta: { title: string; date: string }) {
   })
 
   return toProject(await createProject(getDb(), accountId, doc))
+}
+
+export async function removeProject(id: string) {
+  const { accountId } = await requireAccount()
+
+  await deleteProject(getDb(), getStorage(), accountId, id)
 }
 
 export async function storeProject(input: { id: string; doc: unknown; settings: unknown }) {

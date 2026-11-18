@@ -12,9 +12,12 @@ import {
   Menu,
   MoreIcon,
 } from '@valley/ui'
+import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import type { ProjectSummary } from '../../data/api'
 import { formatGrouped } from '../../lib/format'
 import { useCopyText } from '../../lib/use-copy-text'
+import { DeleteProjectDialog } from './delete-project-dialog'
 
 /**
  * The title link stretches over the whole card. Controls sit in `relative z-10` wrappers
@@ -23,11 +26,14 @@ import { useCopyText } from '../../lib/use-copy-text'
 export function ProjectCard({
   project,
   galleryUrl,
+  onDelete,
 }: {
   project: ProjectSummary
   galleryUrl: string
+  onDelete: () => Promise<void>
 }) {
   const { copied, copy } = useCopyText()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const shareUrl = project.slug && `${galleryUrl}/${project.slug}`
 
   const copyLink = () => shareUrl && void copy(shareUrl)
@@ -98,9 +104,23 @@ export function ProjectCard({
               Open project
             </Menu.Item>
             {shareUrl && <Menu.Item onClick={copyLink}>Copy link</Menu.Item>}
+            <Menu.Separator />
+            <Menu.Item
+              variant="danger"
+              icon={<Trash2 className="size-4" />}
+              onClick={() => setConfirmingDelete(true)}
+            >
+              Delete project
+            </Menu.Item>
           </Menu.Popup>
         </Menu.Root>
       </ButtonGroup>
+      <DeleteProjectDialog
+        title={project.title}
+        open={confirmingDelete}
+        onOpenChange={setConfirmingDelete}
+        onDelete={onDelete}
+      />
     </article>
   )
 }

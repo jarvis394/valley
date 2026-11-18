@@ -40,6 +40,8 @@ export interface ValleyApi {
   getProject(id: string): Promise<Project | null>
   /** Creates a project holding `files`. Runs in the browser, which uploads them. */
   createProject(files: File[]): Promise<ProjectSummary>
+  /** Permanently removes project `id` with its files. */
+  deleteProject(id: string): Promise<void>
   /** The editor's `uploadAsset` for project `id`. */
   uploadAsset(id: string): ReadAsset
   /** Saves the editor's changes to project `id` as they happen. Returns a disposer. */

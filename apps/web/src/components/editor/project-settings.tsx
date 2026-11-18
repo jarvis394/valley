@@ -30,6 +30,7 @@ import {
 } from '@valley/ui'
 import { Archive, CalendarDays, RefreshCw, Trash2, UserLock } from 'lucide-react'
 import { useRef, useState } from 'react'
+import { DeleteProjectDialog } from '../projects/delete-project-dialog'
 
 const storeUntilOptions = [
   { value: 'week', label: '1 week' },
@@ -53,7 +54,7 @@ const randomPassword = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(9)), (n) => n.toString(36).slice(-1)).join('')
 
 /** Project tab of the inspector: document meta, access, statistics and actions. */
-export function ProjectSettings() {
+export function ProjectSettings({ onDelete }: { onDelete?: () => Promise<void> }) {
   const editor = useEditor()
   const meta = useMeta()
   const settings = useSettings()
@@ -61,6 +62,7 @@ export function ProjectSettings() {
   const { galleryUrl } = editor
   const files = summarizeAssets(useAssets())
   const visibility = settings.visibility ?? 'private'
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const set = <K extends keyof DocumentMeta>(key: K, value: DocumentMeta[K]) =>
     editor.commands.updateMeta((m) => void (m[key] = value), { mergeKey: `meta.${key}` })
@@ -157,11 +159,24 @@ export function ProjectSettings() {
             Archive this project
           </Button>
         </Field>
-        <Field description="The project will be permanently deleted, including all its files, folders and settings. This action is irreversible and cannot be undone.">
-          <Button variant="danger" size="md" icon={<Trash2 className="size-4" />}>
-            Delete this project
-          </Button>
-        </Field>
+        {onDelete && (
+          <Field description="The project will be permanently deleted, including all its files, folders and settings. This action is irreversible and cannot be undone.">
+            <Button
+              variant="danger"
+              size="md"
+              icon={<Trash2 className="size-4" />}
+              onClick={() => setConfirmingDelete(true)}
+            >
+              Delete this project
+            </Button>
+            <DeleteProjectDialog
+              title={meta.title}
+              open={confirmingDelete}
+              onOpenChange={setConfirmingDelete}
+              onDelete={onDelete}
+            />
+          </Field>
+        )}
       </Section>
     </div>
   )

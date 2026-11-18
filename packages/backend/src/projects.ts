@@ -5,6 +5,7 @@ import {
   type ProjectSettings,
 } from '@valley/canvas'
 import { and, desc, eq, ne, projects, type Db } from '@valley/db'
+import type { Storage } from '@valley/storage'
 import { customAlphabet } from 'nanoid'
 import { BackendError } from './errors'
 import { referenceDocument } from './refs'
@@ -119,6 +120,28 @@ export async function saveProject(
     .where(eq(projects.id, id))
 
   return { slug, slugError, warnings: parsed.warnings }
+}
+
+/**
+ * Removes the project and its asset rows, then its stored files. Files are cleaned up after the
+ * row is gone, so a storage failure leaves orphaned files rather than a project missing its media.
+ */
+export async function deleteProject(db: Db, storage: Storage, accountId: string, id: string) {
+  const [deleted] = await db
+    .delete(projects)
+    .where(and(eq(projects.id, id), eq(projects.accountId, accountId)))
+    .returning({ id: projects.id })
+  if (!deleted) throw new BackendError('not-found', `Project ${id} not found`)
+
+  const keys = await listKeys(storage, `${storage.keyPrefix}projects/${id}/`).catch(() => [])
+  await Promise.allSettled(keys.map((key) => storage.delete(key)))
+}
+
+async function listKeys(storage: Storage, prefix: string) {
+  const keys: string[] = []
+  for await (const object of storage.list(prefix)) keys.push(object.key)
+
+  return keys
 }
 
 async function checkSlug(db: Db, id: string, slug: string) {

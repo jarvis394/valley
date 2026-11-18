@@ -18,11 +18,13 @@ export function Inspector({
   tab,
   onTabChange,
   header,
+  onDelete,
 }: {
   tab: InspectorTab
   onTabChange: (tab: InspectorTab) => void
   /** Rendered above the tabs, inside the sticky toolbar. */
   header?: ReactNode
+  onDelete?: () => Promise<void>
 }) {
   return (
     <Tabs.Root
@@ -42,7 +44,7 @@ export function Inspector({
           <ComponentPanel />
         </Tabs.Panel>
         <Tabs.Panel value="project">
-          <ProjectSettings />
+          <ProjectSettings onDelete={onDelete} />
         </Tabs.Panel>
       </ScrollArea>
     </Tabs.Root>

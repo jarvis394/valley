@@ -41,6 +41,8 @@ export interface ProjectEditorSlots {
   actions?: ReactNode
   /** `Menu.Item`s of the project switcher in the header. */
   switcher?: ReactNode
+  /** Permanently deletes the project; the inspector asks to confirm first. */
+  onDelete?: () => Promise<void>
 }
 
 /** The panels around the canvas: project outline on the left, inspector on the right. */
@@ -56,7 +58,7 @@ export function ProjectEditor({ editor, ...slots }: { editor: Editor } & Project
 
 type Panel = 'outline' | 'inspector'
 
-function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
+function EditorLayout({ nav, actions, switcher, onDelete }: ProjectEditorSlots) {
   const editor = useEditor()
   const mode = useMode()
   const selectedId = useSelectedId()
@@ -125,6 +127,7 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
         <Inspector
           tab={tab}
           onTabChange={setTab}
+          onDelete={onDelete}
           header={
             actions && (
               <div className="flex items-center justify-end gap-2 py-2.5 pr-3 pl-2">{actions}</div>
@@ -150,7 +153,7 @@ function EditorLayout({ nav, actions, switcher }: ProjectEditorSlots) {
         onOpenChange={(open) => !open && setPanel(null)}
         title="Inspector"
       >
-        <Inspector tab={tab} onTabChange={setTab} />
+        <Inspector tab={tab} onTabChange={setTab} onDelete={onDelete} />
       </Sheet>
     </div>
   )

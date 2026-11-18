@@ -1,4 +1,11 @@
-import { createFileRoute, getRouteApi, Link, notFound } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  getRouteApi,
+  Link,
+  notFound,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router'
 import { createEditor } from '@valley/canvas'
 import { Menu } from '@valley/ui'
 import { useEffect, useState } from 'react'
@@ -36,6 +43,8 @@ function ProjectRoute() {
 
 function ProjectWorkspace({ project }: { project: Project }) {
   const { projects } = appRoute.useLoaderData()
+  const router = useRouter()
+  const navigate = useNavigate()
   const [editor] = useState(() =>
     createEditor({
       doc: project.doc,
@@ -49,9 +58,17 @@ function ProjectWorkspace({ project }: { project: Project }) {
   // oxlint-disable-next-line valley/no-unreasoned-state-sync -- subscribes the store to the backend
   useEffect(() => api.syncProject(project.id, editor), [project.id, editor])
 
+  // Leaves before refreshing loaders, which would otherwise reload this now-missing project.
+  const deleteProject = () =>
+    api
+      .deleteProject(project.id)
+      .then(() => navigate({ to: '/projects' }))
+      .then(() => router.invalidate())
+
   return (
     <ProjectEditor
       editor={editor}
+      onDelete={deleteProject}
       nav={<ProjectNav views={project.views} newFavorites={project.newFavorites} />}
       actions={<ProjectActions />}
       switcher={projects

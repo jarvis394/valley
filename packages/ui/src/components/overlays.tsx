@@ -1,3 +1,4 @@
+import { AlertDialog as BaseAlertDialog } from '@base-ui/react/alert-dialog'
 import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu'
 import { Drawer } from '@base-ui/react/drawer'
 import { Menu as BaseMenu } from '@base-ui/react/menu'
@@ -173,6 +174,46 @@ export const Popover = {
   Trigger: BasePopover.Trigger,
   Close: BasePopover.Close,
   Popup: PopoverPopup,
+}
+
+function AlertDialogPopup({
+  title,
+  description,
+  children,
+}: {
+  title: ReactNode
+  description?: ReactNode
+  /** Actions, right-aligned; put the confirming one last. */
+  children: ReactNode
+}) {
+  return (
+    <BaseAlertDialog.Portal>
+      <BaseAlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/60 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+      <BaseAlertDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <BaseAlertDialog.Popup className="popup-surface flex w-full max-w-100 flex-col gap-5 p-5 outline-none transition-[opacity,scale] duration-200 data-ending-style:scale-96 data-ending-style:opacity-0 data-starting-style:scale-96 data-starting-style:opacity-0">
+          <div className="flex flex-col gap-1.5">
+            <BaseAlertDialog.Title className="text-title font-medium">
+              {title}
+            </BaseAlertDialog.Title>
+            {description && (
+              <BaseAlertDialog.Description className="text-body text-fg/63">
+                {description}
+              </BaseAlertDialog.Description>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">{children}</div>
+        </BaseAlertDialog.Popup>
+      </BaseAlertDialog.Viewport>
+    </BaseAlertDialog.Portal>
+  )
+}
+
+/** Modal that asks to confirm an action; it can't be dismissed by clicking outside. */
+export const AlertDialog = {
+  Root: BaseAlertDialog.Root,
+  Trigger: BaseAlertDialog.Trigger,
+  Close: BaseAlertDialog.Close,
+  Popup: AlertDialogPopup,
 }
 
 /** Bottom sheet with swipe-to-dismiss (mobile panels). */
