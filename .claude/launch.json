@@ -9,6 +9,15 @@
         "[ -s \"$HOME/.nvm/nvm.sh\" ] && . \"$HOME/.nvm/nvm.sh\" 2>/dev/null && nvm use default >/dev/null 2>&1; exec bun run --cwd apps/web dev"
       ],
       "port": 3000
+    },
+    {
+      "name": "gallery",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "[ -s \"$HOME/.nvm/nvm.sh\" ] && . \"$HOME/.nvm/nvm.sh\" 2>/dev/null && nvm use default >/dev/null 2>&1; exec bun run --cwd apps/gallery dev"
+      ],
+      "port": 3001
     }
   ]
 }

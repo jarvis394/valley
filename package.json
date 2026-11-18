@@ -9,6 +9,8 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
+    "web:dev": "turbo run dev --filter=@valley/web",
+    "gallery:dev": "turbo run dev --filter=@valley/gallery",
     "build": "turbo run build",
     "start": "turbo run start",
     "typecheck": "turbo run typecheck",

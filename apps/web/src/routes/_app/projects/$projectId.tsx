@@ -4,6 +4,7 @@ import { Menu } from '@valley/ui'
 import { useEffect, useState } from 'react'
 import { ProjectActions, ProjectNav } from '../../../components/editor/project-chrome'
 import { ProjectEditor } from '../../../components/editor/project-editor'
+import { ProjectEditorSkeleton } from '../../../components/editor/project-editor-skeleton'
 import { GALLERY_SERVICE_URL } from '../../../config/constants'
 import { api, type Project } from '../../../data/api'
 import { registry } from '../../../lib/registry'
@@ -20,6 +21,10 @@ export const Route = createFileRoute('/_app/projects/$projectId')({
   head: ({ loaderData }) => ({
     meta: [{ title: loaderData ? `${loaderData.title} · Valley` : 'Valley' }],
   }),
+  // The panels show at once; the canvas fills in when the project arrives.
+  pendingComponent: ProjectEditorSkeleton,
+  pendingMs: 0,
+  pendingMinMs: 0,
   component: ProjectRoute,
 })
 
@@ -37,6 +42,7 @@ function ProjectWorkspace({ project }: { project: Project }) {
       settings: project.settings,
       registry,
       galleryUrl: GALLERY_SERVICE_URL,
+      uploadAsset: api.uploadAsset(project.id),
     }),
   )
 

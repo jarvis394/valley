@@ -21,7 +21,13 @@
     "valley/no-unscoped-has": "error",
     "valley/require-centered-scroll-gutter": "error",
     "valley/statement-padding": "error",
-    "valley/tailwind-scale": "error"
+    "valley/tailwind-scale": "error",
+    "no-underscore-dangle": [
+      "warn",
+      {
+        "allow": ["_splat"]
+      }
+    ]
   },
   "ignorePatterns": ["**/.output/**", "**/.nitro/**", "**/dist/**", "**/routeTree.gen.ts"],
   "jsPlugins": [

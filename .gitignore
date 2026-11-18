@@ -7,4 +7,6 @@ dist
 *.log
 .env*
 !.env.example
-apps/web/src/routeTree.gen.ts
+apps/*/src/routeTree.gen.ts
+/export
+/storage

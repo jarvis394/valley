@@ -6,6 +6,7 @@ export { FileInput } from './components/file-input'
 export { Badge, ListItem, ListItemMeta } from './components/list-item'
 export { ScrollArea } from './components/scroll-area'
 export { Field, Section, StatRow } from './components/section'
+export { Skeleton } from './components/skeleton'
 export { SwitcherBar, SwitcherMenu } from './components/switcher-bar'
 export { Segmented, TilePicker, type Option } from './components/segmented'
 

@@ -101,6 +101,7 @@ function CoverRender({ node, props, update, mode, selected }: BlockRenderProps<'
     <div style={typographyStyle(theme.typography)}>
       <Layout
         align={props.align}
+        mode={mode}
         text={text}
         meta={metaLine}
         media={<Media asset={asset} focalPoint={props.focalPoint} className="size-full" />}

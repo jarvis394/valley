@@ -8,7 +8,7 @@ import {
   type DocumentMeta,
   type ProjectSettings,
 } from '@valley/canvas'
-import type { Account } from '../types'
+import type { Account } from '../../src/data/types'
 import { sampleDocument, sampleSettings } from './sample-document'
 
 export interface ProjectRecord {

@@ -1,0 +1,13 @@
+**/node_modules
+**/.output
+**/.nitro
+**/.turbo
+**/dist
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.claude
+docs
+storage
+export

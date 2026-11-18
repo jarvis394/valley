@@ -1,4 +1,5 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react'
+import type { RenderMode } from '../../registry/types'
 import { cn } from '@valley/ui'
 
 export type TextAlign = 'left' | 'center' | 'right'
@@ -10,6 +11,7 @@ export interface CoverLayoutProps {
   /** Author and date line; null when hidden. */
   meta: ReactNode
   align: TextAlign
+  mode: RenderMode
 }
 
 export interface CoverVariant {
@@ -72,18 +74,33 @@ export const COVER_VARIANTS = {
         <T />
       </span>
     ),
-    Layout: ({ media, text, meta, align }) => (
-      <div className="p-2">
-        <div className="mx-auto grid max-w-176 overflow-hidden rounded-2xl bg-black text-white sm:aspect-[704/396] sm:grid-cols-2">
-          <div className="aspect-[4/5] sm:aspect-auto">{media}</div>
-          <div className={cn('flex flex-col justify-between gap-6 p-6', alignItems[align])}>
-            <div className="h-7 max-sm:hidden" />
-            <div className={cn('flex w-full flex-col', alignItems[align])}>{text}</div>
-            <div className="h-7">{meta}</div>
+    // The editor shows a capped card so the cover doesn't take the whole canvas; the
+    // gallery runs it edge to edge down to the fold, under the page header if one is set.
+    Layout: ({ media, text, meta, align, mode }) => {
+      // Out of flow so a tall image can't grow the grid row past the cover's height.
+      const mediaFill = <div className="absolute inset-0">{media}</div>
+      const textColumn = (
+        <div className={cn('flex flex-col justify-between gap-6 p-6', alignItems[align])}>
+          <div className="h-7 max-sm:hidden" />
+          <div className={cn('flex w-full flex-col', alignItems[align])}>{text}</div>
+          <div className="h-7">{meta}</div>
+        </div>
+      )
+
+      return mode === 'edit' ? (
+        <div className="p-2">
+          <div className="mx-auto grid max-w-200 overflow-hidden rounded-2xl bg-black text-white sm:aspect-video sm:grid-cols-2">
+            <div className="relative aspect-[4/5] sm:aspect-auto">{mediaFill}</div>
+            {textColumn}
           </div>
         </div>
-      </div>
-    ),
+      ) : (
+        <div className="grid h-[calc(100dvh-var(--page-header-height,0px))] grid-rows-[1fr_auto] bg-black text-white sm:grid-cols-2 sm:grid-rows-1">
+          <div className="relative">{mediaFill}</div>
+          {textColumn}
+        </div>
+      )
+    },
     title: {
       className: 'max-w-[10ch] leading-[normal] font-extrabold text-[#dcffd2]',
       style: {
