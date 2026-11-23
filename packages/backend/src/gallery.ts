@@ -1,4 +1,4 @@
-import { accounts, and, assets, desc, eq, or, projects, sql, type Db } from '@valley/db'
+import { and, assets, desc, eq, or, projects, sql, user, type Db } from '@valley/db'
 import { firstAccount } from './accounts'
 import { documentKeys, refKey, resolveDocument, resolveRef, storeRef, type UrlFor } from './refs'
 
@@ -23,7 +23,7 @@ export async function getPortfolio(db: Db, urlFor: UrlFor) {
     .orderBy(desc(projects.shotOn), desc(projects.createdAt))
 
   return {
-    owner: { name: owner.name, avatar: resolveRef(owner.avatar, urlFor) },
+    owner: { name: owner.name, avatar: resolveRef(owner.image, urlFor) },
     projects: rows.map((row) => ({ ...row, cover: resolveRef(row.cover, urlFor) })),
   }
 }
@@ -76,11 +76,7 @@ export async function isPublishedKey(db: Db, key: string) {
     .limit(1)
   if (project) return true
 
-  const [avatar] = await db
-    .select({ id: accounts.id })
-    .from(accounts)
-    .where(eq(accounts.avatar, ref))
-    .limit(1)
+  const [avatar] = await db.select({ id: user.id }).from(user).where(eq(user.image, ref)).limit(1)
 
   return Boolean(avatar)
 }
@@ -92,11 +88,11 @@ export async function publishedKeys(db: Db, slug?: string) {
       .select({ doc: projects.doc, cover: projects.cover })
       .from(projects)
       .where(and(published, slug ? eq(projects.slug, slug) : undefined)),
-    db.select({ avatar: accounts.avatar }).from(accounts),
+    db.select({ image: user.image }).from(user),
   ])
   const refs = [
     ...rows.flatMap((row) => [...documentKeys(row.doc), refKey(row.cover)]),
-    ...owners.map((owner) => refKey(owner.avatar)),
+    ...owners.map((owner) => refKey(owner.image)),
   ]
 
   return [...new Set(refs.filter((key) => key !== null))]

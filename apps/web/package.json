@@ -8,7 +8,8 @@
     "build": "vite build",
     "start": "bun .output/server/index.mjs",
     "typecheck": "tsc --noEmit",
-    "seed": "bun scripts/seed/index.ts"
+    "seed": "bun scripts/seed/index.ts",
+    "grant-admin": "bun scripts/grant-admin.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -17,6 +18,7 @@
     "@valley/backend": "workspace:*",
     "@valley/canvas": "workspace:*",
     "@valley/ui": "workspace:*",
+    "better-auth": "^1.7.10",
     "lucide-react": "^1.61.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

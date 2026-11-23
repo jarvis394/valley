@@ -1,14 +1,20 @@
 import { useRender } from '@base-ui/react/use-render'
+import { Loader2 } from 'lucide-react'
 import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import { cn } from '../cn'
+import { buttonType, focusRing, hairline } from './styles'
 
-const pressable =
-  'inline-flex shrink-0 items-center outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-97 disabled:pointer-events-none disabled:opacity-40'
+const pressable = cn(
+  'inline-flex shrink-0 items-center select-none active:scale-97 disabled:pointer-events-none disabled:opacity-40',
+  focusRing,
+)
 
 const VARIANTS = {
   /** Toolbar button with a hairline border (Share); its icon is muted until hovered. */
-  outline:
-    'border-[0.5px] border-white/7 text-fg hover:bg-white/5 data-popup-open:bg-white/7 *:data-icon:opacity-63 hover:*:data-icon:opacity-100 data-popup-open:*:data-icon:opacity-100',
+  outline: cn(
+    hairline,
+    'text-fg hover:bg-white/5 data-popup-open:bg-white/7 *:data-icon:opacity-63 hover:*:data-icon:opacity-100 data-popup-open:*:data-icon:opacity-100',
+  ),
   /** Bright call to action (Visit). */
   primary:
     'border-[0.5px] border-white/24 bg-linear-to-b from-white to-[#e1e1e1] text-[#1b1b1b] shadow-[0_2px_16px_rgba(255,255,255,0.07),0_0_4px_rgba(255,255,255,0.07)] hover:to-white',
@@ -24,6 +30,8 @@ const VARIANTS = {
 const SIZES = {
   sm: 'h-8 gap-2 rounded-[10px] px-3',
   md: 'h-10 gap-2.5 rounded-xl px-4',
+  /** Form submit, usually stretched to the form's width, so its label is centred. */
+  lg: 'h-11 justify-center gap-2.5 rounded-xl px-5',
   /** `sm` height for icon-only content, e.g. an icon with a dropdown chevron (Language). */
   compact: 'h-8 gap-1 rounded-[10px] px-2',
 } as const
@@ -32,6 +40,9 @@ export function Button({
   variant = 'ghost',
   size = 'sm',
   icon,
+  loading = false,
+  disabled,
+  render,
   className,
   children,
   ...props
@@ -40,26 +51,61 @@ export function Button({
   size?: keyof typeof SIZES
   /** Leading icon; sits in a 14px slot so labels align like in the design. */
   icon?: ReactNode
+  /** Swaps the icon for a spinner; without an icon, the spinner covers the label so the width holds. */
+  loading?: boolean
+  render?: ReactElement
 }) {
+  const spinner = <Loader2 className="size-4 animate-spin" />
+  const covered = loading && !icon
+
+  return useRender({
+    render,
+    defaultTagName: 'button',
+    props: {
+      ...buttonType(render),
+      ...props,
+      disabled: disabled || loading,
+      'aria-busy': loading || undefined,
+      className: cn(
+        pressable,
+        'relative overflow-hidden text-body font-medium whitespace-nowrap',
+        SIZES[size],
+        VARIANTS[variant],
+        className,
+      ),
+      children: (
+        <>
+          {icon && (
+            <span data-icon className="-ml-0.5 flex h-4 w-3.5 items-center">
+              {loading ? spinner : icon}
+            </span>
+          )}
+          {covered ? (
+            <>
+              <span className="invisible">{children}</span>
+              <span className="absolute inset-0 flex items-center justify-center">{spinner}</span>
+            </>
+          ) : (
+            children
+          )}
+        </>
+      ),
+    },
+  })
+}
+
+/** Inline text action inside copy ("Use another email"). */
+export function LinkButton({ className, ...props }: ComponentProps<'button'>) {
   return (
     <button
       type="button"
       className={cn(
-        pressable,
-        'overflow-hidden text-body font-medium whitespace-nowrap',
-        VARIANTS[variant],
-        SIZES[size],
+        'rounded text-body font-medium text-accent underline-offset-4 hover:underline disabled:opacity-40',
+        focusRing,
         className,
       )}
       {...props}
-    >
-      {icon && (
-        <span data-icon className="-ml-0.5 flex h-4 w-3.5 items-center">
-          {icon}
-        </span>
-      )}
-      {children}
-    </button>
+    />
   )
 }
 
@@ -68,8 +114,10 @@ const ICON_VARIANTS = {
   default:
     'text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
   /** Hairline-bordered counterpart of `Button`'s `outline` (copy link, card menus). */
-  outline:
-    'border-[0.5px] border-white/7 text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+  outline: cn(
+    hairline,
+    'text-fg *:opacity-63 hover:bg-white/5 hover:*:opacity-100 data-popup-open:bg-white/7 data-popup-open:*:opacity-100',
+  ),
   /** Destructive action (Delete). */
   danger: 'text-danger hover:bg-danger/12',
   /** Sits on photos: a dark blurred fill keeps the icon legible over any image. */
@@ -109,7 +157,7 @@ export function IconButton({
     render,
     defaultTagName: 'button',
     props: {
-      ...(render ? {} : { type: 'button' }),
+      ...buttonType(render),
       ...props,
       className: cn(
         pressable,

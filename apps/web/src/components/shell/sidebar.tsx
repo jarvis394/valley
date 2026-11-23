@@ -1,5 +1,6 @@
 import { useRender } from '@base-ui/react/use-render'
 import {
+  Avatar,
   ChevronRightIcon,
   cn,
   Divider,
@@ -8,6 +9,7 @@ import {
   IconButton,
   ListItem,
   LogoIcon,
+  Menu,
   ScrollArea,
   Section,
   SwitcherBar,
@@ -71,14 +73,37 @@ function Account({
   render?: ReactElement
   menu?: ReactNode
 }) {
+  const collapsed = useCollapsed()
+
+  if (collapsed && menu) {
+    return (
+      <>
+        <div className="flex h-12.75 shrink-0 items-center justify-center">
+          <Menu.Root>
+            <Menu.Trigger
+              aria-label="Account menu"
+              className="flex size-9 items-center justify-center rounded-lg outline-none hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-accent/60 data-popup-open:bg-white/7"
+            >
+              <Avatar src={avatar || null} name={name} size="sm" />
+            </Menu.Trigger>
+            <Menu.Popup align="start" sideOffset={8}>
+              {menu}
+            </Menu.Popup>
+          </Menu.Root>
+        </div>
+        <SidebarDivider />
+      </>
+    )
+  }
+
   return (
     <>
       <SwitcherBar
         image={avatar}
         label={name}
         render={render}
-        compact={useCollapsed()}
-        after={menu && <SwitcherMenu label="Switch account">{menu}</SwitcherMenu>}
+        compact={collapsed}
+        after={menu && <SwitcherMenu label="Account menu">{menu}</SwitcherMenu>}
       />
       <SidebarDivider />
     </>

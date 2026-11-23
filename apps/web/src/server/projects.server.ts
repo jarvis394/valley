@@ -5,7 +5,9 @@ import {
   getDb,
   getProject,
   getStorage,
+  hasCredentialAccount,
   listProjects,
+  refKey,
   resolveDocument,
   resolveRef,
   saveProject,
@@ -37,13 +39,22 @@ const toProject = (row: ProjectRow): Project => ({
 })
 
 export async function loadAccount(): Promise<Account> {
-  const { owner } = await requireAccount()
+  const { user } = await requireAccount()
+  const [views, hasPassword] = await Promise.all([
+    getAccountViews(getDb(), user.id),
+    hasCredentialAccount(getDb(), user.id),
+  ])
 
   return {
-    id: owner.id,
-    name: owner.name,
-    avatar: resolveRef(owner.avatar, mediaUrl) ?? '',
-    views: await getAccountViews(getDb(), owner.id),
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: resolveRef(user.image, mediaUrl) ?? '',
+    views,
+    role: user.role === 'admin' ? 'admin' : 'user',
+    isAdmin: user.role === 'admin',
+    hasPassword,
+    hasUploadedAvatar: Boolean(refKey(user.image)),
   }
 }
 
@@ -61,11 +72,11 @@ export async function loadProject(id: string) {
 }
 
 export async function startProject(meta: { title: string; date: string }) {
-  const { accountId, owner } = await requireAccount()
+  const { accountId, user } = await requireAccount()
   const doc = emptyDocument({
     ...meta,
-    author: owner.name,
-    authorAvatar: owner.avatar ?? undefined,
+    author: user.name,
+    authorAvatar: user.image ?? undefined,
   })
 
   return toProject(await createProject(getDb(), accountId, doc))

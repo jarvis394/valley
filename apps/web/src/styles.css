@@ -1,1 +1,42 @@
 @import '@valley/canvas/styles.css';
+
+/*
+ * Auth screen transitions: /login <-> /signup morphs the header, card outline, shared inputs
+ * and footer switch in place while keeping the cover showcase static.
+ */
+::view-transition-group(.auth) {
+  animation-duration: 300ms;
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(.auth),
+::view-transition-new(.auth) {
+  animation-duration: 200ms;
+}
+
+::view-transition-old(auth-card),
+::view-transition-new(auth-card) {
+  height: 100%;
+}
+
+::view-transition-group(.auth-static),
+::view-transition-old(.auth-static),
+::view-transition-new(.auth-static) {
+  animation: none;
+}
+
+::view-transition-new(.auth-static) {
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(.auth-static) {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

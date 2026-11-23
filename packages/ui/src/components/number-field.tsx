@@ -9,7 +9,7 @@ import { Check, MoveHorizontal } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '../cn'
 import { ChevronDownIcon } from '../icons'
-import { controlStates } from './inputs'
+import { controlRing } from './control'
 import { Menu } from './overlays'
 
 export interface NumberPreset {
@@ -61,7 +61,7 @@ export function NumberField({
       onValueCommit={(next) => next === null && onClear?.()}
       className={cn(
         'flex h-10 w-full min-w-0 flex-row items-center gap-0 rounded-xl bg-control text-small text-fg',
-        controlStates,
+        controlRing.quiet,
         'has-data-popup-open:inset-ring-accent',
       )}
     >

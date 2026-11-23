@@ -1,8 +1,16 @@
-export type BackendErrorCode = 'not-found' | 'invalid-input'
+export type BackendErrorCode =
+  | 'not-found'
+  | 'invalid-input'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'conflict'
 
 const STATUS: Record<BackendErrorCode, number> = {
   'not-found': 404,
   'invalid-input': 400,
+  unauthorized: 401,
+  forbidden: 403,
+  conflict: 409,
 }
 
 export class BackendError extends Error {
