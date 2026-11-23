@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   AnalyticsIcon,
+  Badge,
   EyeIcon,
   ListItemMeta,
   Menu,
@@ -8,6 +9,7 @@ import {
   ProjectsIcon,
   SettingsIcon,
 } from '@valley/ui'
+import { LogOut, ShieldCheck } from 'lucide-react'
 import { APP_VERSION, REPOSITORY_URL } from '../../config/constants'
 import type { Account, ProjectSummary } from '../../data/api'
 import { formatCompact } from '../../lib/format'
@@ -17,10 +19,14 @@ export function AppSidebar({
   account,
   projects,
   collapsed,
+  pendingUsersCount = 0,
+  onSignOut,
 }: {
   account: Account
   projects: ProjectSummary[]
   collapsed: boolean
+  pendingUsersCount?: number
+  onSignOut: () => void
 }) {
   const navigate = useNavigate()
 
@@ -30,7 +36,28 @@ export function AppSidebar({
         name={account.name}
         avatar={account.avatar}
         render={<Link to="/projects" />}
-        menu={<Menu.Item disabled>{account.name}</Menu.Item>}
+        menu={
+          <>
+            <Menu.Label title={account.name} description={account.email} />
+            <Menu.Separator />
+            <Menu.Item icon={<SettingsIcon />} render={<Link to="/settings" />}>
+              Settings
+            </Menu.Item>
+            {account.isAdmin && (
+              <Menu.Item
+                icon={<ShieldCheck className="size-4" />}
+                render={<Link to="/admin/users" />}
+              >
+                <span className="min-w-0 flex-1">Manage users</span>
+                {pendingUsersCount > 0 && <Badge>{pendingUsersCount}</Badge>}
+              </Menu.Item>
+            )}
+            <Menu.Separator />
+            <Menu.Item variant="danger" icon={<LogOut className="size-4" />} onClick={onSignOut}>
+              Sign out
+            </Menu.Item>
+          </>
+        }
       />
       <Sidebar.Nav>
         <Sidebar.NavItem
@@ -49,7 +76,7 @@ export function AppSidebar({
             </ListItemMeta>
           }
         />
-        <Sidebar.NavItem icon={SettingsIcon} label="Settings" />
+        <Sidebar.NavItem icon={SettingsIcon} label="Settings" render={<Link to="/settings" />} />
       </Sidebar.Nav>
       <Sidebar.Projects
         title="Recent"

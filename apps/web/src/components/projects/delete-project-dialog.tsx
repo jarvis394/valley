@@ -40,12 +40,14 @@ export function DeleteProjectDialog({
             : 'The project and all its files will be permanently deleted. This cannot be undone.'
         }
       >
-        <AlertDialog.Close render={<Button variant="secondary" size="md" disabled={deleting} />}>
-          Cancel
-        </AlertDialog.Close>
-        <Button variant="danger" size="md" disabled={deleting} onClick={confirm}>
-          {deleting ? 'Deleting…' : 'Delete project'}
-        </Button>
+        <AlertDialog.Actions>
+          <AlertDialog.Close render={<Button variant="secondary" size="md" disabled={deleting} />}>
+            Cancel
+          </AlertDialog.Close>
+          <Button variant="danger" size="md" disabled={deleting} onClick={confirm}>
+            {deleting ? 'Deleting…' : 'Delete project'}
+          </Button>
+        </AlertDialog.Actions>
       </AlertDialog.Popup>
     </AlertDialog.Root>
   )

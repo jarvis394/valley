@@ -64,7 +64,7 @@ services:
       postgres:
         condition: service_healthy
 
-  # The editor. Bound to localhost because it has no sign-in yet.
+  # The editor.
   web:
     <<: *app
     build:
@@ -75,8 +75,10 @@ services:
     environment:
       <<: *app-env
       GALLERY_SERVICE_URL: ${GALLERY_SERVICE_URL:-http://localhost:3001}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      VALLEY_SIGNUP_MODE: ${VALLEY_SIGNUP_MODE:-invite}
     ports:
-      - 127.0.0.1:${WEB_PORT:-3000}:3000
+      - ${WEB_PORT:-3000}:3000
 
   # Public galleries and the portfolio, e.g. gallery.yekushev.dev.
   gallery:

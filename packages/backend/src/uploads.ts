@@ -73,6 +73,9 @@ const toTusError = (error: unknown) =>
 export function createUploadServer(options: UploadServerOptions) {
   const { db, storage, path, maxSize, authorize, urlFor } = options
 
+  const readFileId = (request: Request) =>
+    decodeURIComponent(new URL(request.url).pathname.slice(path.length + 1)) || undefined
+
   /**
    * Drops a finished upload that couldn't be recorded. Its tus info goes too, so the client's
    * retry gets a 404 and starts a fresh upload instead of resuming one that is already complete.
@@ -89,8 +92,7 @@ export function createUploadServer(options: UploadServerOptions) {
     respectForwardedHeaders: true,
     generateUrl: (_request, { path: base, id }) => `${base}/${encodeURIComponent(id)}`,
     // Ids are storage keys with slashes, and routers may decode `%2F` before tus sees the URL.
-    getFileIdFromRequest: (request) =>
-      decodeURIComponent(new URL(request.url).pathname.slice(path.length + 1)) || undefined,
+    getFileIdFromRequest: readFileId,
     namingFunction: (_request, raw) => {
       const metadata = parseMetadata(raw ?? undefined)
 
@@ -98,9 +100,20 @@ export function createUploadServer(options: UploadServerOptions) {
     },
     async onIncomingRequest(request) {
       if (request.method === 'GET') throw { status_code: 405, body: 'Downloads go through media\n' }
-      await authorize(request).catch((error: unknown) => {
+      const { accountId } = await authorize(request).catch((error: unknown) => {
         throw toTusError(error)
       })
+      if (request.method !== 'POST' && request.method !== 'OPTIONS') {
+        const key = readFileId(request)
+        const prefix = `${storage.keyPrefix}projects/`
+        const projectId = key?.startsWith(prefix)
+          ? key.slice(prefix.length).split('/')[0]
+          : undefined
+        if (!projectId) throw { status_code: 404, body: 'Upload not found\n' }
+        await requireProject(db, accountId, projectId).catch((error: unknown) => {
+          throw toTusError(error)
+        })
+      }
     },
     async onUploadCreate(request, upload) {
       const metadata = parseMetadata(upload.metadata)

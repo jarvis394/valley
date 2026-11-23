@@ -1,6 +1,7 @@
 import { useRender } from '@base-ui/react/use-render'
 import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import { cn } from '../cn'
+import { buttonType, focusRing } from './styles'
 
 const LEADING = {
   /** 16px icon, muted until selected. */
@@ -46,11 +47,12 @@ export function ListItem({
     render,
     defaultTagName: 'button',
     props: {
-      ...(render ? {} : { type: 'button' }),
+      ...buttonType(render),
       ...props,
       'data-selected': selected || undefined,
       className: cn(
-        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-body font-medium text-fg outline-none hover:bg-white/3 group-hover/list-row:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 before:absolute before:inset-x-0 before:-inset-y-0.5',
+        'group/item relative flex h-10 w-full shrink-0 items-center gap-1 rounded-xl text-left text-body font-medium text-fg hover:bg-white/3 group-hover/list-row:bg-white/3 before:absolute before:inset-x-0 before:-inset-y-0.5',
+        focusRing,
         styles.row,
         filled && 'bg-white/3',
         selected &&
@@ -93,21 +95,4 @@ export function ListItemMeta({ children, className }: { children: ReactNode; cla
       {children}
     </span>
   )
-}
-
-const BADGE_VARIANTS = {
-  /** Count of something new ("2 new"). */
-  info: 'rounded-full bg-selected px-2 py-0.75 text-small leading-4.25 font-medium text-info-fg',
-  /** Small caps tag for unfinished features ("beta"). */
-  warning: 'rounded bg-amber-400/15 px-1.5 py-0.5 text-caption text-amber-300 uppercase',
-} as const
-
-export function Badge({
-  variant = 'info',
-  children,
-}: {
-  variant?: keyof typeof BADGE_VARIANTS
-  children: ReactNode
-}) {
-  return <span className={cn('shrink-0', BADGE_VARIANTS[variant])}>{children}</span>
 }

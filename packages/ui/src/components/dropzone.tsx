@@ -2,6 +2,7 @@ import { useRender } from '@base-ui/react/use-render'
 import { useState, type ComponentProps, type DragEvent, type ReactElement } from 'react'
 import { cn } from '../cn'
 import { PlusIcon } from '../icons'
+import { buttonType, focusRing } from './styles'
 
 const VARIANTS = {
   /** Page-level upload target (projects page). */
@@ -55,13 +56,14 @@ export function Dropzone({
     render,
     defaultTagName: 'button',
     props: {
-      ...(render ? {} : { type: 'button' }),
+      ...buttonType(render),
       ...props,
       onDragOver,
       onDragLeave: () => setDragging(false),
       onDrop,
       className: cn(
-        'flex w-full flex-col items-center justify-center border outline-none select-none hover:bg-white/3 focus-visible:ring-2 focus-visible:ring-accent/60 active:scale-99 disabled:opacity-40',
+        'flex w-full flex-col items-center justify-center border select-none hover:bg-white/3 active:scale-99 disabled:opacity-40',
+        focusRing,
         styles.root,
         dragging && styles.dragging,
       ),

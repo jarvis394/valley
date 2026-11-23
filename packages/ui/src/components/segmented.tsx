@@ -2,6 +2,7 @@ import { Toggle } from '@base-ui/react/toggle'
 import { ToggleGroup } from '@base-ui/react/toggle-group'
 import type { ReactNode } from 'react'
 import { cn } from '../cn'
+import { focusRing } from './styles'
 
 export interface Option<T> {
   value: T
@@ -40,7 +41,10 @@ export function Segmented<T extends string | number>({
           key={keyOf(option.value)}
           value={keyOf(option.value)}
           title={option.title}
-          className="group flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-small text-fg outline-none select-none focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7"
+          className={cn(
+            'group flex h-8 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 text-small text-fg select-none data-pressed:bg-white/7',
+            focusRing,
+          )}
         >
           <span className="flex min-w-0 items-center opacity-63 group-hover:opacity-100 group-data-pressed:opacity-100">
             {option.label}
@@ -83,7 +87,10 @@ export function TilePicker<T extends string>({
         <Toggle
           key={option.value}
           value={option.value}
-          className="group flex flex-col items-center gap-1.5 rounded-[10px] p-2 text-caption text-fg/63 outline-none hover:text-fg focus-visible:ring-2 focus-visible:ring-accent/60 data-pressed:bg-white/7 data-pressed:text-fg"
+          className={cn(
+            'group flex flex-col items-center gap-1.5 rounded-[10px] p-2 text-caption text-fg/63 hover:text-fg data-pressed:bg-white/7 data-pressed:text-fg',
+            focusRing,
+          )}
         >
           <span
             className={cn(

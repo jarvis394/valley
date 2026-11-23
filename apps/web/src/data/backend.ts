@@ -1,6 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import {
+  approveAdminUser,
+  changeAdminUserRole,
+  loadAdminUsers,
+  loadAuthConfig,
+  loadPendingUsersCount,
+  loadProfileSettings,
+  loadSessionState,
+  removeAdminUser,
+  saveProfileName,
+} from '../server/auth.server'
+import {
   loadAccount,
   loadProject,
   loadProjects,
@@ -8,6 +19,32 @@ import {
   startProject,
   storeProject,
 } from '../server/projects.server'
+
+export const getAuthConfig = createServerFn().handler(() => loadAuthConfig())
+
+export const getSessionState = createServerFn().handler(() => loadSessionState())
+
+export const getProfileSettings = createServerFn().handler(() => loadProfileSettings())
+
+export const updateProfileName = createServerFn({ method: 'POST' })
+  .validator(z.string().trim().min(1).max(64))
+  .handler(({ data }) => saveProfileName(data))
+
+export const listAdminUsers = createServerFn().handler(() => loadAdminUsers())
+
+export const getPendingUsersCount = createServerFn().handler(() => loadPendingUsersCount())
+
+export const approveUser = createServerFn({ method: 'POST' })
+  .validator(z.string().min(1))
+  .handler(({ data }) => approveAdminUser(data))
+
+export const setUserRole = createServerFn({ method: 'POST' })
+  .validator(z.object({ id: z.string().min(1), role: z.enum(['user', 'admin']) }))
+  .handler(({ data }) => changeAdminUserRole(data.id, data.role))
+
+export const deleteAdminUser = createServerFn({ method: 'POST' })
+  .validator(z.string().min(1))
+  .handler(({ data }) => removeAdminUser(data))
 
 export const getAccount = createServerFn().handler(() => loadAccount())
 

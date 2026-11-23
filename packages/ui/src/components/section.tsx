@@ -41,26 +41,6 @@ export function Section({
   )
 }
 
-export function Field({
-  label,
-  description,
-  children,
-  className,
-}: {
-  label?: string
-  description?: ReactNode
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div className={cn('flex min-w-0 flex-col gap-1.5', className)}>
-      {label && <span className="truncate px-2 text-caption leading-3.5 text-fg/63">{label}</span>}
-      {children}
-      {description && <p className="px-2 text-caption text-pretty text-fg/63">{description}</p>}
-    </div>
-  )
-}
-
 /** Label/value line, e.g. project statistics. */
 export function StatRow({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (

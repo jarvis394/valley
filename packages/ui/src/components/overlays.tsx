@@ -1,12 +1,16 @@
 import { AlertDialog as BaseAlertDialog } from '@base-ui/react/alert-dialog'
 import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu'
+import { Dialog as BaseDialog } from '@base-ui/react/dialog'
 import { Drawer } from '@base-ui/react/drawer'
 import { Menu as BaseMenu } from '@base-ui/react/menu'
 import { Popover as BasePopover } from '@base-ui/react/popover'
+import { X } from 'lucide-react'
 import { Fragment, type ComponentProps, type ReactNode } from 'react'
 import { cn } from '../cn'
 import { ChevronRightIcon } from '../icons'
+import { IconButton } from './button'
 import { ScrollArea } from './scroll-area'
+import type { WithClassName } from './styles'
 
 /**
  * Styled Base UI overlays. Parts that need no styling are re-exported as-is,
@@ -50,16 +54,13 @@ function MenuItem({
   variant = 'default',
   children,
   ...props
-}: ComponentProps<typeof BaseMenu.Item> & {
+}: WithClassName<ComponentProps<typeof BaseMenu.Item>> & {
   /** Leading 16px icon, in a 14px slot like `Button`'s. */
   icon?: ReactNode
   variant?: keyof typeof ITEM_VARIANTS
 }) {
   return (
-    <BaseMenu.Item
-      className={cn(menuItemClass, ITEM_VARIANTS[variant], className as string)}
-      {...props}
-    >
+    <BaseMenu.Item className={cn(menuItemClass, ITEM_VARIANTS[variant], className)} {...props}>
       {icon && <MenuItemIcon icon={icon} />}
       {children}
     </BaseMenu.Item>
@@ -72,10 +73,10 @@ function MenuSubmenuTrigger({
   icon,
   children,
   ...props
-}: ComponentProps<typeof BaseMenu.SubmenuTrigger> & { icon?: ReactNode }) {
+}: WithClassName<ComponentProps<typeof BaseMenu.SubmenuTrigger>> & { icon?: ReactNode }) {
   return (
     <BaseMenu.SubmenuTrigger
-      className={cn(menuItemClass, ITEM_VARIANTS.default, className as string)}
+      className={cn(menuItemClass, ITEM_VARIANTS.default, className)}
       {...props}
     >
       {icon && <MenuItemIcon icon={icon} />}
@@ -88,6 +89,18 @@ function MenuSubmenuTrigger({
 /** Full-bleed separator; cancels the popup's padding. */
 function MenuSeparator() {
   return <BaseMenu.Separator className="-mx-1.5 my-0.5 h-px bg-white/10" />
+}
+
+/** Non-interactive summary block above menu items (e.g. signed-in user name and email). */
+function MenuLabel({ title, description }: { title: ReactNode; description?: ReactNode }) {
+  return (
+    <div className="flex flex-col px-3.5 py-2 select-none">
+      <span className="truncate text-body font-medium text-fg">{title}</span>
+      {description && (
+        <span className="truncate text-small font-normal text-fg/63">{description}</span>
+      )}
+    </div>
+  )
 }
 
 /** Summary of what the menu acts on (a file), above the items. */
@@ -132,6 +145,7 @@ export const Menu = {
   Trigger: BaseMenu.Trigger,
   Popup: MenuPopup,
   Header: MenuHeader,
+  Label: MenuLabel,
   Item: MenuItem,
   SubmenuRoot: BaseMenu.SubmenuRoot,
   SubmenuTrigger: MenuSubmenuTrigger,
@@ -176,36 +190,72 @@ export const Popover = {
   Popup: PopoverPopup,
 }
 
-function AlertDialogPopup({
+/**
+ * Shared modal chrome. Base UI's alert dialog is built from the same parts as its dialog, so
+ * these render under either root.
+ */
+function ModalPopup({
   title,
   description,
+  closable,
   children,
 }: {
   title: ReactNode
   description?: ReactNode
-  /** Actions, right-aligned; put the confirming one last. */
+  closable: boolean
   children: ReactNode
 }) {
   return (
-    <BaseAlertDialog.Portal>
-      <BaseAlertDialog.Backdrop className="fixed inset-0 z-50 bg-black/60 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-      <BaseAlertDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <BaseAlertDialog.Popup className="popup-surface flex w-full max-w-100 flex-col gap-5 p-5 outline-none transition-[opacity,scale] duration-200 data-ending-style:scale-96 data-ending-style:opacity-0 data-starting-style:scale-96 data-starting-style:opacity-0">
-          <div className="flex flex-col gap-1.5">
-            <BaseAlertDialog.Title className="text-title font-medium">
-              {title}
-            </BaseAlertDialog.Title>
+    <BaseDialog.Portal>
+      <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-black/60 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+      <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <BaseDialog.Popup className="popup-surface relative flex w-full max-w-100 flex-col gap-5 p-5 outline-none transition-[opacity,scale] duration-200 data-ending-style:scale-96 data-ending-style:opacity-0 data-starting-style:scale-96 data-starting-style:opacity-0">
+          {closable && (
+            <BaseDialog.Close
+              render={
+                <IconButton size="sm" aria-label="Close" className="absolute top-3 right-3" />
+              }
+            >
+              <X className="size-4" />
+            </BaseDialog.Close>
+          )}
+          <div className={cn('flex flex-col gap-1.5', closable && 'pr-8')}>
+            <BaseDialog.Title className="text-title font-medium">{title}</BaseDialog.Title>
             {description && (
-              <BaseAlertDialog.Description className="text-body text-fg/63">
+              <BaseDialog.Description className="text-body text-fg/63">
                 {description}
-              </BaseAlertDialog.Description>
+              </BaseDialog.Description>
             )}
           </div>
-          <div className="flex justify-end gap-2">{children}</div>
-        </BaseAlertDialog.Popup>
-      </BaseAlertDialog.Viewport>
-    </BaseAlertDialog.Portal>
+          {children}
+        </BaseDialog.Popup>
+      </BaseDialog.Viewport>
+    </BaseDialog.Portal>
   )
+}
+
+/** Buttons at the foot of a modal, right-aligned; put the confirming one last. */
+function ModalActions({ children }: { children: ReactNode }) {
+  return <div className="flex justify-end gap-2">{children}</div>
+}
+
+type ModalPopupProps = Omit<ComponentProps<typeof ModalPopup>, 'closable'>
+
+function DialogPopup(props: ModalPopupProps) {
+  return <ModalPopup closable {...props} />
+}
+
+function AlertDialogPopup(props: ModalPopupProps) {
+  return <ModalPopup closable={false} {...props} />
+}
+
+/** Modal with a close button that also dismisses on outside press or Escape. */
+export const Dialog = {
+  Root: BaseDialog.Root,
+  Trigger: BaseDialog.Trigger,
+  Close: BaseDialog.Close,
+  Popup: DialogPopup,
+  Actions: ModalActions,
 }
 
 /** Modal that asks to confirm an action; it can't be dismissed by clicking outside. */
@@ -214,6 +264,7 @@ export const AlertDialog = {
   Trigger: BaseAlertDialog.Trigger,
   Close: BaseAlertDialog.Close,
   Popup: AlertDialogPopup,
+  Actions: ModalActions,
 }
 
 /** Bottom sheet with swipe-to-dismiss (mobile panels). */

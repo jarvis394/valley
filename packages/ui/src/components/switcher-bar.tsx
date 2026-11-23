@@ -2,6 +2,7 @@ import { useRender } from '@base-ui/react/use-render'
 import type { ReactElement, ReactNode } from 'react'
 import { cn } from '../cn'
 import { MenuExpandIcon } from '../icons'
+import { Avatar } from './avatar'
 import { IconButton } from './button'
 import { Menu } from './overlays'
 
@@ -34,18 +35,12 @@ export function SwitcherBar({
       ),
       children: (
         <>
-          {image ? (
-            <img
-              src={image}
-              alt={compact ? label : ''}
-              className="size-7 shrink-0 rounded-md border-[0.5px] border-white/4 object-cover"
-            />
-          ) : (
-            <span className="size-7 shrink-0 rounded-md bg-white/7" />
-          )}
-          {!compact && (
-            <span className="min-w-0 flex-1 truncate text-title font-medium">{label}</span>
-          )}
+          <Avatar src={image} name={label} size="sm" />
+          <span
+            className={cn('min-w-0 flex-1 truncate text-title font-medium', compact && 'sr-only')}
+          >
+            {label}
+          </span>
         </>
       ),
     },

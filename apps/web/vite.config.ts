@@ -17,7 +17,6 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    // Localhost only: the editor has no sign-in yet.
     server: { port: 3000 },
     envPrefix: ['VITE_', 'GALLERY_SERVICE_URL'],
     resolve: {

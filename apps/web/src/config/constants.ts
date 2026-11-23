@@ -9,3 +9,4 @@ export const GALLERY_SERVICE_URL = galleryServiceUrl.replace(/\/+$/, '')
 
 export const APP_VERSION = version
 export const REPOSITORY_URL = 'https://github.com/jarvis394/valley'
+export const TELEGRAM_PHOTOS_URL = 'https://t.me/photojepg'

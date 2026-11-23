@@ -23,8 +23,13 @@ export interface ProjectRecord {
 export const account: Account = {
   id: 'u_vladislav',
   name: 'Vladislav Ekushev',
+  email: 'vladislav@valley.local',
   avatar: '/demo/user.jpg',
   views: 12_400,
+  role: 'admin',
+  isAdmin: true,
+  hasPassword: true,
+  hasUploadedAvatar: true,
 }
 
 const ROOT = nodeId('n_root')
