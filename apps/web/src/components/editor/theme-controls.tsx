@@ -118,21 +118,25 @@ const layoutOptions = [
 export function GalleryControls({
   value,
   onChange,
+  showLayout = true,
 }: {
   value: GalleryStyle
   onChange: (patch: Partial<GalleryStyle>, options?: ChangeOptions) => void
+  showLayout?: boolean
 }) {
   return (
     <>
-      <Field label="Grid">
-        <TilePicker
-          value={value.layout}
-          options={layoutOptions}
-          columns={2}
-          size="sm"
-          onChange={(layout) => onChange({ layout })}
-        />
-      </Field>
+      {showLayout && (
+        <Field label="Grid">
+          <TilePicker
+            value={value.layout}
+            options={layoutOptions}
+            columns={2}
+            size="sm"
+            onChange={(layout) => onChange({ layout })}
+          />
+        </Field>
+      )}
       <Field label="Item size">
         <NumberField
           label="Item size"

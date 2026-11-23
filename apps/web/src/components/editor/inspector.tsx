@@ -107,7 +107,9 @@ function NodeInspector({ id }: { id: NodeId }) {
             editor.commands.setOverride(id, 'gallery', value, options)
           }
         >
-          {(value, set) => <GalleryControls value={value} onChange={set} />}
+          {(value, set) => (
+            <GalleryControls value={value} onChange={set} showLayout={node.type !== 'island'} />
+          )}
         </ThemeGroupSection>
       )}
       {BlockInspectorFooter && (

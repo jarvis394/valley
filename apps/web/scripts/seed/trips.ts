@@ -15,8 +15,8 @@ type Trip = keyof typeof tripPhotos
 
 const root = nodeId('n_root')
 
-const node = <T extends CanvasNode>(n: Omit<T, 'parentId' | 'v' | 'placement'>) =>
-  ({ ...n, parentId: root, placement: FLOW, v: 1 }) as T
+const node = <T extends CanvasNode>(n: Omit<T, 'parentId' | 'v' | 'placement'> & { v?: number }) =>
+  ({ v: 1, ...n, parentId: root, placement: FLOW }) as T
 
 /**
  * A trip's photos after a cover: one Island block per group as the photographer split
@@ -63,7 +63,16 @@ export function tripDocument(
           node<CanvasNode<'island'>>({
             id: nodeId(`n_island_${i + 1}`),
             type: 'island',
-            props: { assetIds: group.map((a) => a.id) },
+            v: 2,
+            props: {
+              assetIds: group.map((a) => a.id),
+              layout: 'collage',
+              frame: 'card',
+              title: '',
+              meta: '',
+              caption: '',
+              showCount: false,
+            },
           }),
         )
       : [
@@ -83,7 +92,7 @@ export function tripDocument(
       ...defaultTheme,
       gallery:
         layout === 'islands'
-          ? { layout: 'justified', size: 240, spacing: 4, roundness: 0 }
+          ? { layout: 'justified', size: 240, spacing: 4, roundness: 8 }
           : defaultTheme.gallery,
     },
     assets: Object.fromEntries(assets.map((a) => [a.id, a])) as CanvasDocument['assets'],
