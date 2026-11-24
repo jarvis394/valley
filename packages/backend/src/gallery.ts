@@ -1,4 +1,4 @@
-import { and, assets, desc, eq, or, projects, sql, user, type Db } from '@valley/db'
+import { and, assets, desc, eq, or, projects, sql, type Db } from '@valley/db'
 import { firstAccount } from './accounts'
 import { documentKeys, refKey, resolveDocument, resolveRef, storeRef, type UrlFor } from './refs'
 
@@ -47,7 +47,7 @@ export async function recordView(db: Db, projectId: string) {
 
 /**
  * Whether a published page shows a key: as an asset of a published project, through its
- * document like `documentKeys`, or as an account avatar. Cheapest checks first.
+ * document like `documentKeys`, or as the portfolio owner's avatar. Cheapest checks first.
  */
 export async function isPublishedKey(db: Db, key: string) {
   const ref = storeRef(key)
@@ -76,23 +76,23 @@ export async function isPublishedKey(db: Db, key: string) {
     .limit(1)
   if (project) return true
 
-  const [avatar] = await db.select({ id: user.id }).from(user).where(eq(user.image, ref)).limit(1)
+  const owner = await firstAccount(db)
 
-  return Boolean(avatar)
+  return owner?.image === ref
 }
 
 /** Storage keys of every published project, or of the one at `slug`, for a static export. */
 export async function publishedKeys(db: Db, slug?: string) {
-  const [rows, owners] = await Promise.all([
+  const [rows, owner] = await Promise.all([
     db
       .select({ doc: projects.doc, cover: projects.cover })
       .from(projects)
       .where(and(published, slug ? eq(projects.slug, slug) : undefined)),
-    db.select({ image: user.image }).from(user),
+    firstAccount(db),
   ])
   const refs = [
     ...rows.flatMap((row) => [...documentKeys(row.doc), refKey(row.cover)]),
-    ...owners.map((owner) => refKey(owner.image)),
+    refKey(owner?.image),
   ]
 
   return [...new Set(refs.filter((key) => key !== null))]

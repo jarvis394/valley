@@ -15,22 +15,12 @@ describe('isApproved', () => {
 })
 
 describe('resolveNewUserAccess', () => {
-  it('promotes and approves the first user even in invite mode', () => {
-    const access = resolveNewUserAccess({ hasExistingUsers: false, signupMode: 'invite' })
-
-    expect(access.role).toBe('admin')
-    expect(access.approvedAt).toBeInstanceOf(Date)
+  it('leaves sign-ups pending in invite mode', () => {
+    expect(resolveNewUserAccess('invite')).toEqual({ role: 'user', approvedAt: null })
   })
 
-  it('leaves subsequent users pending in invite mode', () => {
-    const access = resolveNewUserAccess({ hasExistingUsers: true, signupMode: 'invite' })
-
-    expect(access.role).toBe('user')
-    expect(access.approvedAt).toBeNull()
-  })
-
-  it('approves subsequent users immediately in open mode', () => {
-    const access = resolveNewUserAccess({ hasExistingUsers: true, signupMode: 'open' })
+  it('approves sign-ups immediately in open mode', () => {
+    const access = resolveNewUserAccess('open')
 
     expect(access.role).toBe('user')
     expect(access.approvedAt).toBeInstanceOf(Date)

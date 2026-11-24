@@ -1,8 +1,14 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { AuthCoverShowcase } from '../components/auth/cover-showcase'
-import { getAuthConfig } from '../data/backend'
+import { getAuthConfig, getSetupRequired } from '../data/backend'
 
 export const Route = createFileRoute('/_auth')({
+  beforeLoad: async ({ location }) => {
+    const setupRequired = await getSetupRequired()
+    if (setupRequired && location.pathname !== '/setup') throw redirect({ to: '/setup' })
+
+    return { setupRequired }
+  },
   loader: () => getAuthConfig(),
   component: AuthLayout,
 })

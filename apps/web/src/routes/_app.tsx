@@ -9,13 +9,14 @@ import {
 import { AppShell } from '../components/shell/app-shell'
 import { AppSidebar } from '../components/shell/app-sidebar'
 import { api } from '../data/api'
-import { getPendingUsersCount, getSessionState } from '../data/backend'
+import { getPendingUsersCount, getSessionState, getSetupRequired } from '../data/backend'
 import { authClient } from '../lib/auth'
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ location }) => {
     const state = await getSessionState()
     if (state.status === 'signed-out') {
+      if (await getSetupRequired()) throw redirect({ to: '/setup' })
       throw redirect({ to: '/login', search: { redirect: location.href } })
     }
     if (state.status === 'pending') {

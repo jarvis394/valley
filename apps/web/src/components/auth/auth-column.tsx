@@ -5,7 +5,7 @@ import { REPOSITORY_URL } from '../../config/constants'
 
 export function AuthColumn({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-1 flex-col items-center justify-between p-4 lg:p-6">
+    <div className="flex min-h-dvh flex-1 flex-col items-center justify-between p-4">
       <header className="flex h-12 w-full items-center justify-between px-2">
         <Link
           to="/"

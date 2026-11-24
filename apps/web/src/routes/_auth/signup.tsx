@@ -64,6 +64,7 @@ function SignupPage() {
       footer={
         <Button
           variant="ghost"
+          size="lg"
           style={part('switch')}
           render={<Link to="/login" search={{ redirect: search.redirect }} viewTransition />}
         >
@@ -72,7 +73,7 @@ function SignupPage() {
       }
     >
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <h1 className="text-display font-medium tracking-tight text-fg [view-transition-class:auth] [view-transition-name:auth-title]">
+        <h1 className="font-display text-display font-medium tracking-tight text-fg [view-transition-class:auth] [view-transition-name:auth-title]">
           {copy.title}
         </h1>
         <p className="text-body text-fg/63 [view-transition-class:auth] [view-transition-name:auth-subtitle]">

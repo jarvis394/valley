@@ -47,7 +47,7 @@ export function AuthCoverShowcase() {
 
   return (
     <aside className="hidden flex-1 p-4 lg:flex">
-      <div className="sticky top-4 flex h-[calc(100dvh-2rem)] w-full items-center justify-center overflow-hidden rounded-4xl border-[0.5px] border-white/7 bg-surface [view-transition-class:auth-static] [view-transition-name:auth-showcase]">
+      <div className="sticky top-4 flex h-[calc(100dvh-2rem)] w-full items-center justify-center overflow-hidden rounded-[48px] bg-white/7 [view-transition-class:auth-static] [view-transition-name:auth-showcase]">
         {COVERS.map((cover, index) => (
           <img
             key={`blur-${cover}`}
@@ -66,7 +66,7 @@ export function AuthCoverShowcase() {
             loading={index === 0 ? 'eager' : 'lazy'}
             alt=""
             className={cn(
-              'absolute z-10 aspect-2/3 h-[calc(100%-4rem)] w-auto max-w-[calc(100%-4rem)] rounded-3xl object-cover object-center shadow-[0_0_16px_rgba(0,0,0,0.24)] transition-[opacity,filter,transform,visibility] duration-[1200ms] ease-[cubic-bezier(1,0,0,1)] select-none',
+              'absolute z-10 aspect-2/3 h-[calc(100%-4rem)] w-auto max-w-[calc(100%-4rem)] rounded-3xl object-cover object-center shadow-[0_0_4px_rgba(0,0,0,0.05),0_0_16px_rgba(0,0,0,0.05)] transition-[opacity,filter,scale,visibility] duration-[1200ms] ease-[cubic-bezier(1,0,0,1)] select-none',
               index === active
                 ? 'visible scale-100 opacity-100 blur-none'
                 : 'invisible scale-98 opacity-0 blur-sm',
@@ -77,7 +77,7 @@ export function AuthCoverShowcase() {
           href={TELEGRAM_PHOTOS_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-8 z-20 rounded-full px-4 py-2 text-body text-white/70 [text-shadow:0_1px_8px_rgba(0,0,0,0.6)] transition-[color,transform] duration-200 hover:text-white active:scale-98"
+          className="absolute bottom-10 z-20 rounded-full p-4 text-body text-white opacity-63 [text-shadow:0_0_4px_rgba(0,0,0,0.4)] transition-[opacity,scale] duration-240 ease-[cubic-bezier(0.075,0.82,0.165,1)] hover:opacity-100 active:scale-98"
         >
           @tarnatovski
         </a>

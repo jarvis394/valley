@@ -44,6 +44,9 @@ export interface UploadServerOptions {
 
 const MEDIA_TYPE = /^(image|video)\/[\w.+-]+$/
 
+/** The tail `namingFunction` gives every upload key; anything else, like `..`, is rejected. */
+const UPLOAD_KEY = /^([a-z0-9-]{1,64})\/originals\/[\w-]{16}(?:\.[a-z0-9]{1,8})?$/i
+
 function parseMetadata(metadata: Upload['metadata']): UploadMetadata {
   const result = uploadMetadataSchema.safeParse(metadata ?? {})
   if (!result.success) {
@@ -107,7 +110,7 @@ export function createUploadServer(options: UploadServerOptions) {
         const key = readFileId(request)
         const prefix = `${storage.keyPrefix}projects/`
         const projectId = key?.startsWith(prefix)
-          ? key.slice(prefix.length).split('/')[0]
+          ? UPLOAD_KEY.exec(key.slice(prefix.length))?.[1]
           : undefined
         if (!projectId) throw { status_code: 404, body: 'Upload not found\n' }
         await requireProject(db, accountId, projectId).catch((error: unknown) => {

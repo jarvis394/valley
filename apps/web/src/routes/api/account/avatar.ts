@@ -1,10 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { BackendError, getDb, getStorage, resolveRef, updateProfileAvatar } from '@valley/backend'
+import {
+  BackendError,
+  MAX_AVATAR_BYTES,
+  getDb,
+  getStorage,
+  resolveRef,
+  updateProfileAvatar,
+} from '@valley/backend'
 import { mediaUrl, requireAccount } from '../../../server/backend.server'
+
+const MAX_FORM_OVERHEAD_BYTES = 64 * 1024
 
 async function uploadAvatar({ request }: { request: Request }) {
   try {
     const { accountId } = await requireAccount(request)
+    const length = Number(request.headers.get('content-length'))
+    if (!length) return Response.json({ error: 'Content-Length is required' }, { status: 411 })
+    if (length > MAX_AVATAR_BYTES + MAX_FORM_OVERHEAD_BYTES) {
+      return Response.json({ error: 'Avatar image must be 5 MB or smaller' }, { status: 413 })
+    }
+
     const form = await request.formData()
     const file = form.get('file')
     if (!(file instanceof File)) {

@@ -66,13 +66,15 @@ function ResetPasswordPage() {
   return (
     <AuthColumn
       footer={
-        <Button variant="ghost" render={<Link to="/login" viewTransition />}>
+        <Button variant="ghost" size="lg" render={<Link to="/login" viewTransition />}>
           Back to sign in
         </Button>
       }
     >
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <h1 className="text-display font-medium tracking-tight text-fg">New password</h1>
+        <h1 className="font-display text-display font-medium tracking-tight text-fg">
+          New password
+        </h1>
         <p className="text-body text-fg/63">
           {invalidLink ? 'That reset link is no longer valid' : 'Choose a new password for Valley'}
         </p>

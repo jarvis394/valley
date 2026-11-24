@@ -36,7 +36,7 @@ function UsersPage() {
             >
               Projects
             </Button>
-            <h1 className="text-display font-medium tracking-tight text-fg">Users</h1>
+            <h1 className="font-display text-display font-medium tracking-tight text-fg">Users</h1>
             <Badge variant={signupMode === 'invite' ? 'neutral' : 'info'}>
               {signupMode === 'invite' ? 'Invite-only' : 'Open sign-up'}
             </Badge>

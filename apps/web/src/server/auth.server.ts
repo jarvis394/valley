@@ -1,7 +1,9 @@
 import {
   approveUser,
   BackendError,
+  completeSetup,
   countPendingUsers,
+  declineUser,
   deleteAdminUser,
   getDb,
   getMailer,
@@ -9,11 +11,14 @@ import {
   getStorage,
   hasCredentialAccount,
   isApproved,
+  isSetupComplete,
   listUsers,
   readAuthEnv,
   refKey,
   resolveRef,
   setUserRole,
+  setupToken,
+  type SetupInput,
   updateProfileName,
 } from '@valley/backend'
 import type { UserRole } from '@valley/db'
@@ -22,6 +27,27 @@ import { getSession, mediaUrl, requireAccount, requireAdmin } from './backend.se
 
 export function loadAuthConfig(): AuthConfig {
   return { signupMode: getSignupMode() }
+}
+
+const setupOptions = () => {
+  const env = readAuthEnv()
+
+  return { preset: env.VALLEY_SETUP_TOKEN, publicUrl: env.PUBLIC_URL }
+}
+
+/** Whether `/setup` still has to run. Prints the setup link to the log the first time it does. */
+export async function loadSetupRequired() {
+  if (await isSetupComplete(getDb())) return false
+
+  setupToken(setupOptions())
+
+  return true
+}
+
+export async function finishSetup(input: SetupInput) {
+  await completeSetup(getDb(), setupOptions(), input)
+
+  return { ok: true }
 }
 
 export async function loadSessionState(): Promise<SessionState> {
@@ -109,6 +135,12 @@ export async function changeAdminUserRole(id: string, role: UserRole) {
   const { accountId } = await requireAdmin()
 
   return setUserRole(getDb(), accountId, id, role)
+}
+
+export async function declineAdminUser(id: string) {
+  await requireAdmin()
+
+  return declineUser(getDb(), getStorage(), id)
 }
 
 export async function removeAdminUser(id: string) {

@@ -3,7 +3,7 @@ import { formatLongDate } from '@valley/canvas'
 import {
   Button,
   ButtonGroup,
-  CopyIcon,
+  CopyButton,
   EyeIcon,
   FileIcon,
   IconButton,
@@ -11,12 +11,12 @@ import {
   LockClosedIcon,
   Menu,
   MoreIcon,
+  useCopy,
 } from '@valley/ui'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import type { ProjectSummary } from '../../data/api'
 import { formatGrouped } from '../../lib/format'
-import { useCopyText } from '../../lib/use-copy-text'
 import { DeleteProjectDialog } from './delete-project-dialog'
 
 /**
@@ -32,7 +32,7 @@ export function ProjectCard({
   galleryUrl: string
   onDelete: () => Promise<void>
 }) {
-  const { copied, copy } = useCopyText()
+  const { copy } = useCopy()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const shareUrl = project.slug && `${galleryUrl}/${project.slug}`
 
@@ -67,13 +67,12 @@ export function ProjectCard({
             <LinkIcon opacity={0.63} />
             <span className="min-w-0 flex-1 truncate text-title font-medium">/{project.slug}</span>
             <span className="relative z-10 flex">
-              <IconButton
+              <CopyButton
                 variant="outline"
-                aria-label={copied ? 'Link copied' : 'Copy link'}
-                onClick={copyLink}
-              >
-                <CopyIcon />
-              </IconButton>
+                value={shareUrl}
+                label="Copy link"
+                copiedLabel="Link copied"
+              />
             </span>
           </div>
         ) : (

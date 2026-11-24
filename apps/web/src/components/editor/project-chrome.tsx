@@ -12,9 +12,9 @@ import {
   ListItem,
   ListItemMeta,
   ShareIcon,
+  useCopy,
 } from '@valley/ui'
 import { formatCompact } from '../../lib/format'
-import { useCopyText } from '../../lib/use-copy-text'
 
 /** Project-level links under the "Project" row. */
 export function ProjectNav({ views, newFavorites }: { views: number; newFavorites: number }) {
@@ -46,7 +46,7 @@ export function ProjectNav({ views, newFavorites }: { views: number; newFavorite
 /** Toolbar above the inspector: language, share link and preview. */
 export function ProjectActions() {
   const editor = useEditor()
-  const { copied, copy } = useCopyText()
+  const { copied, copy } = useCopy()
 
   const galleryPage = () => `${editor.galleryUrl}/${editor.getState().settings.slug ?? ''}`
   const share = () => copy(galleryPage())
