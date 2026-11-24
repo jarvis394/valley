@@ -4,6 +4,7 @@ import { Button, Field, FormError, LinkButton, PasswordInput, TextInput } from '
 import { MailCheck } from 'lucide-react'
 import { type CSSProperties, type FormEvent, useState } from 'react'
 import { authClient } from '../../lib/auth'
+import { withViewTransition } from '../../lib/view-transition'
 import { AuthCard } from './auth-card'
 
 export type AuthMode = 'sign-in' | 'sign-up'
@@ -48,7 +49,7 @@ export const part = (name: string) =>
 export function authCopy(mode: AuthMode, signupMode: SignupMode) {
   if (mode === 'sign-in') {
     return {
-      title: 'Sign in',
+      title: 'Enter the Valley',
       subtitle: 'Your galleries and editor workspace',
       switch: 'I do not have an account',
     }
@@ -110,8 +111,10 @@ export function AuthForm({
     }
 
     if (mode === 'sign-up') {
-      setPending(false)
-      setSentTo(email)
+      withViewTransition(() => {
+        setPending(false)
+        setSentTo(email)
+      })
 
       return
     }
@@ -139,7 +142,9 @@ export function AuthForm({
             Did not get it? Sign in with the same email and password to get a new link.
           </p>
           <div className="pt-1">
-            <LinkButton onClick={() => setSentTo(null)}>Use another email</LinkButton>
+            <LinkButton onClick={() => withViewTransition(() => setSentTo(null))}>
+              Use another email
+            </LinkButton>
           </div>
         </div>
       ) : (

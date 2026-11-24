@@ -63,9 +63,13 @@ The output includes a `vercel.json` and deploys to Vercel or any static host as 
 `apps/web` uses `better-auth` mounted at `/api/auth/$` with Drizzle tables in `@valley/db` (`user`, `session`, `account`, `verification`) and mailer helpers in `@valley/backend`.
 
 - `PUBLIC_URL`: public origin of `apps/web` for auth cookies and links in emails.
-- `BETTER_AUTH_SECRET`: session signing secret (32+ bytes, required when `NODE_ENV=production`).
-- `VALLEY_SIGNUP_MODE`: `invite` (default) or `open`. The first user on a fresh instance becomes an approved `admin`. In `invite` mode, later sign-ups verify their email and wait on `/pending` until an admin approves them from `/admin/users`. In `open` mode, verified sign-ups are approved automatically.
+- `BETTER_AUTH_SECRET`: session signing secret (32+ bytes, required unless `NODE_ENV` is `development` or `test`).
+- `VALLEY_SIGNUP_MODE`: `invite` (default) or `open`. In `invite` mode, later sign-ups verify their email and wait on `/pending` until an admin approves them from `/admin/users`. In `open` mode, verified sign-ups are approved automatically.
 - `RESEND_API_KEY` & `MAIL_FROM`: sends verification, password-reset, email-change, and approval emails through Resend; when `RESEND_API_KEY` is unset, links are printed to the server log for local development.
+
+- `VALLEY_SETUP_TOKEN`: optional, 16+ characters. Fixes the token of the setup link below instead of a random one.
+
+A fresh instance has no admin who can sign in, so every editor page redirects to `/setup` and sign-up stays closed. The server prints a one-time link, `<PUBLIC_URL>/setup?token=…`, to its log the first time that happens (`docker compose logs web`). Opening it creates the admin, already confirmed, and signs them in. A restart before setup prints a new link.
 
 To promote an existing user to admin from the CLI:
 
@@ -82,6 +86,9 @@ bun db:migrate
 bun run --cwd apps/web seed
 bun run dev
 ```
+
+The seed prints the admin's email and password. Set `VALLEY_SEED_PASSWORD` to choose it;
+otherwise a new admin gets a random one and an existing admin keeps theirs.
 
 `docker compose up -d --build` runs the whole stack: migrations, the editor on port 3000
 and the gallery on port 3001. `requireAccount` and `requireAdmin` in

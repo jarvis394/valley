@@ -5,6 +5,7 @@ export const SIGNUP_MODES = ['invite', 'open'] as const
 export type SignupMode = (typeof SIGNUP_MODES)[number]
 
 const DEV_FALLBACK_SECRET = 'INSECURE_UPDATE_ME_IMMEDIATELY_DEV_ONLY'
+const PLACEHOLDER_SENDER = /@valley\.invalid>?$/i
 
 let warnedDevSecret = false
 
@@ -35,6 +36,12 @@ const authEnvSchema = z.object({
     .optional()
     .transform((v) => v || undefined),
   MAIL_FROM: z.string().trim().min(1).default('Valley <noreply@valley.invalid>'),
+  VALLEY_SETUP_TOKEN: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || undefined)
+    .pipe(z.string().min(16, 'VALLEY_SETUP_TOKEN must be at least 16 characters').optional()),
 })
 
 export interface AuthEnv {
@@ -43,19 +50,24 @@ export interface AuthEnv {
   VALLEY_SIGNUP_MODE: SignupMode
   RESEND_API_KEY?: string
   MAIL_FROM: string
+  VALLEY_SETUP_TOKEN?: string
 }
 
 export function readAuthEnv(env: Record<string, string | undefined> = process.env): AuthEnv {
   const parsed = authEnvSchema.parse(env)
   const rawSecret = parsed.BETTER_AUTH_SECRET?.trim()
 
-  if (env.NODE_ENV === 'production') {
+  if (parsed.RESEND_API_KEY && PLACEHOLDER_SENDER.test(parsed.MAIL_FROM)) {
+    throw new Error('Set MAIL_FROM to a sender on a Resend-verified domain before RESEND_API_KEY')
+  }
+
+  if (env.NODE_ENV !== 'development' && env.NODE_ENV !== 'test') {
     const secret = z
       .string()
-      .min(32, 'BETTER_AUTH_SECRET must be at least 32 characters in production')
+      .min(32, 'BETTER_AUTH_SECRET must be at least 32 characters outside development')
       .refine(
         (value) => value !== DEV_FALLBACK_SECRET,
-        'BETTER_AUTH_SECRET must be changed from the development placeholder in production',
+        'BETTER_AUTH_SECRET must be changed from the development placeholder',
       )
       .parse(rawSecret)
 

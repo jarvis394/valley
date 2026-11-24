@@ -1,14 +1,31 @@
-import { account, session, user, verification, type Db } from '@valley/db'
+import { account, and, count, eq, ne, session, user, verification, type Db } from '@valley/db'
 import type { Storage } from '@valley/storage'
 import { betterAuth } from 'better-auth'
+import { APIError } from 'better-auth/api'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { cleanupUserStorage } from '../accounts'
 import type { AuthEnv } from '../env'
 import { type Mailer, resetPasswordMail, verifyEmailMail } from '../mail'
+import { isSetupComplete } from '../setup'
 import { emailChange } from './email-plugin'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, isApproved, resolveNewUserAccess } from './rules'
 
 const RESET_PASSWORD_TTL_HOURS = 1
+
+async function ensureAnotherAdmin(db: Db, id: string) {
+  const [target] = await db.select({ role: user.role }).from(user).where(eq(user.id, id)).limit(1)
+  if (target?.role !== 'admin') return
+
+  const [others] = await db
+    .select({ n: count() })
+    .from(user)
+    .where(and(eq(user.role, 'admin'), ne(user.id, id)))
+  if (!others?.n) {
+    throw new APIError('BAD_REQUEST', {
+      message: 'Make another user an admin before deleting the last admin account',
+    })
+  }
+}
 
 export function createAuth({
   db,
@@ -75,20 +92,23 @@ export function createAuth({
       },
       deleteUser: {
         enabled: true,
-        beforeDelete: (target) => cleanupUserStorage(db, storage, target.id),
+        beforeDelete: async (target) => {
+          await ensureAnotherAdmin(db, target.id)
+          await cleanupUserStorage(db, storage, target.id)
+        },
       },
     },
     databaseHooks: {
       user: {
         create: {
           async before(createdUser) {
-            const existing = await db.select({ id: user.id }).from(user).limit(1)
-            const access = resolveNewUserAccess({
-              hasExistingUsers: existing.length > 0,
-              signupMode: env.VALLEY_SIGNUP_MODE,
-            })
+            if (!(await isSetupComplete(db))) {
+              throw new APIError('FORBIDDEN', { message: 'Finish setting up Valley first' })
+            }
 
-            return { data: { ...createdUser, ...access } }
+            return {
+              data: { ...createdUser, ...resolveNewUserAccess(env.VALLEY_SIGNUP_MODE) },
+            }
           },
         },
       },

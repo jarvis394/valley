@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import type { CanvasDocument } from '@valley/canvas'
@@ -27,19 +28,11 @@ loadEnvFiles(
 )
 
 const seedEmail = (process.env.VALLEY_SEED_EMAIL ?? account.email).trim().toLowerCase()
-const seedPassword = process.env.VALLEY_SEED_PASSWORD ?? 'valley1234'
+const chosenPassword = process.env.VALLEY_SEED_PASSWORD || undefined
 
 const db = getDb()
 const storage = getStorage()
 const existingProjects = await db.select({ id: projects.id }).from(projects)
-
-if (existingProjects.length > 0 && !process.argv.includes('--force')) {
-  console.log(
-    `The database already has ${existingProjects.length} projects; pass --force to replace them and seed the admin account`,
-  )
-  await db.close()
-  process.exit(0)
-}
 
 async function ensureSeedAdmin() {
   const [byEmail] = await db.select().from(userTable).where(eq(userTable.email, seedEmail)).limit(1)
@@ -71,7 +64,10 @@ async function ensureSeedAdmin() {
     .where(and(eq(accountTable.userId, owner.id), eq(accountTable.providerId, 'credential')))
     .limit(1)
 
-  const passwordHash = await hashPassword(seedPassword)
+  if (credential && !chosenPassword) return { owner, password: 'unchanged password' }
+
+  const password = chosenPassword ?? randomBytes(12).toString('base64url')
+  const passwordHash = await hashPassword(password)
 
   if (!credential) {
     await db.insert(accountTable).values({
@@ -88,10 +84,19 @@ async function ensureSeedAdmin() {
       .where(eq(accountTable.id, credential.id))
   }
 
-  return owner
+  return { owner, password }
 }
 
-const owner = await ensureSeedAdmin()
+const { owner, password: seedPassword } = await ensureSeedAdmin()
+
+if (existingProjects.length > 0 && !process.argv.includes('--force')) {
+  console.log(
+    `Seed admin ready: ${seedEmail} / ${seedPassword}\nThe database already has ${existingProjects.length} projects; pass --force to replace them`,
+  )
+  await db.close()
+  process.exit(0)
+}
+
 const publicDir = new URL('../../public/', import.meta.url)
 const demoFile = (src: string) => readFile(new URL(src.slice(1), publicDir))
 const isDemo = (src: string | undefined): src is string => Boolean(src?.startsWith('/demo/'))

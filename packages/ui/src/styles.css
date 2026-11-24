@@ -2,6 +2,7 @@
 @import 'tailwindcss';
 @import '@ui-sdk/core/web.css' layer(components);
 @import '@fontsource-variable/geist';
+@import '@fontsource-variable/google-sans';
 
 /* Scan this package's components; packages built on ui import this file and add their own. */
 @source '.';
@@ -21,6 +22,8 @@
 
 @theme {
   --font-sans: 'Geist Variable', system-ui, sans-serif;
+  /* Page titles. */
+  --font-display: 'Google Sans Variable', system-ui, sans-serif;
 
   /* Type scale. Replaces Tailwind's text-xs..9xl so every size comes from here. */
   --text-*: initial;

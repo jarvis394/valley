@@ -4,8 +4,10 @@ import { MailCheck } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { AuthCard } from '../../components/auth/auth-card'
 import { AuthColumn } from '../../components/auth/auth-column'
+import { part } from '../../components/auth/auth-form'
 import { getSessionState } from '../../data/backend'
 import { authClient } from '../../lib/auth'
+import { withViewTransition } from '../../lib/view-transition'
 
 export const Route = createFileRoute('/_auth/forgot-password')({
   head: () => ({ meta: [{ title: 'Reset password · Valley' }] }),
@@ -32,30 +34,44 @@ function ForgotPasswordPage() {
       email,
       redirectTo: `${window.location.origin}/reset-password`,
     })
-    setPending(false)
-
     if (result.error) {
+      setPending(false)
       setError(result.error.message || 'Could not send reset email. Try again.')
 
       return
     }
 
-    setSentTo(email)
+    withViewTransition(() => {
+      setPending(false)
+      setSentTo(email)
+    })
   }
 
   return (
     <AuthColumn
       footer={
-        <Button variant="ghost" render={<Link to="/login" viewTransition />}>
+        <Button
+          variant="ghost"
+          size="lg"
+          style={part('switch')}
+          render={<Link to="/login" viewTransition />}
+        >
           Back to sign in
         </Button>
       }
     >
       <div className="flex flex-col items-center gap-1.5 text-center">
-        <h1 className="text-display font-medium tracking-tight text-fg">Forgot password</h1>
-        <p className="text-body text-fg/63">Enter your email and we will send you a reset link</p>
+        <h1
+          className="font-display text-display font-medium tracking-tight text-fg"
+          style={part('title')}
+        >
+          Forgot password
+        </h1>
+        <p className="text-body text-fg/63" style={part('subtitle')}>
+          Enter your email and we will send you a reset link
+        </p>
       </div>
-      <AuthCard>
+      <AuthCard style={part('card')}>
         {sentTo ? (
           <div role="status" className="flex flex-col gap-3 select-text">
             <p className="flex items-center gap-2 text-body font-medium text-fg">
@@ -67,12 +83,14 @@ function ForgotPasswordPage() {
               reset your password.
             </p>
             <div className="pt-1">
-              <LinkButton onClick={() => setSentTo(null)}>Send another link</LinkButton>
+              <LinkButton onClick={() => withViewTransition(() => setSentTo(null))}>
+                Send another link
+              </LinkButton>
             </div>
           </div>
         ) : (
           <form onSubmit={submit} className="flex flex-col gap-3">
-            <Field variant="form" label="Email" error={error}>
+            <Field variant="form" label="Email" style={part('email')} error={error}>
               <TextInput
                 name="email"
                 type="email"
@@ -88,6 +106,7 @@ function ForgotPasswordPage() {
               variant="primary"
               size="lg"
               className="mt-1 w-full"
+              style={part('submit')}
               loading={pending}
             >
               Send reset link

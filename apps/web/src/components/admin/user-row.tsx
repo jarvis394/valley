@@ -12,7 +12,7 @@ import {
 } from '@valley/ui'
 import { ShieldCheck, ShieldOff, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { approveUser, deleteAdminUser, setUserRole } from '../../data/backend'
+import { approveUser, declineUser, deleteAdminUser, setUserRole } from '../../data/backend'
 import type { AdminUser } from '../../data/types'
 
 type ConfirmedAction = 'decline' | 'promote' | 'demote' | 'delete'
@@ -89,7 +89,9 @@ export function UserRow({ user, isMe }: { user: AdminUser; isMe: boolean }) {
         ? setUserRole({ data: { id: user.id, role: 'admin' } })
         : shown === 'demote'
           ? setUserRole({ data: { id: user.id, role: 'user' } })
-          : deleteAdminUser({ data: user.id })
+          : shown === 'decline'
+            ? declineUser({ data: user.id })
+            : deleteAdminUser({ data: user.id })
 
     void request
       .then(async () => {

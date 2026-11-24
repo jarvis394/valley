@@ -103,7 +103,12 @@ export function Field({
 }) {
   const styles = VARIANTS[variant]
   const shownError = useLastMessage(error)
-  const labelElement = label && <BaseField.Label className={styles.label}>{label}</BaseField.Label>
+  // The label's padding fills the gap above the control, so hover holds while the pointer crosses it.
+  const labelElement = label && (
+    <BaseField.Label className={cn(styles.label, 'pb-1.5', !labelEnd && '-mb-1.5')}>
+      {label}
+    </BaseField.Label>
+  )
 
   return (
     <BaseField.Root
@@ -112,7 +117,7 @@ export function Field({
       className={cn('flex min-w-0 flex-col gap-1.5', className)}
     >
       {labelEnd ? (
-        <div className="flex items-center justify-between gap-2">
+        <div className="-mb-1.5 flex items-start justify-between gap-2">
           {labelElement}
           {labelEnd}
         </div>

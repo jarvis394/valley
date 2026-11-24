@@ -3,10 +3,13 @@ import { z } from 'zod'
 import {
   approveAdminUser,
   changeAdminUserRole,
+  declineAdminUser,
+  finishSetup,
   loadAdminUsers,
   loadAuthConfig,
   loadPendingUsersCount,
   loadProfileSettings,
+  loadSetupRequired,
   loadSessionState,
   removeAdminUser,
   saveProfileName,
@@ -30,6 +33,19 @@ export const updateProfileName = createServerFn({ method: 'POST' })
   .validator(z.string().trim().min(1).max(64))
   .handler(({ data }) => saveProfileName(data))
 
+export const getSetupRequired = createServerFn().handler(() => loadSetupRequired())
+
+export const completeSetup = createServerFn({ method: 'POST' })
+  .validator(
+    z.object({
+      token: z.string().min(1),
+      name: z.string().trim().min(1).max(64),
+      email: z.string().trim().toLowerCase().pipe(z.email()),
+      password: z.string().min(8).max(128),
+    }),
+  )
+  .handler(({ data }) => finishSetup(data))
+
 export const listAdminUsers = createServerFn().handler(() => loadAdminUsers())
 
 export const getPendingUsersCount = createServerFn().handler(() => loadPendingUsersCount())
@@ -41,6 +57,10 @@ export const approveUser = createServerFn({ method: 'POST' })
 export const setUserRole = createServerFn({ method: 'POST' })
   .validator(z.object({ id: z.string().min(1), role: z.enum(['user', 'admin']) }))
   .handler(({ data }) => changeAdminUserRole(data.id, data.role))
+
+export const declineUser = createServerFn({ method: 'POST' })
+  .validator(z.string().min(1))
+  .handler(({ data }) => declineAdminUser(data))
 
 export const deleteAdminUser = createServerFn({ method: 'POST' })
   .validator(z.string().min(1))

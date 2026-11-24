@@ -111,6 +111,26 @@ export async function setUserRole(db: Db, actorId: string, targetId: string, rol
   return 'updated' as const
 }
 
+export async function declineUser(db: Db, storage: Storage, targetId: string) {
+  const isPending = and(eq(user.id, targetId), isNull(user.approvedAt), ne(user.role, 'admin'))
+  const [pending] = await db.select({ id: user.id }).from(user).where(isPending).limit(1)
+
+  if (!pending) {
+    const [exists] = await db
+      .select({ id: user.id })
+      .from(user)
+      .where(eq(user.id, targetId))
+      .limit(1)
+    if (!exists) throw new BackendError('not-found', 'User not found')
+    throw new BackendError('conflict', 'This user was already approved')
+  }
+
+  await cleanupUserStorage(db, storage, targetId)
+  await db.delete(user).where(isPending)
+
+  return 'declined' as const
+}
+
 export async function deleteAdminUser(db: Db, storage: Storage, actorId: string, targetId: string) {
   if (actorId === targetId) {
     throw new BackendError('conflict', 'cannot_delete_self')

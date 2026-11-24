@@ -54,7 +54,9 @@ function SettingsPage() {
             >
               Projects
             </Button>
-            <h1 className="text-display font-medium tracking-tight text-fg">Settings</h1>
+            <h1 className="font-display text-display font-medium tracking-tight text-fg">
+              Settings
+            </h1>
           </div>
           {profile.isAdmin && (
             <Button variant="secondary" size="sm" render={<Link to="/admin/users" />}>

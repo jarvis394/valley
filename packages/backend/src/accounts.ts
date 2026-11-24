@@ -6,7 +6,7 @@ import { BackendError } from './errors'
 import { refKey, storeRef } from './refs'
 
 const AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
-const MAX_AVATAR_BYTES = 5 * 1024 * 1024
+export const MAX_AVATAR_BYTES = 5 * 1024 * 1024
 const AVATAR_SIZE = 512
 
 /** Earliest admin (or earliest user), which owns the public portfolio. */

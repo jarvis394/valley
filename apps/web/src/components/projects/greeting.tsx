@@ -33,7 +33,7 @@ export function Greeting({ name }: { name: string }) {
       )}
       style={{ fontFamily: getFont('google-sans-flex').family }}
     >
-      <h1 className="text-display">
+      <h1 className="font-display text-display">
         Good {part}, {name.split(' ')[0]}
       </h1>
       <p className="text-heading font-light">{PARTS_OF_DAY[part]}</p>

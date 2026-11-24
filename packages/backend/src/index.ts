@@ -22,13 +22,17 @@ export {
   firstAccount,
   getAccountViews,
   hasCredentialAccount,
+  MAX_AVATAR_BYTES,
   updateProfileAvatar,
   updateProfileName,
 } from './accounts'
 
+export { completeSetup, isSetupComplete, setupToken, type SetupInput } from './setup'
+
 export {
   approveUser,
   countPendingUsers,
+  declineUser,
   deleteAdminUser,
   listUsers,
   setUserRole,

@@ -5,6 +5,7 @@ export { Avatar } from './components/avatar'
 export { Badge } from './components/badge'
 
 export { Button, ButtonGroup, IconButton, LinkButton } from './components/button'
+export { CopyButton, useCopy } from './components/copy-button'
 
 export { Card, CardRow } from './components/card'
 
